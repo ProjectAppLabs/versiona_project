@@ -1,7 +1,65 @@
-import { expect, test } from '../../test-with-coverage';
+import { expect, test, type Page } from '../../test-with-coverage';
 import { A2_INVITE_TEAM } from '../../helpers/flow-tags';
 import { waitForEmail } from '../../helpers/mailpit';
+import { viewportUse } from '../../helpers/viewports';
 import { openSeededProject, uniqueEmail } from '../../helpers/versiona';
+
+const LONG_MEMBER_EMAIL = `responsable-${'departamento'.repeat(8)}@versiona.test`;
+const LONG_PENDING_EMAIL = `invitado-${'departamento'.repeat(8)}@versiona.test`;
+const MAILPIT_API = process.env.MAILPIT_API ?? 'http://127.0.0.1:8025';
+
+async function mockLongEmailRows(page: Page): Promise<void> {
+  await page.route('**/api/projects/*/members/', async (route) => {
+    if (route.request().method() !== 'GET') return route.continue();
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ results: [{ id: 1, email: LONG_MEMBER_EMAIL, role: 'admin' }] }),
+    });
+  });
+  await page.route('**/api/projects/*/invitations/', async (route) => {
+    if (route.request().method() !== 'GET') return route.continue();
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        results: [{
+          public_id: '00000000-0000-4000-8000-000000000001',
+          email: LONG_PENDING_EMAIL,
+          role: 'reviewer',
+          status: 'pending',
+          invited_by: LONG_MEMBER_EMAIL,
+          created_at: '2026-09-30T00:00:00Z',
+        }],
+      }),
+    });
+  });
+}
+
+async function assertLongEmailLayout(page: Page, memberRow: ReturnType<Page['getByText']>, pendingRow: ReturnType<Page['getByText']>): Promise<void> {
+  const viewportWidth = await page.evaluate(() => window.innerWidth);
+  const controls = ['invite-email', 'invite-role', 'send-invite', `revoke-${LONG_PENDING_EMAIL}`]
+    .map((testId) => page.getByTestId(testId));
+  const controlMetrics = await Promise.all(controls.map(async (control) => {
+    const box = await control.boundingBox();
+    return box === null ? { insideViewport: false, touchTarget: false } : {
+      insideViewport: box.x + box.width <= viewportWidth,
+      touchTarget: box.height >= 44,
+    };
+  }));
+  const emailMetrics = await Promise.all([memberRow, pendingRow].map((row) => row.evaluate((element) => {
+    const style = window.getComputedStyle(element);
+    const rect = element.getBoundingClientRect();
+    return {
+      clipped: element.scrollWidth > element.clientWidth,
+      hasEllipsis: style.textOverflow === 'ellipsis',
+      hasNoWrap: style.whiteSpace === 'nowrap',
+      insideViewport: rect.right <= window.innerWidth,
+    };
+  })));
+  expect(controlMetrics.every(({ insideViewport, touchTarget }) => insideViewport && touchTarget)).toBe(true);
+  expect(emailMetrics.every(({ clipped, hasEllipsis, hasNoWrap, insideViewport }) => (
+    !clipped && !hasEllipsis && !hasNoWrap && insideViewport
+  ))).toBe(true);
+}
 
 test.describe('A2 — Invitar al equipo', () => {
   test.slow();
@@ -35,11 +93,11 @@ test.describe('A2 — Invitar al equipo', () => {
       const inviteePage = await inviteeContext.newPage();
       // El token viaja en el cuerpo del email; lo recuperamos vía API pública
       const adminApi = await adminContext.request.get(
-        'http://127.0.0.1:8025/api/v1/search?query=' + encodeURIComponent(`to:${invitee}`)
+        `${MAILPIT_API}/api/v1/search?query=${encodeURIComponent(`to:${invitee}`)}`
       );
       const messages = (await adminApi.json()).messages;
       const detail = await adminContext.request.get(
-        `http://127.0.0.1:8025/api/v1/message/${messages[0].ID}`
+        `${MAILPIT_API}/api/v1/message/${messages[0].ID}`
       );
       const body = (await detail.json()).Text as string;
       const token = body.match(/\/invite\/([\w-]+)/)?.[1];
@@ -110,6 +168,45 @@ test.describe('A2 — Invitar al equipo', () => {
         await expect(
           page.getByTestId('invitations-list').locator('li', { hasText: invitee })
         ).toHaveCount(1);
+      }
+    );
+  });
+
+  test.describe('miembros responsivos', () => {
+    test.use({ ...viewportUse('portrait'), storageState: 'e2e/.auth/admin.json' });
+
+    test(
+      'A2-R01 — a 835 px los correos largos conservan lectura y acciones de invitación',
+      {
+        tag: [
+          ...A2_INVITE_TEAM,
+          '@scenario:a2-r01',
+          '@outcome:display',
+          '@viewport:portrait',
+        ],
+      },
+      async ({ page }) => {
+        // quality: allow-duplicate (per-viewport contract: a2-invite-team @ 835)
+        // Catches: a long member or pending-invitation email that truncates,
+        // pushes its revoke action outside the tablet viewport, or shrinks the
+        // invitation controls below a touch target.
+        await mockLongEmailRows(page);
+        await openSeededProject(page);
+        await page.getByTestId('project-settings-link').click();
+        await page.waitForURL(/\/settings$/);
+        const memberRow = page.getByTestId('members-section').getByText(LONG_MEMBER_EMAIL, { exact: true });
+        await expect(memberRow).toHaveCount(1);
+
+        const invitee = uniqueEmail('portrait-invite');
+        await page.getByTestId('invite-email').fill(invitee);
+        await page.getByTestId('invite-role').selectOption('reviewer');
+        await expect(page.getByTestId('invite-email')).toHaveValue(invitee);
+        const pendingRow = page.getByTestId('invitations-list').getByText(LONG_PENDING_EMAIL, { exact: false });
+        await expect(pendingRow).toHaveCount(1);
+        await assertLongEmailLayout(page, memberRow, pendingRow);
+        await expect
+          .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth))
+          .toBe(true);
       }
     );
   });

@@ -1,8 +1,32 @@
-import { expect, test } from '../../test-with-coverage';
+import { expect, test, type Page } from '../../test-with-coverage';
 import { B2_PROJECTS_BOARD } from '../../helpers/flow-tags';
+import { viewportUse } from '../../helpers/viewports';
 import { createProject, uniqueName, uploadPdf } from '../../helpers/versiona';
 
 test.use({ storageState: 'e2e/.auth/editor.json' });
+
+async function createProjectWithLongDescription(page: Page, name: string, description: string): Promise<void> {
+  await page.goto('/projects');
+  await page.getByRole('link', { name: 'Nuevo proyecto' }).click();
+  await page.waitForURL(/\/projects\/new$/);
+  await page.getByTestId('project-name').fill(name);
+  await page.getByTestId('project-description').fill(description);
+  await page.getByTestId('project-submit').click();
+  await expect(page.getByTestId('upload-dropzone')).toBeVisible({ timeout: 15_000 });
+}
+
+async function visualTextMetrics(locator: ReturnType<Page['getByText']>) {
+  return locator.evaluate((element) => {
+    const style = window.getComputedStyle(element);
+    return {
+      horizontallyClipped: element.scrollWidth > element.clientWidth,
+      verticallyClipped: element.scrollHeight > element.clientHeight,
+      hasEllipsis: style.textOverflow === 'ellipsis',
+      hasNoWrap: style.whiteSpace === 'nowrap',
+      hasLineClamp: style.webkitLineClamp !== 'none',
+    };
+  });
+}
 
 test.describe('B2 — Tablero completo', () => {
   test.slow();
@@ -51,4 +75,89 @@ test.describe('B2 — Tablero completo', () => {
       ).toBeVisible({ timeout: 15_000 });
     }
   );
+
+  test.describe('controles responsivos', () => {
+    test.use(viewportUse('compact'));
+
+    test(
+      'B2-R01 — a 412 px la búsqueda y el filtro conservan la tarjeta creada dentro del tablero',
+      {
+        tag: [
+          ...B2_PROJECTS_BOARD,
+          '@scenario:b2-r01',
+          '@outcome:display',
+          '@viewport:compact',
+        ],
+      },
+      async ({ page }) => {
+        // quality: allow-duplicate (per-viewport contract: b2-projects-board @ 412)
+        // Catches: a compact filter bar that leaves its select, search, or CTA
+        // outside the projects module after a member creates a project.
+        const name = `${'Proyecto de seguimiento documental '.repeat(3)}${uniqueName('compact')}`;
+        const description = 'Descripción extensa del proyecto para confirmar que la tarjeta conserva todo el contenido visible '.repeat(3);
+        await createProjectWithLongDescription(page, name, description);
+
+        await page.getByRole('link', { name: 'Panel' }).click();
+        await page.waitForURL(/\/projects$/);
+        await page.getByTestId('board-search').fill(name);
+        await page.getByTestId('board-status-filter').selectOption('active');
+
+        const cardTitle = page.getByTestId('projects-grid').getByText(name, { exact: true });
+        const cardDescription = page.getByTestId('projects-grid').getByText(description, { exact: true });
+        await expect(cardTitle).toHaveCount(1);
+        await expect(cardDescription).toHaveCount(1);
+
+        const viewportWidth = await page.evaluate(() => window.innerWidth);
+        const controls = [
+          page.getByTestId('board-status-filter'),
+          page.getByTestId('board-search'),
+          page.getByRole('link', { name: 'Nuevo proyecto' }),
+        ];
+        const controlMetrics = await Promise.all(controls.map(async (control) => {
+          const box = await control.boundingBox();
+          return box === null
+            ? { insideViewport: false, touchTarget: false }
+            : { insideViewport: box.x + box.width <= viewportWidth, touchTarget: box.height >= 44 };
+        }));
+        const textMetrics = await Promise.all([cardTitle, cardDescription].map(visualTextMetrics));
+        expect(controlMetrics.every(({ insideViewport, touchTarget }) => insideViewport && touchTarget)).toBe(true);
+        expect(textMetrics.every(({ horizontallyClipped, verticallyClipped, hasEllipsis, hasNoWrap, hasLineClamp }) => (
+          !horizontallyClipped && !verticallyClipped && !hasEllipsis && !hasNoWrap && !hasLineClamp
+        ))).toBe(true);
+      }
+    );
+  });
+
+  test.describe('distribución landscape', () => {
+    test.use(viewportUse('landscape'));
+
+    test(
+      'B2-R02 — a 1195 px la búsqueda y el filtro conservan el tablero sin desborde',
+      {
+        tag: [
+          ...B2_PROJECTS_BOARD,
+          '@scenario:b2-r02',
+          '@outcome:display',
+          '@viewport:landscape',
+        ],
+      },
+      async ({ page }) => {
+        // quality: allow-duplicate (per-viewport contract: b2-projects-board @ 1195)
+        // Catches: a compact-layout repair that overflows again when the board
+        // returns to its horizontal landscape distribution.
+        const name = uniqueName('Landscape board project');
+        await createProject(page, name);
+
+        await page.getByRole('link', { name: 'Panel' }).click();
+        await page.waitForURL(/\/projects$/);
+        await page.getByTestId('board-search').fill(name);
+        await page.getByTestId('board-status-filter').selectOption('active');
+
+        await expect(page.getByTestId('projects-grid').getByText(name, { exact: true })).toHaveCount(1);
+        await expect
+          .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth))
+          .toBe(true);
+      }
+    );
+  });
 });
