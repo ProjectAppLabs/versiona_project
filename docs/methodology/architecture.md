@@ -58,6 +58,15 @@ surfaces: landing revamp with dual CTA, /precios (live catalog + static fallback
 402 sites; flow contract v2.2.0 (36 flows); CI green (OCR system deps, mailpit
 service, quality-gate parser fixes).
 
+**Ronda de mantenimiento — 2026-09-30:** el historial de versiones carga autor,
+existencia de sellos/revisiones y último resumen válido de checks con anotaciones
+específicas del listado, conservando el payload y los fallbacks del serializer.
+La limpieza de comparaciones públicas expiradas avanza por claves crecientes en
+lotes sin cargar resultados JSON. Proyectos conserva cinco columnas del checklist
+en tableta vertical, envuelve filtros y correos largos y mantiene controles
+accesibles. El desborde del Header compacto queda para layout. QA validó los
+presupuestos y los recorridos de uso sin debilitar los triggers de inmutabilidad.
+
 **Next**: operator-gated go-public items — deployment (DP-21), domain+SMTP (DP-22),
 Ed25519 key rotation/custody (DP-24), Wompi checkout keys (F1 payment leg), optional
 It10: public certificate verification (/verificar + QR).

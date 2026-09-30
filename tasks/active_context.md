@@ -3,7 +3,24 @@
 > Memory Bank core file: current focus, recent changes, next steps. Updated every session
 > that changes project state.
 
-**Last updated**: 2026-07-23
+**Last updated**: 2026-09-30
+
+## Rendimiento, responsividad y QA (2026-09-30)
+
+Ronda aplicada sobre una base aislada: la línea de tiempo de versiones obtiene la
+misma información visible con relaciones y resúmenes de checks precargados, y la
+limpieza de comparaciones públicas vencidas avanza en lotes acotados sin cargar
+sus resultados JSON. En el módulo de proyectos, filtros, formularios, ajustes e
+invitaciones respetan controles táctiles y envuelven los textos largos sin cambiar
+la distribución de cinco columnas del checklist que ya cabe en tableta vertical.
+
+QA confirmó 18 casos pytest y 9 Playwright, con el control estricto de los cinco
+archivos tocados sin errores ni advertencias. Los recorridos propietarios B2, B3
+y A2 se ejecutaron sobre la base privada de la sesión, incluyendo entrega de correo
+y lectura del token en un buzón local. Entrega: [PR #34](https://github.com/ProjectAppLabs/versiona_project/pull/34) hacia master. El `Header` compartido conserva un overflow horizontal
+preexistente en ancho compacto; se registró para una futura ronda de layout y no
+se atribuye al módulo de proyectos. La lista general de documentos quedó
+diagnosticada: su autorización compartida excedía el presupuesto de esta ronda.
 
 ## Ronda de cobertura total de escenarios (2026-07-23)
 
@@ -46,7 +63,7 @@ E2E harness ports (env-parameterized after a foreign fleet server squatted :3000
   comparator; authed paths never pass it explicitly (byte-identical behavior).
 - Frontend public routes: `/`, `/precios`, `/comparar[/:id]`, `/manual`, auth pages.
   `publicApi` (no interceptors) is the client for AllowAny endpoints.
-- Flow contract: `frontend/e2e/flow-definitions.json` v2.2.0 — 36 flows; f1-billing is
+- Flow contract: `frontend/e2e/flow-definitions.json` v2.2.1 — 37 flows; f1-billing is
   honestly scoped (no online checkout).
 
 ## Next steps (operator-gated — in order of launch impact)

@@ -154,7 +154,7 @@
       ],
       "priority": "P1",
       "description": "Admin invites an email with a role; invitee accepts and lands directly on the project. Member and pending-invitation rows remain readable with long addresses in the project settings view (docs/plan/01 A2)",
-      "expectedSpecs": 1,
+      "expectedSpecs": 3,
       "outcomes": [
         "success",
         "error",
@@ -169,7 +169,7 @@
       ],
       "priority": "P1",
       "description": "Member creates a project with name only and lands on the empty project with the upload dropzone (docs/plan/01 B1)",
-      "expectedSpecs": 1,
+      "expectedSpecs": 3,
       "outcomes": [
         "success",
         "error"
@@ -183,7 +183,7 @@
       ],
       "priority": "P2",
       "description": "Board shows derived states, filters by state and searches by name and content; its local controls and complete card text remain usable across the supported project-module viewports (docs/plan/01 B2)",
-      "expectedSpecs": 1,
+      "expectedSpecs": 3,
       "outcomes": [
         "display"
       ]
@@ -196,7 +196,7 @@
       ],
       "priority": "P2",
       "description": "Admin edits checklist/section owners/approval rules creating a new config version, including an editable five-column checklist that remains usable in portrait tablet (docs/plan/01 B3)",
-      "expectedSpecs": 1,
+      "expectedSpecs": 3,
       "outcomes": [
         "success",
         "failure"
@@ -448,7 +448,7 @@
       ],
       "priority": "P2",
       "description": "Archiving locks writes; deletion needs the exact name, lands in the org trash and is restorable; sealed projects only archive (T4) (docs/audit/03 B4)",
-      "expectedSpecs": 1,
+      "expectedSpecs": 2,
       "outcomes": [
         "success",
         "error"
