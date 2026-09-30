@@ -8,6 +8,8 @@ from engine.services.analysis import OcrRequiredError
 
 from .models import PublicComparison
 
+PUBLIC_COMPARISON_PURGE_BATCH_SIZE = 100
+
 
 @shared_task(name='public_tools.tasks.run_public_comparison', soft_time_limit=120)
 def run_public_comparison(comparison_pk: int) -> None:
@@ -46,9 +48,16 @@ def purge_expired_public_comparisons() -> int:
     from .services.public_comparison_service import delete_stored_files
 
     expired = PublicComparison.objects.filter(expires_at__lt=timezone.now())
+    last_pk = 0
     purged = 0
-    for comparison in expired:
-        delete_stored_files(comparison)  # covers rows whose worker died mid-job
-        comparison.delete()
-        purged += 1
+    while batch := list(
+        expired.filter(pk__gt=last_pk).order_by('pk').only('pk', 'public_id')[
+            :PUBLIC_COMPARISON_PURGE_BATCH_SIZE
+        ]
+    ):
+        last_pk = batch[-1].pk
+        for comparison in batch:
+            delete_stored_files(comparison)  # covers rows whose worker died mid-job
+            comparison.delete()
+            purged += 1
     return purged
