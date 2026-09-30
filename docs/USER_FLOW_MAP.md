@@ -4,11 +4,11 @@
 
 Use this document to understand each flow's steps, branching conditions, role restrictions,
 and API contracts before writing or reviewing E2E tests. Flow ids map 1:1 to
-`frontend/e2e/flow-definitions.json` (v2.2.0) and to the founding-artifact flow ids
+`frontend/e2e/flow-definitions.json` (v2.2.1) and to the founding-artifact flow ids
 (A1…F1) planned in `docs/plan/01-alcance-mvp.md`.
 
-**Version:** 2.2.0
-**Last Updated:** 2026-08-13
+**Version:** 2.2.1
+**Last Updated:** 2026-09-30
 
 > Maintenance rule (docs/plan/09 DoD #4): each vertical iteration rewrites the sheets of the
 > flows it ships and flips them from *Planned* to *Implemented*. Acceptance criteria live in
@@ -23,13 +23,16 @@ and API contracts before writing or reviewing E2E tests. Flow ids map 1:1 to
 3. [Auth Module](#auth-module)
 4. [Planned Versiona Modules](#planned-versiona-modules)
 5. [Cross-Reference](#cross-reference)
+6. [Roles and Conventions](#roles-and-conventions)
+7. [Projects — interactions by role](#projects--interactions-by-role)
+8. [E2E Coverage Index](#e2e-coverage-index)
 
 ---
 
 ## Module Index
 
 > **Status governance (updated 2026-08-13)**: the authoritative status per flow is
-> `frontend/e2e/flow-definitions.json` (v2.2.0, 37 flows) + the flow-coverage CI report;
+> `frontend/e2e/flow-definitions.json` (v2.2.1, 37 flows) + the flow-coverage CI report;
 > the audit trail lives in `docs/audit/`. Every flow below is **Implemented** and E2E
 > covered; the "(ItN)" suffix records the iteration that shipped it, not a pending
 > target — the previous revision of this table still read "Planned (ItN)" for 15 flows
@@ -208,3 +211,57 @@ it (see the Module Index status column for the shipping iteration).
 > file (B3+E3, F1+F2, and separately E4+E2 in `e4-e2-certificate-saved.spec.ts`).
 > Every path above was confirmed against `find frontend/e2e -name "*.spec.ts"` and the
 > `@flow:` tag constants in `frontend/e2e/helpers/flow-tags.ts` on 2026-08-13.
+
+## Roles and Conventions
+
+Viewer consulta proyectos y documentos; editor también crea proyectos; admin del
+proyecto configura checks y administra invitaciones. Los permisos siguen las
+reglas existentes del backend. Esta ronda cambia la presentación de proyectos,
+sin agregar rutas ni acciones.
+
+Las pruebas usan `data-testid` o roles accesibles y los tags `@flow` / `@outcome`
+existentes. Una prueba de display debe navegar por la UI y comprobar datos de la
+fixture. Los tamaños de `docs/RESPONSIVE_STANDARDS.md` son portrait primero
+(835×1194), compact (412×915), landscape (1195×835), desktop (1440×900) y wide
+(2560×1440). En compact se miden los controles de proyectos: el Header compartido
+mantiene un desborde previo registrado fuera del alcance de este módulo.
+
+## Projects — interactions by role
+
+### Viewer
+
+| Ruta / flujo | Interacción | Outcome | Resultado observable |
+|---|---|---|---|
+| `/projects` — B2 | Navegar mediante Panel, buscar un nombre y elegir Active | display | Aparece exactamente la tarjeta buscada; títulos y descripciones completos; filtro, búsqueda y creación caben en compact |
+
+El tablero permite buscar y filtrar; la validación al crear corresponde a B1 y
+los fallos del servidor al guardar configuración corresponden a B3.
+
+### Editor
+
+| Ruta / flujo | Interacción | Outcome | Resultado observable |
+|---|---|---|---|
+| `/projects/new` — B1 | Abrir Nuevo proyecto, completar un nombre y enviar | success | Se abre el detalle con el nombre creado |
+| `/projects/new` — B1 | Enviar un nombre inválido | error | La validación conserva el formulario y no crea un proyecto |
+
+### Admin del proyecto
+
+| Ruta / flujo | Interacción | Outcome | Resultado observable |
+|---|---|---|---|
+| `/projects/[id]/settings` — B3 | Abrir ajustes desde el detalle, agregar/editar un check, guardar y recargar | success | Se confirma una nueva versión de configuración; persiste la etiqueta editada; campos y acciones admiten uso táctil en portrait |
+| `/projects/[id]/settings` — B3 | Intentar guardar cuando falla el servidor | failure | Se muestra el error y sigue disponible el formulario sin guardar |
+| `/projects/[id]/settings` — A2 | Abrir ajustes, completar el correo y elegir un rol | display | Los correos completos de miembros e invitaciones se ajustan al ancho portrait; Enviar y Revocar siguen accesibles |
+| `/projects/[id]/settings` — A2 | Enviar una invitación válida | success | Aparece pendiente con correo y rol elegidos; al aceptarla se abre el proyecto |
+| `/projects/[id]/settings` — A2 | Intentar invitar sin permiso | error | El servidor rechaza el intento sin crear la invitación |
+
+## E2E Coverage Index
+
+| Flujo | Outcomes declarados | Spec dueño |
+|---|---|---|
+| B1 | success, error | `e2e/app/projects/b1-create-project.spec.ts` |
+| B2 | display | `e2e/app/projects/b2-board-search.spec.ts` (compact + landscape) |
+| B3 | success, failure | `e2e/app/projects/b3-e3-governance.spec.ts` (persistencia en portrait) |
+| A2 | success, error, display | `e2e/app/onboarding/a2-invite-team.spec.ts` (correos largos en portrait) |
+
+La auditoría automática calcula la cobertura real. Estas filas declaran qué se
+debe validar; mencionar un spec aquí no le otorga crédito de cobertura.

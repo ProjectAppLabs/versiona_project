@@ -1,6 +1,6 @@
 {
-  "version": "2.2.0",
-  "lastUpdated": "2026-08-13",
+  "version": "2.2.1",
+  "lastUpdated": "2026-09-30",
   "flows": {
     "home-loads": {
       "name": "Landing page loads",
@@ -153,11 +153,12 @@
         "admin"
       ],
       "priority": "P1",
-      "description": "Admin invites an email with a role; invitee accepts and lands directly on the project (docs/plan/01 A2)",
+      "description": "Admin invites an email with a role; invitee accepts and lands directly on the project. Member and pending-invitation rows remain readable with long addresses in the project settings view (docs/plan/01 A2)",
       "expectedSpecs": 1,
       "outcomes": [
         "success",
-        "error"
+        "error",
+        "display"
       ]
     },
     "b1-create-project": {
@@ -181,7 +182,7 @@
         "viewer"
       ],
       "priority": "P2",
-      "description": "Board shows derived states, filters by state and searches by name and content (docs/plan/01 B2)",
+      "description": "Board shows derived states, filters by state and searches by name and content; its local controls and complete card text remain usable across the supported project-module viewports (docs/plan/01 B2)",
       "expectedSpecs": 1,
       "outcomes": [
         "display"
@@ -194,7 +195,7 @@
         "admin"
       ],
       "priority": "P2",
-      "description": "Admin edits checklist/section owners/approval rules creating a new config version (docs/plan/01 B3)",
+      "description": "Admin edits checklist/section owners/approval rules creating a new config version, including an editable five-column checklist that remains usable in portrait tablet (docs/plan/01 B3)",
       "expectedSpecs": 1,
       "outcomes": [
         "success",
