@@ -89,7 +89,11 @@ def document_restore(request, doc):
 def document_versions(request, doc):
     """Timeline C3-F01: alive versions + trashed tombstones (C4-F01)."""
     document: Document = request.resolved_object
-    queryset = DocumentVersion.all_objects.filter(document=document).order_by('-number')
+    from .queries import with_version_list_data
+
+    queryset = with_version_list_data(
+        DocumentVersion.all_objects.filter(document=document).order_by('-number')
+    )
     paginator = PageNumberPagination()
     page = paginator.paginate_queryset(queryset, request)
     return paginator.get_paginated_response(VersionListSerializer(page, many=True).data)
