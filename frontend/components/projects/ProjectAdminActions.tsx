@@ -65,7 +65,7 @@ export function ProjectAdminActions({ projectId }: { projectId: string }) {
       <div className="flex flex-wrap gap-2">
         <button
           data-testid="archive-project"
-          className="rounded-full border border-border px-4 py-2 text-sm hover:bg-accent"
+          className="min-h-11 rounded-full border border-border px-4 py-2 text-sm hover:bg-accent"
           onClick={() => void archiveToggle()}
           type="button"
         >
@@ -73,7 +73,7 @@ export function ProjectAdminActions({ projectId }: { projectId: string }) {
         </button>
         <button
           data-testid="trash-project"
-          className="rounded-full border border-destructive/50 px-4 py-2 text-sm text-destructive hover:bg-destructive/10"
+          className="min-h-11 rounded-full border border-destructive/50 px-4 py-2 text-sm text-destructive hover:bg-destructive/10"
           onClick={() => setConfirmOpen(true)}
           type="button"
         >

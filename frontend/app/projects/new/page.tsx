@@ -77,7 +77,7 @@ export default function NewProjectPage() {
           <span className="text-muted-foreground">{t.name}</span>
           <input
             data-testid="project-name"
-            className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2"
+            className="mt-1 min-h-11 w-full rounded-lg border border-border bg-background px-3 py-2 text-base sm:text-sm"
             value={name}
             onChange={(event) => setName(event.target.value)}
             autoFocus
@@ -87,7 +87,7 @@ export default function NewProjectPage() {
           <span className="text-muted-foreground">{t.description}</span>
           <textarea
             data-testid="project-description"
-            className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2"
+            className="mt-1 min-h-11 w-full rounded-lg border border-border bg-background px-3 py-2 text-base sm:text-sm"
             rows={3}
             value={description}
             onChange={(event) => setDescription(event.target.value)}
@@ -100,7 +100,7 @@ export default function NewProjectPage() {
         ) : null}
         <button
           data-testid="project-submit"
-          className="rounded-full bg-primary px-5 py-2.5 text-sm text-primary-foreground disabled:opacity-50"
+          className="min-h-11 rounded-full bg-primary px-5 py-2.5 text-sm text-primary-foreground disabled:opacity-50"
           disabled={isSubmitting}
           type="submit"
         >

@@ -40,17 +40,17 @@ export default function ProjectPage() {
     <main className="mx-auto max-w-5xl px-6 py-10">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold">{t.title}</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
         <Link
           data-testid="project-settings-link"
-          className="rounded-full border border-border px-4 py-2 text-sm hover:bg-accent"
+          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-border px-4 py-2 text-sm hover:bg-accent"
           href={`/projects/${projectId}/settings`}
         >
           ⚙
         </Link>
         <input
           data-testid="documents-search"
-          className="w-56 rounded-full border border-border bg-background px-4 py-2 text-sm"
+          className="min-h-11 w-56 max-w-full rounded-full border border-border bg-background px-4 py-2 text-base sm:text-sm"
           placeholder={common.search}
           value={list.search}
           onChange={(event) => list.setSearch(event.target.value)}
@@ -90,7 +90,7 @@ export default function ProjectPage() {
                     </div>
                   )}
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium">{document.title}</p>
+                    <p className="break-words font-medium [overflow-wrap:anywhere]">{document.title}</p>
                     <p className="text-xs text-muted-foreground">
                       {t.version} v{document.latest_number}
                       {document.latest_version?.message

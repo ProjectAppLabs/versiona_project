@@ -155,7 +155,7 @@ export default function ProjectSettingsPage() {
                   <span className="text-muted-foreground">{t.d5Mode}</span>
                   <select
                     data-testid="config-d5-mode"
-                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2"
+                    className="mt-1 min-h-11 w-full rounded-lg border border-border bg-background px-3 py-2 text-base sm:text-sm"
                     value={config.d5_mode}
                     onChange={(event) =>
                       setConfig({ ...config, d5_mode: event.target.value as 'auto' | 'coordinator' })
@@ -169,7 +169,7 @@ export default function ProjectSettingsPage() {
                   <span className="text-muted-foreground">{t.approval}</span>
                   <select
                     data-testid="config-approval"
-                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2"
+                    className="mt-1 min-h-11 w-full rounded-lg border border-border bg-background px-3 py-2 text-base sm:text-sm"
                     value={String(config.approval_policy.required ?? 1)}
                     onChange={(event) =>
                       setConfig({
@@ -194,7 +194,7 @@ export default function ProjectSettingsPage() {
                   <h2 className="text-sm font-semibold">{t.checklist}</h2>
                   <button
                     data-testid="add-check"
-                    className="rounded-full border border-border px-3 py-1.5 text-xs hover:bg-accent"
+                    className="min-h-11 rounded-full border border-border px-3 py-1.5 text-sm hover:bg-accent"
                     onClick={() =>
                       setConfig({
                         ...config,
@@ -219,11 +219,11 @@ export default function ProjectSettingsPage() {
                   {config.checklist.map((item, index) => (
                     <li
                       key={item.key}
-                      className="grid grid-cols-1 gap-2 rounded-xl border border-border bg-card p-3 sm:grid-cols-[1fr_auto_1fr_auto_auto]"
+                      className="grid grid-cols-1 gap-2 rounded-xl border border-border bg-card p-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_auto]"
                     >
                       <input
                         data-testid={`check-label-${index}`}
-                        className="rounded-lg border border-border bg-background px-2 py-1.5 text-sm"
+                        className="min-h-11 min-w-0 rounded-lg border border-border bg-background px-2 py-1.5 text-base sm:text-sm"
                         placeholder={t.checkLabel}
                         aria-label={t.checkLabel}
                         value={item.label}
@@ -232,7 +232,7 @@ export default function ProjectSettingsPage() {
                       <select
                         data-testid={`check-type-${index}`}
                         aria-label={t.checkType}
-                        className="rounded-lg border border-border bg-background px-2 py-1.5 text-sm"
+                        className="min-h-11 min-w-0 rounded-lg border border-border bg-background px-2 py-1.5 text-base sm:text-sm"
                         value={item.type}
                         onChange={(event) =>
                           setChecklist(index, { type: event.target.value as CheckItem['type'] })
@@ -244,7 +244,7 @@ export default function ProjectSettingsPage() {
                       </select>
                       <input
                         data-testid={`check-param-${index}`}
-                        className="rounded-lg border border-border bg-background px-2 py-1.5 text-sm"
+                        className="min-h-11 min-w-0 rounded-lg border border-border bg-background px-2 py-1.5 text-base sm:text-sm"
                         placeholder={t.checkParam}
                         aria-label={t.checkParam}
                         value={item.param}
@@ -252,7 +252,7 @@ export default function ProjectSettingsPage() {
                       />
                       <select
                         aria-label={t.checkSeverity}
-                        className="rounded-lg border border-border bg-background px-2 py-1.5 text-sm"
+                        className="min-h-11 min-w-0 rounded-lg border border-border bg-background px-2 py-1.5 text-base sm:text-sm"
                         value={item.severity}
                         onChange={(event) =>
                           setChecklist(index, {
@@ -265,7 +265,7 @@ export default function ProjectSettingsPage() {
                       </select>
                       <button
                         aria-label={t.remove}
-                        className="text-xs text-destructive underline-offset-2 hover:underline"
+                        className="min-h-11 min-w-11 text-sm text-destructive underline-offset-2 hover:underline"
                         onClick={() =>
                           setConfig({
                             ...config,
@@ -282,12 +282,12 @@ export default function ProjectSettingsPage() {
               </section>
 
               {templates.length > 0 ? (
-                <section className="flex items-end gap-2">
-                  <label className="block flex-1 text-sm">
+                <section className="flex flex-wrap items-end gap-2">
+                  <label className="block min-w-0 flex-1 text-sm">
                     <span className="text-muted-foreground">{t.applyTemplate}</span>
                     <select
                       data-testid="template-select"
-                      className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2"
+                      className="mt-1 min-h-11 w-full rounded-lg border border-border bg-background px-3 py-2 text-base sm:text-sm"
                       value={selectedTemplate}
                       onChange={(event) => setSelectedTemplate(event.target.value)}
                     >
@@ -300,7 +300,7 @@ export default function ProjectSettingsPage() {
                     </select>
                   </label>
                   <button
-                    className="rounded-full border border-border px-4 py-2 text-sm hover:bg-accent"
+                    className="min-h-11 rounded-full border border-border px-4 py-2 text-sm hover:bg-accent"
                     disabled={!selectedTemplate}
                     onClick={() => void applyTemplate()}
                     type="button"
@@ -312,7 +312,7 @@ export default function ProjectSettingsPage() {
 
               <button
                 data-testid="save-config"
-                className="self-start rounded-full bg-primary px-5 py-2.5 text-sm text-primary-foreground disabled:opacity-50"
+                className="min-h-11 self-start rounded-full bg-primary px-5 py-2.5 text-sm text-primary-foreground disabled:opacity-50"
                 disabled={isSaving}
                 onClick={() => void save()}
                 type="button"
