@@ -47,3 +47,20 @@ banned_tokens:
   - "coverage"
   - "cov"
   - "deep"
+
+# --- Performance (consumido por /perf-pass; el quality gate lo IGNORA) ---
+# performance_dataset_ceiling: ["documents.DocumentVersion=10000"]
+performance_query_budget_default: 6
+# performance_query_budget_detail: 4
+# performance_query_budget_mutation: 8
+# performance_page_size_max: 100
+# performance_task_budget_s: 30
+# performance_payload_kb: 256
+# performance_bundle_kb: ["initial=300", "route=150"]
+# performance_index_threshold_rows: 10000
+# performance_paths: ["documents=backend/documents/views.py,backend/documents/serializers.py,backend/documents/queries.py"]
+# performance_exclude: []
+# performance_project_doc: docs/methodology/performance-standard.md
+# performance_host_override: vps-projectapp-staging
+# performance_budget_tests: ["backend/documents/tests/views/test_version_list_budget.py", "backend/public_tools/tests/test_public_comparison_purge_budget.py"]
+# performance_silk_reports: backend/logs/silk-reports

@@ -78,7 +78,9 @@ def _consume_backup_code(user, code: str) -> bool:
 
 def verify_code(user, code: str) -> bool:
     """A TOTP code or an unused backup code."""
-    code = (code or '').strip()
+    if not isinstance(code, str):
+        return False
+    code = code.strip()
     if not code:
         return False
     if user.totp_secret and pyotp.TOTP(user.totp_secret).verify(code, valid_window=1):
@@ -98,20 +100,31 @@ def disable(user, code: str):
 
 
 def issue_challenge(user) -> str:
-    """Signed, short-lived proof that the password step passed."""
+    """Signed, short-lived proof that the first authentication step passed."""
     return signing.dumps({'user': user.pk}, salt=CHALLENGE_SALT)
 
 
 def resolve_challenge(challenge: str):
     from django.contrib.auth import get_user_model
 
+    invalid_challenge = 'Desafío inválido o vencido.'
+    if not isinstance(challenge, str) or not challenge:
+        raise DomainError(invalid_challenge, 401)
     try:
         payload = signing.loads(challenge, salt=CHALLENGE_SALT, max_age=CHALLENGE_MAX_AGE)
-    except signing.SignatureExpired as exc:
-        raise DomainError('El desafío venció: vuelve a iniciar sesión.', 401) from exc
-    except signing.BadSignature as exc:
-        raise DomainError('Desafío inválido.', 401) from exc
-    return get_user_model().objects.get(pk=payload['user'])
+    except (signing.BadSignature, ValueError, TypeError) as exc:
+        raise DomainError(invalid_challenge, 401) from exc
+    if not isinstance(payload, dict) or type(payload.get('user')) is not int:
+        raise DomainError(invalid_challenge, 401)
+
+    user_model = get_user_model()
+    try:
+        user = user_model.objects.get(pk=payload['user'])
+    except (user_model.DoesNotExist, ValueError, TypeError, OverflowError) as exc:
+        raise DomainError(invalid_challenge, 401) from exc
+    if not user.is_active or not user.totp_enabled_at:
+        raise DomainError(invalid_challenge, 401)
+    return user
 
 
 # ── Active sessions (refresh tokens) ───────────────────────────────────────

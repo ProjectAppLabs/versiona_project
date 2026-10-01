@@ -21,7 +21,20 @@
 
 **MVP feature-complete**: 19 flows E2E green (`docs/audit/05-cierre.md` "MISIÓN
 CUMPLIDA") + It9 public surfaces. Flow contract: `frontend/e2e/flow-definitions.json`
-v2.2.0 (36 flows).
+v2.2.2 (37 flows).
+
+## Rondas de mantenimiento
+
+- **2026-10-01 — mejora transversal:** identidad Google vinculada
+  a claims verificados, segundo factor obligatorio también por Google y análisis
+  recuperable por etapas. Se seleccionaron tres candidatos globales mediante el
+  ledger común; los otros frentes conservan trabajo pendiente. Se amplía el PR #34
+  por decisión del operador, sin merge ni cambios en el checkout del servicio.
+- **2026-09-30 — rendimiento, proyectos y QA:** historial con consultas de metadatos
+  acotadas y limpieza de comparaciones públicas por lotes; controles táctiles y
+  textos completos en proyectos. QA confirmó 18 casos backend y 9 de navegador.
+  El Header compacto queda para su módulo layout; la autorización de la lista
+  general de documentos requiere una ronda propia. Entrega mediante PR #34.
 
 ## It9 delivered (2026-07-22) — freemium à la iLovePDF
 

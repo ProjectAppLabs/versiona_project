@@ -19,6 +19,13 @@ def _thumb_url(version):
 
 class CheckSummaryMixin:
     def get_check_summary(self, obj):
+        if hasattr(obj, '_list_check_run_id'):
+            if obj._list_check_run_id is None:
+                return None
+            return {
+                outcome: getattr(obj, f'_list_check_{outcome}')
+                for outcome in ('pass', 'warn', 'fail')
+            }
         from checks.services import summary_for
 
         return summary_for(obj)
@@ -27,7 +34,7 @@ class CheckSummaryMixin:
 class VersionListSerializer(CheckSummaryMixin, serializers.ModelSerializer):
     author_email = serializers.EmailField(source='author.email', default=None)
     thumb_url = serializers.SerializerMethodField()
-    is_draft = serializers.BooleanField(read_only=True)
+    is_draft = serializers.SerializerMethodField()
     is_trashed = serializers.BooleanField(read_only=True)
     # E3 traffic light: {pass, warn, fail} of the latest check run (or null).
     check_summary = serializers.SerializerMethodField()
@@ -43,6 +50,11 @@ class VersionListSerializer(CheckSummaryMixin, serializers.ModelSerializer):
 
     def get_thumb_url(self, obj):
         return _thumb_url(obj)
+
+    def get_is_draft(self, obj):
+        if hasattr(obj, '_list_has_seal'):
+            return not (obj.is_approved or obj._list_has_seal or obj._list_has_open_review)
+        return obj.is_draft
 
 
 class SectionSerializer(serializers.ModelSerializer):

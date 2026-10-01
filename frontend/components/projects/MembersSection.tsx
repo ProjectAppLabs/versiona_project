@@ -71,9 +71,9 @@ export function MembersSection({ projectId }: { projectId: string }) {
         {members.map((member) => (
           <li
             key={member.id}
-            className="flex items-center justify-between rounded-xl border border-border bg-card px-3 py-2 text-sm"
+            className="flex flex-wrap items-start justify-between gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm sm:items-center"
           >
-            <span>{member.email}</span>
+            <span className="min-w-0 flex-1 break-words [overflow-wrap:anywhere]">{member.email}</span>
             <StatusBadge variant="neutral">
               {projects.role[member.role as keyof typeof projects.role] ?? member.role}
             </StatusBadge>
@@ -82,11 +82,11 @@ export function MembersSection({ projectId }: { projectId: string }) {
       </ul>
 
       <div className="mt-4 flex flex-wrap items-end gap-2">
-        <label className="block flex-1 text-sm">
+        <label className="block min-w-0 flex-[1_1_12rem] text-sm">
           <span className="text-muted-foreground">{t.email}</span>
           <input
             data-testid="invite-email"
-            className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2"
+            className="mt-1 min-h-11 w-full rounded-lg border border-border bg-background px-3 py-2 text-base sm:text-sm"
             type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
@@ -96,7 +96,7 @@ export function MembersSection({ projectId }: { projectId: string }) {
           <span className="text-muted-foreground">{t.role}</span>
           <select
             data-testid="invite-role"
-            className="mt-1 rounded-lg border border-border bg-background px-3 py-2"
+            className="mt-1 min-h-11 rounded-lg border border-border bg-background px-3 py-2 text-base sm:text-sm"
             value={role}
             onChange={(event) => setRole(event.target.value)}
           >
@@ -109,7 +109,7 @@ export function MembersSection({ projectId }: { projectId: string }) {
         </label>
         <button
           data-testid="send-invite"
-          className="rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
+          className="min-h-11 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
           disabled={!email.trim()}
           onClick={() => void invite()}
           type="button"
@@ -123,15 +123,15 @@ export function MembersSection({ projectId }: { projectId: string }) {
           {invitations.map((invitation) => (
             <li
               key={invitation.public_id}
-              className="flex items-center justify-between gap-2 rounded-xl border border-dashed border-border px-3 py-2 text-sm"
+              className="flex flex-wrap items-start justify-between gap-2 rounded-xl border border-dashed border-border px-3 py-2 text-sm sm:items-center"
             >
-              <span className="truncate">
+              <span className="min-w-0 flex-1 break-words [overflow-wrap:anywhere]">
                 {invitation.email}
                 <span className="ml-2 text-xs text-muted-foreground">
                   ({projects.role[invitation.role as keyof typeof projects.role] ?? invitation.role})
                 </span>
               </span>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <StatusBadge
                   variant={
                     invitation.status === 'accepted'
@@ -146,7 +146,7 @@ export function MembersSection({ projectId }: { projectId: string }) {
                 {invitation.status === 'pending' ? (
                   <button
                     data-testid={`revoke-${invitation.email}`}
-                    className="text-xs text-destructive underline-offset-2 hover:underline"
+                    className="min-h-11 min-w-11 text-sm text-destructive underline-offset-2 hover:underline"
                     onClick={() =>
                       void api
                         .post(`projects/${projectId}/invitations/${invitation.public_id}/revoke/`)

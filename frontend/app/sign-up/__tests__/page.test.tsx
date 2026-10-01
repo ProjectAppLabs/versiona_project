@@ -73,6 +73,7 @@ describe('SignUpPage', () => {
     mockGoogleCredential = 'token';
     mockGoogleError = false;
     process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID = 'test-client';
+    window.history.pushState({}, '', '/sign-up');
   });
 
   afterEach(() => {
@@ -224,7 +225,7 @@ describe('SignUpPage', () => {
   });
 
   it('handles Google registration success', async () => {
-    const googleLogin = jest.fn().mockResolvedValue(undefined);
+    const googleLogin = jest.fn().mockResolvedValue({ requires2fa: false });
     setAuthStoreState({ signUp: jest.fn(), googleLogin });
     const replace = jest.fn();
     mockUseRouter.mockReturnValue({ replace });
@@ -247,6 +248,67 @@ describe('SignUpPage', () => {
         family_name: 'User',
         picture: 'pic.png',
       });
+    });
+    expect(replace).toHaveBeenCalledWith('/onboarding');
+  });
+
+  it('shows the TOTP form for a Google registration challenge', async () => {
+    const googleLogin = jest.fn().mockResolvedValue({ requires2fa: true, challenge: 'challenge-1' });
+    const replace = jest.fn();
+    setAuthStoreState({ signUp: jest.fn(), signIn2fa: jest.fn(), googleLogin });
+    mockUseRouter.mockReturnValue({ replace });
+    mockJwtDecode.mockReturnValue({ email: 'google@example.com' });
+
+    render(<SignUpPage />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Google Login' }));
+
+    // Fails if Google registration enters onboarding before the requested second factor.
+    expect(await screen.findByTestId('twofa-step')).toHaveTextContent('Verificación en dos pasos');
+    expect(screen.getByTestId('twofa-verify')).toHaveTextContent('Verificar');
+    expect(replace).not.toHaveBeenCalled();
+  });
+
+  it('keeps the TOTP form after an invalid Google registration code', async () => {
+    const googleLogin = jest.fn().mockResolvedValue({ requires2fa: true, challenge: 'challenge-1' });
+    const signIn2fa = jest.fn().mockRejectedValue({ response: { data: { error: 'Código rechazado' } } });
+    const replace = jest.fn();
+    setAuthStoreState({ signUp: jest.fn(), signIn2fa, googleLogin });
+    mockUseRouter.mockReturnValue({ replace });
+    mockJwtDecode.mockReturnValue({ email: 'google@example.com' });
+
+    render(<SignUpPage />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Google Login' }));
+    await screen.findByTestId('twofa-step');
+    fireEvent.change(screen.getByTestId('twofa-code'), { target: { value: '123456' } });
+    fireEvent.click(screen.getByTestId('twofa-verify'));
+
+    // Fails if a rejected registration code loses the TOTP challenge or disables retry.
+    expect(await screen.findByRole('alert')).toHaveTextContent('Código rechazado');
+    expect(screen.getByTestId('twofa-code')).toHaveValue('123456');
+    expect(screen.getByTestId('twofa-verify')).toBeEnabled();
+    expect(replace).not.toHaveBeenCalled();
+  });
+
+  it('routes to onboarding after verifying a Google registration challenge', async () => {
+    const googleLogin = jest.fn().mockResolvedValue({ requires2fa: true, challenge: 'challenge-1' });
+    const signIn2fa = jest.fn().mockResolvedValue(undefined);
+    const replace = jest.fn();
+    setAuthStoreState({ signUp: jest.fn(), signIn2fa, googleLogin });
+    mockUseRouter.mockReturnValue({ replace });
+    mockJwtDecode.mockReturnValue({ email: 'google@example.com' });
+
+    render(<SignUpPage />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Google Login' }));
+    await screen.findByTestId('twofa-step');
+    fireEvent.change(screen.getByTestId('twofa-code'), { target: { value: '123456' } });
+    fireEvent.click(screen.getByTestId('twofa-verify'));
+
+    // Fails if verified Google registration submits a different challenge or skips onboarding.
+    await waitFor(() => {
+      expect(signIn2fa).toHaveBeenCalledWith({ challenge: 'challenge-1', code: '123456' });
     });
     expect(replace).toHaveBeenCalledWith('/onboarding');
   });
@@ -276,7 +338,7 @@ describe('SignUpPage', () => {
   });
 
   it('continues when jwt decode fails', async () => {
-    const googleLogin = jest.fn().mockResolvedValue(undefined);
+    const googleLogin = jest.fn().mockResolvedValue({ requires2fa: false });
     setAuthStoreState({ signUp: jest.fn(), googleLogin });
     const replace = jest.fn();
     mockUseRouter.mockReturnValue({ replace });

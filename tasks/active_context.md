@@ -3,7 +3,37 @@
 > Memory Bank core file: current focus, recent changes, next steps. Updated every session
 > that changes project state.
 
-**Last updated**: 2026-07-23
+**Last updated**: 2026-10-01
+
+## Ronda transversal de mejora (2026-10-01)
+
+Implementadas sobre la rama propia del PR #34: identidad Google vinculada a
+claims verificados, segundo factor obligatorio en ese acceso y análisis
+recuperable desde fases confirmadas. El motor común eligió tres causas globales
+(`I-S-cae2f9667fc6`, `I-S-f775b80c4455`, `I-O-478a8866d0d5`).
+La autoría de QA incluye claims inválidos, desafíos vigentes, pantallas de
+código y recuperación por fase. La evidencia de ejecución y entrega del SHA
+final se conserva en el reporte canónico del toolkit:
+`docs/audits/2026-10-01-versiona_project_staging-improvement-pass-project-transversal.md`. El entorno de pruebas usa un MySQL privado en el puerto 3309 y schemas
+propios, sin reutilizar la base del deploy. Los demás hallazgos quedan pendientes
+por cupo o por evidencia; esta ronda no declara suficiente ningún frente.
+
+## Rendimiento, responsividad y QA (2026-09-30)
+
+Ronda aplicada sobre una base aislada: la línea de tiempo de versiones obtiene la
+misma información visible con relaciones y resúmenes de checks precargados, y la
+limpieza de comparaciones públicas vencidas avanza en lotes acotados sin cargar
+sus resultados JSON. En el módulo de proyectos, filtros, formularios, ajustes e
+invitaciones respetan controles táctiles y envuelven los textos largos sin cambiar
+la distribución de cinco columnas del checklist que ya cabe en tableta vertical.
+
+QA confirmó 18 casos pytest y 9 Playwright, con el control estricto de los cinco
+archivos tocados sin errores ni advertencias. Los recorridos propietarios B2, B3
+y A2 se ejecutaron sobre la base privada de la sesión, incluyendo entrega de correo
+y lectura del token en un buzón local. Entrega: [PR #34](https://github.com/ProjectAppLabs/versiona_project/pull/34) hacia master. El `Header` compartido conserva un overflow horizontal
+preexistente en ancho compacto; se registró para una futura ronda de layout y no
+se atribuye al módulo de proyectos. La lista general de documentos quedó
+diagnosticada: su autorización compartida excedía el presupuesto de esta ronda.
 
 ## Ronda de cobertura total de escenarios (2026-07-23)
 
@@ -46,7 +76,7 @@ E2E harness ports (env-parameterized after a foreign fleet server squatted :3000
   comparator; authed paths never pass it explicitly (byte-identical behavior).
 - Frontend public routes: `/`, `/precios`, `/comparar[/:id]`, `/manual`, auth pages.
   `publicApi` (no interceptors) is the client for AllowAny endpoints.
-- Flow contract: `frontend/e2e/flow-definitions.json` v2.2.0 — 36 flows; f1-billing is
+- Flow contract: `frontend/e2e/flow-definitions.json` v2.2.1 — 37 flows; f1-billing is
   honestly scoped (no online checkout).
 
 ## Next steps (operator-gated — in order of launch impact)

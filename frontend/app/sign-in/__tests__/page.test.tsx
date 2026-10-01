@@ -75,6 +75,7 @@ describe('SignInPage', () => {
     mockGoogleCredential = 'token';
     mockGoogleError = false;
     process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID = 'test-client';
+    window.history.pushState({}, '', '/sign-in');
     user = userEvent.setup();
   });
 
@@ -161,7 +162,7 @@ describe('SignInPage', () => {
   });
 
   it('handles Google login success', async () => {
-    const googleLogin = jest.fn().mockResolvedValue(undefined);
+    const googleLogin = jest.fn().mockResolvedValue({ requires2fa: false });
     setAuthStoreState({ signIn: jest.fn().mockResolvedValue({ requires2fa: false }), googleLogin });
     const replace = jest.fn();
     mockUseRouter.mockReturnValue({ replace });
@@ -186,6 +187,106 @@ describe('SignInPage', () => {
       });
     });
     expect(replace).toHaveBeenCalledWith('/projects');
+  });
+
+  it('shows the TOTP form for a Google challenge', async () => {
+    const googleLogin = jest.fn().mockResolvedValue({ requires2fa: true, challenge: 'challenge-1' });
+    const replace = jest.fn();
+    setAuthStoreState({
+      signIn: jest.fn().mockResolvedValue({ requires2fa: false }),
+      signIn2fa: jest.fn(),
+      googleLogin,
+    });
+    mockUseRouter.mockReturnValue({ replace });
+    mockJwtDecode.mockReturnValue({ email: 'google@example.com' });
+
+    render(<SignInPage />);
+
+    await user.click(screen.getByRole('button', { name: 'Google Login' }));
+
+    // Fails if a Google account with TOTP is redirected before its second factor.
+    expect(await screen.findByTestId('twofa-step')).toHaveTextContent('Verificación en dos pasos');
+    expect(screen.getByTestId('twofa-verify')).toHaveTextContent('Verificar');
+    expect(replace).not.toHaveBeenCalled();
+  });
+
+  it('keeps the TOTP form after an invalid Google challenge code', async () => {
+    const googleLogin = jest.fn().mockResolvedValue({ requires2fa: true, challenge: 'challenge-1' });
+    const signIn2fa = jest.fn().mockRejectedValue({ response: { data: { error: 'Código rechazado' } } });
+    const replace = jest.fn();
+    setAuthStoreState({
+      signIn: jest.fn().mockResolvedValue({ requires2fa: false }),
+      signIn2fa,
+      googleLogin,
+    });
+    mockUseRouter.mockReturnValue({ replace });
+    mockJwtDecode.mockReturnValue({ email: 'google@example.com' });
+
+    render(<SignInPage />);
+
+    await user.click(screen.getByRole('button', { name: 'Google Login' }));
+    await screen.findByTestId('twofa-step');
+    fireEvent.change(screen.getByTestId('twofa-code'), { target: { value: '123456' } });
+    fireEvent.click(screen.getByTestId('twofa-verify'));
+
+    // Fails if a rejected TOTP code discards the challenge or leaves the retry disabled.
+    expect(await screen.findByRole('alert')).toHaveTextContent('Código rechazado');
+    expect(screen.getByTestId('twofa-code')).toHaveValue('123456');
+    expect(screen.getByTestId('twofa-verify')).toBeEnabled();
+    expect(replace).not.toHaveBeenCalled();
+  });
+
+  it('routes to projects after verifying a Google challenge', async () => {
+    const googleLogin = jest.fn().mockResolvedValue({ requires2fa: true, challenge: 'challenge-1' });
+    const signIn2fa = jest.fn().mockResolvedValue(undefined);
+    const replace = jest.fn();
+    setAuthStoreState({
+      signIn: jest.fn().mockResolvedValue({ requires2fa: false }),
+      signIn2fa,
+      googleLogin,
+    });
+    mockUseRouter.mockReturnValue({ replace });
+    mockJwtDecode.mockReturnValue({ email: 'google@example.com' });
+
+    render(<SignInPage />);
+
+    await user.click(screen.getByRole('button', { name: 'Google Login' }));
+    await screen.findByTestId('twofa-step');
+    fireEvent.change(screen.getByTestId('twofa-code'), { target: { value: '123456' } });
+    await user.click(screen.getByTestId('twofa-verify'));
+
+    // Fails if the verified Google challenge is submitted with another challenge or code.
+    await waitFor(() => {
+      expect(signIn2fa).toHaveBeenCalledWith({ challenge: 'challenge-1', code: '123456' });
+    });
+    expect(replace).toHaveBeenCalledWith('/projects');
+  });
+
+  it('routes to the next path after verifying a Google challenge', async () => {
+    window.history.pushState({}, '', '/sign-in?next=/projects/id');
+    const googleLogin = jest.fn().mockResolvedValue({ requires2fa: true, challenge: 'challenge-1' });
+    const signIn2fa = jest.fn().mockResolvedValue(undefined);
+    const replace = jest.fn();
+    setAuthStoreState({
+      signIn: jest.fn().mockResolvedValue({ requires2fa: false }),
+      signIn2fa,
+      googleLogin,
+    });
+    mockUseRouter.mockReturnValue({ replace });
+    mockJwtDecode.mockReturnValue({ email: 'google@example.com' });
+
+    render(<SignInPage />);
+
+    await user.click(screen.getByRole('button', { name: 'Google Login' }));
+    await screen.findByTestId('twofa-step');
+    fireEvent.change(screen.getByTestId('twofa-code'), { target: { value: '123456' } });
+    await user.click(screen.getByTestId('twofa-verify'));
+
+    // Fails if second-factor completion drops the requested return path.
+    await waitFor(() => {
+      expect(signIn2fa).toHaveBeenCalledWith({ challenge: 'challenge-1', code: '123456' });
+    });
+    expect(replace).toHaveBeenCalledWith('/projects/id');
   });
 
   it('shows an error when Google credential is missing', async () => {
@@ -251,7 +352,7 @@ describe('SignInPage', () => {
   });
 
   it('continues when jwt decode fails', async () => {
-    const googleLogin = jest.fn().mockResolvedValue(undefined);
+    const googleLogin = jest.fn().mockResolvedValue({ requires2fa: false });
     setAuthStoreState({ signIn: jest.fn().mockResolvedValue({ requires2fa: false }), googleLogin });
     const replace = jest.fn();
     mockUseRouter.mockReturnValue({ replace });

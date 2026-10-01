@@ -1,5 +1,6 @@
 import { expect, test } from '../../test-with-coverage';
 import { B3_PROJECT_SETTINGS, E3_CONFIGURABLE_CHECKS } from '../../helpers/flow-tags';
+import { viewportUse } from '../../helpers/viewports';
 import { openSeededProject, uniqueName, uploadPdf } from '../../helpers/versiona';
 
 test.describe('B3 + E3 — Gobernanza del proyecto', () => {
@@ -88,4 +89,57 @@ test.describe('B3 + E3 — Gobernanza del proyecto', () => {
       await viewerContext.close();
     }
   );
+
+  test.describe('checklist responsiva', () => {
+    test.use({ ...viewportUse('portrait'), storageState: 'e2e/.auth/admin.json' });
+
+    test(
+      'B3-R01 — a 835 px el admin persiste un check sin comprimir sus controles',
+      {
+        tag: [
+          ...B3_PROJECT_SETTINGS,
+          '@scenario:b3-r01',
+          '@outcome:success',
+          '@viewport:portrait',
+        ],
+      },
+      async ({ page }) => {
+        // quality: allow-duplicate (per-viewport contract: b3-project-settings @ 835)
+        // Catches: checklist columns that squeeze controls below a touch target
+        // or discard a new check while saving the next configuration version.
+        await openSeededProject(page);
+        await page.getByTestId('project-settings-link').click();
+        await page.waitForURL(/\/settings$/);
+        await expect(page.getByTestId('project-config')).toBeVisible({ timeout: 20_000 });
+
+        const checkRows = page.getByTestId(/^check-label-/);
+        const initialCount = await checkRows.count();
+        const index = initialCount;
+        const label = uniqueName('Portrait checklist');
+        await page.getByTestId('add-check').click();
+        await expect(checkRows).toHaveCount(initialCount + 1);
+        await page.getByTestId(`check-label-${index}`).fill(label);
+        await page.getByTestId(`check-type-${index}`).selectOption('required_text');
+        await page.getByTestId(`check-param-${index}`).fill('portrait-proof');
+
+        const rowMetrics = await page.getByTestId(`check-label-${index}`).evaluate((input) =>
+          Array.from(input.parentElement?.querySelectorAll('input, select, button') ?? []).map(
+            (control) => ({ height: control.getBoundingClientRect().height })
+          )
+        );
+        expect(rowMetrics).toHaveLength(5);
+        expect(rowMetrics.every((metric) => metric.height >= 44)).toBe(true);
+
+        await page.getByTestId('save-config').click();
+        await expect(page.getByTestId('toaster')).toContainText(/Configuración v\d+ creada/, {
+          timeout: 15_000,
+        });
+        await page.reload();
+        await expect(page.getByTestId(`check-label-${index}`)).toHaveValue(label, { timeout: 15_000 });
+        await expect
+          .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth))
+          .toBe(true);
+      }
+    );
+  });
 });

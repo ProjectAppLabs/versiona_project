@@ -1,6 +1,6 @@
 {
-  "version": "2.2.0",
-  "lastUpdated": "2026-08-13",
+  "version": "2.2.2",
+  "lastUpdated": "2026-10-01",
   "flows": {
     "home-loads": {
       "name": "Landing page loads",
@@ -22,7 +22,7 @@
         "shared"
       ],
       "priority": "P2",
-      "description": "Sign-in page renders email/password fields and links to recovery",
+      "description": "Sign-in renders email/password and recovery controls. A successful first factor for an account with TOTP enabled replaces that form with the TOTP challenge; no session is created until the code succeeds.",
       "expectedSpecs": 1,
       "outcomes": [
         "display"
@@ -35,7 +35,7 @@
         "shared"
       ],
       "priority": "P1",
-      "description": "Sign-up page renders and validates password confirmation",
+      "description": "Sign-up renders and validates password confirmation. A Google login that legitimately returns a TOTP challenge replaces this form with the same second-factor form; a successful code lands on onboarding.",
       "expectedSpecs": 1,
       "outcomes": [
         "error"
@@ -48,7 +48,7 @@
         "shared"
       ],
       "priority": "P1",
-      "description": "Wrong credentials show an error and do not create a session",
+      "description": "Wrong credentials or an inactive account show an error and do not create a session. Invalid Google claims are rejected server-side; real Google OAuth remains an explicit backend/unit-only exemption.",
       "expectedSpecs": 1,
       "outcomes": [
         "error"
@@ -87,7 +87,7 @@
         "shared"
       ],
       "priority": "P1",
-      "description": "Valid credentials create a real session (cookies set) and land on /projects directly (no /dashboard hop); header shows Panel/Salir",
+      "description": "Valid password credentials for an account without TOTP create a real session and land on /projects directly. The TOTP completion branch belongs to A3.",
       "expectedSpecs": 1,
       "knownGaps": "Closed in It1 by the storageState harness + session spec",
       "outcomes": [
@@ -153,11 +153,12 @@
         "admin"
       ],
       "priority": "P1",
-      "description": "Admin invites an email with a role; invitee accepts and lands directly on the project (docs/plan/01 A2)",
-      "expectedSpecs": 1,
+      "description": "Admin invites an email with a role; invitee accepts and lands directly on the project. Member and pending-invitation rows remain readable with long addresses in the project settings view (docs/plan/01 A2)",
+      "expectedSpecs": 3,
       "outcomes": [
         "success",
-        "error"
+        "error",
+        "display"
       ]
     },
     "b1-create-project": {
@@ -168,7 +169,7 @@
       ],
       "priority": "P1",
       "description": "Member creates a project with name only and lands on the empty project with the upload dropzone (docs/plan/01 B1)",
-      "expectedSpecs": 1,
+      "expectedSpecs": 3,
       "outcomes": [
         "success",
         "error"
@@ -181,8 +182,8 @@
         "viewer"
       ],
       "priority": "P2",
-      "description": "Board shows derived states, filters by state and searches by name and content (docs/plan/01 B2)",
-      "expectedSpecs": 1,
+      "description": "Board shows derived states, filters by state and searches by name and content; its local controls and complete card text remain usable across the supported project-module viewports (docs/plan/01 B2)",
+      "expectedSpecs": 3,
       "outcomes": [
         "display"
       ]
@@ -194,8 +195,8 @@
         "admin"
       ],
       "priority": "P2",
-      "description": "Admin edits checklist/section owners/approval rules creating a new config version (docs/plan/01 B3)",
-      "expectedSpecs": 1,
+      "description": "Admin edits checklist/section owners/approval rules creating a new config version, including an editable five-column checklist that remains usable in portrait tablet (docs/plan/01 B3)",
+      "expectedSpecs": 3,
       "outcomes": [
         "success",
         "failure"
@@ -377,7 +378,7 @@
         "user"
       ],
       "priority": "P2",
-      "description": "TOTP enrolment, challenge on login and session revocation (docs/audit/03 A3)",
+      "description": "TOTP enrolment, active-session revocation, and completion of a challenge issued after password or validated Google first-factor login. A malformed, expired, disabled, deleted, or inactive-user challenge returns 401 and creates no session. Google OAuth itself remains exempt from real E2E because it depends on the external provider.",
       "expectedSpecs": 1,
       "outcomes": [
         "success",
@@ -447,7 +448,7 @@
       ],
       "priority": "P2",
       "description": "Archiving locks writes; deletion needs the exact name, lands in the org trash and is restorable; sealed projects only archive (T4) (docs/audit/03 B4)",
-      "expectedSpecs": 1,
+      "expectedSpecs": 2,
       "outcomes": [
         "success",
         "error"

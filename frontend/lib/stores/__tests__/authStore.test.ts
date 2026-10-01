@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from '@jest/globals';
+import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import { act } from '@testing-library/react';
 
 import { useAuthStore } from '../authStore';
@@ -42,6 +42,10 @@ describe('authStore', () => {
     mockGetRefreshToken.mockReturnValue(null);
   });
 
+  afterEach(() => {
+    localStorage.removeItem('user_data');
+  });
+
   it('syncs tokens from cookies', () => {
     mockGetAccessToken.mockReturnValue('access');
     mockGetRefreshToken.mockReturnValue('refresh');
@@ -60,6 +64,7 @@ describe('authStore', () => {
     mockGetAccessToken.mockReturnValue('access');
     mockGetRefreshToken.mockReturnValue('refresh');
     mockApi.post.mockResolvedValueOnce({
+      status: 200,
       data: {
         access: 'access',
         refresh: 'refresh',
@@ -74,13 +79,15 @@ describe('authStore', () => {
       },
     });
 
+    let result: unknown;
     await act(async () => {
-      await useAuthStore.getState().signIn({ email: 'user@example.com', password: 'password' });
+      result = await useAuthStore.getState().signIn({ email: 'user@example.com', password: 'password' });
     });
 
     expect(mockSetTokens).toHaveBeenCalledWith({ access: 'access', refresh: 'refresh' });
     expect(useAuthStore.getState().isAuthenticated).toBe(true);
     expect(useAuthStore.getState().user?.email).toBe('user@example.com');
+    expect(result).toEqual({ requires2fa: false });
   });
 
   it('throws when sign in response is missing tokens', async () => {
@@ -95,6 +102,7 @@ describe('authStore', () => {
     mockGetAccessToken.mockReturnValue('access');
     mockGetRefreshToken.mockReturnValue('refresh');
     mockApi.post.mockResolvedValueOnce({
+      status: 200,
       data: {
         access: 'access',
         refresh: 'refresh',
@@ -143,12 +151,90 @@ describe('authStore', () => {
       },
     });
 
+    let result: unknown;
     await act(async () => {
-      await useAuthStore.getState().googleLogin({ credential: 'token', email: 'google@example.com' });
+      result = await useAuthStore.getState().googleLogin({ credential: 'token', email: 'google@example.com' });
     });
 
     expect(mockSetTokens).toHaveBeenCalledWith({ access: 'access', refresh: 'refresh' });
     expect(useAuthStore.getState().isAuthenticated).toBe(true);
+    expect(result).toEqual({ requires2fa: false });
+  });
+
+  it('returns a second-factor challenge from sign in without authenticating', async () => {
+    mockApi.post.mockResolvedValueOnce({
+      status: 202,
+      data: {
+        requires_2fa: true,
+        challenge: 'challenge-1',
+        access: 'unexpected-access',
+        refresh: 'unexpected-refresh',
+        user: { id: 8, email: 'unexpected@example.com' },
+      },
+    });
+
+    // Fails if a pending TOTP challenge is persisted as an authenticated session.
+    const result = await useAuthStore.getState().signIn({ email: 'user@example.com', password: 'password' });
+
+    expect(result).toEqual({ requires2fa: true, challenge: 'challenge-1' });
+    expect(mockSetTokens).not.toHaveBeenCalled();
+    expect(localStorage.getItem('user_data')).toBeNull();
+    expect(useAuthStore.getState().isAuthenticated).toBe(false);
+  });
+
+  it('returns a second-factor challenge from Google login without authenticating', async () => {
+    mockApi.post.mockResolvedValueOnce({
+      status: 202,
+      data: {
+        requires_2fa: true,
+        challenge: 'challenge-1',
+        access: 'unexpected-access',
+        refresh: 'unexpected-refresh',
+        user: { id: 8, email: 'unexpected@example.com' },
+      },
+    });
+
+    // Fails if a pending Google TOTP challenge writes authentication state before verification.
+    const result = await useAuthStore.getState().googleLogin({ credential: 'token' });
+
+    expect(result).toEqual({ requires2fa: true, challenge: 'challenge-1' });
+    expect(mockSetTokens).not.toHaveBeenCalled();
+    expect(localStorage.getItem('user_data')).toBeNull();
+    expect(useAuthStore.getState().isAuthenticated).toBe(false);
+  });
+
+  it.each([
+    ['a missing second-factor marker', { challenge: 'challenge-1', access: 'access', refresh: 'refresh', user: { id: 8 } }],
+    ['a false second-factor marker', { requires_2fa: false, challenge: 'challenge-1', access: 'access', refresh: 'refresh', user: { id: 8 } }],
+    ['a non-string challenge', { requires_2fa: true, challenge: 123456, access: 'access', refresh: 'refresh', user: { id: 8 } }],
+    ['a blank challenge', { requires_2fa: true, challenge: '   ', access: 'access', refresh: 'refresh', user: { id: 8 } }],
+  ])('rejects sign in 202 response with %s', async (_label, data) => {
+    mockApi.post.mockResolvedValueOnce({ status: 202, data });
+
+    // Fails if token-shaped data lets a malformed sign-in challenge create a session.
+    await expect(useAuthStore.getState().signIn({ email: 'user@example.com', password: 'password' })).rejects.toThrow(
+      'Invalid challenge response'
+    );
+
+    expect(mockSetTokens).not.toHaveBeenCalled();
+    expect(localStorage.getItem('user_data')).toBeNull();
+    expect(useAuthStore.getState()).toMatchObject({ accessToken: null, refreshToken: null, user: null, isAuthenticated: false });
+  });
+
+  it.each([
+    ['a missing second-factor marker', { challenge: 'challenge-1', access: 'access', refresh: 'refresh', user: { id: 8 } }],
+    ['a false second-factor marker', { requires_2fa: false, challenge: 'challenge-1', access: 'access', refresh: 'refresh', user: { id: 8 } }],
+    ['a non-string challenge', { requires_2fa: true, challenge: 123456, access: 'access', refresh: 'refresh', user: { id: 8 } }],
+    ['a blank challenge', { requires_2fa: true, challenge: '   ', access: 'access', refresh: 'refresh', user: { id: 8 } }],
+  ])('rejects Google login 202 response with %s', async (_label, data) => {
+    mockApi.post.mockResolvedValueOnce({ status: 202, data });
+
+    // Fails if token-shaped data lets a malformed Google challenge create a session.
+    await expect(useAuthStore.getState().googleLogin({ credential: 'token' })).rejects.toThrow('Invalid challenge response');
+
+    expect(mockSetTokens).not.toHaveBeenCalled();
+    expect(localStorage.getItem('user_data')).toBeNull();
+    expect(useAuthStore.getState()).toMatchObject({ accessToken: null, refreshToken: null, user: null, isAuthenticated: false });
   });
 
   it('throws when google login response is missing tokens', async () => {
