@@ -2,7 +2,10 @@
 
 import pyotp
 import pytest
+from django.core import signing
+from freezegun import freeze_time
 from rest_framework.test import APIClient
+from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from accounts import twofactor
@@ -165,3 +168,99 @@ def test_revoke_others_keeps_the_current_refresh_usable(auth_client, user, api_c
     )
 
     assert refreshed.status_code == 200
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'challenge',
+    [
+        '',
+        'not-a-signed-challenge',
+        signing.dumps([], salt=twofactor.CHALLENGE_SALT),
+        signing.dumps({'user': '7'}, salt=twofactor.CHALLENGE_SALT),
+        signing.dumps({'user': True}, salt=twofactor.CHALLENGE_SALT),
+    ],
+    ids=['empty', 'bad-signature', 'signed-list', 'string-user-id', 'bool-user-id'],
+)
+def test_sign_in_2fa_rejects_malformed_challenges(challenge, api_client):
+    """Fails if malformed signed challenges escape the generic 401 admission error."""
+    outstanding_before = OutstandingToken.objects.count()
+
+    response = api_client.post(
+        '/api/sign_in/2fa/', {'challenge': challenge, 'code': '000000'}, format='json'
+    )
+
+    assert response.status_code == 401
+    assert response.data == {'error': 'Desafío inválido o vencido.'}
+    assert OutstandingToken.objects.count() == outstanding_before
+
+
+@pytest.mark.django_db
+def test_sign_in_2fa_rejects_an_expired_challenge(enabled_user, api_client):
+    """Fails if a stale first-factor proof can still mint a TOTP session."""
+    user, _secret, _backup_codes = enabled_user
+    with freeze_time('2026-10-01 10:00:00'):
+        challenge = twofactor.issue_challenge(user)
+    outstanding_before = OutstandingToken.objects.count()
+
+    with freeze_time('2026-10-01 10:06:00'):
+        response = api_client.post(
+            '/api/sign_in/2fa/', {'challenge': challenge, 'code': '000000'}, format='json'
+        )
+
+    assert response.status_code == 401
+    assert response.data == {'error': 'Desafío inválido o vencido.'}
+    assert OutstandingToken.objects.count() == outstanding_before
+
+
+@pytest.mark.django_db
+def test_sign_in_2fa_rejects_a_deleted_challenge_user(enabled_user, api_client):
+    """Fails if a challenge can authenticate a user removed after the first factor."""
+    user, _secret, _backup_codes = enabled_user
+    challenge = twofactor.issue_challenge(user)
+    user.delete()
+    outstanding_before = OutstandingToken.objects.count()
+
+    response = api_client.post(
+        '/api/sign_in/2fa/', {'challenge': challenge, 'code': '000000'}, format='json'
+    )
+
+    assert response.status_code == 401
+    assert response.data == {'error': 'Desafío inválido o vencido.'}
+    assert OutstandingToken.objects.count() == outstanding_before
+
+
+@pytest.mark.django_db
+def test_sign_in_2fa_rejects_an_inactive_challenge_user(enabled_user, api_client):
+    """Fails if account deactivation after the first factor still grants a session."""
+    user, _secret, _backup_codes = enabled_user
+    challenge = twofactor.issue_challenge(user)
+    user.is_active = False
+    user.save(update_fields=['is_active'])
+    outstanding_before = OutstandingToken.objects.count()
+
+    response = api_client.post(
+        '/api/sign_in/2fa/', {'challenge': challenge, 'code': '000000'}, format='json'
+    )
+
+    assert response.status_code == 401
+    assert response.data == {'error': 'Desafío inválido o vencido.'}
+    assert OutstandingToken.objects.count() == outstanding_before
+
+
+@pytest.mark.django_db
+def test_sign_in_2fa_rejects_a_user_with_disabled_totp_after_challenge(enabled_user, api_client):
+    """Fails if disabling TOTP after a challenge leaves a usable second-factor grant."""
+    user, _secret, _backup_codes = enabled_user
+    challenge = twofactor.issue_challenge(user)
+    user.totp_enabled_at = None
+    user.save(update_fields=['totp_enabled_at'])
+    outstanding_before = OutstandingToken.objects.count()
+
+    response = api_client.post(
+        '/api/sign_in/2fa/', {'challenge': challenge, 'code': '000000'}, format='json'
+    )
+
+    assert response.status_code == 401
+    assert response.data == {'error': 'Desafío inválido o vencido.'}
+    assert OutstandingToken.objects.count() == outstanding_before

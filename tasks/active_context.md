@@ -7,12 +7,14 @@
 
 ## Ronda transversal de mejora (2026-10-01)
 
-En curso sobre la rama propia del PR #34: validar la identidad Google antes de
-buscar una cuenta, exigir el segundo factor en ese acceso y reanudar el análisis
-desde fases confirmadas. El motor común eligió tres causas globales
+Implementadas sobre la rama propia del PR #34: identidad Google vinculada a
+claims verificados, segundo factor obligatorio en ese acceso y análisis
+recuperable desde fases confirmadas. El motor común eligió tres causas globales
 (`I-S-cae2f9667fc6`, `I-S-f775b80c4455`, `I-O-478a8866d0d5`).
-La aplicación es secuencial; QA validará la unión de capas sobre un SHA final
-limpio. El entorno de pruebas usa un MySQL privado en el puerto 3309 y schemas
+La autoría de QA incluye claims inválidos, desafíos vigentes, pantallas de
+código y recuperación por fase. La evidencia de ejecución y entrega del SHA
+final se conserva en el reporte canónico del toolkit:
+`docs/audits/2026-10-01-versiona_project_staging-improvement-pass-project-transversal.md`. El entorno de pruebas usa un MySQL privado en el puerto 3309 y schemas
 propios, sin reutilizar la base del deploy. Los demás hallazgos quedan pendientes
 por cupo o por evidencia; esta ronda no declara suficiente ningún frente.
 

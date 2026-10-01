@@ -69,7 +69,7 @@ en tableta vertical, envuelve filtros y correos largos y mantiene controles
 accesibles. El desborde del Header compacto queda para layout. QA validó los
 presupuestos y los recorridos de uso sin debilitar los triggers de inmutabilidad.
 
-**Ronda transversal — 2026-10-01 (QA pendiente):** el acceso Google toma la
+**Ronda transversal — 2026-10-01:** el acceso Google toma la
 identidad exclusivamente de claims verificados, con audience configurado y
 correo confirmado. Google y contraseña comprueban el estado vigente de la
 cuenta y exigen TOTP antes de emitir JWT. Un desafío firmado no sustituye esa

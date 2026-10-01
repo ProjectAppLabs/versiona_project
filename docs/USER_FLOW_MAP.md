@@ -4,11 +4,11 @@
 
 Use this document to understand each flow's steps, branching conditions, role restrictions,
 and API contracts before writing or reviewing E2E tests. Flow ids map 1:1 to
-`frontend/e2e/flow-definitions.json` (v2.2.1) and to the founding-artifact flow ids
+`frontend/e2e/flow-definitions.json` (v2.2.2) and to the founding-artifact flow ids
 (A1…F1) planned in `docs/plan/01-alcance-mvp.md`.
 
-**Version:** 2.2.1
-**Last Updated:** 2026-09-30
+**Version:** 2.2.2
+**Last Updated:** 2026-10-01
 
 > Maintenance rule (docs/plan/09 DoD #4): each vertical iteration rewrites the sheets of the
 > flows it ships and flips them from *Planned* to *Implemented*. Acceptance criteria live in
@@ -45,8 +45,8 @@ and API contracts before writing or reviewing E2E tests. Flow ids map 1:1 to
 | Flow ID | Name | Module | Priority | Roles | Frontend Route | Status |
 |---------|------|--------|----------|-------|----------------|--------|
 | `home-loads` | Landing page loads | home | P1 | shared | `/` | Implemented |
-| `auth-sign-in-form` | Sign-in form | auth | P2 | shared | `/sign-in` | Implemented |
-| `auth-sign-up-form` | Sign-up form | auth | P1 | shared | `/sign-up` | Implemented |
+| `auth-sign-in-form` | Sign-in + admisión TOTP | auth | P2 | shared | `/sign-in` | Implemented |
+| `auth-sign-up-form` | Sign-up + desafío TOTP de Google | auth | P1 | shared | `/sign-up` | Implemented |
 | `auth-login-invalid` | Invalid credentials rejected | auth | P1 | shared | `/sign-in` | Implemented |
 | `auth-protected-redirect` | Protected routes redirect | auth | P1 | guest | `/dashboard` | Implemented |
 | `auth-forgot-password-form` | Password recovery | auth | P2 | shared | `/forgot-password` | Implemented |
@@ -73,7 +73,7 @@ and API contracts before writing or reviewing E2E tests. Flow ids map 1:1 to
 | `f2-usage-panel` | F2 Usage panel + warnings + trial line | billing | P2 | member | `/org/usage` (header "Plan y uso") | Implemented (It7/It9) |
 | `c4-delete-draft` | C4 Delete a draft version | documents | P2 | editor | version timeline | Implemented (It1) |
 | `b4-archive-delete` | B4 Archive/delete a project | projects | P2 | admin | project settings + `/org/trash` | Implemented (It1) |
-| `a3-account-security` | A3 TOTP 2FA + sessions | auth | P2 | user | `/settings` (Seguridad) | Implemented (It6) |
+| `a3-account-security` | A3 TOTP, admisión y sesiones | auth | P2 | user | `/settings`, `/sign-in`, `/sign-up` | Implemented (It6) |
 | `e2-saved-comparisons` | E2 Saved comparisons | compare | P2 | viewer | compare view + project panel | Implemented (It7) |
 | `e4-constancia` | E4 Exportable certificate | review | P2 | admin | version viewer (Certificates panel — Constancias) | Implemented (It7) |
 | `master-e2e-journey` | Master journey (16 steps, 3 users) | master | P1 | guest/editor/reviewer | end-to-end | Implemented (It8) |
@@ -108,23 +108,27 @@ are visible.
 
 Auth pages are inherited from the template and already functional (JWT + Google + reCAPTCHA).
 
-### auth-sign-in-form / auth-login-invalid
+### auth-sign-in-form / auth-login-invalid / auth-sign-in-success
 
 | Field | Value |
 |-------|-------|
-| **Priority** | P2 / P1 |
+| **Priority** | P2 / P1 / P1 |
 | **Roles** | shared |
 | **Frontend route** | `/sign-in` |
-| **API endpoints** | `POST /api/sign_in/`, `POST /api/google_login/`, `GET /api/google-captcha/site-key/` |
+| **API endpoints** | `POST /api/sign_in/`, `POST /api/sign_in/2fa/`, `POST /api/google_login/`, `GET /api/google-captcha/site-key/` |
 
-**Steps:** form renders email/password + Google button → invalid credentials show an inline
-error and no session cookie is set → valid credentials redirect to `/projects` (direct —
-`app/sign-in/page.tsx` calls `router.replace(next ?? '/projects')`; see `auth-sign-in-success`
-for the full session/cookie contract. Corrected 2026-08-13: this row previously claimed a
-`/dashboard` landing, which stopped being true once sign-in started targeting `/projects`
-directly — `/dashboard` today is only a redirect stub, exercised by `auth-protected-redirect`).
+**Pasos:** el formulario muestra email, contraseña y recuperación. Credenciales inválidas o una cuenta inactiva muestran un error inline y no crean sesión. Una cuenta válida sin TOTP recibe tokens y aterriza directamente en `/projects`; una cuenta válida con TOTP pasa al desafío de código y sólo al completarlo recibe tokens. El desafío también puede seguir a una primera autenticación Google validada, pero el intercambio OAuth real sigue excluido de E2E por ser un proveedor externo (`docs/audit/03-mapa-flujos.md:489`).
 
-**Spec:** `e2e/auth/auth.spec.ts`.
+Los claims de Google se validan en backend antes de buscar o crear una cuenta: audiencia configurada, email y `email_verified`. Un `202` debe traer `requires_2fa: true` y un desafío no vacío; una respuesta malformada conserva al visitante sin sesión y muestra el error de autenticación.
+
+| Clase | Interacción observable | Cobertura |
+|---|---|---|
+| success | Contraseña válida sin TOTP crea cookies y llega a `/projects`. | `e2e/auth/session.spec.ts` (`auth-sign-in-success`) |
+| error | Credenciales erróneas, cuenta inactiva, código TOTP erróneo o desafío inválido conservan la pantalla sin sesión. | A3 E2E para código; backend/unit para admisión y ciclo de desafío |
+| failure | n/a como estado de UI separado: la falla de proveedor se normaliza a rechazo de autenticación y usa la misma superficie inline. | backend/unit |
+| display | Se ve el formulario inicial y, después de un `202` válido, el de código TOTP. | `e2e/auth/auth.spec.ts` requiere revisión de navegación UI para crédito display |
+
+**Spec:** `e2e/auth/auth.spec.ts` y `e2e/auth/session.spec.ts`.
 
 ### auth-sign-up-form
 
@@ -133,13 +137,31 @@ directly — `/dashboard` today is only a redirect stub, exercised by `auth-prot
 | **Priority** | P1 |
 | **Roles** | shared |
 | **Frontend route** | `/sign-up` |
-| **API endpoints** | `POST /api/sign_up/` |
+| **API endpoints** | `POST /api/sign_up/`, `POST /api/google_login/`, `POST /api/sign_in/2fa/` |
 
-**Steps:** form renders → mismatched passwords are rejected client-side → successful sign-up
-returns tokens. From It6 on, sign-up also auto-creates the personal Organization and triggers
-the A1 sample-project job (see `a1-onboarding-wow`).
+**Pasos:** el formulario renderiza y valida localmente la confirmación de contraseña. Un registro con contraseña válido recibe tokens y aterriza en onboarding. Si una cuenta existente que entra por Google ya tiene TOTP activo, el `202` válido reemplaza el formulario por el desafío de código; el código correcto aterriza en `/onboarding` y uno inválido conserva el desafío con su error inline.
 
-**Spec:** `e2e/auth/auth.spec.ts`.
+La rama Google no recibe crédito E2E: depende de OAuth externo y se cubre en backend y frontend-unit. La rama password sigue cubierta por `e2e/auth/auth.spec.ts`; el desafío de Google se prueba en la capa unitaria, sin presentar un mock del proveedor como E2E real.
+
+### a3-account-security
+
+| Field | Value |
+|-------|-------|
+| **Priority** | P2 |
+| **Roles** | user para enrolamiento y sesiones; shared al completar inicio de sesión |
+| **Frontend routes** | `/settings`, `/sign-in`, `/sign-up` |
+| **API endpoints** | `GET /api/me/security/`, `POST /api/me/2fa/setup/`, `POST /api/me/2fa/enable/`, `POST /api/sign_in/2fa/`, `GET/POST /api/me/sessions/…` |
+
+**Pasos:** una persona autenticada activa TOTP desde Seguridad, confirma el código y guarda los códigos de respaldo. En un inicio posterior, una cuenta con TOTP activo recibe un desafío breve tras una primera autenticación válida. El código correcto crea la sesión; un código incorrecto o un desafío malformado, vencido, de usuario eliminado/inactivo o con TOTP ya desactivado devuelve 401 y no crea sesión.
+
+| Clase | Interacción observable | Cobertura |
+|---|---|---|
+| success | Activar TOTP, salir, completar contraseña → desafío → código correcto y volver autenticado. | `e2e/app/onboarding/a3-account-security.spec.ts` |
+| error | Código incorrecto muestra alerta y no crea sesión. El ciclo de desafío inválido se cubre en backend. | A3 E2E + pruebas backend |
+| failure | n/a como superficie separada: el cliente presenta las fallas de endpoint en el mismo error del desafío. | frontend-unit/backend |
+| display | Seguridad muestra el estado; login o registro muestran el desafío sólo después del `202` válido. | Selectores `security-section`, `twofa-step`, `twofa-code`, `twofa-verify` |
+
+La autenticación Google real permanece exenta de E2E; la ruta password → desafío → código sí es una interacción de navegador real.
 
 ### auth-protected-redirect
 
@@ -175,6 +197,8 @@ password.
 ---
 
 ## Planned Versiona Modules
+
+> **Nota de análisis:** los checkpoints de reintento del engine son privados. El polling sigue exponiendo el mismo contrato público (`status`, `error`, `result`) y `result` permanece `null` hasta `done`; por eso no cambia ninguna interacción ni outcome de C1/C2.
 
 The 16 MVP flows (A1…F1) are specified with Given/When/Then acceptance criteria in
 `docs/plan/01-alcance-mvp.md`, their screens in `docs/plan/04-frontend.md` §2, their API in
@@ -213,6 +237,8 @@ it (see the Module Index status column for the shipping iteration).
 > `@flow:` tag constants in `frontend/e2e/helpers/flow-tags.ts` on 2026-08-13.
 
 ## Roles and Conventions
+
+Las superficies de admisión TOTP tienen selectores estables: `twofa-step`, `twofa-code`, `twofa-verify` y `security-section`. Permiten probar la rama real password → desafío → código. Un mock del proveedor Google no concede crédito E2E.
 
 Viewer consulta proyectos y documentos; editor también crea proyectos; admin del
 proyecto configura checks y administra invitaciones. Los permisos siguen las

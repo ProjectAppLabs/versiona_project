@@ -21,11 +21,11 @@
 
 **MVP feature-complete**: 19 flows E2E green (`docs/audit/05-cierre.md` "MISIÓN
 CUMPLIDA") + It9 public surfaces. Flow contract: `frontend/e2e/flow-definitions.json`
-v2.2.1 (37 flows).
+v2.2.2 (37 flows).
 
 ## Rondas de mantenimiento
 
-- **2026-10-01 — mejora transversal (QA pendiente):** identidad Google vinculada
+- **2026-10-01 — mejora transversal:** identidad Google vinculada
   a claims verificados, segundo factor obligatorio también por Google y análisis
   recuperable por etapas. Se seleccionaron tres candidatos globales mediante el
   ledger común; los otros frentes conservan trabajo pendiente. Se amplía el PR #34

@@ -1,25 +1,35 @@
 from datetime import timedelta
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import pytest
+import pyotp
 from django.contrib.auth import get_user_model
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 from rest_framework import status
+from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
 
+from accounts import twofactor
 from accounts.models import PasswordCode
 from accounts.views import auth as auth_views
+from orgs.models import Organization, OrganizationMembership
+
+
+_UNSET = object()
 
 
 class DummyResponse:
-    def __init__(self, status_code=200, payload=None, text=''):
+    def __init__(self, status_code=200, payload=_UNSET, text='', json_error=None):
         self.status_code = status_code
-        self._payload = payload or {}
+        self._payload = {} if payload is _UNSET else payload
         self.text = text
+        self._json_error = json_error
 
     def json(self):
+        if self._json_error is not None:
+            raise self._json_error
         return self._payload
 
 
@@ -122,7 +132,7 @@ def test_sign_in_rejects_inactive_user(mock_captcha, api_client):
         format='json',
     )
 
-    assert response.status_code == status.HTTP_403_FORBIDDEN
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
     assert response.json()['error'] == 'Account is inactive'
 
 
@@ -218,6 +228,7 @@ def test_google_login_creates_user_with_payload(api_client, monkeypatch):
     payload = {
         'aud': 'client-1',
         'email': 'google@example.com',
+        'email_verified': True,
         'given_name': 'Google',
         'family_name': 'User',
         'picture': 'pic',
@@ -258,6 +269,7 @@ def test_google_login_updates_existing_user_names(api_client, monkeypatch):
     payload = {
         'aud': 'client-1',
         'email': 'existing@example.com',
+        'email_verified': True,
         'given_name': 'Given',
         'family_name': 'Name',
     }
@@ -299,6 +311,226 @@ def test_google_login_allows_debug_without_payload(api_client, monkeypatch):
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json()['google_validated'] is False
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'tokeninfo',
+    [
+        DummyResponse(payload={'email': 'google@example.com', 'email_verified': True}),
+        DummyResponse(payload={'aud': 'other', 'email': 'google@example.com', 'email_verified': True}),
+        DummyResponse(payload={'aud': 'client-1', 'email': ' ', 'email_verified': True}),
+        DummyResponse(payload={'aud': 'client-1', 'email': 7, 'email_verified': True}),
+        DummyResponse(payload={'aud': 'client-1', 'email': 'google@example.com', 'email_verified': False}),
+        DummyResponse(payload={'aud': 'client-1', 'email': 'google@example.com'}),
+        DummyResponse(payload={'aud': 'client-1', 'email': 'google@example.com', 'email_verified': 'false'}),
+        DummyResponse(payload={'aud': 'client-1', 'email': 'google@example.com', 'email_verified': True, 'given_name': 9}),
+        DummyResponse(payload={'aud': 'client-1', 'email': 'google@example.com', 'email_verified': True, 'family_name': []}),
+        DummyResponse(payload=[]),
+        DummyResponse(payload=None),
+        DummyResponse(json_error=ValueError('not json')),
+    ],
+    ids=[
+        'aud-missing', 'aud-mismatch', 'email-blank', 'email-non-string',
+        'email-unverified-bool', 'email-unverified-missing', 'email-unverified-string',
+        'given-name-non-string', 'family-name-non-string', 'json-list', 'json-null',
+        'json-unparseable',
+    ],
+)
+@override_settings(DEBUG=True, GOOGLE_OAUTH_CLIENT_ID='client-1')
+def test_google_login_rejects_invalid_http_200_claims_without_using_hints(
+    api_client, monkeypatch, tokeninfo
+):
+    """Fails if invalid tokeninfo claims can select a browser-supplied identity."""
+    User = get_user_model()
+    hinted = User.objects.create_user(
+        email='hinted@example.com', password='pass1234', first_name='Original'
+    )
+    initial_ids = list(User.objects.values_list('pk', flat=True))
+    monkeypatch.setattr(auth_views.requests, 'get', Mock(return_value=tokeninfo))
+
+    response = api_client.post(
+        reverse('google_login'),
+        {
+            'credential': 'token',
+            'email': hinted.email,
+            'given_name': 'Forged',
+            'family_name': 'Identity',
+        },
+        format='json',
+    )
+
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert 'access' not in response.json()
+    assert 'refresh' not in response.json()
+    assert list(User.objects.values_list('pk', flat=True)) == initial_ids
+    hinted.refresh_from_db()
+    assert hinted.first_name == 'Original'
+
+
+@pytest.mark.django_db
+@override_settings(DEBUG=False, GOOGLE_OAUTH_CLIENT_ID='')
+def test_google_login_rejects_an_unconfigured_production_client_before_tokeninfo(
+    api_client, monkeypatch
+):
+    """Fails if production queries tokeninfo without a configured client audience."""
+    tokeninfo = Mock()
+    monkeypatch.setattr(auth_views.requests, 'get', tokeninfo)
+
+    response = api_client.post(
+        reverse('google_login'), {'credential': 'token', 'email': 'hinted@example.com'}, format='json'
+    )
+
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.json()['error'] == 'Invalid Google client'
+    tokeninfo.assert_not_called()
+
+
+@pytest.mark.django_db
+@override_settings(DEBUG=False, GOOGLE_OAUTH_CLIENT_ID='client-1')
+def test_google_login_uses_the_verified_string_claim_identity_instead_of_hints(
+    api_client, monkeypatch
+):
+    """Fails if a browser hint can replace the verified token email or token-owned names."""
+    User = get_user_model()
+    hinted = User.objects.create_user(
+        email='hinted@example.com', password='pass1234', first_name='Hint', last_name='User'
+    )
+    payload = {
+        'aud': 'client-1',
+        'email': 'claimed@example.com',
+        'email_verified': 'true',
+        'given_name': 'Claimed',
+        'family_name': 'Identity',
+    }
+    monkeypatch.setattr(auth_views.requests, 'get', Mock(return_value=DummyResponse(payload=payload)))
+
+    response = api_client.post(
+        reverse('google_login'),
+        {
+            'credential': 'token',
+            'email': hinted.email,
+            'given_name': 'Forged',
+            'family_name': 'Names',
+        },
+        format='json',
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()['google_validated'] is True
+    claimed = User.objects.get(email='claimed@example.com')
+    assert claimed.first_name == 'Claimed'
+    assert claimed.last_name == 'Identity'
+    hinted.refresh_from_db()
+    assert hinted.first_name == 'Hint'
+    assert hinted.last_name == 'User'
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'tokeninfo',
+    [
+        Mock(return_value=DummyResponse(status_code=500)),
+        Mock(side_effect=auth_views.requests.RequestException('network unavailable')),
+    ],
+    ids=['provider-500', 'transport-error'],
+)
+@override_settings(DEBUG=True, GOOGLE_OAUTH_CLIENT_ID='client-1')
+def test_google_login_uses_debug_transport_fallback_with_an_email(api_client, monkeypatch, tokeninfo):
+    """Fails if DEBUG stops admitting the documented provider-failure fallback."""
+    monkeypatch.setattr(auth_views.requests, 'get', tokeninfo)
+
+    response = api_client.post(
+        reverse('google_login'),
+        {'credential': 'token', 'email': 'debug-transport@example.com'},
+        format='json',
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()['google_validated'] is False
+    assert response.json()['access']
+    assert response.json()['refresh']
+
+
+@pytest.fixture
+def totp_login_user(django_user_model):
+    user = django_user_model.objects.create_user(
+        email='totp-login@example.com', password='pass1234'
+    )
+    enrollment = twofactor.setup(user)
+    twofactor.enable(user, pyotp.TOTP(enrollment['secret']).now())
+    user.refresh_from_db()
+    return user, enrollment['secret']
+
+
+@pytest.mark.django_db
+@patch('accounts.views.auth.verify_recaptcha', return_value=True)
+def test_password_login_returns_a_second_factor_challenge_before_token_issuance(
+    mock_captcha, api_client, totp_login_user
+):
+    """Fails if a password first factor issues JWTs before the enrolled TOTP check."""
+    user, secret = totp_login_user
+    outstanding_before = OutstandingToken.objects.count()
+
+    first = api_client.post(
+        reverse('sign_in'), {'email': user.email, 'password': 'pass1234'}, format='json'
+    )
+
+    assert first.status_code == status.HTTP_202_ACCEPTED
+    assert set(first.json()) == {'requires_2fa', 'challenge'}
+    assert first.json()['requires_2fa'] is True
+    assert isinstance(first.json()['challenge'], str) and first.json()['challenge']
+    assert OutstandingToken.objects.count() == outstanding_before
+
+    second = api_client.post(
+        reverse('sign-in-2fa'),
+        {'challenge': first.json()['challenge'], 'code': pyotp.TOTP(secret).now()},
+        format='json',
+    )
+
+    assert second.status_code == status.HTTP_200_OK
+    assert second.json()['access']
+    assert second.json()['refresh']
+    assert OutstandingToken.objects.count() == outstanding_before + 1
+    refreshed = api_client.post('/api/token/refresh/', {'refresh': second.json()['refresh']}, format='json')
+    assert refreshed.status_code == status.HTTP_200_OK
+    assert refreshed.json()['access']
+
+
+@pytest.mark.django_db
+@override_settings(DEBUG=False, GOOGLE_OAUTH_CLIENT_ID='client-1')
+def test_google_login_returns_a_second_factor_challenge_before_token_issuance(
+    api_client, monkeypatch, totp_login_user
+):
+    """Fails if a validated Google first factor bypasses an enrolled TOTP check."""
+    user, _secret = totp_login_user
+    user.first_name = 'Original'
+    user.last_name = 'Names'
+    user.save(update_fields=['first_name', 'last_name'])
+    outstanding_before = OutstandingToken.objects.count()
+    organizations_before = Organization.objects.count()
+    memberships_before = OrganizationMembership.objects.count()
+    payload = {
+        'aud': 'client-1',
+        'email': user.email,
+        'email_verified': True,
+        'given_name': 'Claim',
+        'family_name': 'Names',
+    }
+    monkeypatch.setattr(auth_views.requests, 'get', Mock(return_value=DummyResponse(payload=payload)))
+
+    response = api_client.post(reverse('google_login'), {'credential': 'token'}, format='json')
+
+    assert response.status_code == status.HTTP_202_ACCEPTED
+    assert set(response.json()) == {'requires_2fa', 'challenge'}
+    assert response.json()['requires_2fa'] is True
+    assert isinstance(response.json()['challenge'], str) and response.json()['challenge']
+    assert OutstandingToken.objects.count() == outstanding_before
+    assert Organization.objects.count() == organizations_before
+    assert OrganizationMembership.objects.count() == memberships_before
+    user.refresh_from_db()
+    assert user.first_name == 'Original'
+    assert user.last_name == 'Names'
 
 
 @pytest.mark.django_db

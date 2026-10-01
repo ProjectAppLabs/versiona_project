@@ -118,3 +118,22 @@ this file records the *discovered-the-hard-way* items.
   touch sealed history.
 - The `testdata/` truth table is a contract: engine/E2E assertions must match it exactly,
   and any change to it requires regenerating fixtures via the script in the same PR.
+
+### Primer factor y desafíos TOTP (2026-10-01)
+
+- Un `202` válido contiene `requires_2fa: true` y un desafío no vacío. Los campos
+  de tokens accidentales se ignoran hasta completar el segundo factor; un desafío
+  mal formado se rechaza aunque incluya tokens.
+- Las pruebas del store observan su estado real y la frontera de persistencia
+  mockeada. La ausencia de cookies de sesión se comprueba en el navegador real.
+- Para probar un error del formulario TOTP, acotar `role=alert` al paso de código:
+  Next también agrega un anunciador de rutas con ese rol.
+
+### Reanudación del análisis (2026-10-01)
+
+- El checkpoint privado y los efectos de una fase se confirman en una transacción
+  con lock del job. La forma del resultado público se conserva y sólo se publica
+  al terminar.
+- Las versiones de fixtures nacen PENDING antes del análisis real. Los triggers
+  de inmutabilidad siguen activos en MySQL; una versión READY antigua sin un
+  checkpoint comprobable se conserva y el job se detiene.

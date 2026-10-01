@@ -37,6 +37,7 @@ def google_signup(api_client, monkeypatch, settings):
     tokeninfo.json = Mock(return_value={
         'aud': 'client-1',
         'email': GOOGLE_EMAIL,
+        'email_verified': True,
         'given_name': 'Nueva',
         'family_name': 'Google',
     })

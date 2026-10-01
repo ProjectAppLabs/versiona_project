@@ -13,6 +13,7 @@ test.describe('A3 — Seguridad de la cuenta', () => {
     'A3-F01/F03 — activar 2FA y entrar con el código',
     { tag: [...A3_ACCOUNT_SECURITY, '@scenario:a3-f01', '@scenario:a3-f03', '@outcome:success', '@outcome:error'] },
     async ({ page }) => {
+      // Catches a first-factor login that creates a usable browser session before TOTP succeeds.
       const email = uniqueEmail('sec');
 
       // Cuenta nueva por UI
@@ -43,16 +44,27 @@ test.describe('A3 — Seguridad de la cuenta', () => {
 
       // Re-login: la contraseña ya no basta (A3-F03)
       await page.getByRole('button', { name: 'Salir' }).click();
+      const signInLink = page.getByTestId('public-header').getByRole('link', { name: 'Iniciar sesión' });
+      await expect(signInLink).toHaveAttribute('href', '/sign-in');
+      await signInLink.click();
       await page.waitForURL(/sign-in/, { timeout: 15_000 });
       await page.getByPlaceholder('Email').fill(email);
       await page.getByPlaceholder('Password').fill('secreta123');
       await page.getByRole('button', { name: 'Entrar' }).click();
 
-      await expect(page.getByTestId('twofa-step')).toBeVisible({ timeout: 15_000 });
+      const twoFactorStep = page.getByTestId('twofa-step');
+      await expect(twoFactorStep).toContainText('Verificación en dos pasos', { timeout: 15_000 });
+
+      const pendingCookies = await page.context().cookies();
+      expect(pendingCookies.some((cookie) => cookie.name === 'access_token' && cookie.value)).toBe(false);
+      expect(pendingCookies.some((cookie) => cookie.name === 'refresh_token' && cookie.value)).toBe(false);
+
       // Un código malo se rechaza
       await page.getByTestId('twofa-code').fill('000000');
       await page.getByTestId('twofa-verify').click();
-      await expect(page.getByRole('alert')).toBeVisible({ timeout: 10_000 });
+      await expect(twoFactorStep.getByRole('alert')).toHaveText('Código incorrecto.', { timeout: 10_000 });
+      await expect(twoFactorStep).toContainText('Verificación en dos pasos');
+      await expect(page.getByTestId('twofa-code')).toHaveValue('000000');
 
       // El código correcto entra
       await page.getByTestId('twofa-code').fill(totpNow(secret));
