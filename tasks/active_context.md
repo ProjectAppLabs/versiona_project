@@ -3,7 +3,18 @@
 > Memory Bank core file: current focus, recent changes, next steps. Updated every session
 > that changes project state.
 
-**Last updated**: 2026-09-30
+**Last updated**: 2026-10-01
+
+## Ronda transversal de mejora (2026-10-01)
+
+En curso sobre la rama propia del PR #34: validar la identidad Google antes de
+buscar una cuenta, exigir el segundo factor en ese acceso y reanudar el análisis
+desde fases confirmadas. El motor común eligió tres causas globales
+(`I-S-cae2f9667fc6`, `I-S-f775b80c4455`, `I-O-478a8866d0d5`).
+La aplicación es secuencial; QA validará la unión de capas sobre un SHA final
+limpio. El entorno de pruebas usa un MySQL privado en el puerto 3309 y schemas
+propios, sin reutilizar la base del deploy. Los demás hallazgos quedan pendientes
+por cupo o por evidencia; esta ronda no declara suficiente ningún frente.
 
 ## Rendimiento, responsividad y QA (2026-09-30)
 

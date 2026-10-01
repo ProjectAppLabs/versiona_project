@@ -25,6 +25,20 @@ User = get_user_model()
 logger = logging.getLogger(__name__)
 
 
+def _login_admission(user):
+    """Require an active account and its second factor before issuing tokens."""
+    if not user.is_active:
+        return Response({'error': 'Account is inactive'}, status=status.HTTP_401_UNAUTHORIZED)
+    if user.totp_enabled_at:
+        from accounts.twofactor import issue_challenge
+
+        return Response(
+            {'requires_2fa': True, 'challenge': issue_challenge(user)},
+            status=status.HTTP_202_ACCEPTED,
+        )
+    return None
+
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def sign_up(request):
@@ -126,20 +140,9 @@ def sign_in(request):
             status=status.HTTP_401_UNAUTHORIZED
         )
     
-    if not user.is_active:
-        return Response(
-            {'error': 'Account is inactive'},
-            status=status.HTTP_403_FORBIDDEN
-        )
-    
-    # A3: with 2FA on, the password step only earns a short-lived challenge.
-    if user.totp_enabled_at:
-        from accounts.twofactor import issue_challenge
-
-        return Response(
-            {'requires_2fa': True, 'challenge': issue_challenge(user)},
-            status=status.HTTP_202_ACCEPTED,
-        )
+    admission = _login_admission(user)
+    if admission is not None:
+        return admission
 
     # Generate tokens
     tokens = generate_auth_tokens(user)
@@ -152,24 +155,24 @@ def sign_in(request):
 def google_login(request):
     """
     Google OAuth login endpoint.
-    
-    Expected data:
-    - email: str
-    - given_name: str (optional)
-    - family_name: str (optional)
-    - picture: str (optional)
+
+    Expected data: credential (or id_token).
+    Email and name hints are used only by the DEBUG transport fallback.
     """
     credential = request.data.get('credential') or request.data.get('id_token')
 
     if not credential:
         return Response({'error': 'Google credential is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-    email = request.data.get('email', '').strip().lower()
-    given_name = request.data.get('given_name', '').strip()
-    family_name = request.data.get('family_name', '').strip()
+    allowed_auds = [
+        value.strip()
+        for value in (settings.GOOGLE_OAUTH_CLIENT_ID or '').split(',')
+        if value.strip()
+    ]
+    if not allowed_auds and not settings.DEBUG:
+        return Response({'error': 'Invalid Google client'}, status=status.HTTP_401_UNAUTHORIZED)
 
     payload = None
-    aud_mismatch = False
     try:
         tokeninfo = requests.get(
             'https://oauth2.googleapis.com/tokeninfo',
@@ -177,37 +180,48 @@ def google_login(request):
             timeout=5,
         )
         if tokeninfo.status_code == 200:
-            payload = tokeninfo.json()
+            try:
+                payload = tokeninfo.json()
+            except ValueError:
+                return Response({'error': 'Invalid Google credential'}, status=status.HTTP_401_UNAUTHORIZED)
+
+            if not isinstance(payload, dict):
+                return Response({'error': 'Invalid Google credential'}, status=status.HTTP_401_UNAUTHORIZED)
+
+            aud = payload.get('aud')
+            if not isinstance(aud, str) or not aud.strip() or aud not in allowed_auds:
+                return Response({'error': 'Invalid Google client'}, status=status.HTTP_401_UNAUTHORIZED)
+
+            token_email = payload.get('email')
+            email_verified = payload.get('email_verified')
+            if (
+                not isinstance(token_email, str)
+                or not token_email.strip()
+                or not (email_verified is True or email_verified == 'true')
+            ):
+                return Response({'error': 'Invalid Google credential'}, status=status.HTTP_401_UNAUTHORIZED)
+
+            token_given = payload.get('given_name', '')
+            token_family = payload.get('family_name', '')
+            if not isinstance(token_given, str) or not isinstance(token_family, str):
+                return Response({'error': 'Invalid Google credential'}, status=status.HTTP_401_UNAUTHORIZED)
+
+            email = token_email.strip().lower()
+            given_name = token_given.strip()
+            family_name = token_family.strip()
         else:
-            logger.warning('Google tokeninfo rejected credential: status=%s body=%s', tokeninfo.status_code, tokeninfo.text)
-    except (requests.RequestException, ValueError) as exc:
-        logger.warning('Google token validation failed: %s', exc)
+            logger.warning('Google tokeninfo rejected credential: status=%s', tokeninfo.status_code)
+    except requests.RequestException:
+        logger.warning('Google token validation transport failed')
 
-    if payload is not None:
-        aud = payload.get('aud', '')
-        allowed_auds = [v.strip() for v in (settings.GOOGLE_OAUTH_CLIENT_ID or '').split(',') if v.strip()]
-        if allowed_auds and aud not in allowed_auds:
-            logger.warning('Google aud mismatch. aud=%s allowed=%s', aud, allowed_auds)
-            aud_mismatch = True
-            payload = None
+    if payload is None:
+        if not settings.DEBUG:
+            return Response({'error': 'Invalid Google credential'}, status=status.HTTP_401_UNAUTHORIZED)
 
-    if payload is None and not settings.DEBUG:
-        if aud_mismatch:
-            return Response({'error': 'Invalid Google client'}, status=status.HTTP_401_UNAUTHORIZED)
-        return Response({'error': 'Invalid Google credential'}, status=status.HTTP_401_UNAUTHORIZED)
-
-    if payload is not None:
-        token_email = (payload.get('email') or '').strip().lower()
-        if token_email:
-            email = token_email
-
-        token_given = (payload.get('given_name') or '').strip()
-        token_family = (payload.get('family_name') or '').strip()
-
-        if token_given:
-            given_name = token_given
-        if token_family:
-            family_name = token_family
+        # Invalid claims returned with HTTP 200 never reach this fallback.
+        email = request.data.get('email', '').strip().lower()
+        given_name = request.data.get('given_name', '').strip()
+        family_name = request.data.get('family_name', '').strip()
     
     if not email:
         return Response(
@@ -224,6 +238,10 @@ def google_login(request):
             'is_active': True,
         }
     )
+
+    admission = _login_admission(user)
+    if admission is not None:
+        return admission
 
     if created:
         user.set_unusable_password()

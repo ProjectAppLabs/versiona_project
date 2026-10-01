@@ -22,7 +22,9 @@ flowchart LR
 - **Bounded contexts** (each a Django app, 14): core, accounts, orgs, projects,
   documents, reviews, observations, checks, comparisons, engine, notifications,
   billing, audit, public_tools (anonymous AllowAny surface, It9).
-  Engine imports nothing from reviews/billing (extractable to a service later).
+  El task de análisis coordina checks, comparaciones, sellos y observaciones a
+  través de sus servicios; la extracción y persistencia de snapshots quedan
+  separadas de esa coordinación.
 - **Conventions**: FBV `@api_view` + services layer; triple serializers; `public_id`
   (UUIDv7) in routes; non-members get 404 (I12); DRF pagination 25.
 - **Immutability spine**: DocumentVersion frozen once analyzed (I2/I3); Seal +
@@ -66,6 +68,19 @@ lotes sin cargar resultados JSON. Proyectos conserva cinco columnas del checklis
 en tableta vertical, envuelve filtros y correos largos y mantiene controles
 accesibles. El desborde del Header compacto queda para layout. QA validó los
 presupuestos y los recorridos de uso sin debilitar los triggers de inmutabilidad.
+
+**Ronda transversal — 2026-10-01 (QA pendiente):** el acceso Google toma la
+identidad exclusivamente de claims verificados, con audience configurado y
+correo confirmado. Google y contraseña comprueban el estado vigente de la
+cuenta y exigen TOTP antes de emitir JWT. Un desafío firmado no sustituye esa
+comprobación al completar el segundo paso; las pantallas de acceso y registro
+mantienen el formulario de código hasta que termina.
+El análisis confirma sus etapas en el payload privado del job, junto con los
+efectos de cada transacción. Un lock por job evita repetir snapshots, checks,
+comparación, D5 y anclajes en entregas simultáneas. Parse/OCR quedan fuera del
+lock; el resultado público sólo se publica al terminar. Los fallos posteriores
+a la persistencia conservan la versión READY. Un trabajo antiguo sin checkpoint
+seguro se detiene sin reescribir datos; no se promete entrega única de SMTP.
 
 **Next**: operator-gated go-public items — deployment (DP-21), domain+SMTP (DP-22),
 Ed25519 key rotation/custody (DP-24), Wompi checkout keys (F1 payment leg), optional

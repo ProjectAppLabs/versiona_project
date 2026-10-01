@@ -22,8 +22,10 @@ type GoogleUser = {
 
 export default function SignUpPage() {
   const router = useRouter();
-  const { signUp, googleLogin } = useAuthStore();
+  const { signUp, signIn2fa, googleLogin } = useAuthStore();
   const t = useDict('auth');
+  const [challenge, setChallenge] = useState<string | null>(null);
+  const [totpCode, setTotpCode] = useState('');
 
   const hasGoogleClientId = Boolean(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
 
@@ -105,13 +107,17 @@ export default function SignUpPage() {
         decoded = null;
       }
 
-      await googleLogin({
+      const result = await googleLogin({
         credential: credentialResponse.credential,
         email: decoded?.email,
         given_name: decoded?.given_name,
         family_name: decoded?.family_name,
         picture: decoded?.picture,
       });
+      if (result.requires2fa) {
+        setChallenge(result.challenge);
+        return;
+      }
       
       router.replace('/onboarding');
     } catch (err) {
@@ -131,6 +137,45 @@ export default function SignUpPage() {
         <h1 className="text-2xl font-semibold tracking-tight">{t.signUpTitle}</h1>
         <p className="mt-1 text-sm text-muted-foreground">Join and start shopping in minutes.</p>
 
+        {challenge ? (
+          <form
+            data-testid="twofa-step"
+            className="mt-6 space-y-4"
+            onSubmit={async (e) => {
+              e.preventDefault();
+              setError('');
+              setLoading(true);
+              try {
+                await signIn2fa({ challenge, code: totpCode });
+                router.replace('/onboarding');
+              } catch (err) {
+                setError(apiErrorMessage(err, t.twofaInvalid));
+              } finally {
+                setLoading(false);
+              }
+            }}
+          >
+            <p className="text-sm font-medium">{t.twofaTitle}</p>
+            <p className="text-sm text-muted-foreground">{t.twofaHint}</p>
+            <input
+              data-testid="twofa-code"
+              className="border border-border rounded-xl px-3 py-2 w-full bg-card text-center tracking-widest"
+              placeholder="000000"
+              value={totpCode}
+              onChange={(e) => setTotpCode(e.target.value)}
+              autoFocus
+            />
+            {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+            <button
+              data-testid="twofa-verify"
+              className="w-full bg-primary text-primary-foreground rounded-full px-4 py-2 disabled:opacity-60"
+              disabled={loading || !totpCode.trim()}
+              type="submit"
+            >
+              {t.twofaVerify}
+            </button>
+          </form>
+        ) : (
         <form className="mt-6 space-y-4" onSubmit={onSubmit}>
           <div className="grid grid-cols-2 gap-3">
             <input 
@@ -210,6 +255,7 @@ export default function SignUpPage() {
 
           {error ? <p className="text-destructive text-sm">{error}</p> : null}
         </form>
+        )}
 
         <div className="mt-6">
           <div className="relative">

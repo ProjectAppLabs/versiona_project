@@ -55,9 +55,8 @@ export default function SignInPage() {
 
     try {
       const result = await signIn({ email, password, captcha_token: captchaToken ?? undefined });
-      if (result.requires2fa && result.challenge) {
+      if (result.requires2fa) {
         setChallenge(result.challenge);
-        setLoading(false);
         return;
       }
       const next = new URLSearchParams(window.location.search).get('next');
@@ -88,13 +87,17 @@ export default function SignInPage() {
         decoded = null;
       }
 
-      await googleLogin({
+      const result = await googleLogin({
         credential: credentialResponse.credential,
         email: decoded?.email,
         given_name: decoded?.given_name,
         family_name: decoded?.family_name,
         picture: decoded?.picture,
       });
+      if (result.requires2fa) {
+        setChallenge(result.challenge);
+        return;
+      }
       
       router.replace('/projects');
     } catch (err) {
@@ -128,6 +131,7 @@ export default function SignInPage() {
                 router.replace(next && next.startsWith('/') ? next : '/projects');
               } catch (err) {
                 setError(apiErrorMessage(err, t.twofaInvalid));
+              } finally {
                 setLoading(false);
               }
             }}

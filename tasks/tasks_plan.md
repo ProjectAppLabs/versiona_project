@@ -25,6 +25,11 @@ v2.2.1 (37 flows).
 
 ## Rondas de mantenimiento
 
+- **2026-10-01 — mejora transversal (QA pendiente):** identidad Google vinculada
+  a claims verificados, segundo factor obligatorio también por Google y análisis
+  recuperable por etapas. Se seleccionaron tres candidatos globales mediante el
+  ledger común; los otros frentes conservan trabajo pendiente. Se amplía el PR #34
+  por decisión del operador, sin merge ni cambios en el checkout del servicio.
 - **2026-09-30 — rendimiento, proyectos y QA:** historial con consultas de metadatos
   acotadas y limpieza de comparaciones públicas por lotes; controles táctiles y
   textos completos en proyectos. QA confirmó 18 casos backend y 9 de navegador.

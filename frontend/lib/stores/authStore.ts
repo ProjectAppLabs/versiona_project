@@ -14,15 +14,19 @@ type User = {
   is_staff: boolean;
 };
 
+export type LoginResult =
+  | { requires2fa: true; challenge: string }
+  | { requires2fa: false };
+
 type AuthState = {
   accessToken: string | null;
   refreshToken: string | null;
   user: User | null;
   isAuthenticated: boolean;
-  signIn: (args: { email: string; password: string; captcha_token?: string }) => Promise<{ requires2fa: boolean; challenge?: string }>;
+  signIn: (args: { email: string; password: string; captcha_token?: string }) => Promise<LoginResult>;
   signIn2fa: (args: { challenge: string; code: string }) => Promise<void>;
   signUp: (args: { email: string; password: string; first_name?: string; last_name?: string; captcha_token?: string }) => Promise<void>;
-  googleLogin: (args: { credential?: string; email?: string; given_name?: string; family_name?: string; picture?: string }) => Promise<void>;
+  googleLogin: (args: { credential?: string; email?: string; given_name?: string; family_name?: string; picture?: string }) => Promise<LoginResult>;
   signOut: () => void;
   syncFromCookies: () => void;
   restoreUser: () => Promise<void>;
@@ -47,9 +51,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   
   signIn: async ({ email, password, captcha_token }) => {
     const response = await api.post('sign_in/', { email, password, captcha_token });
-    // A3: with 2FA enabled the password step returns a short-lived challenge.
-    if (response.status === 202 && response.data?.requires_2fa) {
-      return { requires2fa: true, challenge: response.data.challenge };
+    if (response.status === 202) {
+      const challenge = response.data?.challenge;
+      if (response.data?.requires_2fa !== true || typeof challenge !== 'string' || !challenge.trim()) {
+        throw new Error('Invalid challenge response');
+      }
+      return { requires2fa: true, challenge };
     }
     const access = response.data?.access;
     const refresh = response.data?.refresh;
@@ -109,6 +116,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       family_name,
       picture,
     });
+
+    if (response.status === 202) {
+      const challenge = response.data?.challenge;
+      if (response.data?.requires_2fa !== true || typeof challenge !== 'string' || !challenge.trim()) {
+        throw new Error('Invalid challenge response');
+      }
+      return { requires2fa: true, challenge };
+    }
     
     const access = response.data?.access;
     const refresh = response.data?.refresh;
@@ -122,6 +137,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (user) localStorage.setItem('user_data', JSON.stringify(user));
     set({ user, isAuthenticated: true });
     get().syncFromCookies();
+    return { requires2fa: false };
   },
 
   signOut: () => {
