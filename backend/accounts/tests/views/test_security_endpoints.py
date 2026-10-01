@@ -13,6 +13,7 @@ from accounts import twofactor
 
 @pytest.fixture
 def user(django_user_model):
+    """Create the account used by security endpoint tests."""
     return django_user_model.objects.create_user(
         email='segura@versiona.test', password='secreta123'
     )
@@ -20,6 +21,7 @@ def user(django_user_model):
 
 @pytest.fixture
 def auth_client(user):
+    """Return an API client authenticated as the security test user."""
     client = APIClient()
     client.force_authenticate(user)
     return client
@@ -27,6 +29,7 @@ def auth_client(user):
 
 @pytest.fixture
 def enabled_user(user):
+    """Enroll the security test user in TOTP and return its recovery data."""
     setup = twofactor.setup(user)
     code = pyotp.TOTP(setup['secret']).now()
     backup_codes = twofactor.enable(user, code)
@@ -37,6 +40,7 @@ def enabled_user(user):
 @pytest.mark.django_db
 @pytest.mark.escenario('A3-C01')
 def test_setup_endpoint_returns_enrolment_material(auth_client, user):
+    """Return a QR payload and persist the TOTP secret during setup."""
     response = auth_client.post('/api/me/2fa/setup/')
 
     assert response.status_code == 200
@@ -48,6 +52,7 @@ def test_setup_endpoint_returns_enrolment_material(auth_client, user):
 @pytest.mark.django_db
 @pytest.mark.escenario('A3-C02')
 def test_setup_endpoint_conflicts_when_2fa_already_active(auth_client, enabled_user):
+    """Reject a second TOTP enrolment while two-factor auth is active."""
     response = auth_client.post('/api/me/2fa/setup/')
 
     assert response.status_code == 409
@@ -57,6 +62,7 @@ def test_setup_endpoint_conflicts_when_2fa_already_active(auth_client, enabled_u
 @pytest.mark.django_db
 @pytest.mark.escenario('A3-C03')
 def test_enable_endpoint_returns_backup_codes(auth_client, user):
+    """Return the configured number of backup codes after valid TOTP setup."""
     secret = twofactor.setup(user)['secret']
 
     response = auth_client.post(
@@ -70,6 +76,7 @@ def test_enable_endpoint_returns_backup_codes(auth_client, user):
 @pytest.mark.django_db
 @pytest.mark.escenario('A3-C04')
 def test_enable_endpoint_rejects_a_wrong_code(auth_client, user):
+    """Reject TOTP activation when the submitted code is incorrect."""
     twofactor.setup(user)
 
     response = auth_client.post('/api/me/2fa/enable/', {'code': '000000'}, format='json')
@@ -81,6 +88,7 @@ def test_enable_endpoint_rejects_a_wrong_code(auth_client, user):
 @pytest.mark.django_db
 @pytest.mark.escenario('A3-C05')
 def test_disable_endpoint_turns_2fa_off(auth_client, enabled_user):
+    """Clear the TOTP activation timestamp after a valid disable request."""
     user, secret, _ = enabled_user
 
     response = auth_client.post(
@@ -96,6 +104,7 @@ def test_disable_endpoint_turns_2fa_off(auth_client, enabled_user):
 @pytest.mark.django_db
 @pytest.mark.escenario('A3-C06')
 def test_disable_endpoint_rejects_a_wrong_code(auth_client, enabled_user):
+    """Keep two-factor auth active when the disable code is incorrect."""
     response = auth_client.post('/api/me/2fa/disable/', {'code': '000000'}, format='json')
 
     assert response.status_code == 400
@@ -105,6 +114,7 @@ def test_disable_endpoint_rejects_a_wrong_code(auth_client, enabled_user):
 @pytest.mark.django_db
 @pytest.mark.escenario('A3-C07')
 def test_session_revoke_endpoint_blacklists_the_session(auth_client, user):
+    """Remove the selected refresh-token session from the active list."""
     RefreshToken.for_user(user)
     session_id = twofactor.list_sessions(user)[0]['id']
 
@@ -119,6 +129,7 @@ def test_session_revoke_endpoint_blacklists_the_session(auth_client, user):
 @pytest.mark.escenario('A3-C08')
 @pytest.mark.escenario('A3-P01')
 def test_session_revoke_endpoint_returns_404_for_unknown_session(auth_client):
+    """Return not found when revoking an unknown session identifier."""
     response = auth_client.post('/api/me/sessions/999999/revoke/')
 
     assert response.status_code == 404
@@ -128,6 +139,7 @@ def test_session_revoke_endpoint_returns_404_for_unknown_session(auth_client):
 @pytest.mark.django_db
 @pytest.mark.escenario('A3-C09')
 def test_revoke_others_endpoint_keeps_only_the_given_refresh(auth_client, user):
+    """Revoke every session except the refresh token supplied by the caller."""
     keep = RefreshToken.for_user(user)
     RefreshToken.for_user(user)
     RefreshToken.for_user(user)
@@ -144,6 +156,7 @@ def test_revoke_others_endpoint_keeps_only_the_given_refresh(auth_client, user):
 @pytest.mark.django_db
 @pytest.mark.escenario('A3-L01')
 def test_revoke_others_without_a_refresh_closes_every_session(auth_client, user):
+    """Close every active session when no refresh token is retained."""
     RefreshToken.for_user(user)
     RefreshToken.for_user(user)
     RefreshToken.for_user(user)
@@ -157,6 +170,7 @@ def test_revoke_others_without_a_refresh_closes_every_session(auth_client, user)
 @pytest.mark.django_db
 @pytest.mark.escenario('A3-L01')
 def test_revoke_others_keeps_the_current_refresh_usable(auth_client, user, api_client):
+    """Keep the retained refresh token usable after revoking other sessions."""
     keep = RefreshToken.for_user(user)
     RefreshToken.for_user(user)
     auth_client.post(

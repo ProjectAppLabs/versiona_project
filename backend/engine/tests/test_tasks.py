@@ -1,35 +1,36 @@
-"""EngineJob task edges: idempotent short-circuits (I15), permanent parse
-failures (C1-E04) and the infrastructure retry ladder (docs/plan/05 §7)."""
+"""Engine task idempotency, parse failures, and infrastructure retries."""
 
-from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 from threading import Barrier, Event, Lock
 from unittest.mock import patch
 
 import pytest
-
-from checks.models import CheckRun
 from checks import services as check_services
+from checks.models import CheckRun
 from comparisons import services as comparison_services
 from comparisons.models import Comparison
 from documents.models import Document, DocumentVersion, SectionVersion
-from engine.models import EngineJob
-from engine import tasks as task_module
-from engine.tasks import PROGRESS_KEY, enqueue_analysis, run_analysis
-from observations.models import ObservationAnchor
 from observations import services as observation_services
+from observations.models import ObservationAnchor
 from reviews.models import SealValidityRecord
 from reviews.services import seal_service
+
+from engine import tasks as task_module
+from engine.models import EngineJob
+from engine.tasks import PROGRESS_KEY, enqueue_analysis, run_analysis
 
 TESTDATA = Path(__file__).resolve().parents[3] / 'testdata' / 'pdfs'
 
 
 def load(name: str) -> bytes:
+    """Load one deterministic PDF fixture by name."""
     return (TESTDATA / name).read_bytes()
 
 
 @pytest.fixture
 def pending_version_factory(versiona_context):
+    """Create pending document versions inside the shared engine context."""
     def _make(document=None):
         if document is None:
             document = Document.objects.create(
@@ -56,11 +57,13 @@ def pending_version_factory(versiona_context):
 
 @pytest.fixture
 def version(pending_version_factory):
+    """Create a pending document version for a task test."""
     return pending_version_factory()
 
 
 @pytest.fixture
 def make_job(version):
+    """Create analysis jobs for the pending test version."""
     def _make(**overrides):
         fields = {
             'job_type': EngineJob.Type.ANALYSIS,
@@ -119,6 +122,7 @@ def _prepared_redelivery(versiona_context, pending_version_factory):
 @pytest.mark.django_db
 @pytest.mark.escenario('C1-A04')
 def test_enqueue_analysis_returns_the_done_job_without_redispatch(version, make_job):
+    """Return an existing completed job without dispatching another task."""
     job = make_job(status=EngineJob.Status.DONE, result={'sections': {'total': 1}})
 
     returned = enqueue_analysis(version)
@@ -131,6 +135,7 @@ def test_enqueue_analysis_returns_the_done_job_without_redispatch(version, make_
 @pytest.mark.django_db
 @pytest.mark.escenario('C1-A05')
 def test_run_analysis_returns_the_stored_result_for_a_done_job(make_job):
+    """Return the stored result without incrementing a completed job attempt."""
     job = make_job(status=EngineJob.Status.DONE, result={'cached': True})
 
     result = run_analysis(job.pk)
@@ -143,6 +148,7 @@ def test_run_analysis_returns_the_stored_result_for_a_done_job(make_job):
 @pytest.mark.django_db
 @pytest.mark.escenario('C1-E02')
 def test_run_analysis_marks_a_corrupt_pdf_as_permanent_failure(version, make_job):
+    """Mark the job and version failed when PDF parsing finds corrupt input."""
     job = make_job()
 
     with patch('engine.tasks.storage_service.get_bytes', return_value=load('corrupto.pdf')):
@@ -159,6 +165,7 @@ def test_run_analysis_marks_a_corrupt_pdf_as_permanent_failure(version, make_job
 @pytest.mark.django_db
 @pytest.mark.escenario('C1-E01')
 def test_run_analysis_marks_an_encrypted_pdf_as_permanent_failure(version, make_job):
+    """Mark an encrypted PDF job failed without retrying the parse error."""
     job = make_job()
 
     with patch('engine.tasks.storage_service.get_bytes', return_value=load('protegido.pdf')):
@@ -173,6 +180,7 @@ def test_run_analysis_marks_an_encrypted_pdf_as_permanent_failure(version, make_
 @pytest.mark.django_db
 @pytest.mark.escenario('C1-E05')
 def test_run_analysis_requests_a_retry_on_infrastructure_error(version, make_job):
+    """Keep the job running while an infrastructure failure requests retry."""
     job = make_job()
 
     with patch('engine.tasks.storage_service.get_bytes', side_effect=RuntimeError('minio caído')):
@@ -187,6 +195,7 @@ def test_run_analysis_requests_a_retry_on_infrastructure_error(version, make_job
 @pytest.mark.django_db
 @pytest.mark.escenario('C1-E05')
 def test_run_analysis_fails_permanently_after_exhausting_retries(version, make_job):
+    """Fail the job and version after infrastructure retries are exhausted."""
     job = make_job()
 
     with patch('engine.tasks.storage_service.get_bytes', side_effect=RuntimeError('minio caído')):
@@ -414,6 +423,7 @@ def test_run_analysis_blocks_a_checkpoint_when_its_version_is_not_ready(pending_
     result = run_analysis(job.pk)
 
     job.refresh_from_db()
+    current.refresh_from_db()
     assert result is None
     assert job.status == EngineJob.Status.FAILED
     assert job.error_detail == 'No se puede reanudar este análisis antiguo sin un punto de recuperación verificado.'
