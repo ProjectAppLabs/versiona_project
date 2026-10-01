@@ -161,7 +161,7 @@ def test_google_login_requires_credential(api_client):
 
 
 @pytest.mark.django_db
-@override_settings(DEBUG=False, GOOGLE_OAUTH_CLIENT_ID='')
+@override_settings(DEBUG=False, GOOGLE_OAUTH_CLIENT_ID='client-1')
 def test_google_login_invalid_credential_when_not_debug(api_client, monkeypatch):
     """Verifies Google login returns 401 when credential is invalid and the app is not in debug mode."""
 
