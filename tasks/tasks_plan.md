@@ -21,10 +21,16 @@
 
 **MVP feature-complete**: 19 flows E2E green (`docs/audit/05-cierre.md` "MISIÓN
 CUMPLIDA") + It9 public surfaces. Flow contract: `frontend/e2e/flow-definitions.json`
-v2.2.2 (37 flows).
+v2.2.3 (37 flows).
 
 ## Rondas de mantenimiento
 
+- **2026-10-02 — contraseñas y diagnóstico:** registro, cambio y recuperación
+  aplican los validadores configurados, preservando credenciales y código ante
+  rechazo. La QA de la corrección prueba clases débiles, reintento válido y los
+  formularios reales. El volumen anidado de observaciones y las consultas por
+  documento del reporte quedaron medidos; requieren optimizaciones posteriores.
+  Rama propia desde `master`, independiente de otras sesiones.
 - **2026-10-01 — mejora transversal:** identidad Google vinculada
   a claims verificados, segundo factor obligatorio también por Google y análisis
   recuperable por etapas. Se seleccionaron tres candidatos globales mediante el

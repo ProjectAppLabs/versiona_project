@@ -9,7 +9,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.hashers import check_password, make_password
 from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 import requests
 
@@ -23,6 +25,17 @@ from accounts.views.captcha_views import verify_recaptcha
 User = get_user_model()
 
 logger = logging.getLogger(__name__)
+
+
+def _password_validation_error(password, user):
+    """Return configured password policy errors in the API's existing shape."""
+    if not isinstance(password, str):
+        return 'Password must be a string'
+    try:
+        validate_password(password, user=user)
+    except ValidationError as exc:
+        return ' '.join(exc.messages)
+    return None
 
 
 def _login_admission(user):
@@ -69,7 +82,7 @@ def sign_up(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    if len(password) < 8:
+    if isinstance(password, str) and len(password) < 8:
         return Response(
             {'error': 'Password must be at least 8 characters'},
             status=status.HTTP_400_BAD_REQUEST
@@ -80,6 +93,13 @@ def sign_up(request):
             {'error': 'User with this email already exists'},
             status=status.HTTP_400_BAD_REQUEST
         )
+
+    password_error = _password_validation_error(
+        password,
+        User(email=email, first_name=first_name, last_name=last_name),
+    )
+    if password_error:
+        return Response({'error': password_error}, status=status.HTTP_400_BAD_REQUEST)
     
     # Create user
     user = User.objects.create(
@@ -358,6 +378,10 @@ def verify_passcode_and_reset_password(request):
             {'error': 'Invalid or expired code'},
             status=status.HTTP_400_BAD_REQUEST
         )
+
+    password_error = _password_validation_error(new_password, user)
+    if password_error:
+        return Response({'error': password_error}, status=status.HTTP_400_BAD_REQUEST)
     
     # Update password
     user.password = make_password(new_password)
@@ -399,6 +423,10 @@ def update_password(request):
             {'error': 'Current password is incorrect'},
             status=status.HTTP_400_BAD_REQUEST
         )
+
+    password_error = _password_validation_error(new_password, user)
+    if password_error:
+        return Response({'error': password_error}, status=status.HTTP_400_BAD_REQUEST)
     
     user.password = make_password(new_password)
     user.save()

@@ -1,6 +1,30 @@
 import { test, expect } from '../test-with-coverage';
+import type { APIRequestContext } from '@playwright/test';
+import { randomUUID } from 'node:crypto';
 import { waitForPageLoad } from '../fixtures';
+import { waitForEmail } from '../helpers/mailpit';
 import { AUTH_SIGN_IN_FORM, AUTH_SIGN_UP_FORM, AUTH_LOGIN_INVALID, AUTH_PROTECTED_REDIRECT, AUTH_FORGOT_PASSWORD_FORM } from '../helpers/flow-tags';
+
+async function createRecoveryAccount(request: APIRequestContext): Promise<string> {
+  const email = `password-policy-${randomUUID()}@versiona.test`;
+  const response = await request.post('/api/sign_up/', {
+    data: { email, password: 'Violet-River!83', first_name: 'Recovery', last_name: 'Visitor' },
+  });
+  expect(response.status()).toBe(201);
+  return email;
+}
+
+async function readRecoveryCode(request: APIRequestContext, email: string): Promise<string> {
+  const mailpitApi = process.env.MAILPIT_API;
+  if (!mailpitApi) throw new Error('MAILPIT_API must name the private E2E mailbox.');
+  const message = await waitForEmail({ to: email, subjectContains: 'Password Reset Code' });
+  const response = await request.get(`${mailpitApi}/api/v1/message/${message.ID}`);
+  expect(response.status()).toBe(200);
+  const body = (await response.json()).Text as string;
+  const code = body.match(/\b\d{6}\b/)?.[0];
+  expect(code).toMatch(/^\d{6}$/);
+  return code as string;
+}
 
 test.describe('Authentication', () => {
   test('should show validation on empty form submission', { tag: [...AUTH_SIGN_IN_FORM, '@outcome:display'] }, async ({ page }) => {
@@ -78,6 +102,47 @@ test.describe('Authentication', () => {
     // Should show password mismatch error and stay on sign-up page
     await expect(page.getByText('Las contraseñas no coinciden')).toBeVisible();
     await expect(page).toHaveURL(/.*sign-up/);
+  });
+
+  // Fails if sign-up discards the real server's common-password rejection or enters onboarding after a 400.
+  test('should display the server rejection for a common sign-up password', {
+    tag: [...AUTH_SIGN_UP_FORM, '@outcome:error'],
+  }, async ({ page }) => {
+    await page.goto('/sign-up');
+    await page.getByPlaceholder('First Name').fill('Policy');
+    await page.getByPlaceholder('Last Name').fill('Visitor');
+    await page.getByPlaceholder('Email').fill(`signup-policy-${randomUUID()}@versiona.test`);
+    await page.getByPlaceholder('Password', { exact: true }).fill('password123');
+    await page.getByPlaceholder('Confirm Password').fill('password123');
+    await page.getByRole('button', { name: 'Crear cuenta' }).click();
+    await expect(page.getByText('This password is too common.', { exact: true })).toHaveText('This password is too common.');
+    await expect(page).toHaveURL(/\/sign-up$/);
+  });
+
+  // Fails if a password-policy rejection consumes the recovery code or the valid retry cannot authenticate.
+  test('should preserve the recovery code after rejecting a numeric password', {
+    tag: [...AUTH_FORGOT_PASSWORD_FORM, '@outcome:error'],
+  }, async ({ page, request }) => {
+    const email = await createRecoveryAccount(request);
+    await page.goto('/forgot-password');
+    await page.getByPlaceholder('Email').fill(email);
+    await page.getByRole('button', { name: 'Send verification code', exact: true }).click();
+    const code = await readRecoveryCode(request, email);
+    await page.getByPlaceholder('000000').fill(code);
+    await page.getByPlaceholder('New Password', { exact: true }).fill('739152864039');
+    await page.getByPlaceholder('Confirm New Password').fill('739152864039');
+    await page.getByRole('button', { name: 'Reset password', exact: true }).click();
+    await expect(page.getByText('This password is entirely numeric.', { exact: true })).toHaveText('This password is entirely numeric.');
+    await expect(page).toHaveURL(/\/forgot-password$/);
+    await page.getByPlaceholder('000000').fill(code);
+    await page.getByPlaceholder('New Password', { exact: true }).fill('NewPass!2026');
+    await page.getByPlaceholder('Confirm New Password').fill('NewPass!2026');
+    await page.getByRole('button', { name: 'Reset password', exact: true }).click();
+    await expect(page).toHaveURL(/\/sign-in$/);
+    await page.getByPlaceholder('Email').fill(email);
+    await page.getByPlaceholder('Password', { exact: true }).fill('NewPass!2026');
+    await page.getByRole('button', { name: 'Entrar', exact: true }).click();
+    await expect(page).toHaveURL(/\/projects$/);
   });
 
   test('should navigate from sign-in to forgot password', { tag: [...AUTH_FORGOT_PASSWORD_FORM, '@outcome:display'] }, async ({ page }) => {
