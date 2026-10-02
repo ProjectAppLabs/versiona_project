@@ -73,7 +73,7 @@ def test_sign_up_creates_user(mock_captcha, api_client):
         reverse('sign_up'),
         {
             'email': 'new@example.com',
-            'password': 'pass1234',
+            'password': 'Violet-River!83',
             'first_name': 'New',
             'last_name': 'User',
         },
@@ -86,6 +86,36 @@ def test_sign_up_creates_user(mock_captcha, api_client):
     User = get_user_model()
     user = User.objects.get(email='new@example.com')
     assert user.first_name == 'New'
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'weak_password',
+    ['short', 'password123', '12345678', 'Alexandra99', 42],
+)
+@patch('accounts.views.auth.verify_recaptcha', return_value=True)
+def test_sign_up_rejects_passwords_that_fail_the_configured_policy(
+    mock_captcha, api_client, weak_password
+):
+    """Fails if sign-up creates an account after rejecting an unsafe password."""
+    User = get_user_model()
+    email = 'alexandra@example.com'
+
+    response = api_client.post(
+        reverse('sign_up'),
+        {
+            'email': email,
+            'password': weak_password,
+            'first_name': 'Alexandra',
+            'last_name': 'Stone',
+        },
+        format='json',
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert isinstance(response.json()['error'], str)
+    assert response.json()['error'] != ''
+    assert User.objects.filter(email=email).exists() is False
 
 
 @pytest.mark.django_db
@@ -681,7 +711,7 @@ def test_verify_passcode_resets_password(api_client):
 
     response = api_client.post(
         reverse('verify_passcode_reset'),
-        {'email': user.email, 'code': '333333', 'new_password': 'newpass'},
+        {'email': user.email, 'code': '333333', 'new_password': 'NewPass!2026'},
         format='json',
     )
 
@@ -690,7 +720,50 @@ def test_verify_passcode_resets_password(api_client):
     user.refresh_from_db()
 
     assert password_code.used is True
-    assert user.check_password('newpass') is True
+    assert user.check_password('NewPass!2026') is True
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'weak_password',
+    ['short', 'password123', '12345678', 'Alexandra99', 42],
+)
+def test_verify_passcode_keeps_valid_code_after_password_policy_rejection(
+    api_client, weak_password
+):
+    """Fails if a rejected password consumes a reset code before a valid retry."""
+    User = get_user_model()
+    user = User.objects.create_user(
+        email='reset-policy@example.com',
+        password='Violet-River!83',
+        first_name='Alexandra',
+        last_name='Stone',
+    )
+    password_code = PasswordCode.objects.create(user=user, code='444444')
+
+    rejected_response = api_client.post(
+        reverse('verify_passcode_reset'),
+        {'email': user.email, 'code': password_code.code, 'new_password': weak_password},
+        format='json',
+    )
+
+    assert rejected_response.status_code == status.HTTP_400_BAD_REQUEST
+    password_code.refresh_from_db()
+    user.refresh_from_db()
+    assert password_code.used is False
+    assert user.check_password('Violet-River!83') is True
+
+    accepted_response = api_client.post(
+        reverse('verify_passcode_reset'),
+        {'email': user.email, 'code': password_code.code, 'new_password': 'NewPass!2026'},
+        format='json',
+    )
+
+    assert accepted_response.status_code == status.HTTP_200_OK
+    password_code.refresh_from_db()
+    user.refresh_from_db()
+    assert password_code.used is True
+    assert user.check_password('NewPass!2026') is True
 
 
 @pytest.mark.django_db
@@ -734,13 +807,54 @@ def test_update_password_success(api_client):
 
     response = api_client.post(
         reverse('update_password'),
-        {'current_password': 'pass1234', 'new_password': 'newpass'},
+        {'current_password': 'pass1234', 'new_password': 'NewPass!2026'},
         format='json',
     )
 
     assert response.status_code == status.HTTP_200_OK
     user.refresh_from_db()
-    assert user.check_password('newpass') is True
+    assert user.check_password('NewPass!2026') is True
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'weak_password',
+    ['short', 'password123', '12345678', 'Alexandra99', 42],
+)
+def test_update_password_preserves_hash_when_new_password_fails_policy(
+    api_client, weak_password
+):
+    """Fails if an unsafe new password changes the hash before the request is rejected."""
+    User = get_user_model()
+    user = User.objects.create_user(
+        email='update-policy@example.com',
+        password='Violet-River!83',
+        first_name='Alexandra',
+        last_name='Stone',
+    )
+    api_client.force_authenticate(user=user)
+
+    rejected_response = api_client.post(
+        reverse('update_password'),
+        {'current_password': 'Violet-River!83', 'new_password': weak_password},
+        format='json',
+    )
+
+    assert rejected_response.status_code == status.HTTP_400_BAD_REQUEST
+    assert isinstance(rejected_response.json()['error'], str)
+    assert rejected_response.json()['error'] != ''
+    user.refresh_from_db()
+    assert user.check_password('Violet-River!83') is True
+
+    accepted_response = api_client.post(
+        reverse('update_password'),
+        {'current_password': 'Violet-River!83', 'new_password': 'NewPass!2026'},
+        format='json',
+    )
+
+    assert accepted_response.status_code == status.HTTP_200_OK
+    user.refresh_from_db()
+    assert user.check_password('NewPass!2026') is True
 
 
 @pytest.mark.django_db

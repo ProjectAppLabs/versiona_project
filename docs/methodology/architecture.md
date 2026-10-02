@@ -82,6 +82,16 @@ lock; el resultado público sólo se publica al terminar. Los fallos posteriores
 a la persistencia conservan la versión READY. Un trabajo antiguo sin checkpoint
 seguro se detiene sin reescribir datos; no se promete entrega única de SMTP.
 
+**Ronda de contraseñas — 2026-10-02:** todas las escrituras de contraseña de la
+API de acceso ejecutan la política configurada de Django antes de persistir.
+El registro valida contra el usuario todavía no creado; cambio y recuperación
+usan el usuario existente para detectar similitud con sus atributos. Recuperación
+comprueba primero la vigencia del código y sólo lo consume tras aceptar la
+contraseña. Cambio comprueba primero la contraseña actual. Los errores conservan
+el contrato HTTP 400 con texto, sin alterar los validadores de settings.
+Los diagnósticos de observaciones y reporte no cambian sus endpoints ni la
+resolución de cadenas D5; las obligaciones de rendimiento permanecen abiertas.
+
 **Next**: operator-gated go-public items — deployment (DP-21), domain+SMTP (DP-22),
 Ed25519 key rotation/custody (DP-24), Wompi checkout keys (F1 payment leg), optional
 It10: public certificate verification (/verificar + QR).
