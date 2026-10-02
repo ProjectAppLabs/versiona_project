@@ -301,6 +301,8 @@ jobs:
       DJANGO_EMAIL_USE_TLS: 'false'
       DJANGO_DEFAULT_FROM_EMAIL: versiona@localhost
       MAILPIT_API: http://127.0.0.1:8025
+      # Shared browser-runner IP; quota-specific backend tests enforce 5/min.
+      THROTTLE_AUTH: '1000/min'
 
     steps:
       - name: Checkout
