@@ -18,6 +18,22 @@ from documents.models import Document, DocumentVersion
 from documents.services.version_service import DomainError
 from projects.models import Project
 
+PURGE_BATCH_SIZE = 100
+
+
+def _purge_batches(queryset):
+    """Bound traversal even on MySQL, whose driver buffers iterator results."""
+    last_pk = 0
+    while batch := list(
+        queryset.filter(pk__gt=last_pk).order_by('pk').only('pk', 'deleted_at')[
+            :PURGE_BATCH_SIZE
+        ]
+    ):
+        # delete() clears instance PKs: advance before callers delete the batch.
+        last_pk = batch[-1].pk
+        yield from batch
+        del batch
+
 
 def _has_sealed_versions(document: Document) -> bool:
     versions = DocumentVersion.all_objects.filter(document=document)
@@ -139,20 +155,20 @@ def purge_expired(now=None) -> dict:
     Versions first (children), then documents, then projects. Numbers are
     never reused (I1: Document.latest_number is monotonic)."""
     counts = {'versions': 0, 'documents': 0, 'projects': 0}
-    for version in DocumentVersion.all_objects.purgeable(now):
+    for version in _purge_batches(DocumentVersion.all_objects.purgeable(now)):
         version.delete()
         counts['versions'] += 1
-    for document in Document.all_objects.purgeable(now):
+    for document in _purge_batches(Document.all_objects.purgeable(now)):
         DocumentVersion.all_objects.filter(document=document).update(
             deleted_at=document.deleted_at
         )
-        for version in DocumentVersion.all_objects.filter(document=document):
+        for version in _purge_batches(DocumentVersion.all_objects.filter(document=document)):
             version.delete()
         document.delete()
         counts['documents'] += 1
-    for project in Project.all_objects.purgeable(now):
-        for document in Document.all_objects.filter(project=project):
-            for version in DocumentVersion.all_objects.filter(document=document):
+    for project in _purge_batches(Project.all_objects.purgeable(now)):
+        for document in _purge_batches(Document.all_objects.filter(project=project)):
+            for version in _purge_batches(DocumentVersion.all_objects.filter(document=document)):
                 version.soft_delete()
                 version.delete()
             document.delete()

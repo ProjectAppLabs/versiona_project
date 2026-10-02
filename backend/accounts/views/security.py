@@ -1,10 +1,11 @@
 """A3 endpoints: 2FA lifecycle + active sessions."""
 
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, throttle_classes
 from rest_framework.response import Response
 
 from accounts import twofactor
+from accounts.throttles import AuthThrottle
 from documents.services.version_service import DomainError
 
 
@@ -27,6 +28,7 @@ def twofa_setup(request):
 
 
 @api_view(['POST'])
+@throttle_classes([AuthThrottle])
 def twofa_enable(request):
     try:
         backup_codes = twofactor.enable(request.user, (request.data or {}).get('code', ''))
@@ -36,6 +38,7 @@ def twofa_enable(request):
 
 
 @api_view(['POST'])
+@throttle_classes([AuthThrottle])
 def twofa_disable(request):
     try:
         twofactor.disable(request.user, (request.data or {}).get('code', ''))

@@ -205,8 +205,8 @@ def silk_reports_cleanup():
 def purge_trashed():
     """
     Daily physical purge of trash rows past the grace window (kit 3 —
-    docs/audit/03 B4-A02/C4-A01). The PG trigger guarantees nothing alive or
-    sealed can be deleted through this path.
+    docs/audit/03 B4-A02/C4-A01). The MySQL trigger requires versions to be
+    trashed before deletion; trash eligibility and PROTECT guard evidence.
     """
     from documents.services.trash_service import purge_expired
 
