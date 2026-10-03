@@ -67,6 +67,7 @@ test.describe('C2 — Subir una nueva versión', () => {
         .getByRole('link', { name: 'Contrato cuota C2' });
       await expect(documentLink).toBeVisible({ timeout: 90_000 });
       await documentLink.click();
+      await expect(page.getByTestId('version-item-1')).toBeVisible({ timeout: 20_000 });
       const message = 'Reentrega pendiente por cuota';
       const intentRoute = async (route: import('@playwright/test').Route) => {
         const url = new URL(route.request().url());

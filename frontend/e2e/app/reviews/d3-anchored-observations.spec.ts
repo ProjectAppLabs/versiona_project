@@ -227,10 +227,12 @@ test.describe('D3 — Observaciones ancladas', () => {
       const documentLink = editorPage.getByTestId('documents-list').getByRole('link', { name: title });
       await expect(documentLink).toBeVisible({ timeout: 90_000 });
       await documentLink.click();
+      await expect(editorPage.getByTestId('version-item-1')).toBeVisible({ timeout: 20_000 });
       const timelineUrl = editorPage.url();
       await editorPage.getByRole('link', { name: 'Ver documento' }).click();
       await editorPage.waitForURL(/versions\//);
       const v1Url = editorPage.url();
+      const v1Id = v1Url.split('/versions/')[1].split(/[/?#]/)[0];
 
       const reviewerContext = await browser.newContext({ storageState: 'e2e/.auth/reviewer.json' });
       const reviewerPage = await reviewerContext.newPage();
@@ -285,8 +287,15 @@ test.describe('D3 — Observaciones ancladas', () => {
       await reviewerPage.getByTestId(`observation-history-${threadId}`).click();
       const historicLink = reviewerPage.getByTestId(`observation-history-version-${threadId}-1`);
       await expect(historicLink).toHaveText('Ver en versión 1');
+      const historicObservations = reviewerPage.waitForResponse((response) => {
+        const url = new URL(response.url());
+        return response.status() === 200
+          && url.pathname === `/api/versions/${v1Id}/observations/`
+          && url.searchParams.get('status') === 'all';
+      });
       await historicLink.click();
       await expect(reviewerPage).toHaveURL(new RegExp(`\\?observation=${threadId}#observation-${threadId}$`));
+      await historicObservations;
       await expect(reviewerPage.getByTestId(`observation-${threadId}`)).toContainText(longBody.slice(0, 500));
 
       await editorContext.close();
@@ -308,6 +317,7 @@ test.describe('D3 — Observaciones ancladas', () => {
       const documentLink = editorPage.getByTestId('documents-list').getByRole('link', { name: title });
       await expect(documentLink).toBeVisible({ timeout: 90_000 });
       await documentLink.click();
+      await expect(editorPage.getByTestId('version-item-1')).toBeVisible({ timeout: 20_000 });
       await editorPage.getByRole('link', { name: 'Ver documento' }).click();
       await editorPage.waitForURL(/versions\//);
       const versionId = editorPage.url().split('/versions/')[1].split(/[/?#]/)[0];
@@ -329,7 +339,9 @@ test.describe('D3 — Observaciones ancladas', () => {
       };
       await reviewerPage.route('**/api/versions/*/observations/**', listRoute);
       await openDocumentVersionFromBoard(reviewerPage, title);
-      await expect(reviewerPage.getByRole('alert')).toHaveText('La lista no está disponible temporalmente.');
+      await expect(
+        reviewerPage.getByTestId('observations-panel').getByRole('alert')
+      ).toHaveText('La lista no está disponible temporalmente.');
       await expect(reviewerPage.getByTestId('observations-retry')).toHaveText('Reintentar');
       await reviewerPage.unroute('**/api/versions/*/observations/**', listRoute);
       await reviewerPage.getByTestId('observations-retry').click();
