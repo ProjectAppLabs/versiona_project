@@ -3,21 +3,18 @@
 /** D3: anchored observation threads for a version — status filter, replies,
  * the I14 transitions and the anchor health per version. */
 
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Modal } from '@/components/ui/Modal';
-import { StatusBadge, type StatusBadgeVariant } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toast';
-import { interpolate, useDict } from '@/lib/i18n/dictionaries';
-import { useObservationStore, type ObservationRow } from '@/lib/stores/observationStore';
+import { useDict } from '@/lib/i18n/dictionaries';
+import type { NormalizedBBox } from '@/lib/pdf/coords';
+import { useObservationStore } from '@/lib/stores/observationStore';
 import type { SectionInfo } from '@/lib/types';
 
-const STATUS_VARIANT: Record<ObservationRow['status'], StatusBadgeVariant> = {
-  open: 'in_review',
-  answered: 'draft',
-  resolved: 'approved',
-};
+import { ObservationThread } from './ObservationThread';
 
 interface ObservationsPanelProps {
   versionId: string;
@@ -34,7 +31,7 @@ interface ObservationsPanelProps {
    */
   canResolveAny?: boolean;
   currentUserEmail?: string | null;
-  onSelectAnchor?: (quads: ObservationRow['anchors'][number]['quads']) => void;
+  onSelectAnchor?: (quads: NormalizedBBox[]) => void;
 }
 
 export function ObservationsPanel({
@@ -50,33 +47,45 @@ export function ObservationsPanel({
   const t = useDict('observations');
   const common = useDict('common');
   const { toast } = useToast();
+  const searchParams = useSearchParams();
+  const focusedObservationId = searchParams?.get('observation') ?? null;
   const items = useObservationStore((s) => s.items);
+  const activeVersionId = useObservationStore((s) => s.versionId);
+  const activeFilter = useObservationStore((s) => s.statusFilter);
+  const generation = useObservationStore((s) => s.generation);
+  const nextCursor = useObservationStore((s) => s.nextCursor);
+  const isLoading = useObservationStore((s) => s.isLoading);
+  const error = useObservationStore((s) => s.loadError);
   const isSubmitting = useObservationStore((s) => s.isSubmitting);
   const fetch = useObservationStore((s) => s.fetch);
+  const reset = useObservationStore((s) => s.reset);
+  const loadMore = useObservationStore((s) => s.loadMore);
+  const retryLoad = useObservationStore((s) => s.retryLoad);
   const create = useObservationStore((s) => s.create);
-  const reply = useObservationStore((s) => s.reply);
-  const setStatus = useObservationStore((s) => s.setStatus);
-  const [showResolved, setShowResolved] = useState(false);
+  const filterKey = `${versionId}:${focusedObservationId ?? ''}`;
+  const [filterSelection, setFilterSelection] = useState({ key: filterKey, showResolved: !!focusedObservationId });
+  const showResolved = filterSelection.key === filterKey ? filterSelection.showResolved : !!focusedObservationId;
   const [modalOpen, setModalOpen] = useState(false);
   const [body, setBody] = useState('');
   const [sectionKey, setSectionKey] = useState('');
-  const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
+  const filter = showResolved ? 'all' : 'active';
+  const scopeMatches = activeVersionId === versionId && activeFilter === filter;
 
   useEffect(() => {
-    void fetch(versionId);
-  }, [versionId, fetch]);
+    void fetch(versionId, filter, focusedObservationId);
+    return reset;
+  }, [versionId, filter, focusedObservationId, fetch, reset]);
 
-  const visible = items.filter((item) => showResolved || item.status !== 'resolved');
+  const visible = scopeMatches ? items : [];
 
   const act = async (result: Promise<boolean>) => {
+    const currentGeneration = useObservationStore.getState().generation;
     const ok = await result;
+    if (useObservationStore.getState().generation !== currentGeneration) return false;
     toast(ok ? common.saved : (useObservationStore.getState().error ?? common.error),
       ok ? 'success' : 'error');
     return ok;
   };
-
-  const anchorFor = (item: ObservationRow) =>
-    item.anchors.find((anchor) => anchor.version_number === versionNumber);
 
   return (
     <section data-testid="observations-panel" className="flex flex-col gap-2">
@@ -87,7 +96,7 @@ export function ObservationsPanel({
             data-testid="show-resolved"
             type="checkbox"
             checked={showResolved}
-            onChange={() => setShowResolved((value) => !value)}
+            onChange={() => setFilterSelection({ key: filterKey, showResolved: !showResolved })}
           />
           {t.showResolved}
         </label>
@@ -96,7 +105,8 @@ export function ObservationsPanel({
       {canCreate ? (
         <button
           data-testid="add-observation"
-          className="self-start rounded-full border border-border px-4 py-1.5 text-sm hover:bg-accent"
+          className="self-start rounded-full border border-border px-4 py-1.5 text-sm hover:bg-accent disabled:opacity-50"
+          disabled={!scopeMatches || isLoading}
           onClick={() => setModalOpen(true)}
           type="button"
         >
@@ -104,112 +114,53 @@ export function ObservationsPanel({
         </button>
       ) : null}
 
-      {visible.length === 0 ? (
+      {isLoading || !scopeMatches ? <p role="status" className="text-xs text-muted-foreground">{common.loading}</p> : null}
+      {scopeMatches && error ? (
+        <div className="text-xs text-destructive">
+          <p role="alert">{error}</p>
+          <button
+            data-testid="observations-retry"
+            className="mt-1 text-primary hover:underline disabled:opacity-50"
+            disabled={isLoading}
+            onClick={() => void retryLoad()}
+            type="button"
+          >
+            {common.retry}
+          </button>
+        </div>
+      ) : null}
+
+      {visible.length === 0 && scopeMatches && !isLoading && !error ? (
         <EmptyState title={t.empty} description={t.emptyBody} />
       ) : (
         <ol className="flex flex-col gap-3">
-          {visible.map((item) => {
-            const anchor = anchorFor(item);
-            return (
-              <li
-                key={item.public_id}
-                data-testid={`observation-${item.public_id}`}
-                data-status={item.status}
-                className="rounded-2xl border border-border bg-card p-4"
-              >
-                <div className="flex flex-wrap items-center gap-2 text-sm">
-                  <StatusBadge variant={STATUS_VARIANT[item.status]}>
-                    {t.status[item.status]}
-                  </StatusBadge>
-                  <span className="font-medium">{item.author_email}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {interpolate(t.onVersion, { version: item.created_on })}
-                    {item.resolved_in
-                      ? ` · ${interpolate(t.resolvedIn, { version: item.resolved_in })}`
-                      : ''}
-                  </span>
-                </div>
-                {item.section_heading ? (
-                  <button
-                    data-testid={`observation-anchor-${item.public_id}`}
-                    className="mt-1 text-xs text-primary underline-offset-2 hover:underline"
-                    onClick={() => anchor && onSelectAnchor?.(anchor.quads)}
-                    type="button"
-                  >
-                    {item.section_heading}
-                    {anchor ? ` — ${t.anchor[anchor.method]}` : ''}
-                  </button>
-                ) : null}
-                <p className="mt-1 text-sm">{item.body}</p>
-
-                {item.replies.map((replyRow) => (
-                  <p
-                    key={replyRow.public_id}
-                    className="mt-2 rounded-xl bg-muted/40 px-3 py-2 text-sm"
-                  >
-                    <span className="font-medium">{replyRow.author_email}</span>: {replyRow.body}
-                  </p>
-                ))}
-
-                <div className="mt-2 flex flex-wrap items-center gap-2">
-                  {canReply && item.status !== 'resolved' ? (
-                    <>
-                      <input
-                        data-testid={`reply-input-${item.public_id}`}
-                        className="min-w-0 flex-1 rounded-lg border border-border bg-background px-3 py-1.5 text-sm"
-                        placeholder={t.replyPlaceholder}
-                        value={replyDrafts[item.public_id] ?? ''}
-                        onChange={(event) =>
-                          setReplyDrafts((current) => ({
-                            ...current,
-                            [item.public_id]: event.target.value,
-                          }))
-                        }
-                      />
-                      <button
-                        data-testid={`reply-send-${item.public_id}`}
-                        className="rounded-full border border-border px-3 py-1.5 text-xs hover:bg-accent"
-                        onClick={() =>
-                          void act(
-                            reply(versionId, item.public_id, replyDrafts[item.public_id] ?? '')
-                          ).then((ok) => {
-                            if (ok)
-                              setReplyDrafts((current) => ({ ...current, [item.public_id]: '' }));
-                          })
-                        }
-                        type="button"
-                      >
-                        {t.reply}
-                      </button>
-                    </>
-                  ) : null}
-                  {item.status === 'answered' &&
-                  (item.author_email === currentUserEmail || canResolveAny) ? (
-                    <button
-                      data-testid={`resolve-${item.public_id}`}
-                      className="rounded-full bg-primary px-3 py-1.5 text-xs text-primary-foreground"
-                      onClick={() => void act(setStatus(versionId, item.public_id, 'resolved'))}
-                      type="button"
-                    >
-                      {t.resolve}
-                    </button>
-                  ) : null}
-                  {item.status === 'resolved' && item.author_email === currentUserEmail ? (
-                    <button
-                      data-testid={`reopen-${item.public_id}`}
-                      className="rounded-full border border-border px-3 py-1.5 text-xs hover:bg-accent"
-                      onClick={() => void act(setStatus(versionId, item.public_id, 'open'))}
-                      type="button"
-                    >
-                      {t.reopen}
-                    </button>
-                  ) : null}
-                </div>
-              </li>
-            );
-          })}
+          {visible.map((item) => (
+            <ObservationThread
+              key={`${generation}:${item.public_id}`}
+              item={item}
+              versionId={versionId}
+              versionNumber={versionNumber}
+              canReply={canReply}
+              canResolveAny={canResolveAny}
+              currentUserEmail={currentUserEmail}
+              act={act}
+              onSelectAnchor={onSelectAnchor}
+            />
+          ))}
         </ol>
       )}
+
+      {scopeMatches && nextCursor ? (
+        <button
+          data-testid="observations-more"
+          className="self-start rounded-full border border-border px-4 py-1.5 text-sm hover:bg-accent disabled:opacity-50"
+          disabled={isLoading}
+          onClick={() => void loadMore()}
+          type="button"
+        >
+          {isLoading ? common.loading : t.loadMore}
+        </button>
+      ) : null}
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={t.addTitle}>
         <label className="block text-sm">

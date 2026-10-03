@@ -4,11 +4,11 @@
 
 Use this document to understand each flow's steps, branching conditions, role restrictions,
 and API contracts before writing or reviewing E2E tests. Flow ids map 1:1 to
-`frontend/e2e/flow-definitions.json` (v2.2.2) and to the founding-artifact flow ids
+`frontend/e2e/flow-definitions.json` (v2.3.0) and to the founding-artifact flow ids
 (A1…F1) planned in `docs/plan/01-alcance-mvp.md`.
 
-**Version:** 2.2.2
-**Last Updated:** 2026-10-01
+**Version:** 2.3.0
+**Last Updated:** 2026-10-02
 
 > Maintenance rule (docs/plan/09 DoD #4): each vertical iteration rewrites the sheets of the
 > flows it ships and flips them from *Planned* to *Implemented*. Acceptance criteria live in
@@ -25,7 +25,8 @@ and API contracts before writing or reviewing E2E tests. Flow ids map 1:1 to
 5. [Cross-Reference](#cross-reference)
 6. [Roles and Conventions](#roles-and-conventions)
 7. [Projects — interactions by role](#projects--interactions-by-role)
-8. [E2E Coverage Index](#e2e-coverage-index)
+8. [Document and review — interactions by role](#document-and-review--interactions-by-role)
+9. [E2E Coverage Index](#e2e-coverage-index)
 
 ---
 
@@ -59,12 +60,12 @@ and API contracts before writing or reviewing E2E tests. Flow ids map 1:1 to
 | `b1-create-project` | B1 Create a project | projects | P1 | editor | `/projects/new` | Implemented (It1) |
 | `b2-projects-board` | B2 Projects board | projects | P2 | viewer | `/projects` | Implemented (It5; minimal list in It1) |
 | `b3-project-settings` | B3 Project configuration | projects | P2 | admin | `/projects/[id]/settings` | Implemented (It5) |
-| `c1-upload-first` | C1 Upload first document | documents | P1 | editor | `/projects/[id]` | Implemented (It1) |
-| `c2-upload-version` | C2 Upload a new version | documents | P1 | editor | `/projects/[id]/documents/[docId]` | Implemented (It1) |
+| `c1-upload-first` | C1 Upload first document | documents | P1 | editor | `/projects/[id]` | Implemented (It1; upload-intent quota reviewed 2026-10-02) |
+| `c2-upload-version` | C2 Upload a new version | documents | P1 | editor | `/projects/[id]/documents/[docId]` | Implemented (It1; upload-intent quota reviewed 2026-10-02) |
 | `c3-history` | C3 Version history | documents | P2 | viewer | `/projects/[id]/documents/[docId]` | Implemented (It1) |
 | `d1-request-review` | D1 Request a review | review | P1 | editor/reviewer | version viewer + `/inbox` | Implemented (It4) |
 | `d2-assisted-review` | D2 Assisted review | review | P1 | reviewer | version viewer, auto (`ReviewContextBar`, shown when you sealed an earlier version) | Implemented (It4) |
-| `d3-anchored-observations` | D3 Anchored observations | review | P1 | reviewer/editor/admin | version viewer | Implemented (It4) |
+| `d3-anchored-observations` | D3 Anchored observations | review | P1 | viewer/reviewer/editor/admin | version viewer | Implemented (It4; progressive reading reviewed 2026-10-02) |
 | `d4-seal-approve` | D4 Approve with a seal | review | P1 | reviewer | version viewer (Seals panel) | Implemented (It3) |
 | `d5-selective-invalidation` | D5 Selective invalidation | review | P1 | editor/reviewer/admin | seals panel + `/inbox` | Implemented (It3) |
 | `e1-compare` | E1 Compare two versions | compare | P1 | viewer | `.../compare/[base]/[target]` | Implemented (It2) |
@@ -280,6 +281,42 @@ los fallos del servidor al guardar configuración corresponden a B3.
 | `/projects/[id]/settings` — A2 | Enviar una invitación válida | success | Aparece pendiente con correo y rol elegidos; al aceptarla se abre el proyecto |
 | `/projects/[id]/settings` — A2 | Intentar invitar sin permiso | error | El servidor rechaza el intento sin crear la invitación |
 
+## Document and review — interactions by role
+
+### Editor — C1/C2 upload intent
+
+| Flujo | Interacción | Outcome | Resultado observable |
+|---|---|---|---|
+| C1/C2 | Solicitar un upload dentro de la cuota, elegir un PDF válido y completarlo. | success | Se emite la URL firmada y la versión pasa al análisis. |
+| C1/C2 | Elegir un PDF inválido o protegido. | error | El formulario conserva el borrador y muestra el error. |
+| C1/C2 | Solicitar otra intención después de consumir 20 en una hora con el mismo usuario. | failure | Aparece el 429 reintentable, sin URL nueva; una intención anterior puede completarse. |
+
+La cuota pertenece al usuario autenticado, no al documento ni al navegador. La
+validación real del límite corresponde a los tests backend con caché aislada; las
+pruebas de UI verifican la presentación del 429. La preparación masiva de E2E usa
+una cuota finita mayor, exclusivamente en su entorno de pruebas.
+
+### Viewer, reviewer, editor y admin — D3 anchored observations
+
+| Interacción | Outcome | Resultado observable |
+|---|---|---|
+| Reviewer o admin crea un hilo anclado; editor responde; el autor o admin resuelve y el autor reabre. | success | El resumen refleja el estado I14 sin descargar toda la conversación. |
+| Editor envía una respuesta vacía. | error | Aparece la validación y el hilo sigue abierto. |
+| Abrir el panel desde la historia del documento, cargar más hilos, respuestas anteriores, historial, una versión histórica o el siguiente fragmento de texto/ancla. | display | Se ven texto, estado, autor, página y metadatos de la fixture; cada control carga únicamente la página o fragmento solicitado. |
+| Falla una petición de lista, respuestas, historial o contenido; pulsar reintentar. | failure | Los datos visibles se conservan, aparece un aviso y se reintenta sólo la petición fallida. |
+| Cambiar versión, filtro de resueltas o hilo seleccionado con una petición pendiente. | display | Se muestra únicamente el alcance actual; la respuesta obsoleta no lo reemplaza. |
+
+El enlace histórico mantiene el hilo mediante `?observation=UUID`, incluso fuera
+de la primera página. Las anclas de versiones en la papelera conservan sus datos
+sin ofrecer un enlace al visor que respondería 404.
+
+Selectores D3: `observations-panel`, `show-resolved`, `add-observation`,
+`observations-more`, `observations-retry`, `observation-<id>`,
+`observation-text-<id>-more`, `observation-replies-<id>`,
+`observation-replies-more-<id>`, `observation-history-<id>`,
+`observation-history-more-<id>`, `observation-anchor-<id>` y
+`observation-anchor-more-<id>`.
+
 ## E2E Coverage Index
 
 | Flujo | Outcomes declarados | Spec dueño |
@@ -288,6 +325,9 @@ los fallos del servidor al guardar configuración corresponden a B3.
 | B2 | display | `e2e/app/projects/b2-board-search.spec.ts` (compact + landscape) |
 | B3 | success, failure | `e2e/app/projects/b3-e3-governance.spec.ts` (persistencia en portrait) |
 | A2 | success, error, display | `e2e/app/onboarding/a2-invite-team.spec.ts` (correos largos en portrait) |
+| C1 | success, error, failure | `e2e/app/documents/c1-upload-first-document.spec.ts` — presentación de cuota agotada |
+| C2 | success, error, failure | `e2e/app/documents/c2-upload-new-version.spec.ts` — presentación de cuota agotada |
+| D3 | success, error, failure, display | `e2e/app/reviews/d3-anchored-observations.spec.ts` — lectura progresiva, reintento e historial |
 
 La auditoría automática calcula la cobertura real. Estas filas declaran qué se
 debe validar; mencionar un spec aquí no le otorga crédito de cobertura.

@@ -21,10 +21,17 @@
 
 **MVP feature-complete**: 19 flows E2E green (`docs/audit/05-cierre.md` "MISIÓN
 CUMPLIDA") + It9 public surfaces. Flow contract: `frontend/e2e/flow-definitions.json`
-v2.2.2 (37 flows).
+v2.3.0 (37 flows).
 
 ## Rondas de mantenimiento
 
+- **2026-10-02 — carga de documentos:** cuota por usuario en uploads, reporte
+  mediante proyecciones agrupadas y lectura progresiva de observaciones,
+  incluyendo contenido íntegro antiguo e historial navegable. Rama de sesión
+  propia desde master; pruebas de presupuesto, I11/I14 y UX en un entorno
+  privado. Evidencia y entrega: reporte `improvement-pass-project-document-load`
+  del toolkit. El payload del reporte continúa sin paginación y queda como
+  obligación separada; los cinco frentes conservan alcances pendientes.
 - **2026-10-01 — mejora transversal:** identidad Google vinculada
   a claims verificados, segundo factor obligatorio también por Google y análisis
   recuperable por etapas. Se seleccionaron tres candidatos globales mediante el

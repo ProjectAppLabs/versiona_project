@@ -1,5 +1,6 @@
-"""
-The D5 lifecycle over the REAL fixtures (integration — MinIO + engine +
+"""The D5 lifecycle over real integration fixtures.
+
+The fixtures exercise storage, engine, comparison, resolver and notifications:
 comparison + resolver + notifications):
 
 contrato_v1 → reviewer A seals §1–2, reviewer B seals §3 (multas) → editor
@@ -9,11 +10,14 @@ notified (S6). This is the queen scenario at the API level.
 """
 
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
-
+from django.db.models import Value
+from django.utils import timezone
 from documents.services import storage_service, version_service
 from notifications.models import Notification
+
 from reviews.models import Seal, SealValidityRecord
 from reviews.services import seal_service
 
@@ -27,10 +31,37 @@ def _test_env(settings, tmp_path):
 
 
 def upload(document, fixture, message, author):
+    """Create one analyzed version through the real object-storage lifecycle."""
     intent = version_service.create_upload_intent(document, author)
     storage_service.put_bytes(intent.key, (TESTDATA / fixture).read_bytes(), 'application/pdf')
     version, _ = version_service.complete_upload(document, intent.upload_id, message, author)
     return version
+
+
+def _add_validity_records(seal, versions, decisions):
+    for version, decision in zip(versions, decisions):
+        if decision is not None:
+            SealValidityRecord.objects.create(
+                seal=seal, to_document_version=version, decision=decision,
+            )
+
+
+def _arrange_i11_case(seal, versions, decisions, revoked, trash_intermediate):
+    _add_validity_records(seal, versions[1:], decisions)
+    if revoked:
+        Seal.objects.filter(pk=seal.pk).update(revoked_at=timezone.now())
+        seal.refresh_from_db()
+    if trash_intermediate:
+        from documents.models import DocumentVersion
+        DocumentVersion.all_objects.filter(pk=versions[1].pk).update(deleted_at=timezone.now())
+
+
+def _target_at_number(versions, target_number):
+    return (
+        versions[target_number - 1]
+        if target_number
+        else SimpleNamespace(number=0, document_id=versions[0].document_id)
+    )
 
 
 @pytest.fixture
@@ -57,6 +88,7 @@ def sealed_v1(versiona_context):
 @pytest.mark.django_db
 @pytest.mark.escenario('D4-F01')
 def test_seal_binds_the_exact_content_hashes(sealed_v1):
+    """A seal payload retains the hashes that its signature verifies."""
     _, _, v1, seal_a, _ = sealed_v1
 
     payload = seal_a.signed_payload
@@ -72,6 +104,7 @@ def test_seal_binds_the_exact_content_hashes(sealed_v1):
 @pytest.mark.django_db
 @pytest.mark.escenario('D5-F01')
 def test_new_version_preserves_a_and_invalidates_b_selectively(sealed_v1):
+    """One changed section invalidates only the seal that covered it."""
     context, document, v1, seal_a, seal_b = sealed_v1
     editor = context.users['editor']
 
@@ -94,6 +127,7 @@ def test_new_version_preserves_a_and_invalidates_b_selectively(sealed_v1):
 @pytest.mark.django_db
 @pytest.mark.escenario('D5-F05')
 def test_only_the_invalidated_reviewer_is_notified(sealed_v1):
+    """Only a reviewer whose seal broke receives a re-review notification."""
     context, document, _, seal_a, seal_b = sealed_v1
     editor = context.users['editor']
 
@@ -112,6 +146,7 @@ def test_only_the_invalidated_reviewer_is_notified(sealed_v1):
 @pytest.mark.django_db
 @pytest.mark.escenario('D5-A05')
 def test_invalidation_is_idempotent_per_version_pair(sealed_v1):
+    """Replaying invalidation does not duplicate its validity record or notice."""
     context, document, _, seal_a, seal_b = sealed_v1
     editor = context.users['editor']
     upload(document, 'contrato_v2.pdf', 'v2', editor)
@@ -130,6 +165,7 @@ def test_invalidation_is_idempotent_per_version_pair(sealed_v1):
 @pytest.mark.django_db
 @pytest.mark.escenario('D5-F06')
 def test_validity_chain_i11_across_versions(sealed_v1):
+    """A preserved chain remains valid while an invalidated chain does not."""
     context, document, v1, seal_a, seal_b = sealed_v1
     editor = context.users['editor']
 
@@ -142,9 +178,90 @@ def test_validity_chain_i11_across_versions(sealed_v1):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('case', 'records', 'revoked', 'target_number', 'trash_intermediate', 'expected'),
+    [
+        ('own_version', (), False, 1, False, True),
+        ('preserved_chain', ('preserved', 'preserved'), False, 3, False, True),
+        ('missing_link', (None, 'preserved'), False, 3, False, False),
+        ('pending_link', ('pending_confirmation', 'preserved'), False, 3, False, False),
+        ('invalidated_link', ('invalidated', 'preserved'), False, 3, False, False),
+        ('superseded_link', ('superseded', 'preserved'), False, 3, False, False),
+        ('revoked_seal', ('preserved', 'preserved'), True, 3, False, False),
+        ('target_before_seal', (), False, 0, False, False),
+        ('trashed_intermediate', (None, 'preserved'), False, 3, True, True),
+    ],
+)
+def test_i11_validity_requires_each_live_preserved_link(
+    document_with_versions, versiona_context, case, records, revoked, target_number,
+    trash_intermediate, expected,
+):
+    """Catches: I11 accepting a missing or non-preserved live chain link."""
+    document, versions = document_with_versions(n_versions=3, document_slug=f'i11-{case}')
+    seal = Seal.objects.create(
+        document_version=versions[0], reviewer=versiona_context.users['reviewer'],
+        signed_payload={}, signature=f'signature-{case}', key_id=f'key-{case}',
+    )
+    _arrange_i11_case(seal, versions, records, revoked, trash_intermediate)
+    target = _target_at_number(versions, target_number)
+
+    scalar = seal_service.seal_is_valid_at(seal, target)
+    bulk = seal_service.valid_seals_at_number(
+        Seal.objects.filter(pk=seal.pk), Value(target.number),
+    ).exists()
+
+    assert scalar is expected
+    assert bulk is expected
+
+
+@pytest.mark.django_db
+def test_i11_scalar_validity_rejects_target_from_another_document(
+    document_with_versions, versiona_context,
+):
+    """Catches: a seal becoming valid for a same-number version in another document."""
+    _, sealed_versions = document_with_versions(n_versions=1, document_slug='sellado')
+    _, other_versions = document_with_versions(n_versions=1, document_slug='ajeno')
+    seal = Seal.objects.create(
+        document_version=sealed_versions[0], reviewer=versiona_context.users['reviewer'],
+        signed_payload={}, signature='cross-document', key_id='cross-document',
+    )
+
+    valid = seal_service.seal_is_valid_at(seal, other_versions[0])
+
+    assert valid is False
+
+
+@pytest.mark.django_db
+def test_i11_validity_allows_a_missing_numeric_slot_without_live_version(
+    document_with_versions, versiona_context,
+):
+    """Catches: I11 treating a consumed but absent version number as a broken link."""
+    document, versions = document_with_versions(n_versions=1, document_slug='hueco')
+    from documents.models import DocumentVersion
+    target = DocumentVersion.objects.create(
+        document=document, number=3, message='v3', sha256='3' * 64,
+        file_key=f'test/docs/{document.public_id}/v3/original.pdf',
+        analysis_status=DocumentVersion.AnalysisStatus.READY,
+        config_version=versiona_context.config, author=versiona_context.users['editor'],
+    )
+    seal = Seal.objects.create(
+        document_version=versions[0], reviewer=versiona_context.users['reviewer'],
+        signed_payload={}, signature='number-gap', key_id='number-gap',
+    )
+    SealValidityRecord.objects.create(
+        seal=seal, to_document_version=target, decision=SealValidityRecord.Decision.PRESERVED,
+    )
+
+    valid = seal_service.seal_is_valid_at(seal, target)
+
+    assert valid is True
+
+
+@pytest.mark.django_db
 @pytest.mark.escenario('D4-A01')
 @pytest.mark.escenario('D4-A02')
 def test_seal_can_be_withdrawn_before_approval_but_not_after(sealed_v1):
+    """An unapproved seal can be revoked while approval makes remaining seals immutable."""
     context, document, v1, seal_a, _ = sealed_v1
     from documents.models import DocumentVersion
 
@@ -163,8 +280,10 @@ def test_seal_can_be_withdrawn_before_approval_but_not_after(sealed_v1):
 @pytest.mark.django_db
 @pytest.mark.escenario('D4-F02')
 def test_covers_all_seal_approves_the_version_and_freezes_it(versiona_context):
-    """I10 + I5: a covers_all seal under the MVP policy approves the version;
-    approval freezes the draft (message no longer editable — I2b)."""
+    """A covers-all seal approves the version and freezes its editable draft fields.
+
+    This enforces I10 and I5 under the MVP policy.
+    """
     context = versiona_context
     editor = context.users['editor']
     reviewer = context.users['reviewer']

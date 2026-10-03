@@ -57,4 +57,41 @@ test.describe('C1 — Subir el primer documento', () => {
       await expect(page.getByTestId('upload-dropzone')).toBeVisible();
     }
   );
+
+  test(
+    'C1-F02 — una cuota agotada conserva el borrador y no inicia el análisis',
+    { tag: [...C1_UPLOAD_FIRST, '@scenario:c1-f02', '@outcome:failure'] },
+    async ({ page }) => {
+      // Catches: rendering a 429 as a successful upload, losing the title or
+      // message, or starting analysis despite the server issuing no intent.
+      await createProject(page, uniqueName('Cuota C1'));
+      const title = 'Borrador sin cuota';
+      const message = 'Mantener este mensaje para reintentar';
+      const intentRoute = async (route: import('@playwright/test').Route) => {
+        const url = new URL(route.request().url());
+        if (/\/api\/documents\/[^/]+\/versions\/upload_intent\/$/.test(url.pathname)) {
+          await route.fulfill({
+            status: 429,
+            contentType: 'application/json',
+            headers: { 'Retry-After': '60' },
+            body: JSON.stringify({ detail: 'Request was throttled. Expected available in 60 seconds.' }),
+          });
+          return;
+        }
+        await route.fallback();
+      };
+      await page.route('**/api/documents/*/versions/upload_intent/**', intentRoute);
+      await page.getByTestId('upload-input').setInputFiles(path.join(TESTDATA, 'contrato_v1.pdf'));
+      await page.getByTestId('upload-title').fill(title);
+      await page.getByTestId('upload-message').fill(message);
+      await page.getByTestId('upload-confirm').click();
+      await expect(page.getByTestId('upload-error')).toHaveText(
+        'Alcanzaste el límite de subidas. Espera 60 segundos y vuelve a intentarlo.'
+      );
+      await expect(page.getByTestId('upload-title')).toHaveValue(title);
+      await expect(page.getByTestId('upload-message')).toHaveValue(message);
+      await expect(page.getByTestId('upload-analyzing')).toHaveCount(0);
+      await page.unroute('**/api/documents/*/versions/upload_intent/**', intentRoute);
+    }
+  );
 });

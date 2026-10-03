@@ -53,4 +53,46 @@ test.describe('C2 — Subir una nueva versión', () => {
       await expect(page.getByText('mensaje corregido')).toBeVisible({ timeout: 15_000 });
     }
   );
+
+  test(
+    'C2-F02 — una cuota agotada conserva la re-entrega para reintentarla',
+    { tag: [...C2_UPLOAD_VERSION, '@scenario:c2-f02', '@outcome:failure'] },
+    async ({ page }) => {
+      // Catches: treating a 429 intent rejection as a completed v2, or
+      // dropping the editor's re-delivery message before it can be retried.
+      await createProject(page, uniqueName('Cuota C2'));
+      await uploadPdf(page, 'contrato_v1.pdf', { title: 'Contrato cuota C2', message: 'v1' });
+      const documentLink = page
+        .getByTestId('documents-list')
+        .getByRole('link', { name: 'Contrato cuota C2' });
+      await expect(documentLink).toBeVisible({ timeout: 90_000 });
+      await documentLink.click();
+      await expect(page.getByTestId('version-item-1')).toBeVisible({ timeout: 20_000 });
+      const message = 'Reentrega pendiente por cuota';
+      const intentRoute = async (route: import('@playwright/test').Route) => {
+        const url = new URL(route.request().url());
+        if (/\/api\/documents\/[^/]+\/versions\/upload_intent\/$/.test(url.pathname)) {
+          await route.fulfill({
+            status: 429,
+            contentType: 'application/json',
+            headers: { 'Retry-After': '60' },
+            body: JSON.stringify({ detail: 'Request was throttled. Expected available in 60 seconds.' }),
+          });
+          return;
+        }
+        await route.fallback();
+      };
+      await page.route('**/api/documents/*/versions/upload_intent/**', intentRoute);
+      await page.getByTestId('upload-input').setInputFiles(path.join(TESTDATA, 'contrato_v2.pdf'));
+      await page.getByTestId('upload-message').fill(message);
+      await page.getByTestId('upload-confirm').click();
+      await expect(page.getByTestId('upload-error')).toHaveText(
+        'Alcanzaste el límite de subidas. Espera 60 segundos y vuelve a intentarlo.'
+      );
+      await expect(page.getByTestId('upload-message')).toHaveValue(message);
+      await expect(page.getByTestId('upload-analyzing')).toHaveCount(0);
+      await expect(page.getByTestId('version-item-2')).toHaveCount(0);
+      await page.unroute('**/api/documents/*/versions/upload_intent/**', intentRoute);
+    }
+  );
 });
