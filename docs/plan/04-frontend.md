@@ -119,7 +119,7 @@ exported selectors):
 | `versionStore` | Timeline (C3), active version (meta + sections + bboxes), signed download URL |
 | `jobStore` | **Generic** job tracker: `jobs: Record<jobId, {type, status, progress, error, result_ref}>`; `track(jobId)` starts polling — 2 s → ×1.5 backoff to 10 s, stops on done/failed or 5-min timeout (StagingGate pattern) |
 | `compareStore` | base/target pair, result (section_changes + highlights + summary), active view (E1) |
-| `observationStore` | Threads per version, reviewer/state filters, create/reply/transition (D3) |
+| `observationStore` | Hilos por versión y estado, páginas de respuestas/historial, contenido íntegro por partes y create/reply/transition (D3). Descarta respuestas tardías al cambiar versión o filtro. |
 | `reviewStore` | Requests (D1), inbox, "already reviewed by you" progress (D2) |
 | `sealStore` | Seals per version with validity states, seal action (D4), invalidation plan + confirm (D5) |
 | `checkStore` | Checklist config (E3/B3) + per-version results with evidence |

@@ -1,54 +1,18 @@
-"""Observation endpoints (D3)."""
+"""Observation endpoints (D3) with bounded pages and progressive content."""
 
 from django.http import Http404
 from rest_framework import serializers, status
 from rest_framework.decorators import api_view
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from core.permissions import require_project_role, resolve_effective_role
 from documents.models import DocumentVersion
 from documents.services.version_service import DomainError
 
+from . import queries, services
 from .models import Observation, ObservationAnchor, ObservationReply
-from . import services
-
-
-class ReplySerializer(serializers.ModelSerializer):
-    author_email = serializers.EmailField(source='author.email', read_only=True)
-
-    class Meta:
-        model = ObservationReply
-        fields = ('public_id', 'author_email', 'body', 'status_change', 'created_at')
-
-
-class AnchorSerializer(serializers.ModelSerializer):
-    version_number = serializers.IntegerField(source='document_version.number', read_only=True)
-
-    class Meta:
-        model = ObservationAnchor
-        fields = ('version_number', 'page', 'quads', 'text_snippet', 'method')
-
-
-class ObservationSerializer(serializers.ModelSerializer):
-    author_email = serializers.EmailField(source='author.email', read_only=True)
-    section_key = serializers.CharField(source='section.stable_key', read_only=True, default=None)
-    section_heading = serializers.CharField(
-        source='section.title_current', read_only=True, default=None
-    )
-    created_on = serializers.IntegerField(source='created_on_version.number', read_only=True)
-    resolved_in = serializers.IntegerField(
-        source='resolved_in_version.number', read_only=True, default=None
-    )
-    replies = ReplySerializer(many=True, read_only=True)
-    anchors = AnchorSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Observation
-        fields = (
-            'public_id', 'body', 'status', 'author_email', 'section_key',
-            'section_heading', 'created_on', 'resolved_in', 'replies', 'anchors',
-            'created_at',
-        )
+from .pagination import page_by_created_at, page_by_version_number
 
 
 class ObservationCreateSerializer(serializers.Serializer):
@@ -59,23 +23,54 @@ class ObservationCreateSerializer(serializers.Serializer):
     snippet = serializers.CharField(required=False, allow_blank=True, default='')
 
 
+def _requested_version(request):
+    raw = request.query_params.get('version')
+    if raw is None:
+        return None
+    return serializers.UUIDField().run_validation(raw)
+
+
+def _summary(observation, *, version_id=None):
+    row = queries.observation_rows(
+        Observation.objects.filter(pk=observation.pk), version_id=version_id,
+    ).get()
+    return queries.observation_summary(row)
+
+
 @api_view(['GET', 'POST'])
 @require_project_role('viewer')
 def version_observations(request, ver):
-    """GET: the document's threads with their anchor for THIS version.
-    POST (reviewer+): open a thread anchored to a section/region of it."""
+    """Page document threads or create a thread anchored to this version."""
     version: DocumentVersion = request.resolved_object
 
     if request.method == 'GET':
-        status_filter = request.query_params.get('status')
-        queryset = (
-            Observation.objects.filter(document=version.document)
-            .select_related('author', 'section', 'created_on_version', 'resolved_in_version')
-            .prefetch_related('replies__author', 'anchors__document_version')
-        )
-        if status_filter:
+        status_filter = request.query_params.get('status', 'all')
+        if status_filter not in ('all', 'active', *Observation.Status.values):
+            raise ValidationError({'status': 'El filtro de estado no es válido.'})
+        queryset = Observation.objects.filter(document=version.document)
+        if status_filter == 'active':
+            queryset = queryset.exclude(status=Observation.Status.RESOLVED)
+        elif status_filter != 'all':
             queryset = queryset.filter(status=status_filter)
-        return Response({'results': ObservationSerializer(queryset, many=True).data})
+        rows, next_cursor = page_by_created_at(
+            queries.observation_rows(queryset), cursor=request.query_params.get('cursor'),
+            scope=f'observations:{version.public_id}:{status_filter}',
+        )
+        anchors = {
+            row['observation_id']: row
+            for row in queries.anchor_rows(ObservationAnchor.objects.filter(
+                observation_id__in=[row['pk'] for row in rows], document_version=version,
+            ))
+        }
+        results = []
+        for row in rows:
+            anchor = anchors.get(row['pk'])
+            results.append(queries.observation_summary(
+                row,
+                current_anchor=queries.anchor_summary(anchor, row['public_id'])
+                if anchor else None,
+            ))
+        return Response({'results': results, 'next_cursor': next_cursor})
 
     if request.effective_role not in ('reviewer', 'admin'):
         raise Http404
@@ -93,13 +88,16 @@ def version_observations(request, ver):
         )
     except DomainError as exc:
         return Response({'error': str(exc)}, status=exc.status_code)
-    return Response(ObservationSerializer(observation).data, status=status.HTTP_201_CREATED)
+    return Response(
+        _summary(observation, version_id=version.public_id), status=status.HTTP_201_CREATED,
+    )
 
 
 def _load_observation(request, obs):
     observation = (
         Observation.objects.filter(public_id=obs)
         .select_related('document__project__organization', 'author', 'section')
+        .defer('body')
         .first()
     )
     if observation is None:
@@ -111,18 +109,36 @@ def _load_observation(request, obs):
     return observation
 
 
-@api_view(['POST'])
+@api_view(['GET'])
+def observation_detail(request, obs):
+    observation = _load_observation(request, obs)
+    return Response(_summary(observation, version_id=_requested_version(request)))
+
+
+@api_view(['GET', 'POST'])
 def observation_reply(request, obs):
     observation = _load_observation(request, obs)
+    if request.method == 'GET':
+        rows, next_cursor = page_by_created_at(
+            queries.reply_rows(ObservationReply.objects.filter(observation=observation)),
+            cursor=request.query_params.get('cursor'), scope=f'replies:{observation.public_id}',
+        )
+        return Response({
+            'results': [queries.reply_summary(row, observation.public_id) for row in rows],
+            'next_cursor': next_cursor,
+        })
+
     if request.effective_role == 'viewer':
         raise Http404  # read-only role
     body = (request.data or {}).get('body', '')
     try:
-        services.reply_to_observation(observation, request.user, body, request=request)
+        reply = services.reply_to_observation(observation, request.user, body, request=request)
     except DomainError as exc:
         return Response({'error': str(exc)}, status=exc.status_code)
-    observation.refresh_from_db()
-    return Response(ObservationSerializer(observation).data, status=status.HTTP_201_CREATED)
+    row = queries.reply_rows(ObservationReply.objects.filter(pk=reply.pk)).get()
+    return Response({
+        'reply': queries.reply_summary(row, observation.public_id), 'status': observation.status,
+    }, status=status.HTTP_201_CREATED)
 
 
 @api_view(['POST'])
@@ -130,9 +146,66 @@ def observation_status(request, obs):
     observation = _load_observation(request, obs)
     if request.effective_role == 'viewer':
         raise Http404
+    version_id = _requested_version(request)
     new_status = (request.data or {}).get('status', '')
     try:
         services.set_observation_status(observation, request.user, new_status, request=request)
     except DomainError as exc:
         return Response({'error': str(exc)}, status=exc.status_code)
-    return Response(ObservationSerializer(observation).data)
+    return Response(_summary(observation, version_id=version_id))
+
+
+@api_view(['GET'])
+def observation_anchors(request, obs):
+    observation = _load_observation(request, obs)
+    rows, next_cursor = page_by_version_number(
+        queries.anchor_rows(ObservationAnchor.objects.filter(observation=observation)),
+        cursor=request.query_params.get('cursor'), scope=f'anchors:{observation.public_id}',
+    )
+    return Response({
+        'results': [queries.anchor_summary(row, observation.public_id) for row in rows],
+        'next_cursor': next_cursor,
+    })
+
+
+def _content_response(request, queryset, expression):
+    # MySQL LONGTEXT cannot exceed this character count. Reject an oversized
+    # offset before binding it as a SQL integer, alongside other invalid offsets.
+    raw_offset = request.query_params.get('offset', '0')
+    if not raw_offset.isascii() or not raw_offset.isdecimal():
+        raise ValidationError({'offset': 'La posición debe ser un entero no negativo.'})
+    offset = serializers.IntegerField(min_value=0, max_value=2 ** 32 - 1).run_validation(raw_offset)
+    fragment = queries.content_fragment(queryset, expression, offset)
+    if fragment is None:
+        raise Http404
+    if offset > fragment['content_length']:
+        raise ValidationError({'offset': 'La posición está después del final del contenido.'})
+    content = fragment['content_piece']
+    next_offset = offset + len(content)
+    eof = next_offset >= fragment['content_length']
+    return Response({
+        'content': content, 'offset': offset, 'next_offset': None if eof else next_offset,
+        'eof': eof,
+    })
+
+
+@api_view(['GET'])
+def observation_content(request, obs):
+    observation = _load_observation(request, obs)
+    return _content_response(request, Observation.objects.filter(pk=observation.pk), 'body')
+
+
+@api_view(['GET'])
+def observation_reply_content(request, obs, reply):
+    observation = _load_observation(request, obs)
+    return _content_response(request, ObservationReply.objects.filter(
+        observation=observation, public_id=reply,
+    ), 'body')
+
+
+@api_view(['GET'])
+def observation_anchor_content(request, obs, version_number):
+    observation = _load_observation(request, obs)
+    return _content_response(request, ObservationAnchor.objects.filter(
+        observation=observation, document_version__number=version_number,
+    ), queries.JsonText('quads'))

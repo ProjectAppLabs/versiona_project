@@ -66,6 +66,9 @@ jobs:
       REDIS_URL: redis://127.0.0.1:6379/1
       CELERY_TASK_ALWAYS_EAGER: '1'
       DJANGO_SECRET_KEY: ci-only-secret
+      # Bulk fixtures share users; quota enforcement is tested separately at
+      # its configured limit. This finite override belongs only to CI.
+      THROTTLE_UPLOAD: '1000/hour'
       # No AWS_*: with no bucket configured, settings.py resolves object storage
       # to the filesystem backend — the one every deployment runs. The suite
       # would ignore a bucket anyway: conftest.py's autouse _object_storage_root
@@ -290,6 +293,7 @@ jobs:
       REDIS_URL: redis://127.0.0.1:6379/1
       CELERY_TASK_ALWAYS_EAGER: '1'
       DJANGO_SECRET_KEY: ci-only-secret
+      THROTTLE_UPLOAD: '1000/hour'
       # No AWS_* and no OBJECT_STORAGE_SENDFILE_ROOT: the E2E run exercises the
       # filesystem backend serving signed URLs straight from Django, which is
       # exactly how staging and production are configured. Previously this job

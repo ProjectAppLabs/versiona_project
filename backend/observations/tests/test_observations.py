@@ -259,7 +259,7 @@ def test_create_observation_permission_matrix(client_as, with_v1, actor, expecte
 
 @pytest.mark.django_db
 def test_observations_list_shows_thread_with_anchors_via_api(client_as, with_v1):
-    """The observations-list endpoint returns a thread with per-version anchor methods (exact, reanchored_section)."""
+    """The observations list returns the current anchor without materializing history."""
     context, document, v1 = with_v1
     services.create_observation(
         v1, context.users['reviewer'], body='multa baja',
@@ -273,5 +273,7 @@ def test_observations_list_shows_thread_with_anchors_via_api(client_as, with_v1)
     assert response.status_code == 200
     thread = response.data['results'][0]
     assert thread['status'] == 'open'
-    methods = {anchor['version_number']: anchor['method'] for anchor in thread['anchors']}
-    assert methods == {1: 'exact', 2: 'reanchored_section'}
+    assert thread['current_anchor']['version_number'] == 2
+    assert thread['current_anchor']['method'] == 'reanchored_section'
+    assert thread['current_anchor']['quads_content_url'].endswith('/content/')
+    assert 'anchors' not in thread

@@ -137,3 +137,19 @@ this file records the *discovered-the-hard-way* items.
 - Las versiones de fixtures nacen PENDING antes del análisis real. Los triggers
   de inmutabilidad siguen activos en MySQL; una versión READY antigua sin un
   checkpoint comprobable se conserva y el job se detiene.
+
+### Lectura progresiva e I11 (2026-10-03)
+
+- Los offsets de textos y JSON usan caracteres Unicode del servidor. El cliente
+  conserva `next_offset`; `string.length` de JavaScript cuenta unidades UTF-16 y
+  puede repetir u omitir contenido con emoji. JSON se interpreta sólo al llegar
+  a EOF.
+- Al proyectar un fragmento de JSON grande desde una fila única, eliminar el
+  orden y usar un slice con límite. `QuerySet.first()` vuelve a agregar orden
+  por PK cuando el queryset no está ordenado, lo que puede agotar la memoria de
+  ordenación de MySQL aun con una salida pequeña.
+- I11 recorre versiones vivas reales, no diferencias entre números. Los huecos
+  y la papelera no exigen un enlace; un corte no se repara con un preserved
+  posterior. La comprobación escalar también exige el mismo documento.
+- Los mocks de un 429 deben conservar `detail` y `Retry-After` de DRF. Un payload
+  inventado con `error` puede ocultar un fallo de presentación del límite real.

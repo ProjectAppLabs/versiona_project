@@ -8,6 +8,7 @@ decisions as SealValidityRecords, notifying ONLY the affected reviewers (S6).
 import uuid
 
 from django.db import transaction
+from django.db.models import Exists, F, OuterRef, Value
 from django.utils import timezone
 
 from audit import services as audit
@@ -408,27 +409,46 @@ def confirm_seal_plan(
     return resolved
 
 
+def valid_seals_at_number(queryset, number):
+    """I11 as a SQL predicate, for a target-number expression on each seal.
+
+    Only actual live intermediate versions need a preserved link: numbers
+    remain consumed after trash/purge (I1), so subtracting version numbers
+    would incorrectly invalidate chains with a gap. A missing, pending,
+    invalidated or superseded link fails the same predicate.
+    """
+    preserved_link = SealValidityRecord.objects.filter(
+        seal_id=OuterRef(OuterRef('pk')),
+        to_document_version_id=OuterRef('pk'),
+        decision=SealValidityRecord.Decision.PRESERVED,
+    )
+    missing_link = DocumentVersion.objects.filter(
+        document_id=OuterRef('document_version__document_id'),
+        number__gt=OuterRef('document_version__number'),
+        number__lte=OuterRef('_validity_target_number'),
+    ).filter(~Exists(preserved_link))
+    return queryset.alias(
+        _validity_target_number=number,
+        _validity_has_missing_link=Exists(missing_link),
+    ).filter(
+        revoked_at__isnull=True,
+        document_version__number__lte=F('_validity_target_number'),
+        _validity_has_missing_link=False,
+    )
+
+
 def seal_is_valid_at(seal: Seal, version: DocumentVersion) -> bool:
     """I11: valid at N iff sealed version ≤ N and every link in the chain up to
     N is `preserved`. The seal's own version counts as valid."""
     if seal.revoked_at is not None:
+        return False
+    if seal.document_version.document_id != version.document_id:
         return False
     sealed_number = seal.document_version.number
     if version.number < sealed_number:
         return False
     if version.number == sealed_number:
         return True
-    links = {
-        record.to_document_version.number: record.decision
-        for record in seal.validity_records.select_related('to_document_version')
-    }
-    numbers = list(
-        DocumentVersion.objects.filter(
-            document=seal.document_version.document,
-            number__gt=sealed_number,
-            number__lte=version.number,
-        ).values_list('number', flat=True)
-    )
-    return all(
-        links.get(number) == SealValidityRecord.Decision.PRESERVED for number in numbers
-    )
+    return valid_seals_at_number(
+        Seal.objects.filter(pk=seal.pk), Value(version.number)
+    ).exists()
