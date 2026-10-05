@@ -32,6 +32,23 @@ v2.3.0 (37 flows).
   privado. Evidencia y entrega: reporte `improvement-pass-project-document-load`
   del toolkit. El payload del reporte continúa sin paginación y queda como
   obligación separada; los cinco frentes conservan alcances pendientes.
+
+- **2026-10-02 — autenticación y papelera:** cerrar la emisión JWT sin segundo
+  factor, aplicar la cuota compartida de intentos y recorrer la purga por lotes
+  acotados. QA cubre los rechazos, el acceso completo TOTP, los límites y los
+  borrados con más de dos páginas, conservando certificados y numeración. La
+  entrega usa una rama y PR propios hacia master; evidencia final en el reporte
+  `2026-10-02-versiona_project_staging-improvement-pass-project-auth-purge.md`
+  del toolkit. La cuota multiproceso y el coste del collector por objeto siguen
+  pendientes; esta ronda no certifica el tiempo total del backlog.
+
+- **2026-10-02 — contraseñas y diagnóstico:** registro, cambio y recuperación
+  aplican los validadores configurados, preservando credenciales y código ante
+  rechazo. La QA de la corrección prueba clases débiles, reintento válido y los
+  formularios reales. El volumen anidado de observaciones y las consultas por
+  documento del reporte quedaron medidos; la ronda de carga aplica las mejoras
+  posteriores y conserva pendiente la paginación del reporte.
+  Rama propia desde `master`, independiente de otras sesiones.
 - **2026-10-01 — mejora transversal:** identidad Google vinculada
   a claims verificados, segundo factor obligatorio también por Google y análisis
   recuperable por etapas. Se seleccionaron tres candidatos globales mediante el

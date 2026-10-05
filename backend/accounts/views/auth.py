@@ -3,17 +3,24 @@ Authentication views for user sign up, sign in, and password management.
 """
 import logging
 
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenObtainSerializer
+from rest_framework_simplejwt.settings import api_settings as jwt_settings
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from django.contrib.auth.models import update_last_login
 from django.contrib.auth.hashers import check_password, make_password
 from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 import requests
 
 from accounts.models import PasswordCode
+from accounts.throttles import AuthThrottle
 from accounts.utils.auth_utils import (
     generate_auth_tokens, 
     send_password_reset_code
@@ -23,6 +30,17 @@ from accounts.views.captcha_views import verify_recaptcha
 User = get_user_model()
 
 logger = logging.getLogger(__name__)
+
+
+def _password_validation_error(password, user):
+    """Return configured password policy errors in the API's existing shape."""
+    if not isinstance(password, str):
+        return 'Password must be a string'
+    try:
+        validate_password(password, user=user)
+    except ValidationError as exc:
+        return ' '.join(exc.messages)
+    return None
 
 
 def _login_admission(user):
@@ -39,8 +57,36 @@ def _login_admission(user):
     return None
 
 
+class TokenObtainPairWithAdmissionView(TokenObtainPairView):
+    """Preserve the JWT alias while admitting both authentication factors."""
+
+    serializer_class = TokenObtainSerializer
+    throttle_classes = [AuthThrottle]
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.user
+        admission = _login_admission(user)
+        if admission is not None:
+            return admission
+
+        # Pair validation mints a token, so only use it after admission.
+        refresh = TokenObtainPairSerializer.get_token(user)
+        if jwt_settings.UPDATE_LAST_LOGIN:
+            update_last_login(None, user)
+        return Response({'refresh': str(refresh), 'access': str(refresh.access_token)})
+
+
+class AuthTokenRefreshView(TokenRefreshView):
+    """Refresh participates in the same attempt budget as initial admission."""
+
+    throttle_classes = [AuthThrottle]
+
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([AuthThrottle])
 def sign_up(request):
     """
     User registration endpoint.
@@ -69,7 +115,7 @@ def sign_up(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    if len(password) < 8:
+    if isinstance(password, str) and len(password) < 8:
         return Response(
             {'error': 'Password must be at least 8 characters'},
             status=status.HTTP_400_BAD_REQUEST
@@ -80,6 +126,13 @@ def sign_up(request):
             {'error': 'User with this email already exists'},
             status=status.HTTP_400_BAD_REQUEST
         )
+
+    password_error = _password_validation_error(
+        password,
+        User(email=email, first_name=first_name, last_name=last_name),
+    )
+    if password_error:
+        return Response({'error': password_error}, status=status.HTTP_400_BAD_REQUEST)
     
     # Create user
     user = User.objects.create(
@@ -102,6 +155,7 @@ def sign_up(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([AuthThrottle])
 def sign_in(request):
     """
     User sign in endpoint.
@@ -152,6 +206,7 @@ def sign_in(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([AuthThrottle])
 def google_login(request):
     """
     Google OAuth login endpoint.
@@ -270,6 +325,7 @@ def google_login(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([AuthThrottle])
 def send_passcode(request):
     """
     Send password reset code to user's email.
@@ -314,6 +370,7 @@ def send_passcode(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([AuthThrottle])
 def verify_passcode_and_reset_password(request):
     """
     Verify passcode and reset password.
@@ -358,6 +415,10 @@ def verify_passcode_and_reset_password(request):
             {'error': 'Invalid or expired code'},
             status=status.HTTP_400_BAD_REQUEST
         )
+
+    password_error = _password_validation_error(new_password, user)
+    if password_error:
+        return Response({'error': password_error}, status=status.HTTP_400_BAD_REQUEST)
     
     # Update password
     user.password = make_password(new_password)
@@ -399,6 +460,10 @@ def update_password(request):
             {'error': 'Current password is incorrect'},
             status=status.HTTP_400_BAD_REQUEST
         )
+
+    password_error = _password_validation_error(new_password, user)
+    if password_error:
+        return Response({'error': password_error}, status=status.HTTP_400_BAD_REQUEST)
     
     user.password = make_password(new_password)
     user.save()
@@ -431,6 +496,7 @@ def validate_token(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([AuthThrottle])
 def sign_in_2fa(request):
     """Second step: challenge + TOTP (or backup) code → tokens."""
     from accounts.twofactor import resolve_challenge, verify_code

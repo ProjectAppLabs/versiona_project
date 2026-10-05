@@ -82,6 +82,28 @@ lock; el resultado público sólo se publica al terminar. Los fallos posteriores
 a la persistencia conservan la versión READY. Un trabajo antiguo sin checkpoint
 seguro se detiene sin reescribir datos; no se promete entrega única de SMTP.
 
+**Autenticación y purga — 2026-10-02:** también el alias `/api/token/` valida la
+admisión y devuelve un desafío TOTP sin crear JWT antes del segundo factor. Las
+entradas de autenticación, incluido refresh y habilitar/deshabilitar TOTP,
+comparten un presupuesto por IP (`auth`, configurable; 5/min por defecto) antes
+de sus efectos. El backend mantiene la caché vigente: el alcance multiproceso y
+la identificación de IP detrás del proxy requieren configuración de despliegue.
+La purga mantiene versiones → documentos → proyectos y borrados por instancia,
+pero pagina cada recorrido por PK con 100 filas y sólo PK/deleted_at. El cursor
+avanza antes de borrar, sin alterar contadores ni PROTECT/triggers. El collector
+de una raíz y el tiempo total del backlog siguen sin presupuesto certificado.
+
+**Ronda de contraseñas — 2026-10-02:** todas las escrituras de contraseña de la
+API de acceso ejecutan la política configurada de Django antes de persistir.
+El registro valida contra el usuario todavía no creado; cambio y recuperación
+usan el usuario existente para detectar similitud con sus atributos. Recuperación
+comprueba primero la vigencia del código y sólo lo consume tras aceptar la
+contraseña. Cambio comprueba primero la contraseña actual. Los errores conservan
+el contrato HTTP 400 con texto, sin alterar los validadores de settings.
+En esa ronda, los diagnósticos de observaciones y reporte conservaron sus
+endpoints y las cadenas D5. La ronda de carga descrita abajo aplica las mejoras
+posteriores; la paginación del payload del reporte sigue pendiente.
+
 **Ronda de carga de documentos — 2026-10-02:** la emisión de uploads aplica la
 cuota por usuario mediante `UserRateThrottle`, conservando las capacidades ya
 emitidas. El reporte combina dos proyecciones SQL; el predicado I11 compartido

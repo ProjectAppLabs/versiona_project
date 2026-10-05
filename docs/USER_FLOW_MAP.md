@@ -8,7 +8,7 @@ and API contracts before writing or reviewing E2E tests. Flow ids map 1:1 to
 (A1…F1) planned in `docs/plan/01-alcance-mvp.md`.
 
 **Version:** 2.3.0
-**Last Updated:** 2026-10-02
+**Last Updated:** 2026-10-05
 
 > Maintenance rule (docs/plan/09 DoD #4): each vertical iteration rewrites the sheets of the
 > flows it ships and flips them from *Planned* to *Implemented*. Acceptance criteria live in
@@ -144,6 +144,10 @@ Los claims de Google se validan en backend antes de buscar o crear una cuenta: a
 
 La rama Google no recibe crédito E2E: depende de OAuth externo y se cubre en backend y frontend-unit. La rama password sigue cubierta por `e2e/auth/auth.spec.ts`; el desafío de Google se prueba en la capa unitaria, sin presentar un mock del proveedor como E2E real.
 
+La política del servidor también rechaza contraseñas comunes y conserva el
+formulario de registro con su error. El escenario E2E usa una dirección única y
+`password123`, comprueba el mensaje real y que permanece en `/sign-up`.
+
 ### a3-account-security
 
 | Field | Value |
@@ -192,6 +196,13 @@ a double hop and the spec pins both legs: `/dashboard` itself hard-redirects to 
 
 **Steps:** two-step form → request 6-digit code (valid 15 min) → verify code + set new
 password.
+
+| Clase | Interacción observable | Cobertura |
+|---|---|---|
+| display | Desde acceso, abrir recuperación y ver el formulario de correo. | `e2e/auth/auth.spec.ts` |
+| error | Pedir código real por correo, rechazar una contraseña numérica y reintentar con el mismo código y una contraseña válida; comprobar el acceso posterior. | `e2e/auth/auth.spec.ts` |
+| success | El reintento válido es la prueba de conservación del código del escenario de rechazo; no se declara una cobertura independiente de éxito. | Escenario anterior |
+| failure | Fallos de transporte conservan el formulario; se prueban en frontend-unit y quedan fuera de la validación de política de esta ronda. | `app/forgot-password/__tests__/page.test.tsx` |
 
 **Spec:** `e2e/auth/auth.spec.ts`.
 

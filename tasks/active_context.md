@@ -3,7 +3,7 @@
 > Memory Bank core file: current focus, recent changes, next steps. Updated every session
 > that changes project state.
 
-**Last updated**: 2026-10-02
+**Last updated**: 2026-10-05
 
 ## Ronda de carga de documentos (2026-10-02)
 
@@ -18,6 +18,46 @@ del toolkit; ese reporte conserva resultados y estado del PR. El contrato
 anidado se reemplaza por resúmenes, páginas de 25 y contenido por fragmentos;
 el mapa de flujos pasa a v2.3.0. El reporte mantiene todos sus documentos y
 necesita paginación/exportación en otra ronda. Ningún frente se declara agotado.
+
+## Autenticación y purga por lotes (2026-10-02)
+
+La ruta JWT alternativa exige la misma admisión de cuenta y TOTP que el acceso
+habitual, antes de crear tokens. Las entradas de autenticación comparten la cuota
+configurada por IP; la caché sigue siendo local por proceso y requiere Redis y
+verificación del proxy antes de tráfico real. La purga recorre raíces y
+descendientes en lotes de 100 por clave creciente, conservando borrados por
+instancia, contadores, triggers y protección de certificados.
+
+Se trabaja en `fix/02102026-improvement-auth-purge`, separada del checkout del
+servicio, sobre `master`. QA combina API y los recorridos existentes A1/A3 contra
+un MySQL privado en puerto 3310 y schemas de prueba. Los resultados del commit
+final y el PR se registran en el toolkit:
+`docs/audits/2026-10-02-versiona_project_staging-improvement-pass-project-auth-purge.md`.
+La selección sigue limitada a tres causas; los cinco frentes conservan alcance
+parcial y pendientes explícitos.
+
+## Contraseñas y diagnóstico de rendimiento (2026-10-02)
+
+Ronda independiente desde `master`, en el worktree propio
+`improvement-password-profile`. Registro, cambio autenticado y recuperación
+validan la contraseña con la política configurada de Django y los atributos del
+usuario. Un rechazo conserva la contraseña vigente y el código de recuperación;
+el cliente sigue recibiendo un error de texto con HTTP 400.
+
+El cupo global comprende una corrección (`I-S-0c3d7ee8c75e`) y dos diagnósticos
+(`I-P-b9b80760481e`, `P-backend-views-01`). En los escenarios acordados, el historial
+de observaciones excede los presupuestos de respuesta y memoria instrumentada;
+el reporte consulta por documento y por su cadena de validez. Ambos quedaron
+pendientes en esa ronda. La ronda de carga posterior aplica consultas agrupadas
+y lectura progresiva; la paginación del reporte sigue pendiente. Ningún frente
+queda declarado suficiente.
+
+QA de esta ronda combina pruebas de API y navegador con MySQL y Mailpit privados.
+Su ejecución final se liga al commit limpio de aplicación y tests; el reporte
+canónico conserva el resultado y las mediciones:
+`docs/audits/2026-10-02-versiona_project_staging-improvement-pass-project-password-profile.md`
+en el toolkit. La entrega corresponde a un PR propio abierto hacia `master`,
+con CI verde, sin merge ni cambios en el checkout del servicio.
 
 ## Ronda transversal de mejora (2026-10-01)
 
