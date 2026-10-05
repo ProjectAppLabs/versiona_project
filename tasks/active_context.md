@@ -22,6 +22,28 @@ final y el PR se registran en el toolkit:
 La selección sigue limitada a tres causas; los cinco frentes conservan alcance
 parcial y pendientes explícitos.
 
+## Contraseñas y diagnóstico de rendimiento (2026-10-02)
+
+Ronda independiente desde `master`, en el worktree propio
+`improvement-password-profile`. Registro, cambio autenticado y recuperación
+validan la contraseña con la política configurada de Django y los atributos del
+usuario. Un rechazo conserva la contraseña vigente y el código de recuperación;
+el cliente sigue recibiendo un error de texto con HTTP 400.
+
+El cupo global comprende una corrección (`I-S-0c3d7ee8c75e`) y dos diagnósticos
+(`I-P-b9b80760481e`, `P-backend-views-01`). En los escenarios acordados, el historial
+de observaciones excede los presupuestos de respuesta y memoria instrumentada;
+el reporte consulta por documento y por su cadena de validez. Ambos permanecen
+pendientes de optimización, con contrato y reglas D5 intactos. Ningún frente
+queda declarado suficiente.
+
+QA de esta ronda combina pruebas de API y navegador con MySQL y Mailpit privados.
+Su ejecución final se liga al commit limpio de aplicación y tests; el reporte
+canónico conserva el resultado y las mediciones:
+`docs/audits/2026-10-02-versiona_project_staging-improvement-pass-project-password-profile.md`
+en el toolkit. La entrega corresponde a un PR propio abierto hacia `master`,
+con CI verde, sin merge ni cambios en el checkout del servicio.
+
 ## Ronda transversal de mejora (2026-10-01)
 
 Implementadas sobre la rama propia del PR #34: identidad Google vinculada a
@@ -93,7 +115,7 @@ E2E harness ports (env-parameterized after a foreign fleet server squatted :3000
   comparator; authed paths never pass it explicitly (byte-identical behavior).
 - Frontend public routes: `/`, `/precios`, `/comparar[/:id]`, `/manual`, auth pages.
   `publicApi` (no interceptors) is the client for AllowAny endpoints.
-- Flow contract: `frontend/e2e/flow-definitions.json` v2.2.1 — 37 flows; f1-billing is
+- Flow contract: `frontend/e2e/flow-definitions.json` v2.2.3 — 37 flows; f1-billing is
   honestly scoped (no online checkout).
 
 ## Next steps (operator-gated — in order of launch impact)

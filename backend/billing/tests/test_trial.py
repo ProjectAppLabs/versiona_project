@@ -45,12 +45,13 @@ def test_signup_starts_a_pro_trial_on_the_new_personal_org(mock_captcha, api_cli
     """
     frozen_now = timezone.now()
     with freeze_time(frozen_now):
-        api_client.post(
+        signup_response = api_client.post(
             reverse('sign_up'),
-            {'email': 'nueva@versiona.test', 'password': 'pass1234'},
+            {'email': 'nueva@versiona.test', 'password': 'NewPass!2026'},
             format='json',
         )
 
+    assert signup_response.status_code == 201
     subscription = Subscription.objects.get(
         organization__memberships__user__email='nueva@versiona.test'
     )
