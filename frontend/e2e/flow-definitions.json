@@ -1,6 +1,6 @@
 {
-  "version": "2.2.2",
-  "lastUpdated": "2026-10-01",
+  "version": "2.2.3",
+  "lastUpdated": "2026-10-02",
   "flows": {
     "home-loads": {
       "name": "Landing page loads",
@@ -35,7 +35,7 @@
         "shared"
       ],
       "priority": "P1",
-      "description": "Sign-up renders and validates password confirmation. A Google login that legitimately returns a TOTP challenge replaces this form with the same second-factor form; a successful code lands on onboarding.",
+      "description": "Sign-up validates password confirmation and displays configured server password-policy errors without leaving the form. A Google login that legitimately returns a TOTP challenge replaces this form with the same second-factor form; a successful code lands on onboarding.",
       "expectedSpecs": 1,
       "outcomes": [
         "error"
@@ -74,10 +74,11 @@
         "shared"
       ],
       "priority": "P2",
-      "description": "Recovery page renders the two-step code + reset form",
+      "description": "Recovery renders the two-step code + reset form. A password-policy rejection keeps the form and recovery code usable for a valid retry.",
       "expectedSpecs": 1,
       "outcomes": [
-        "display"
+        "display",
+        "error"
       ]
     },
     "auth-sign-in-success": {
