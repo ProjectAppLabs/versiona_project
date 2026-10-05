@@ -25,6 +25,14 @@ v2.2.2 (37 flows).
 
 ## Rondas de mantenimiento
 
+- **2026-10-02 — autenticación y papelera:** cerrar la emisión JWT sin segundo
+  factor, aplicar la cuota compartida de intentos y recorrer la purga por lotes
+  acotados. QA cubre los rechazos, el acceso completo TOTP, los límites y los
+  borrados con más de dos páginas, conservando certificados y numeración. La
+  entrega usa una rama y PR propios hacia master; evidencia final en el reporte
+  `2026-10-02-versiona_project_staging-improvement-pass-project-auth-purge.md`
+  del toolkit. La cuota multiproceso y el coste del collector por objeto siguen
+  pendientes; esta ronda no certifica el tiempo total del backlog.
 - **2026-10-01 — mejora transversal:** identidad Google vinculada
   a claims verificados, segundo factor obligatorio también por Google y análisis
   recuperable por etapas. Se seleccionaron tres candidatos globales mediante el

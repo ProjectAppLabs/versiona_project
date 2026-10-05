@@ -3,7 +3,24 @@
 > Memory Bank core file: current focus, recent changes, next steps. Updated every session
 > that changes project state.
 
-**Last updated**: 2026-10-01
+**Last updated**: 2026-10-02
+
+## Autenticación y purga por lotes (2026-10-02)
+
+La ruta JWT alternativa exige la misma admisión de cuenta y TOTP que el acceso
+habitual, antes de crear tokens. Las entradas de autenticación comparten la cuota
+configurada por IP; la caché sigue siendo local por proceso y requiere Redis y
+verificación del proxy antes de tráfico real. La purga recorre raíces y
+descendientes en lotes de 100 por clave creciente, conservando borrados por
+instancia, contadores, triggers y protección de certificados.
+
+Se trabaja en `fix/02102026-improvement-auth-purge`, separada del checkout del
+servicio, sobre `master`. QA combina API y los recorridos existentes A1/A3 contra
+un MySQL privado en puerto 3310 y schemas de prueba. Los resultados del commit
+final y el PR se registran en el toolkit:
+`docs/audits/2026-10-02-versiona_project_staging-improvement-pass-project-auth-purge.md`.
+La selección sigue limitada a tres causas; los cinco frentes conservan alcance
+parcial y pendientes explícitos.
 
 ## Ronda transversal de mejora (2026-10-01)
 

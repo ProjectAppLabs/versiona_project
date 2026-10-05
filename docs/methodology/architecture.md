@@ -82,6 +82,17 @@ lock; el resultado público sólo se publica al terminar. Los fallos posteriores
 a la persistencia conservan la versión READY. Un trabajo antiguo sin checkpoint
 seguro se detiene sin reescribir datos; no se promete entrega única de SMTP.
 
+**Autenticación y purga — 2026-10-02:** también el alias `/api/token/` valida la
+admisión y devuelve un desafío TOTP sin crear JWT antes del segundo factor. Las
+entradas de autenticación, incluido refresh y habilitar/deshabilitar TOTP,
+comparten un presupuesto por IP (`auth`, configurable; 5/min por defecto) antes
+de sus efectos. El backend mantiene la caché vigente: el alcance multiproceso y
+la identificación de IP detrás del proxy requieren configuración de despliegue.
+La purga mantiene versiones → documentos → proyectos y borrados por instancia,
+pero pagina cada recorrido por PK con 100 filas y sólo PK/deleted_at. El cursor
+avanza antes de borrar, sin alterar contadores ni PROTECT/triggers. El collector
+de una raíz y el tiempo total del backlog siguen sin presupuesto certificado.
+
 **Next**: operator-gated go-public items — deployment (DP-21), domain+SMTP (DP-22),
 Ed25519 key rotation/custody (DP-24), Wompi checkout keys (F1 payment leg), optional
 It10: public certificate verification (/verificar + QR).
