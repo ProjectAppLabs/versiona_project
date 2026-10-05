@@ -58,6 +58,57 @@ describe('documentStore upload orchestration', () => {
     expect(result.error).toContain('idéntico');
   });
 
+  // Fails if a throttled upload starts object storage or loses the retry delay shown to the user.
+  it('reports the upload limit delay from a DRF throttling response', async () => {
+    mockApiPost.mockRejectedValueOnce({
+      response: {
+        status: 429,
+        data: { detail: 'Request was throttled. Expected available in 60 seconds.' },
+        headers: { 'retry-after': '60' },
+      },
+    });
+
+    const result = await useDocumentStore.getState().uploadVersion('doc-1', file, 'primera');
+
+    expect(result).toEqual({
+      phase: 'error',
+      progress: 0,
+      error: 'Alcanzaste el límite de subidas. Espera 60 segundos y vuelve a intentarlo.',
+      jobId: null,
+      version: null,
+    });
+    expect(mockApiPost).toHaveBeenCalledWith('documents/doc-1/versions/upload_intent/');
+    expect(mockApiPost).toHaveBeenCalledTimes(1);
+    expect(mockAxiosPut).not.toHaveBeenCalled();
+  });
+
+  // Fails if an unusable retry header exposes a raw throttling error instead of the safe fallback.
+  it.each([
+    ['missing', {}],
+    ['malformed', { 'retry-after': 'later' }],
+  ])('reports the generic upload limit message with a %s Retry-After header', async (_kind, headers) => {
+    mockApiPost.mockRejectedValueOnce({
+      response: {
+        status: 429,
+        data: { detail: 'Request was throttled. Expected available in 60 seconds.' },
+        headers,
+      },
+    });
+
+    const result = await useDocumentStore.getState().uploadVersion('doc-1', file, 'primera');
+
+    expect(result).toEqual({
+      phase: 'error',
+      progress: 0,
+      error: 'Alcanzaste el límite de subidas. Vuelve a intentarlo más tarde.',
+      jobId: null,
+      version: null,
+    });
+    expect(mockApiPost).toHaveBeenCalledWith('documents/doc-1/versions/upload_intent/');
+    expect(mockApiPost).toHaveBeenCalledTimes(1);
+    expect(mockAxiosPut).not.toHaveBeenCalled();
+  });
+
   it('createDocument posts the title and returns the summary', async () => {
     mockApiPost.mockResolvedValueOnce({ data: { public_id: 'd1', title: 'Contrato' } });
 

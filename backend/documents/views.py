@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, throttle_classes
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
-from rest_framework.throttling import ScopedRateThrottle
+from rest_framework.throttling import UserRateThrottle
 
 from core.permissions import require_project_role
 
@@ -21,7 +21,7 @@ from .services import trash_service, version_service
 from .services.version_service import DomainError
 
 
-class UploadThrottle(ScopedRateThrottle):
+class UploadThrottle(UserRateThrottle):
     scope = 'upload'
 
 

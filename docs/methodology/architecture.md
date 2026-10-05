@@ -100,8 +100,22 @@ usan el usuario existente para detectar similitud con sus atributos. Recuperaci�
 comprueba primero la vigencia del código y sólo lo consume tras aceptar la
 contraseña. Cambio comprueba primero la contraseña actual. Los errores conservan
 el contrato HTTP 400 con texto, sin alterar los validadores de settings.
-Los diagnósticos de observaciones y reporte no cambian sus endpoints ni la
-resolución de cadenas D5; las obligaciones de rendimiento permanecen abiertas.
+En esa ronda, los diagnósticos de observaciones y reporte conservaron sus
+endpoints y las cadenas D5. La ronda de carga descrita abajo aplica las mejoras
+posteriores; la paginación del payload del reporte sigue pendiente.
+
+**Ronda de carga de documentos — 2026-10-02:** la emisión de uploads aplica la
+cuota por usuario mediante `UserRateThrottle`, conservando las capacidades ya
+emitidas. El reporte combina dos proyecciones SQL; el predicado I11 compartido
+comprueba enlaces preservados para versiones vivas reales, sin materializar
+historia ni exigir eslabones para números consumidos o versiones en papelera.
+Observaciones usa resúmenes, páginas de 25 y fragmentos SQL de 8192 caracteres
+Unicode para cuerpos y coordenadas. El store cancela peticiones por generación;
+respuestas, historial y contenido se solicitan desde controles explícitos. El
+visor histórico conserva el hilo en la URL; las versiones en papelera conservan
+su contenido y no ofrecen un enlace inutilizable. El contrato anterior anidado
+se sustituye coordinadamente en API/UI, sin nuevas migraciones ni dependencias.
+La evidencia de QA y entrega se conserva en el reporte de esta ronda del toolkit.
 
 **Next**: operator-gated go-public items — deployment (DP-21), domain+SMTP (DP-22),
 Ed25519 key rotation/custody (DP-24), Wompi checkout keys (F1 payment leg), optional

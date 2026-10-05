@@ -38,6 +38,16 @@ interface DocumentState {
 const IDLE: UploadState = { phase: 'idle', progress: 0, error: null, jobId: null, version: null };
 
 function extractError(err: unknown): string {
+  const response = (err as {
+    response?: { status?: number; headers?: Record<string, unknown> };
+  })?.response;
+  if (response?.status === 429) {
+    const retryAfter = Number(response.headers?.['retry-after']);
+    const nextStep = Number.isFinite(retryAfter) && retryAfter > 0
+      ? `Espera ${Math.ceil(retryAfter)} segundos y vuelve a intentarlo.`
+      : 'Vuelve a intentarlo más tarde.';
+    return `Alcanzaste el límite de subidas. ${nextStep}`;
+  }
   return (
     (err as { response?: { data?: { error?: string } } })?.response?.data?.error ??
     (err as Error)?.message ??
