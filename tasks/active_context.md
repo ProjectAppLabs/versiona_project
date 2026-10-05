@@ -3,7 +3,21 @@
 > Memory Bank core file: current focus, recent changes, next steps. Updated every session
 > that changes project state.
 
-**Last updated**: 2026-10-02
+**Last updated**: 2026-10-05
+
+## Ronda de carga de documentos (2026-10-02)
+
+Esta sesión usa su propia rama desde master. Se aplican la cuota existente de
+subida por usuario, consultas agrupadas del reporte que conservan la validez D5,
+y carga progresiva de observaciones. El operador aprobó el cambio coordinado de
+API/UI y el acceso al contenido íntegro por partes. La validación usa MySQL y
+almacenamiento privados; no se reutiliza la base del servicio. QA y entrega
+se registran para el commit final en
+`docs/audits/2026-10-02-versiona_project_staging-improvement-pass-project-document-load.md`
+del toolkit; ese reporte conserva resultados y estado del PR. El contrato
+anidado se reemplaza por resúmenes, páginas de 25 y contenido por fragmentos;
+el mapa de flujos pasa a v2.3.0. El reporte mantiene todos sus documentos y
+necesita paginación/exportación en otra ronda. Ningún frente se declara agotado.
 
 ## Autenticación y purga por lotes (2026-10-02)
 
@@ -33,8 +47,9 @@ el cliente sigue recibiendo un error de texto con HTTP 400.
 El cupo global comprende una corrección (`I-S-0c3d7ee8c75e`) y dos diagnósticos
 (`I-P-b9b80760481e`, `P-backend-views-01`). En los escenarios acordados, el historial
 de observaciones excede los presupuestos de respuesta y memoria instrumentada;
-el reporte consulta por documento y por su cadena de validez. Ambos permanecen
-pendientes de optimización, con contrato y reglas D5 intactos. Ningún frente
+el reporte consulta por documento y por su cadena de validez. Ambos quedaron
+pendientes en esa ronda. La ronda de carga posterior aplica consultas agrupadas
+y lectura progresiva; la paginación del reporte sigue pendiente. Ningún frente
 queda declarado suficiente.
 
 QA de esta ronda combina pruebas de API y navegador con MySQL y Mailpit privados.
@@ -115,7 +130,7 @@ E2E harness ports (env-parameterized after a foreign fleet server squatted :3000
   comparator; authed paths never pass it explicitly (byte-identical behavior).
 - Frontend public routes: `/`, `/precios`, `/comparar[/:id]`, `/manual`, auth pages.
   `publicApi` (no interceptors) is the client for AllowAny endpoints.
-- Flow contract: `frontend/e2e/flow-definitions.json` v2.2.3 — 37 flows; f1-billing is
+- Flow contract: `frontend/e2e/flow-definitions.json` v2.3.0 — 37 flows; f1-billing is
   honestly scoped (no online checkout).
 
 ## Next steps (operator-gated — in order of launch impact)

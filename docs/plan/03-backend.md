@@ -145,10 +145,36 @@ EngineJob.
 
 | M | Route | Permission | Flow | Notes |
 |---|---|---|---|---|
-| GET/POST | `versions/{ver}/observations/?reviewer=&status=` | viewer / reviewer+editor | D3 | POST: `{section, page, quads, snippet, body}`. |
-| GET | `observations/{obs}/` | viewer | D3 | Thread + anchors per version. |
-| POST | `observations/{obs}/replies/` | reviewer+editor | D3 | |
+| GET/POST | `versions/{ver}/observations/?status=&cursor=` | viewer / reviewer | D3 | GET: resúmenes paginados. POST: `{section_key, page, quads, snippet, body}`. |
+| GET | `observations/{obs}/?version={uuid}` | viewer | D3 | Resumen y metadatos del ancla de la versión solicitada. |
+| GET/POST | `observations/{obs}/replies/?cursor=` | viewer / reviewer+editor | D3 | GET: respuestas paginadas. POST: resumen de respuesta y estado actualizado. |
+| GET | `observations/{obs}/anchors/?cursor=` | viewer | D3 | Historial paginado de metadatos, sin coordenadas completas. |
+| GET | `observations/{obs}/content/?offset=` | viewer | D3 | Texto íntegro por partes. |
+| GET | `observations/{obs}/replies/{reply}/content/?offset=` | viewer | D3 | Texto íntegro de una respuesta por partes. |
+| GET | `observations/{obs}/anchors/{version_number}/content/?offset=` | viewer | D3 | JSON de coordenadas por partes; el número es de versión, nunca un PK. |
 | POST | `observations/{obs}/status/` | author / editor | D3 | State machine (I14). |
+
+#### Lectura progresiva de observaciones (2026-10-02)
+
+Las colecciones devuelven `{results, next_cursor}` con páginas fijas de 25 y
+cursor firmado ligado al alcance y filtro. Hilos y respuestas usan orden
+estable por fecha/clave descendente; el historial usa número de versión
+descendente. El filtro admite `active`, `open`, `answered`, `resolved` y `all`
+(default API: `all`; UI: `active`). Los resúmenes conservan identidad, estado,
+autor, fechas y versiones, y reemplazan texto completo e historia anidada por
+`body_preview` (500 caracteres), `body_length`, `body_content_url`, conteo de
+respuestas y metadatos del ancla actual. Las anclas incluyen `version_public_id`
+y `version_is_trashed`; la UI conserva la lectura histórica sin enlazar al
+visor de una versión en papelera. Las mutaciones devuelven resúmenes,
+sin cargar historias completas.
+
+Cada lectura de contenido devuelve `{content, offset, next_offset, eof}` con
+hasta 8192 caracteres Unicode, proyectados en SQL. Offset es base cero y no
+puede exceder la longitud; filtros, cursores y offsets inválidos producen 400.
+El cliente concatena el JSON de coordenadas y lo interpreta sólo al llegar a
+EOF. Todo el contenido anterior sigue accesible; no se impone una longitud
+nueva a los textos existentes. Todas las rutas mantienen el aislamiento por
+proyecto/tenant (404 para quien no es miembro).
 
 ### Jobs, notifications, billing, platform
 

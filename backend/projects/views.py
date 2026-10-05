@@ -231,33 +231,9 @@ def project_invitation_revoke(request, proj, inv):
 def project_report(request, proj):
     """Kit 4: the project status report — documents, versions, seals valid at
     the latest version, open observations and check summaries."""
-    from checks.services import summary_for
-    from documents.models import Document
-    from observations.models import Observation
-    from reviews.models import Seal
-    from reviews.services.seal_service import seal_is_valid_at
+    from .queries import project_report_documents
 
-    rows = []
-    for document in Document.objects.filter(project=request.project):
-        latest = document.versions.order_by('-number').first()
-        if latest is None:
-            continue
-        valid_seals = sum(
-            1 for seal in Seal.objects.filter(
-                document_version__document=document, revoked_at__isnull=True
-            )
-            if seal_is_valid_at(seal, latest)
-        )
-        rows.append({
-            'document': document.title,
-            'latest_version': latest.number,
-            'approved': latest.is_approved,
-            'valid_seals': valid_seals,
-            'open_observations': Observation.objects.filter(
-                document=document, status='open'
-            ).count(),
-            'checks': summary_for(latest),
-        })
+    rows = project_report_documents(request.project)
     return Response({
         'project': request.project.name,
         'status': request.project.status,

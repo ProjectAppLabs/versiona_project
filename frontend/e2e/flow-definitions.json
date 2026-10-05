@@ -1,6 +1,6 @@
 {
-  "version": "2.2.3",
-  "lastUpdated": "2026-10-02",
+  "version": "2.3.0",
+  "lastUpdated": "2026-10-05",
   "flows": {
     "home-loads": {
       "name": "Landing page loads",
@@ -210,11 +210,12 @@
         "editor"
       ],
       "priority": "P1",
-      "description": "Editor drags a PDF; analysis indexes sections and version 1 shows its traffic light (docs/plan/01 C1)",
+      "description": "Editor drags a PDF; analysis indexes sections and version 1 shows its traffic light (docs/plan/01 C1) The per-user upload-intent quota is 20/hour: when it is exhausted, the request shows a retryable 429 without issuing another signed URL; an intent issued before exhaustion can still be completed.",
       "expectedSpecs": 1,
       "outcomes": [
         "success",
-        "error"
+        "error",
+        "failure"
       ]
     },
     "c2-upload-version": {
@@ -224,11 +225,12 @@
         "editor"
       ],
       "priority": "P1",
-      "description": "Editor uploads a re-delivery with a message; within seconds sees what changed, check deltas and affected seals (docs/plan/01 C2)",
+      "description": "Editor uploads a re-delivery with a message; within seconds sees what changed, check deltas and affected seals (docs/plan/01 C2) The per-user upload-intent quota is 20/hour: when it is exhausted, the request shows a retryable 429 without issuing another signed URL; an intent issued before exhaustion can still be completed.",
       "expectedSpecs": 1,
       "outcomes": [
         "success",
-        "error"
+        "error",
+        "failure"
       ]
     },
     "c3-history": {
@@ -273,19 +275,22 @@
       ]
     },
     "d3-anchored-observations": {
-      "name": "D3 - Anchored observations with state",
+      "name": "D3 - Anchored observations with progressive reading",
       "module": "review",
       "roles": [
+        "viewer",
         "reviewer",
         "editor",
         "admin"
       ],
       "priority": "P1",
-      "description": "Reviewer selects a page zone and comments; thread transitions open/answered/resolved and survives across versions (docs/plan/01 D3). Resolving a thread you did not open requires admin (`canResolveAny`, gated on `effective_role === 'admin'` in the version viewer) — a non-author reviewer no longer sees an enabled Resolve button that would 403 against observations/services.py's set_status rule; fixed 2026-08-02 (PR #9) and unit-covered in ObservationsPanel.test.tsx",
+      "description": "Reviewer or admin creates an anchored thread; editor replies; the author or an admin resolves it, and the author reopens it under I14. The version viewer loads thread summaries in 25-item pages, then loads replies, anchor history, long text and anchor coordinates only when the person explicitly requests each part. A history link keeps a selected thread reachable beyond the first page. Reading failures provide retry controls and stale responses are discarded when version or status filter changes.",
       "expectedSpecs": 1,
       "outcomes": [
         "success",
-        "error"
+        "error",
+        "failure",
+        "display"
       ]
     },
     "d4-seal-approve": {

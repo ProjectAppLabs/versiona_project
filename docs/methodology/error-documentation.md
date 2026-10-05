@@ -129,3 +129,12 @@ SELECT TABLE_NAME, COLUMN_NAME, COLLATION_NAME FROM information_schema.COLUMNS
 
 `slug` and `slug_alive` must NOT appear in that last query: if their collations diverge,
 the unique index compares by different rules than the application does.
+
+## Resuelto 2026-10-03 — fragmentos de quads grandes agotaban el sort de MySQL
+
+La prueba con coordenadas históricas superiores a 256 KB devolvió MySQL 1038 al
+leer un fragmento. `first()` agregaba orden por PK a una consulta proyectada;
+MySQL ordenaba la fuente JSON grande antes de devolver la parte solicitada.
+`observations.queries.content_fragment` elimina el orden y limita con un slice
+la fila que cada ruta ya identifica de forma única. La reconstrucción Unicode
+de ese JSON pasó en MySQL después de corregir la consulta.
