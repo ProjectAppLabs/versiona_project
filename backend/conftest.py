@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import copy
 import json
 import os
 import tempfile
@@ -292,8 +293,26 @@ def pytest_sessionstart(session) -> None:
 # Shared API fixtures (available to every app's test suite)
 # ---------------------------------------------------------------------------
 import pytest
+from django.core.cache import cache
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
+
+
+@pytest.fixture(autouse=True)
+def _isolate_auth_throttle(settings):
+    """Keep non-quota tests independent from the shared authentication bucket."""
+    original_framework = copy.deepcopy(settings.REST_FRAMEWORK)
+    framework = copy.deepcopy(settings.REST_FRAMEWORK)
+    rates = dict(framework.get('DEFAULT_THROTTLE_RATES', {}))
+    rates['auth'] = '1000/min'
+    framework['DEFAULT_THROTTLE_RATES'] = rates
+    settings.REST_FRAMEWORK = framework
+    cache.clear()
+
+    yield
+
+    cache.clear()
+    settings.REST_FRAMEWORK = original_framework
 
 
 @pytest.fixture
