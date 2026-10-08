@@ -17,6 +17,7 @@ from audit import services as audit
 from documents.models import Document, DocumentVersion
 from documents.services.version_service import DomainError
 from projects.models import Project
+from reviews.models import Seal
 
 PURGE_BATCH_SIZE = 100
 
@@ -35,16 +36,15 @@ def _purge_batches(queryset):
         del batch
 
 
-def _has_sealed_versions(document: Document) -> bool:
-    versions = DocumentVersion.all_objects.filter(document=document)
+def _has_protected_versions(versions) -> bool:
+    """Historic evidence blocks trash without materializing versions or seals."""
     if versions.filter(is_approved=True).exists():
         return True
-    # Seal model joins in It3; getattr keeps this honest until then (I3).
-    for version in versions:
-        seals = getattr(version, 'seals', None)
-        if seals is not None and seals.exists():
-            return True
-    return False
+    return Seal.objects.filter(document_version_id__in=versions.values('pk')).exists()
+
+
+def _has_sealed_versions(document: Document) -> bool:
+    return _has_protected_versions(DocumentVersion.all_objects.filter(document=document))
 
 
 def trash_version(version: DocumentVersion, user, request=None):
@@ -114,11 +114,10 @@ def restore_document(document: Document, user, request=None):
 def trash_project(project: Project, confirm_name: str, user, request=None):
     if (confirm_name or '').strip() != project.name:
         raise DomainError('Escribe el nombre exacto del proyecto para confirmar.', 400)
-    for document in Document.all_objects.filter(project=project):
-        if _has_sealed_versions(document):
-            raise DomainError(
-                'El proyecto contiene versiones selladas: solo puede archivarse (T4).', 409
-            )
+    if _has_protected_versions(DocumentVersion.all_objects.filter(document__project=project)):
+        raise DomainError(
+            'El proyecto contiene versiones selladas: solo puede archivarse (T4).', 409
+        )
     project.soft_delete(user)
     audit.record(org=project.organization, project=project, actor=user,
                  event_type='project.trashed', obj=project,

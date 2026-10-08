@@ -1,5 +1,6 @@
 """Document & version endpoints (flows C1/C2/C3/C4 — docs/plan/03 §3)."""
 
+from django.db.models import Prefetch, prefetch_related_objects
 from rest_framework import status
 from rest_framework.decorators import api_view, throttle_classes
 from rest_framework.pagination import PageNumberPagination
@@ -8,7 +9,8 @@ from rest_framework.throttling import UserRateThrottle
 
 from core.permissions import require_project_role
 
-from .models import Document, DocumentVersion
+from .models import Document, DocumentVersion, SectionVersion
+from .queries import prepare_document_list_versions, with_document_list_data
 from .serializers import (
     DocumentCreateSerializer,
     DocumentListSerializer,
@@ -33,12 +35,15 @@ def _domain_error(exc: DomainError) -> Response:
 @require_project_role('viewer')
 def project_documents(request, proj):
     if request.method == 'GET':
-        queryset = Document.objects.filter(project=request.project).order_by('-updated_at')
+        queryset = with_document_list_data(
+            Document.objects.filter(project=request.project).order_by('-updated_at')
+        )
         search = request.query_params.get('q', '').strip()
         if search:
             queryset = queryset.filter(title__icontains=search)
         paginator = PageNumberPagination()
         page = paginator.paginate_queryset(queryset, request)
+        prepare_document_list_versions(page)
         return paginator.get_paginated_response(
             DocumentListSerializer(page, many=True).data
         )
@@ -143,6 +148,9 @@ def version_detail(request, ver):
     version: DocumentVersion = request.resolved_object
 
     if request.method == 'GET':
+        prefetch_related_objects([version], Prefetch(
+            'section_versions', queryset=SectionVersion.objects.select_related('section')
+        ))
         data = VersionDetailSerializer(version).data
         # The screen decides what to render by role (seal bar, plan card).
         data['effective_role'] = request.effective_role
