@@ -120,6 +120,97 @@ def _prepared_redelivery(versiona_context, pending_version_factory):
 
 
 @pytest.mark.django_db
+def test_current_degraded_analysis_requires_coordinator(versiona_context, pending_version_factory):
+    _previous, current, job = _prepared_redelivery(versiona_context, pending_version_factory)
+
+    _run_with_pdf(job, 'sin_encabezados.pdf')
+
+    job.refresh_from_db()
+    record = SealValidityRecord.objects.get(to_document_version=current)
+    assert job.result['degraded'] is True
+    assert record.decision == SealValidityRecord.Decision.PENDING
+
+
+@pytest.mark.django_db
+def test_previous_done_degradation_requires_coordinator(versiona_context, pending_version_factory):
+    previous, current, job = _prepared_redelivery(versiona_context, pending_version_factory)
+    previous_job = EngineJob.objects.get(document_version=previous)
+    previous_job.result['degraded'] = True
+    previous_job.save(update_fields=['result'])
+
+    _run_with_pdf(job, 'contrato_v2.pdf')
+
+    assert SealValidityRecord.objects.get(to_document_version=current).decision == SealValidityRecord.Decision.PENDING
+
+
+@pytest.mark.django_db
+def test_previous_checkpoint_degradation_requires_coordinator(versiona_context, pending_version_factory):
+    previous, current, job = _prepared_redelivery(versiona_context, pending_version_factory)
+    previous_job = EngineJob.objects.get(document_version=previous)
+    previous_job.result = None
+    previous_job.status = EngineJob.Status.RUNNING
+    previous_job.payload[PROGRESS_KEY]['analysis_result']['degraded'] = True
+    previous_job.save(update_fields=['result', 'status', 'payload'])
+
+    _run_with_pdf(job, 'contrato_v2.pdf')
+
+    assert SealValidityRecord.objects.get(to_document_version=current).decision == SealValidityRecord.Decision.PENDING
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('invalid_flag', ['true', 1, None])
+def test_malformed_previous_degradation_keeps_legacy_fallback(
+    versiona_context, pending_version_factory, invalid_flag,
+):
+    previous, current, job = _prepared_redelivery(versiona_context, pending_version_factory)
+    previous_job = EngineJob.objects.get(document_version=previous)
+    previous_job.result['degraded'] = invalid_flag
+    previous_job.save(update_fields=['result'])
+
+    _run_with_pdf(job, 'contrato_v2.pdf')
+
+    record = SealValidityRecord.objects.get(to_document_version=current)
+    assert record.decided_mode == SealValidityRecord.Mode.AUTO
+    assert record.decision == SealValidityRecord.Decision.INVALIDATED
+
+
+@pytest.mark.django_db
+def test_missing_previous_analysis_keeps_legacy_fallback(versiona_context, pending_version_factory):
+    previous, current, job = _prepared_redelivery(versiona_context, pending_version_factory)
+    EngineJob.objects.filter(document_version=previous).delete()
+
+    _run_with_pdf(job, 'contrato_v2.pdf')
+
+    assert SealValidityRecord.objects.get(to_document_version=current).decided_mode == SealValidityRecord.Mode.AUTO
+
+
+@pytest.mark.django_db
+def test_degraded_d5_retry_preserves_coordinator_decision(versiona_context, pending_version_factory):
+    _previous, current, job = _prepared_redelivery(versiona_context, pending_version_factory)
+    calls = 0
+
+    # Simulate a transient phase failure, retaining the existing recovery test idiom.
+    original = seal_service.apply_invalidation
+
+    def interrupted(*args, **kwargs):
+        nonlocal calls
+        calls += 1
+        result = original(*args, **kwargs)
+        if calls == 1:
+            raise RuntimeError('d5 unavailable')
+        return result
+
+    with patch('reviews.services.seal_service.apply_invalidation', side_effect=interrupted):
+        with pytest.raises(RuntimeError, match='d5 unavailable'):
+            _run_with_pdf(job, 'sin_encabezados.pdf')
+    _run_with_pdf(job, 'sin_encabezados.pdf')
+
+    record = SealValidityRecord.objects.get(to_document_version=current)
+    assert record.decision == SealValidityRecord.Decision.PENDING
+    assert record.decided_mode == SealValidityRecord.Mode.COORDINATOR
+
+
+@pytest.mark.django_db
 @pytest.mark.escenario('C1-A04')
 def test_enqueue_analysis_returns_the_done_job_without_redispatch(version, make_job):
     """Return an existing completed job without dispatching another task."""
