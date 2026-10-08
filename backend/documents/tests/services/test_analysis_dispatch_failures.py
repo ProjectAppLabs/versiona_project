@@ -76,7 +76,8 @@ def test_dispatch_recovery_finishes_the_original_upload(
     version.refresh_from_db()
     assert job.status == EngineJob.Status.DONE
     assert version.analysis_status == DocumentVersion.AnalysisStatus.READY
-    assert version.section_versions.count() == 8
+    # Eight numbered sections plus the detected preamble.
+    assert version.section_versions.count() == 9
     assert DocumentVersion.objects.filter(document=document).count() == 1
 
 
