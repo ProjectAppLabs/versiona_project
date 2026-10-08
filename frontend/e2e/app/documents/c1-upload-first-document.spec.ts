@@ -2,7 +2,8 @@ import path from 'node:path';
 
 import { expect, test } from '../../test-with-coverage';
 import { C1_UPLOAD_FIRST } from '../../helpers/flow-tags';
-import { TESTDATA, createProject, uniqueName, uploadPdf } from '../../helpers/versiona';
+import { TESTDATA, createProject, openSeededProject, uniqueName, uploadPdf } from '../../helpers/versiona';
+import { viewportUse, type ViewportAlias } from '../../helpers/viewports';
 
 test.use({ storageState: 'e2e/.auth/editor.json' });
 
@@ -95,3 +96,47 @@ test.describe('C1 — Subir el primer documento', () => {
     }
   );
 });
+
+for (const alias of ['compact', 'portrait', 'landscape', 'desktop', 'wide'] as ViewportAlias[]) {
+  test.describe(`C1 PDF @viewport:${alias}`, () => {
+    test.use(viewportUse(alias));
+    test.slow(); // Real upload analysis and cold compilation of the version viewer.
+
+    test('la vista previa conserva la página completa al subir un contrato',
+      { tag: [...C1_UPLOAD_FIRST, '@outcome:success'] }, async ({ page }, testInfo) => {
+        // quality: allow-duplicate (per-viewport contract: c1-upload-first-document PDF fit at the five standard viewports)
+        // Bug: el canvas fijo de 420/760 px supera el contenido del modal/visor a 412 px (LAY-1/MED-1).
+        const title = uniqueName(`Contrato responsive ${alias}`);
+        await openSeededProject(page);
+        await page.getByTestId('upload-input').setInputFiles(path.join(TESTDATA, 'contrato_v1.pdf'));
+        const preview = page.getByRole('dialog').getByTestId('pdf-viewer');
+        await expect(preview.locator('canvas').first()).toBeVisible({ timeout: 30_000 });
+        const previewGeometry = await preview.evaluate((viewer) => ({
+          availableWidth: viewer.getBoundingClientRect().width,
+          renderedWidth: viewer.querySelector('canvas')!.getBoundingClientRect().width,
+        }));
+        await testInfo.attach('pdf-preview-geometry', {
+          body: Buffer.from(JSON.stringify({ viewport: page.viewportSize(), ...previewGeometry })),
+          contentType: 'application/json',
+        });
+        await expect.poll(() => preview.evaluate((viewer) => {
+          const bounds = viewer.getBoundingClientRect();
+          const canvas = viewer.querySelector('canvas')!.getBoundingClientRect();
+          return canvas.left >= bounds.left && canvas.right <= bounds.right && canvas.width <= 420;
+        })).toBe(true);
+        await page.getByTestId('upload-title').fill(title);
+        await page.getByTestId('upload-confirm').click();
+        await expect(page.getByRole('dialog')).toBeHidden({ timeout: 90_000 });
+        await page.getByTestId('documents-list').getByRole('link', { name: new RegExp(title) }).click();
+        await page.getByRole('link', { name: 'Ver documento' }).click();
+        await expect(page.getByTestId('sections-list')).toContainText('1. OBJETO DEL CONTRATO');
+        const viewer = page.getByTestId('pdf-viewer');
+        await expect(viewer.locator('canvas').first()).toBeVisible({ timeout: 30_000 });
+        await expect.poll(() => viewer.evaluate((element) => {
+          const bounds = element.getBoundingClientRect();
+          const canvas = element.querySelector('canvas')!.getBoundingClientRect();
+          return canvas.left >= bounds.left && canvas.right <= bounds.right && canvas.width <= 760;
+        })).toBe(true);
+      });
+  });
+}
