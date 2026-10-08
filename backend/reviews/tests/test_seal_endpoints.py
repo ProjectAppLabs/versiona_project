@@ -3,9 +3,12 @@
 from pathlib import Path
 
 import pytest
+from audit.models import AuditEvent
+from django.utils import timezone
 
 from documents.services import storage_service, version_service
 from reviews.services import seal_service
+from reviews.models import Seal
 
 TESTDATA = Path(__file__).resolve().parents[3] / 'testdata' / 'pdfs'
 
@@ -182,3 +185,45 @@ def test_seals_listing_includes_validity_records_of_incoming_version(client_as, 
     assert records[0]['decision'] == 'invalidated'
     assert records[0]['reason_code'] == 'section_modified'
     assert records[0]['seal']['reviewer_email'] == context.users['reviewer'].email
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(('project_state', 'expected_status'), [('archived', 409), ('trashed', 404)])
+def test_readonly_project_rejects_seal_withdrawal_via_api(
+    client_as, analyzed_v1, project_state, expected_status,
+):
+    """Catches: exposing a write surface on archival or revealing a trashed project."""
+    context, _, version = analyzed_v1
+    seal = seal_service.create_seal(
+        version, context.users['reviewer'], section_keys=['objeto-del-contrato'],
+    )
+    project = version.document.project
+    project.status = {'archived': 'archived', 'trashed': 'active'}[project_state]
+    project.deleted_at = {'archived': None, 'trashed': timezone.now()}[project_state]
+    project.save(update_fields=['status', 'deleted_at'])
+    audit_count = AuditEvent.objects.count()
+
+    response = client_as('reviewer').post(f'{seals_url(version)}{seal.public_id}/revoke/')
+
+    assert response.status_code == expected_status
+    seal.refresh_from_db()
+    assert seal.revoked_at is None
+    assert AuditEvent.objects.count() == audit_count
+
+
+@pytest.mark.django_db
+def test_archived_seal_withdrawal_preserves_the_author_permission_error(client_as, analyzed_v1):
+    """Catches: the readonly guard replacing the existing foreign-author 403."""
+    context, _, version = analyzed_v1
+    seal = seal_service.create_seal(
+        version, context.users['reviewer'], section_keys=['objeto-del-contrato'],
+    )
+    project = version.document.project
+    project.status = 'archived'
+    project.save(update_fields=['status'])
+
+    response = client_as('admin').post(f'{seals_url(version)}{seal.public_id}/revoke/')
+
+    assert response.status_code == 403
+    assert response.data == {'error': 'Solo el autor del sello puede retirarlo.'}
+    assert Seal.objects.get(pk=seal.pk).revoked_at is None
