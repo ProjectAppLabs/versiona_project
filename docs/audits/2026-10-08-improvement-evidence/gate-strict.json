@@ -1,0 +1,359 @@
+{
+  "summary": {
+    "total_files": 15,
+    "total_tests": 72,
+    "errors": 0,
+    "warnings": 6,
+    "info": 0,
+    "infra_errors": 0,
+    "unmatched_include_files": [],
+    "quality_score": 98,
+    "status": "passed",
+    "issues_by_category": {
+      "too_many_assertions": 6
+    },
+    "semantic_rules": "strict",
+    "semantic_suppressed_by_mode": {
+      "backend": 0,
+      "frontend_unit": 0,
+      "frontend_e2e": 0
+    },
+    "active_exceptions": {
+      "total": 10,
+      "by_rule": {
+        "duplicate_coverage": 10
+      },
+      "by_file": {
+        "frontend/e2e/app/layout/authenticated-navigation.spec.ts": 3,
+        "frontend/e2e/app/projects/b2-board-search.spec.ts": 2,
+        "frontend/e2e/public/public-navigation.spec.ts": 5
+      },
+      "details": [
+        {
+          "type": "allow",
+          "file": "frontend/e2e/app/layout/authenticated-navigation.spec.ts",
+          "line": 73,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: layout-authenticated-navigation member at the five standard viewports",
+          "marker": "quality: allow-duplicate (per-viewport contract: layout-authenticated-navigation member at the five standard viewports)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/app/layout/authenticated-navigation.spec.ts",
+          "line": 96,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: layout-authenticated-navigation owner at the five standard viewports",
+          "marker": "quality: allow-duplicate (per-viewport contract: layout-authenticated-navigation owner at the five standard viewports)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/app/layout/authenticated-navigation.spec.ts",
+          "line": 118,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: layout-authenticated-navigation bell at the five standard viewports",
+          "marker": "quality: allow-duplicate (per-viewport contract: layout-authenticated-navigation bell at the five standard viewports)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/app/projects/b2-board-search.spec.ts",
+          "line": 93,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: b2-projects-board @ 412",
+          "marker": "quality: allow-duplicate (per-viewport contract: b2-projects-board @ 412)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/app/projects/b2-board-search.spec.ts",
+          "line": 146,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: b2-projects-board @ 1195",
+          "marker": "quality: allow-duplicate (per-viewport contract: b2-projects-board @ 1195)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/public/public-navigation.spec.ts",
+          "line": 60,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: layout-public-navigation at the five standard viewports",
+          "marker": "quality: allow-duplicate (per-viewport contract: layout-public-navigation at the five standard viewports)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/public/public-navigation.spec.ts",
+          "line": 78,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: layout-public-navigation theme control at the five standard viewports",
+          "marker": "quality: allow-duplicate (per-viewport contract: layout-public-navigation theme control at the five standard viewports)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/public/public-navigation.spec.ts",
+          "line": 103,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: layout-public-navigation closure at compact and portrait",
+          "marker": "quality: allow-duplicate (per-viewport contract: layout-public-navigation closure at compact and portrait)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/public/public-navigation.spec.ts",
+          "line": 117,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: layout-public-navigation closure at compact and portrait",
+          "marker": "quality: allow-duplicate (per-viewport contract: layout-public-navigation closure at compact and portrait)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/public/public-navigation.spec.ts",
+          "line": 133,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: layout-public-navigation closure at compact and portrait",
+          "marker": "quality: allow-duplicate (per-viewport contract: layout-public-navigation closure at compact and portrait)"
+        }
+      ],
+      "invalid": {
+        "total": 0,
+        "details": []
+      }
+    },
+    "external_lint": {
+      "mode": "run",
+      "results": [
+        {
+          "source": "ruff",
+          "status": "ok",
+          "message": null,
+          "findings": 0
+        },
+        {
+          "source": "eslint",
+          "status": "ok",
+          "message": null,
+          "findings": 0
+        }
+      ]
+    },
+    "timings": {
+      "backend": 0.6409,
+      "frontend_unit": 21.4083,
+      "frontend_e2e": 1.8432,
+      "external_lint": 42.3834,
+      "total": 66.2766
+    }
+  },
+  "backend": {
+    "files": 6,
+    "tests": 20,
+    "errors": 0,
+    "warnings": 6,
+    "info": 0,
+    "issues": [
+      {
+        "file": "backend/documents/tests/services/test_upload_cleanup_failures.py",
+        "message": "Too many assertions (13 > 7)",
+        "severity": "warning",
+        "category": "too_many_assertions",
+        "line": 16,
+        "identifier": "test_staging_cleanup_failure_preserves_completed_upload",
+        "suggestion": "Split into multiple focused tests.",
+        "rule_id": "too_many_assertions"
+      },
+      {
+        "file": "backend/public_tools/tests/test_public_cleanup_failures.py",
+        "message": "Too many assertions (8 > 7)",
+        "severity": "warning",
+        "category": "too_many_assertions",
+        "line": 80,
+        "identifier": "test_failed_purge_remains_retryable",
+        "suggestion": "Split into multiple focused tests.",
+        "rule_id": "too_many_assertions"
+      },
+      {
+        "file": "backend/public_tools/tests/test_public_cleanup_failures.py",
+        "message": "Too many assertions (10 > 7)",
+        "severity": "warning",
+        "category": "too_many_assertions",
+        "line": 107,
+        "identifier": "test_purge_progresses_past_retained_comparison",
+        "suggestion": "Split into multiple focused tests.",
+        "rule_id": "too_many_assertions"
+      },
+      {
+        "file": "backend/public_tools/tests/test_public_cleanup_failures.py",
+        "message": "Too many assertions (11 > 7)",
+        "severity": "warning",
+        "category": "too_many_assertions",
+        "line": 144,
+        "identifier": "test_purge_waits_for_both_deletions",
+        "suggestion": "Split into multiple focused tests.",
+        "rule_id": "too_many_assertions"
+      },
+      {
+        "file": "backend/public_tools/tests/test_public_cleanup_failures.py",
+        "message": "Too many assertions (10 > 7)",
+        "severity": "warning",
+        "category": "too_many_assertions",
+        "line": 177,
+        "identifier": "test_processing_cleanup_failure_remains_recoverable",
+        "suggestion": "Split into multiple focused tests.",
+        "rule_id": "too_many_assertions"
+      },
+      {
+        "file": "backend/public_tools/tests/test_public_cleanup_failures.py",
+        "message": "Too many assertions (11 > 7)",
+        "severity": "warning",
+        "category": "too_many_assertions",
+        "line": 268,
+        "identifier": "test_cleanup_warning_contains_safe_diagnostics",
+        "suggestion": "Split into multiple focused tests.",
+        "rule_id": "too_many_assertions"
+      }
+    ],
+    "suite_findings": {
+      "semantic_issues_suppressed_by_mode": 0,
+      "active_exceptions_count": 0,
+      "error_count": 0,
+      "warning_count": 6
+    },
+    "file_details": [
+      {
+        "file": "backend/accounts/tests/services/test_single_use_codes.py",
+        "area": "services",
+        "location_ok": true,
+        "tests": 4,
+        "issues": 0
+      },
+      {
+        "file": "backend/accounts/tests/views/test_single_use_codes.py",
+        "area": "views",
+        "location_ok": true,
+        "tests": 2,
+        "issues": 0
+      },
+      {
+        "file": "backend/documents/tests/services/test_storage_delete_failures.py",
+        "area": "services",
+        "location_ok": true,
+        "tests": 2,
+        "issues": 0
+      },
+      {
+        "file": "backend/documents/tests/services/test_upload_cleanup_failures.py",
+        "area": "services",
+        "location_ok": true,
+        "tests": 1,
+        "issues": 1
+      },
+      {
+        "file": "backend/orgs/tests/test_trash_query_budget.py",
+        "area": "",
+        "location_ok": true,
+        "tests": 3,
+        "issues": 0
+      },
+      {
+        "file": "backend/public_tools/tests/test_public_cleanup_failures.py",
+        "area": "",
+        "location_ok": true,
+        "tests": 8,
+        "issues": 5
+      }
+    ]
+  },
+  "frontend": {
+    "unit": {
+      "files": 5,
+      "tests": 35,
+      "errors": 0,
+      "warnings": 0,
+      "info": 0,
+      "issues": [],
+      "suite_findings": {
+        "semantic_issues_suppressed_by_mode": 0,
+        "active_exceptions_count": 0,
+        "error_count": 0,
+        "warning_count": 0
+      },
+      "file_details": [
+        {
+          "file": "frontend/app/comparar/[id]/__tests__/page.test.tsx",
+          "area": "unit",
+          "location_ok": true,
+          "tests": 2,
+          "issues": 0
+        },
+        {
+          "file": "frontend/components/__tests__/navigation-toggles.test.tsx",
+          "area": "unit",
+          "location_ok": true,
+          "tests": 3,
+          "issues": 0
+        },
+        {
+          "file": "frontend/components/layout/__tests__/header-navigation.test.tsx",
+          "area": "unit",
+          "location_ok": true,
+          "tests": 7,
+          "issues": 0
+        },
+        {
+          "file": "frontend/components/marketing/__tests__/public-header-navigation.test.tsx",
+          "area": "unit",
+          "location_ok": true,
+          "tests": 7,
+          "issues": 0
+        },
+        {
+          "file": "frontend/lib/stores/__tests__/publicCompareStore.test.ts",
+          "area": "unit",
+          "location_ok": true,
+          "tests": 16,
+          "issues": 0
+        }
+      ]
+    },
+    "e2e": {
+      "files": 4,
+      "tests": 17,
+      "errors": 0,
+      "warnings": 0,
+      "info": 0,
+      "issues": [],
+      "suite_findings": {
+        "semantic_issues_suppressed_by_mode": 0,
+        "active_exceptions_count": 10,
+        "error_count": 0,
+        "warning_count": 0
+      },
+      "file_details": [
+        {
+          "file": "frontend/e2e/app/layout/authenticated-navigation.spec.ts",
+          "area": "e2e",
+          "location_ok": true,
+          "tests": 6,
+          "issues": 0
+        },
+        {
+          "file": "frontend/e2e/app/projects/b2-board-search.spec.ts",
+          "area": "e2e",
+          "location_ok": true,
+          "tests": 3,
+          "issues": 0
+        },
+        {
+          "file": "frontend/e2e/public/public-compare-lifecycle.spec.ts",
+          "area": "e2e",
+          "location_ok": true,
+          "tests": 2,
+          "issues": 0
+        },
+        {
+          "file": "frontend/e2e/public/public-navigation.spec.ts",
+          "area": "e2e",
+          "location_ok": true,
+          "tests": 6,
+          "issues": 0
+        }
+      ]
+    }
+  }
+}

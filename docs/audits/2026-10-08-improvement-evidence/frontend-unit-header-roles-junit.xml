@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="11" failures="0" skipped="0" errors="0" time="4.396">
+  <properties>
+    <property name="source_json" value="test-results/improvement/2026-10-08-versiona-combined/final-4d067815/frontend-unit-header-roles.json"/>
+    <property name="commit" value="4d067815589b348c3bfd3deba6319ee833ab79f0"/>
+    <property name="converter" value="json-to-junit.mjs: assertion-result preserving"/>
+  </properties>
+  <testsuite name="frontend/components/layout/__tests__/header-navigation.test.tsx" tests="7" failures="0" skipped="0" errors="0" time="3.889">
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/components/layout/__tests__/header-navigation.test.tsx" name="Authenticated header navigation opens the navigation with its original destinations" time="1.891"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/components/layout/__tests__/header-navigation.test.tsx" name="Authenticated header navigation returns focus to the opener after Escape from a navigation link" time="0.742"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/components/layout/__tests__/header-navigation.test.tsx" name="Authenticated header navigation returns focus to the opener after a pointer outside the header" time="0.232"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/components/layout/__tests__/header-navigation.test.tsx" name="Authenticated header navigation closes the navigation when its destination is chosen" time="0.147"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/components/layout/__tests__/header-navigation.test.tsx" name="Authenticated header navigation signs out through the expanded navigation" time="0.293"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/components/layout/__tests__/header-navigation.test.tsx" name="Authenticated header navigation keeps the navigation open after selecting a theme" time="0.518"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/components/layout/__tests__/header-navigation.test.tsx" name="Authenticated header navigation renders the public header before the browser has mounted" time="0.066"/>
+  </testsuite>
+  <testsuite name="frontend/components/layout/__tests__/header-roles.test.tsx" tests="4" failures="0" skipped="0" errors="0" time="0.507">
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/components/layout/__tests__/header-roles.test.tsx" name="Header role-based navigation [Header-R1] hides the trash link for a plain org member" time="0.230"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/components/layout/__tests__/header-roles.test.tsx" name="Header role-based navigation [Header-R2] shows the trash link for an org admin" time="0.064"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/components/layout/__tests__/header-roles.test.tsx" name="Header role-based navigation [Header-R3] shows the trash link for the org owner" time="0.069"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/components/layout/__tests__/header-roles.test.tsx" name="Header role-based navigation [Header-R4] shows the plan-and-usage link for any authed member" time="0.144"/>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,1011 @@
+{
+  "stats": {
+    "startTime": "2026-10-08T12:48:24.145Z",
+    "duration": 64220.856999999996,
+    "expected": 20,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "suites": [
+    {
+      "title": "public/public-compare-lifecycle.spec.ts",
+      "file": "public/public-compare-lifecycle.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "keeps the new comparison after leaving a delayed done result",
+          "ok": true,
+          "tags": [
+            "flow:public-compare-lifecycle",
+            "module:public",
+            "priority:P1",
+            "outcome:success"
+          ],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "slow",
+                  "location": {
+                    "file": "/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/e2e/public/public-compare-lifecycle.spec.ts",
+                    "line": 11,
+                    "column": 6
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "Desktop Chrome",
+              "projectName": "Desktop Chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6525,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-08T12:48:31.173Z",
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/e2e/public/public-compare-lifecycle.spec.ts",
+                        "line": 11,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "09fa50e81d6c1e36873f-5bf01d6de67ce3d0cc93",
+          "file": "public/public-compare-lifecycle.spec.ts",
+          "line": 66,
+          "column": 7
+        },
+        {
+          "title": "keeps the new comparison after leaving a delayed failed result",
+          "ok": true,
+          "tags": [
+            "flow:public-compare-lifecycle",
+            "module:public",
+            "priority:P1",
+            "outcome:success"
+          ],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "slow",
+                  "location": {
+                    "file": "/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/e2e/public/public-compare-lifecycle.spec.ts",
+                    "line": 11,
+                    "column": 6
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "Desktop Chrome",
+              "projectName": "Desktop Chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4028,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-08T12:48:38.444Z",
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/e2e/public/public-compare-lifecycle.spec.ts",
+                        "line": 11,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "09fa50e81d6c1e36873f-8c83fa0bb1d648124105",
+          "file": "public/public-compare-lifecycle.spec.ts",
+          "line": 66,
+          "column": 7
+        },
+        {
+          "title": "shows a failure alert for the current comparison",
+          "ok": true,
+          "tags": [
+            "flow:public-compare",
+            "module:public",
+            "priority:P1",
+            "outcome:failure"
+          ],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "slow",
+                  "location": {
+                    "file": "/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/e2e/public/public-compare-lifecycle.spec.ts",
+                    "line": 11,
+                    "column": 6
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "Desktop Chrome",
+              "projectName": "Desktop Chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4281,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-08T12:48:42.523Z",
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/e2e/public/public-compare-lifecycle.spec.ts",
+                        "line": 11,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "09fa50e81d6c1e36873f-67441046607374195785",
+          "file": "public/public-compare-lifecycle.spec.ts",
+          "line": 107,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "public/public-navigation.spec.ts",
+      "file": "public/public-navigation.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Navegación pública @viewport:compact",
+          "file": "public/public-navigation.spec.ts",
+          "line": 56,
+          "column": 8,
+          "specs": [
+            {
+              "title": "el manual se alcanza desde la navegación principal",
+              "ok": true,
+              "tags": [
+                "viewport:compact",
+                "flow:layout-public-navigation",
+                "module:home",
+                "priority:P2",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4479,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:48:46.871Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "navigation-geometry",
+                          "contentType": "application/json",
+                          "body": "ewogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDQxMiwKICAgICJoZWlnaHQiOiA5MTUKICB9LAogICJzY3JvbGxXaWR0aCI6IDQxMiwKICAiYm94ZXMiOiBbCiAgICB7CiAgICAgICJsYWJlbCI6ICJDb21wYXJhciBQREZzIiwKICAgICAgIndpZHRoIjogMTI0LjU2MjUsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiAyNCwKICAgICAgInJpZ2h0IjogMTQ4LjU2MjUsCiAgICAgICJ0b3AiOiA5MywKICAgICAgImJvdHRvbSI6IDEzNwogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlByZWNpb3MiLAogICAgICAid2lkdGgiOiA2NS43MTg3NSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDI0LAogICAgICAicmlnaHQiOiA4OS43MTg3NSwKICAgICAgInRvcCI6IDE0NSwKICAgICAgImJvdHRvbSI6IDE4OQogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIk1hbnVhbCIsCiAgICAgICJ3aWR0aCI6IDY2Ljg3NSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDI0LAogICAgICAicmlnaHQiOiA5MC44NzUsCiAgICAgICJ0b3AiOiAxOTcsCiAgICAgICJib3R0b20iOiAyNDEKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJTd2l0Y2ggdG8gRW5nbGlzaCIsCiAgICAgICJ3aWR0aCI6IDQ0LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMjQsCiAgICAgICJyaWdodCI6IDY4LAogICAgICAidG9wIjogMjQ5LAogICAgICAiYm90dG9tIjogMjkzCiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiVG9nZ2xlIHRoZW1lIiwKICAgICAgIndpZHRoIjogNDQsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiAyNCwKICAgICAgInJpZ2h0IjogNjgsCiAgICAgICJ0b3AiOiAzMDEsCiAgICAgICJib3R0b20iOiAzNDUKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJJbmljaWFyIHNlc2nDs24iLAogICAgICAid2lkdGgiOiAxMjUuNzk2ODc1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMjQsCiAgICAgICJyaWdodCI6IDE0OS43OTY4NzUsCiAgICAgICJ0b3AiOiAzNTMsCiAgICAgICJib3R0b20iOiAzOTcKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJDcmVhciBjdWVudGEgZ3JhdGlzIiwKICAgICAgIndpZHRoIjogMTY3LjA5Mzc1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMjQsCiAgICAgICJyaWdodCI6IDE5MS4wOTM3NSwKICAgICAgInRvcCI6IDQwNSwKICAgICAgImJvdHRvbSI6IDQ0OQogICAgfQogIF0KfQ=="
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "683d8314069e9739c5a8-f0d727b0b155280202fc",
+              "file": "public/public-navigation.spec.ts",
+              "line": 59,
+              "column": 9
+            },
+            {
+              "title": "el tema oscuro se elige desde el encabezado",
+              "ok": true,
+              "tags": [
+                "viewport:compact",
+                "flow:layout-public-navigation",
+                "module:home",
+                "priority:P2",
+                "outcome:display"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1994,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:48:51.393Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "navigation-geometry",
+                          "contentType": "application/json",
+                          "body": "ewogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDQxMiwKICAgICJoZWlnaHQiOiA5MTUKICB9LAogICJzY3JvbGxXaWR0aCI6IDQxMiwKICAiYm94ZXMiOiBbCiAgICB7CiAgICAgICJsYWJlbCI6ICJMaWdodCIsCiAgICAgICJ3aWR0aCI6IDEyNiwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDMzLAogICAgICAicmlnaHQiOiAxNTksCiAgICAgICJ0b3AiOiAzNjIsCiAgICAgICJib3R0b20iOiA0MDYKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJEYXJrIiwKICAgICAgIndpZHRoIjogMTI2LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMzMsCiAgICAgICJyaWdodCI6IDE1OSwKICAgICAgInRvcCI6IDQxNCwKICAgICAgImJvdHRvbSI6IDQ1OAogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlN5c3RlbSIsCiAgICAgICJ3aWR0aCI6IDEyNiwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDMzLAogICAgICAicmlnaHQiOiAxNTksCiAgICAgICJ0b3AiOiA0NjYsCiAgICAgICJib3R0b20iOiA1MTAKICAgIH0KICBdCn0="
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "683d8314069e9739c5a8-e052d65fff742e819168",
+              "file": "public/public-navigation.spec.ts",
+              "line": 77,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Navegación pública @viewport:portrait",
+          "file": "public/public-navigation.spec.ts",
+          "line": 56,
+          "column": 8,
+          "specs": [
+            {
+              "title": "el manual se alcanza desde la navegación principal",
+              "ok": true,
+              "tags": [
+                "viewport:portrait",
+                "flow:layout-public-navigation",
+                "module:home",
+                "priority:P2",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2080,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:48:53.439Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "navigation-geometry",
+                          "contentType": "application/json",
+                          "body": "ewogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDgzNSwKICAgICJoZWlnaHQiOiAxMTk0CiAgfSwKICAic2Nyb2xsV2lkdGgiOiA4MzUsCiAgImJveGVzIjogWwogICAgewogICAgICAibGFiZWwiOiAiQ29tcGFyYXIgUERGcyIsCiAgICAgICJ3aWR0aCI6IDEyNC41NjI1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMjQsCiAgICAgICJyaWdodCI6IDE0OC41NjI1LAogICAgICAidG9wIjogOTMsCiAgICAgICJib3R0b20iOiAxMzcKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJQcmVjaW9zIiwKICAgICAgIndpZHRoIjogNjUuNzE4NzUsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiAyNCwKICAgICAgInJpZ2h0IjogODkuNzE4NzUsCiAgICAgICJ0b3AiOiAxNDUsCiAgICAgICJib3R0b20iOiAxODkKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJNYW51YWwiLAogICAgICAid2lkdGgiOiA2Ni44NzUsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiAyNCwKICAgICAgInJpZ2h0IjogOTAuODc1LAogICAgICAidG9wIjogMTk3LAogICAgICAiYm90dG9tIjogMjQxCiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiU3dpdGNoIHRvIEVuZ2xpc2giLAogICAgICAid2lkdGgiOiA0NCwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDI0LAogICAgICAicmlnaHQiOiA2OCwKICAgICAgInRvcCI6IDI0OSwKICAgICAgImJvdHRvbSI6IDI5MwogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlRvZ2dsZSB0aGVtZSIsCiAgICAgICJ3aWR0aCI6IDQ0LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMjQsCiAgICAgICJyaWdodCI6IDY4LAogICAgICAidG9wIjogMzAxLAogICAgICAiYm90dG9tIjogMzQ1CiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiSW5pY2lhciBzZXNpw7NuIiwKICAgICAgIndpZHRoIjogMTI1Ljc5Njg3NSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDI0LAogICAgICAicmlnaHQiOiAxNDkuNzk2ODc1LAogICAgICAidG9wIjogMzUzLAogICAgICAiYm90dG9tIjogMzk3CiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiQ3JlYXIgY3VlbnRhIGdyYXRpcyIsCiAgICAgICJ3aWR0aCI6IDE2Ny4wOTM3NSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDI0LAogICAgICAicmlnaHQiOiAxOTEuMDkzNzUsCiAgICAgICJ0b3AiOiA0MDUsCiAgICAgICJib3R0b20iOiA0NDkKICAgIH0KICBdCn0="
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "683d8314069e9739c5a8-ebca4463a3231623e4bc",
+              "file": "public/public-navigation.spec.ts",
+              "line": 59,
+              "column": 9
+            },
+            {
+              "title": "el tema oscuro se elige desde el encabezado",
+              "ok": true,
+              "tags": [
+                "viewport:portrait",
+                "flow:layout-public-navigation",
+                "module:home",
+                "priority:P2",
+                "outcome:display"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1440,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:48:55.582Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "navigation-geometry",
+                          "contentType": "application/json",
+                          "body": "ewogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDgzNSwKICAgICJoZWlnaHQiOiAxMTk0CiAgfSwKICAic2Nyb2xsV2lkdGgiOiA4MzUsCiAgImJveGVzIjogWwogICAgewogICAgICAibGFiZWwiOiAiTGlnaHQiLAogICAgICAid2lkdGgiOiAxMjYsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiAzMywKICAgICAgInJpZ2h0IjogMTU5LAogICAgICAidG9wIjogMzYyLAogICAgICAiYm90dG9tIjogNDA2CiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiRGFyayIsCiAgICAgICJ3aWR0aCI6IDEyNiwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDMzLAogICAgICAicmlnaHQiOiAxNTksCiAgICAgICJ0b3AiOiA0MTQsCiAgICAgICJib3R0b20iOiA0NTgKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJTeXN0ZW0iLAogICAgICAid2lkdGgiOiAxMjYsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiAzMywKICAgICAgInJpZ2h0IjogMTU5LAogICAgICAidG9wIjogNDY2LAogICAgICAiYm90dG9tIjogNTEwCiAgICB9CiAgXQp9"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "683d8314069e9739c5a8-2b474fdec63121b24509",
+              "file": "public/public-navigation.spec.ts",
+              "line": 77,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Navegación pública @viewport:landscape",
+          "file": "public/public-navigation.spec.ts",
+          "line": 56,
+          "column": 8,
+          "specs": [
+            {
+              "title": "el manual se alcanza desde la navegación principal",
+              "ok": true,
+              "tags": [
+                "viewport:landscape",
+                "flow:layout-public-navigation",
+                "module:home",
+                "priority:P2",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1542,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:48:57.048Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "navigation-geometry",
+                          "contentType": "application/json",
+                          "body": "ewogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDExOTUsCiAgICAiaGVpZ2h0IjogODM1CiAgfSwKICAic2Nyb2xsV2lkdGgiOiAxMTk1LAogICJib3hlcyI6IFsKICAgIHsKICAgICAgImxhYmVsIjogIkNvbXBhcmFyIFBERnMiLAogICAgICAid2lkdGgiOiAxMjQuNTYyNSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDQ2My40NTMxMjUsCiAgICAgICJyaWdodCI6IDU4OC4wMTU2MjUsCiAgICAgICJ0b3AiOiAxNiwKICAgICAgImJvdHRvbSI6IDYwCiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiUHJlY2lvcyIsCiAgICAgICJ3aWR0aCI6IDY1LjcxODc1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogNTk2LjAxNTYyNSwKICAgICAgInJpZ2h0IjogNjYxLjczNDM3NSwKICAgICAgInRvcCI6IDE2LAogICAgICAiYm90dG9tIjogNjAKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJNYW51YWwiLAogICAgICAid2lkdGgiOiA2Ni44NzUsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiA2NjkuNzM0Mzc1LAogICAgICAicmlnaHQiOiA3MzYuNjA5Mzc1LAogICAgICAidG9wIjogMTYsCiAgICAgICJib3R0b20iOiA2MAogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlN3aXRjaCB0byBFbmdsaXNoIiwKICAgICAgIndpZHRoIjogNDQsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiA3NDQuNjA5Mzc1LAogICAgICAicmlnaHQiOiA3ODguNjA5Mzc1LAogICAgICAidG9wIjogMTYsCiAgICAgICJib3R0b20iOiA2MAogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlRvZ2dsZSB0aGVtZSIsCiAgICAgICJ3aWR0aCI6IDQ0LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogNzk2LjYwOTM3NSwKICAgICAgInJpZ2h0IjogODQwLjYwOTM3NSwKICAgICAgInRvcCI6IDE2LAogICAgICAiYm90dG9tIjogNjAKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJJbmljaWFyIHNlc2nDs24iLAogICAgICAid2lkdGgiOiAxMjUuNzk2ODc1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogODQ4LjYwOTM3NSwKICAgICAgInJpZ2h0IjogOTc0LjQwNjI1LAogICAgICAidG9wIjogMTYsCiAgICAgICJib3R0b20iOiA2MAogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIkNyZWFyIGN1ZW50YSBncmF0aXMiLAogICAgICAid2lkdGgiOiAxNjcuMDkzNzUsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiA5ODIuNDA2MjUsCiAgICAgICJyaWdodCI6IDExNDkuNSwKICAgICAgInRvcCI6IDE2LAogICAgICAiYm90dG9tIjogNjAKICAgIH0KICBdCn0="
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "683d8314069e9739c5a8-c1dbcbafebe834f51009",
+              "file": "public/public-navigation.spec.ts",
+              "line": 59,
+              "column": 9
+            },
+            {
+              "title": "el tema oscuro se elige desde el encabezado",
+              "ok": true,
+              "tags": [
+                "viewport:landscape",
+                "flow:layout-public-navigation",
+                "module:home",
+                "priority:P2",
+                "outcome:display"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1579,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:48:58.623Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "navigation-geometry",
+                          "contentType": "application/json",
+                          "body": "ewogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDExOTUsCiAgICAiaGVpZ2h0IjogODM1CiAgfSwKICAic2Nyb2xsV2lkdGgiOiAxMTk1LAogICJib3hlcyI6IFsKICAgIHsKICAgICAgImxhYmVsIjogIkxpZ2h0IiwKICAgICAgIndpZHRoIjogMTI2LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogNzA1LjYwOTM3NSwKICAgICAgInJpZ2h0IjogODMxLjYwOTM3NSwKICAgICAgInRvcCI6IDc3LAogICAgICAiYm90dG9tIjogMTIxCiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiRGFyayIsCiAgICAgICJ3aWR0aCI6IDEyNiwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDcwNS42MDkzNzUsCiAgICAgICJyaWdodCI6IDgzMS42MDkzNzUsCiAgICAgICJ0b3AiOiAxMjksCiAgICAgICJib3R0b20iOiAxNzMKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJTeXN0ZW0iLAogICAgICAid2lkdGgiOiAxMjYsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiA3MDUuNjA5Mzc1LAogICAgICAicmlnaHQiOiA4MzEuNjA5Mzc1LAogICAgICAidG9wIjogMTgxLAogICAgICAiYm90dG9tIjogMjI1CiAgICB9CiAgXQp9"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "683d8314069e9739c5a8-7dba382ed2aee20a6ba0",
+              "file": "public/public-navigation.spec.ts",
+              "line": 77,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Navegación pública @viewport:desktop",
+          "file": "public/public-navigation.spec.ts",
+          "line": 56,
+          "column": 8,
+          "specs": [
+            {
+              "title": "el manual se alcanza desde la navegación principal",
+              "ok": true,
+              "tags": [
+                "viewport:desktop",
+                "flow:layout-public-navigation",
+                "module:home",
+                "priority:P2",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1814,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:49:00.241Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "navigation-geometry",
+                          "contentType": "application/json",
+                          "body": "ewogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDE0NDAsCiAgICAiaGVpZ2h0IjogOTAwCiAgfSwKICAic2Nyb2xsV2lkdGgiOiAxNDQwLAogICJib3hlcyI6IFsKICAgIHsKICAgICAgImxhYmVsIjogIkNvbXBhcmFyIFBERnMiLAogICAgICAid2lkdGgiOiAxMjQuNTYyNSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDU4NS45NTMxMjUsCiAgICAgICJyaWdodCI6IDcxMC41MTU2MjUsCiAgICAgICJ0b3AiOiAxNiwKICAgICAgImJvdHRvbSI6IDYwCiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiUHJlY2lvcyIsCiAgICAgICJ3aWR0aCI6IDY1LjcxODc1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogNzE4LjUxNTYyNSwKICAgICAgInJpZ2h0IjogNzg0LjIzNDM3NSwKICAgICAgInRvcCI6IDE2LAogICAgICAiYm90dG9tIjogNjAKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJNYW51YWwiLAogICAgICAid2lkdGgiOiA2Ni44NzUsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiA3OTIuMjM0Mzc1LAogICAgICAicmlnaHQiOiA4NTkuMTA5Mzc1LAogICAgICAidG9wIjogMTYsCiAgICAgICJib3R0b20iOiA2MAogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIkluaWNpYXIgc2VzacOzbiIsCiAgICAgICJ3aWR0aCI6IDEyNS43OTY4NzUsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiA5NzEuMTA5Mzc1LAogICAgICAicmlnaHQiOiAxMDk2LjkwNjI1LAogICAgICAidG9wIjogMTYsCiAgICAgICJib3R0b20iOiA2MAogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIkNyZWFyIGN1ZW50YSBncmF0aXMiLAogICAgICAid2lkdGgiOiAxNjcuMDkzNzUsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiAxMTA0LjkwNjI1LAogICAgICAicmlnaHQiOiAxMjcyLAogICAgICAidG9wIjogMTYsCiAgICAgICJib3R0b20iOiA2MAogICAgfQogIF0KfQ=="
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "683d8314069e9739c5a8-3d58960ecfe6b25d3185",
+              "file": "public/public-navigation.spec.ts",
+              "line": 59,
+              "column": 9
+            },
+            {
+              "title": "el tema oscuro se elige desde el encabezado",
+              "ok": true,
+              "tags": [
+                "viewport:desktop",
+                "flow:layout-public-navigation",
+                "module:home",
+                "priority:P2",
+                "outcome:display"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1628,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:49:02.086Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "navigation-geometry",
+                          "contentType": "application/json",
+                          "body": "ewogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDE0NDAsCiAgICAiaGVpZ2h0IjogOTAwCiAgfSwKICAic2Nyb2xsV2lkdGgiOiAxNDQwLAogICJib3hlcyI6IFsKICAgIHsKICAgICAgImxhYmVsIjogIkxpZ2h0IiwKICAgICAgIndpZHRoIjogMTI2LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogODI4LjEwOTM3NSwKICAgICAgInJpZ2h0IjogOTU0LjEwOTM3NSwKICAgICAgInRvcCI6IDc3LAogICAgICAiYm90dG9tIjogMTIxCiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiRGFyayIsCiAgICAgICJ3aWR0aCI6IDEyNiwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDgyOC4xMDkzNzUsCiAgICAgICJyaWdodCI6IDk1NC4xMDkzNzUsCiAgICAgICJ0b3AiOiAxMjksCiAgICAgICJib3R0b20iOiAxNzMKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJTeXN0ZW0iLAogICAgICAid2lkdGgiOiAxMjYsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiA4MjguMTA5Mzc1LAogICAgICAicmlnaHQiOiA5NTQuMTA5Mzc1LAogICAgICAidG9wIjogMTgxLAogICAgICAiYm90dG9tIjogMjI1CiAgICB9CiAgXQp9"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "683d8314069e9739c5a8-c8feb2ed5c4c49ab6f3d",
+              "file": "public/public-navigation.spec.ts",
+              "line": 77,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Navegación pública @viewport:wide",
+          "file": "public/public-navigation.spec.ts",
+          "line": 56,
+          "column": 8,
+          "specs": [
+            {
+              "title": "el manual se alcanza desde la navegación principal",
+              "ok": true,
+              "tags": [
+                "viewport:wide",
+                "flow:layout-public-navigation",
+                "module:home",
+                "priority:P2",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1631,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:49:03.738Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "navigation-geometry",
+                          "contentType": "application/json",
+                          "body": "ewogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDI1NjAsCiAgICAiaGVpZ2h0IjogMTQ0MAogIH0sCiAgInNjcm9sbFdpZHRoIjogMjU2MCwKICAiYm94ZXMiOiBbCiAgICB7CiAgICAgICJsYWJlbCI6ICJDb21wYXJhciBQREZzIiwKICAgICAgIndpZHRoIjogMTI0LjU2MjUsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiAxMTQ1Ljk1MzEyNSwKICAgICAgInJpZ2h0IjogMTI3MC41MTU2MjUsCiAgICAgICJ0b3AiOiAxNiwKICAgICAgImJvdHRvbSI6IDYwCiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiUHJlY2lvcyIsCiAgICAgICJ3aWR0aCI6IDY1LjcxODc1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMTI3OC41MTU2MjUsCiAgICAgICJyaWdodCI6IDEzNDQuMjM0Mzc1LAogICAgICAidG9wIjogMTYsCiAgICAgICJib3R0b20iOiA2MAogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIk1hbnVhbCIsCiAgICAgICJ3aWR0aCI6IDY2Ljg3NSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDEzNTIuMjM0Mzc1LAogICAgICAicmlnaHQiOiAxNDE5LjEwOTM3NSwKICAgICAgInRvcCI6IDE2LAogICAgICAiYm90dG9tIjogNjAKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJJbmljaWFyIHNlc2nDs24iLAogICAgICAid2lkdGgiOiAxMjUuNzk2ODc1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMTUzMS4xMDkzNzUsCiAgICAgICJyaWdodCI6IDE2NTYuOTA2MjUsCiAgICAgICJ0b3AiOiAxNiwKICAgICAgImJvdHRvbSI6IDYwCiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiQ3JlYXIgY3VlbnRhIGdyYXRpcyIsCiAgICAgICJ3aWR0aCI6IDE2Ny4wOTM3NSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDE2NjQuOTA2MjUsCiAgICAgICJyaWdodCI6IDE4MzIsCiAgICAgICJ0b3AiOiAxNiwKICAgICAgImJvdHRvbSI6IDYwCiAgICB9CiAgXQp9"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "683d8314069e9739c5a8-89e8f28fabb5d58759b1",
+              "file": "public/public-navigation.spec.ts",
+              "line": 59,
+              "column": 9
+            },
+            {
+              "title": "el tema oscuro se elige desde el encabezado",
+              "ok": true,
+              "tags": [
+                "viewport:wide",
+                "flow:layout-public-navigation",
+                "module:home",
+                "priority:P2",
+                "outcome:display"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1888,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:49:05.400Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "navigation-geometry",
+                          "contentType": "application/json",
+                          "body": "ewogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDI1NjAsCiAgICAiaGVpZ2h0IjogMTQ0MAogIH0sCiAgInNjcm9sbFdpZHRoIjogMjU2MCwKICAiYm94ZXMiOiBbCiAgICB7CiAgICAgICJsYWJlbCI6ICJMaWdodCIsCiAgICAgICJ3aWR0aCI6IDEyNiwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDEzODguMTA5Mzc1LAogICAgICAicmlnaHQiOiAxNTE0LjEwOTM3NSwKICAgICAgInRvcCI6IDc3LAogICAgICAiYm90dG9tIjogMTIxCiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiRGFyayIsCiAgICAgICJ3aWR0aCI6IDEyNiwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDEzODguMTA5Mzc1LAogICAgICAicmlnaHQiOiAxNTE0LjEwOTM3NSwKICAgICAgInRvcCI6IDEyOSwKICAgICAgImJvdHRvbSI6IDE3MwogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlN5c3RlbSIsCiAgICAgICJ3aWR0aCI6IDEyNiwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDEzODguMTA5Mzc1LAogICAgICAicmlnaHQiOiAxNTE0LjEwOTM3NSwKICAgICAgInRvcCI6IDE4MSwKICAgICAgImJvdHRvbSI6IDIyNQogICAgfQogIF0KfQ=="
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "683d8314069e9739c5a8-80ce76782a10ef97d54c",
+              "file": "public/public-navigation.spec.ts",
+              "line": 77,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Cierre público @viewport:compact",
+          "file": "public/public-navigation.spec.ts",
+          "line": 99,
+          "column": 8,
+          "specs": [
+            {
+              "title": "el botón cierra el menú",
+              "ok": true,
+              "tags": [
+                "viewport:compact",
+                "flow:layout-public-navigation",
+                "module:home",
+                "priority:P2",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1722,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:49:07.315Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "683d8314069e9739c5a8-b34c96b99f865be0cdcd",
+              "file": "public/public-navigation.spec.ts",
+              "line": 102,
+              "column": 9
+            },
+            {
+              "title": "Escape desde un enlace cierra el menú",
+              "ok": true,
+              "tags": [
+                "viewport:compact",
+                "flow:layout-public-navigation",
+                "module:home",
+                "priority:P2",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1376,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:49:09.069Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "683d8314069e9739c5a8-ed198d902be32cdb6aa4",
+              "file": "public/public-navigation.spec.ts",
+              "line": 116,
+              "column": 9
+            },
+            {
+              "title": "un toque fuera cierra el menú",
+              "ok": true,
+              "tags": [
+                "viewport:compact",
+                "flow:layout-public-navigation",
+                "module:home",
+                "priority:P2",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1870,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:49:10.475Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "683d8314069e9739c5a8-a00b69bff627678644c5",
+              "file": "public/public-navigation.spec.ts",
+              "line": 132,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Cierre público @viewport:portrait",
+          "file": "public/public-navigation.spec.ts",
+          "line": 99,
+          "column": 8,
+          "specs": [
+            {
+              "title": "el botón cierra el menú",
+              "ok": true,
+              "tags": [
+                "viewport:portrait",
+                "flow:layout-public-navigation",
+                "module:home",
+                "priority:P2",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2944,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:49:12.379Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "683d8314069e9739c5a8-a46de03e953f8d9f8d0c",
+              "file": "public/public-navigation.spec.ts",
+              "line": 102,
+              "column": 9
+            },
+            {
+              "title": "Escape desde un enlace cierra el menú",
+              "ok": true,
+              "tags": [
+                "viewport:portrait",
+                "flow:layout-public-navigation",
+                "module:home",
+                "priority:P2",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2138,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:49:15.386Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "683d8314069e9739c5a8-8aa7d97c92b1c2eaeb8f",
+              "file": "public/public-navigation.spec.ts",
+              "line": 116,
+              "column": 9
+            },
+            {
+              "title": "un toque fuera cierra el menú",
+              "ok": true,
+              "tags": [
+                "viewport:portrait",
+                "flow:layout-public-navigation",
+                "module:home",
+                "priority:P2",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2383,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:49:17.561Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "683d8314069e9739c5a8-399238a66f8cfc727761",
+              "file": "public/public-navigation.spec.ts",
+              "line": 132,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Idioma público @viewport:portrait",
+          "file": "public/public-navigation.spec.ts",
+          "line": 148,
+          "column": 6,
+          "specs": [
+            {
+              "title": "el menú traducido conserva el destino de precios",
+              "ok": true,
+              "tags": [
+                "viewport:portrait",
+                "flow:layout-public-navigation",
+                "module:home",
+                "priority:P2",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7203,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:49:19.985Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "navigation-geometry",
+                          "contentType": "application/json",
+                          "body": "ewogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDgzNSwKICAgICJoZWlnaHQiOiAxMTk0CiAgfSwKICAic2Nyb2xsV2lkdGgiOiA4MzUsCiAgImJveGVzIjogWwogICAgewogICAgICAibGFiZWwiOiAiQ29tcGFyZSBQREZzIiwKICAgICAgIndpZHRoIjogMTE4LjUzMTI1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMjQsCiAgICAgICJyaWdodCI6IDE0Mi41MzEyNSwKICAgICAgInRvcCI6IDkzLAogICAgICAiYm90dG9tIjogMTM3CiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiUHJpY2luZyIsCiAgICAgICJ3aWR0aCI6IDYzLjIwMzEyNSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDI0LAogICAgICAicmlnaHQiOiA4Ny4yMDMxMjUsCiAgICAgICJ0b3AiOiAxNDUsCiAgICAgICJib3R0b20iOiAxODkKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJNYW51YWwiLAogICAgICAid2lkdGgiOiA2Ni44NzUsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiAyNCwKICAgICAgInJpZ2h0IjogOTAuODc1LAogICAgICAidG9wIjogMTk3LAogICAgICAiYm90dG9tIjogMjQxCiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiQ2FtYmlhciBhIGVzcGHDsW9sIiwKICAgICAgIndpZHRoIjogNDQsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiAyNCwKICAgICAgInJpZ2h0IjogNjgsCiAgICAgICJ0b3AiOiAyNDksCiAgICAgICJib3R0b20iOiAyOTMKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJUb2dnbGUgdGhlbWUiLAogICAgICAid2lkdGgiOiA0NCwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDI0LAogICAgICAicmlnaHQiOiA2OCwKICAgICAgInRvcCI6IDMwMSwKICAgICAgImJvdHRvbSI6IDM0NQogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlNpZ24gaW4iLAogICAgICAid2lkdGgiOiA4MS43NSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDI0LAogICAgICAicmlnaHQiOiAxMDUuNzUsCiAgICAgICJ0b3AiOiAzNTMsCiAgICAgICJib3R0b20iOiAzOTcKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJDcmVhdGUgZnJlZSBhY2NvdW50IiwKICAgICAgIndpZHRoIjogMTcwLjc5Njg3NSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDI0LAogICAgICAicmlnaHQiOiAxOTQuNzk2ODc1LAogICAgICAidG9wIjogNDA1LAogICAgICAiYm90dG9tIjogNDQ5CiAgICB9CiAgXQp9"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "683d8314069e9739c5a8-6899092910359b8c7cc7",
+              "file": "public/public-navigation.spec.ts",
+              "line": 151,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

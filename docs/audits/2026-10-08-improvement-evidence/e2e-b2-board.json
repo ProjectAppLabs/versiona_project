@@ -1,0 +1,225 @@
+{
+  "stats": {
+    "startTime": "2026-10-08T12:53:54.375Z",
+    "duration": 37957.724,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "suites": [
+    {
+      "title": "app/projects/b2-board-search.spec.ts",
+      "file": "app/projects/b2-board-search.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "B2 — Tablero completo",
+          "file": "app/projects/b2-board-search.spec.ts",
+          "line": 31,
+          "column": 6,
+          "specs": [
+            {
+              "title": "B2-A03 — la búsqueda encuentra el proyecto por CONTENIDO del PDF",
+              "ok": true,
+              "tags": [
+                "flow:b2-projects-board",
+                "module:projects",
+                "priority:P2",
+                "scenario:b2-a03",
+                "scenario:b2-a01",
+                "outcome:display"
+              ],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/e2e/app/projects/b2-board-search.spec.ts",
+                        "line": 32,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 17396,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:54:04.269Z",
+                      "annotations": [
+                        {
+                          "type": "slow",
+                          "location": {
+                            "file": "/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/e2e/app/projects/b2-board-search.spec.ts",
+                            "line": 32,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b3023065f296f351048d-a1aff52a7e7bc5621ce1",
+              "file": "app/projects/b2-board-search.spec.ts",
+              "line": 34,
+              "column": 7
+            }
+          ],
+          "suites": [
+            {
+              "title": "controles responsivos",
+              "file": "app/projects/b2-board-search.spec.ts",
+              "line": 79,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "B2-R01 — a 412 px la búsqueda y el filtro conservan la tarjeta creada dentro del tablero",
+                  "ok": true,
+                  "tags": [
+                    "flow:b2-projects-board",
+                    "module:projects",
+                    "priority:P2",
+                    "scenario:b2-r01",
+                    "outcome:display",
+                    "viewport:compact"
+                  ],
+                  "tests": [
+                    {
+                      "timeout": 180000,
+                      "annotations": [
+                        {
+                          "type": "slow",
+                          "location": {
+                            "file": "/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/e2e/app/projects/b2-board-search.spec.ts",
+                            "line": 32,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop Chrome",
+                      "projectName": "Desktop Chrome",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 4547,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-10-08T12:54:23.080Z",
+                          "annotations": [
+                            {
+                              "type": "slow",
+                              "location": {
+                                "file": "/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/e2e/app/projects/b2-board-search.spec.ts",
+                                "line": 32,
+                                "column": 8
+                              }
+                            }
+                          ],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "b3023065f296f351048d-497602c1e890e193cdb9",
+                  "file": "app/projects/b2-board-search.spec.ts",
+                  "line": 82,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "distribución landscape",
+              "file": "app/projects/b2-board-search.spec.ts",
+              "line": 132,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "B2-R02 — a 1195 px la búsqueda y el filtro conservan el tablero sin desborde",
+                  "ok": true,
+                  "tags": [
+                    "flow:b2-projects-board",
+                    "module:projects",
+                    "priority:P2",
+                    "scenario:b2-r02",
+                    "outcome:display",
+                    "viewport:landscape"
+                  ],
+                  "tests": [
+                    {
+                      "timeout": 180000,
+                      "annotations": [
+                        {
+                          "type": "slow",
+                          "location": {
+                            "file": "/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/e2e/app/projects/b2-board-search.spec.ts",
+                            "line": 32,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop Chrome",
+                      "projectName": "Desktop Chrome",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 4362,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-10-08T12:54:27.669Z",
+                          "annotations": [
+                            {
+                              "type": "slow",
+                              "location": {
+                                "file": "/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/e2e/app/projects/b2-board-search.spec.ts",
+                                "line": 32,
+                                "column": 8
+                              }
+                            }
+                          ],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "b3023065f296f351048d-0ffb5e6ff74f08e932c2",
+                  "file": "app/projects/b2-board-search.spec.ts",
+                  "line": 135,
+                  "column": 9
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

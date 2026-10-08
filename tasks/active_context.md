@@ -3,7 +3,33 @@
 > Memory Bank core file: current focus, recent changes, next steps. Updated every session
 > that changes project state.
 
-**Last updated**: 2026-10-05
+**Last updated**: 2026-10-08
+
+## Ronda coordinada de mejora (2026-10-08)
+
+Implementación y QA completadas: 114 casos pasan en `4d06781`, con gate estricto
+sin errores. Entregas #41–#44, integración mediante el tren de `$merge-queue`.
+La evidencia y el ledger verificado están en
+`docs/audits/2026-10-08-improvement-evidence/QA.md`.
+
+La ronda parte de `master@5b373ef`, con las entregas anteriores #37–#39 ya
+integradas. Se asignaron ramas independientes para consumo único de códigos y
+ciclo de vida del comparador público, recuperación de la limpieza de archivos,
+navegación en los cinco anchos y consultas acotadas de papelera. El orquestador
+conserva registros, configuración de pruebas y cierre combinado de QA.
+
+Papelera conserva datos, orden y permisos mediante precarga de relaciones. La
+regresión reprodujo 9 consultas con tres elementos y 105 con 75; la corrección
+debe mantener el mismo número de consultas con un límite de seis. Las pruebas
+usan MySQL privado, esquemas separados y Redis propio; el harness permite
+seleccionar un Python externo con `E2E_PYTHON_BIN` sin enlazar venvs.
+
+El registro de flujos incorpora navegación pública/autenticada y sustitución de
+comparaciones en curso. Los resultados de los PR y la validación combinada
+determinan el cierre; ni el registro de flujos ni las pruebas escritas por sí
+solos acreditan ejecución. Los otros hallazgos permanecen pendientes, incluidos
+revocación de acceso a la bandeja, escrituras en proyectos archivados y
+concurrencia/replay de decisiones D5. No se declara maduro ningún frente global.
 
 ## Ronda de carga de documentos (2026-10-02)
 

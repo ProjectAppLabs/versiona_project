@@ -1,6 +1,6 @@
 {
-  "version": "2.3.0",
-  "lastUpdated": "2026-10-05",
+  "version": "2.4.0",
+  "lastUpdated": "2026-10-08",
   "flows": {
     "home-loads": {
       "name": "Landing page loads",
@@ -493,11 +493,12 @@
         "guest"
       ],
       "priority": "P1",
-      "description": "Visitor compares two PDFs on /comparar without an account (10MB/100-page caps, no OCR), sees the truth-table result on a shareable 24h page and the persistent signup CTA",
+      "description": "Visitor compares two PDFs on /comparar without an account (10MB/100-page caps, no OCR), sees the truth-table result on a shareable 24h page and the persistent signup CTA A current result-route poll that fails, expires or times out renders an alert and lets the visitor start a new comparison; an obsolete prior poll is discarded by public-compare-lifecycle.",
       "expectedSpecs": 1,
       "outcomes": [
         "success",
-        "error"
+        "error",
+        "failure"
       ]
     },
     "f3-org-audit": {
@@ -513,6 +514,49 @@
       "outcomes": [
         "display",
         "failure"
+      ]
+    },
+    "layout-public-navigation": {
+      "name": "Public navigation at every reference width",
+      "module": "home",
+      "roles": [
+        "guest"
+      ],
+      "priority": "P1",
+      "description": "The public menu opens in one interaction on phone and portrait tablet; desktop navigation exposes the same links and actions. Navigation, theme and language remain usable; Escape and outside click close the menu and restore focus.",
+      "expectedSpecs": 1,
+      "outcomes": [
+        "success",
+        "display"
+      ]
+    },
+    "layout-authenticated-navigation": {
+      "name": "Authenticated navigation at every reference width",
+      "module": "org",
+      "roles": [
+        "owner",
+        "admin",
+        "member"
+      ],
+      "priority": "P1",
+      "description": "Signed-in navigation preserves link order and role-gated trash access at all five reference widths. The compact menu, notification dropdown and sign-out remain operable without horizontal scrolling.",
+      "expectedSpecs": 1,
+      "outcomes": [
+        "success",
+        "display"
+      ]
+    },
+    "public-compare-lifecycle": {
+      "name": "Public comparison loading follows the current page",
+      "module": "public",
+      "roles": [
+        "guest"
+      ],
+      "priority": "P1",
+      "description": "Leaving an in-progress comparison and opening a new comparison cancels the old polling lifecycle. Late responses from the previous page cannot replace the current comparison result. Out-of-order HTTP errors and timer cancellation are also verified at the store unit layer.",
+      "expectedSpecs": 1,
+      "outcomes": [
+        "success"
       ]
     }
   }
