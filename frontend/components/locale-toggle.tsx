@@ -5,8 +5,6 @@
  * Anonymous visitors get a local preference; authed users still sync their
  * profile language from /settings. Mounted-guard mirrors ThemeToggle.
  */
-import { useEffect, useState } from 'react';
-
 import { useLocaleStore } from '@/lib/stores/localeStore';
 import { useMounted } from '@/lib/hooks/useMounted';
 
@@ -16,7 +14,7 @@ export function LocaleToggle() {
   const mounted = useMounted();
 
   if (!mounted) {
-    return <div className="h-9 w-9" aria-hidden />;
+    return <div className="h-11 w-11" aria-hidden />;
   }
 
   const next = locale === 'es' ? 'en' : 'es';
@@ -27,7 +25,7 @@ export function LocaleToggle() {
       data-testid="locale-toggle"
       aria-label={locale === 'es' ? 'Switch to English' : 'Cambiar a español'}
       onClick={() => setLocale(next)}
-      className="inline-flex h-9 items-center justify-center rounded-full px-2.5 text-xs font-semibold uppercase tracking-wide text-foreground hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
+      className="inline-flex h-11 min-w-11 items-center justify-center rounded-full px-2.5 text-xs font-semibold uppercase tracking-wide text-foreground hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
     >
       {next}
     </button>
