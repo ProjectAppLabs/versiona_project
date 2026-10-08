@@ -10,6 +10,7 @@ PAYLOAD = b'%PDF-1.7 private fixture'
 
 
 def test_delete_reports_permission_failure():
+    """Propagate permission errors without deleting the stored object."""
     storage_service.put_bytes(KEY, PAYLOAD, 'application/pdf')
     path = filesystem.resolve_path(KEY)
     path.parent.chmod(0o500)
@@ -26,6 +27,7 @@ def test_delete_reports_permission_failure():
 
 
 def test_delete_reports_directory_failure():
+    """Reject directory deletion while preserving its contents."""
     path = filesystem.resolve_path(KEY)
     path.mkdir(parents=True)
     child = path / 'retained.pdf'

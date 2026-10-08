@@ -16,6 +16,7 @@ TESTDATA = Path(__file__).resolve().parents[4] / 'testdata' / 'pdfs'
 def test_staging_cleanup_failure_preserves_completed_upload(
     versiona_context, monkeypatch, caplog, error_type
 ):
+    """Preserve the completed upload when temporary cleanup fails."""
     editor = versiona_context.users['editor']
     document = version_service.create_document(
         versiona_context.project, 'Contrato privado', editor
