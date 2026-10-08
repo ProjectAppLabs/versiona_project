@@ -121,6 +121,7 @@ def _prepared_redelivery(versiona_context, pending_version_factory):
 
 @pytest.mark.django_db
 def test_current_degraded_analysis_requires_coordinator(versiona_context, pending_version_factory):
+    """Current degraded analysis requires coordinator."""
     _previous, current, job = _prepared_redelivery(versiona_context, pending_version_factory)
 
     _run_with_pdf(job, 'sin_encabezados.pdf')
@@ -133,6 +134,7 @@ def test_current_degraded_analysis_requires_coordinator(versiona_context, pendin
 
 @pytest.mark.django_db
 def test_previous_done_degradation_requires_coordinator(versiona_context, pending_version_factory):
+    """Previous done degradation requires coordinator."""
     previous, current, job = _prepared_redelivery(versiona_context, pending_version_factory)
     previous_job = EngineJob.objects.get(document_version=previous)
     previous_job.result['degraded'] = True
@@ -145,6 +147,7 @@ def test_previous_done_degradation_requires_coordinator(versiona_context, pendin
 
 @pytest.mark.django_db
 def test_previous_checkpoint_degradation_requires_coordinator(versiona_context, pending_version_factory):
+    """Previous checkpoint degradation requires coordinator."""
     previous, current, job = _prepared_redelivery(versiona_context, pending_version_factory)
     previous_job = EngineJob.objects.get(document_version=previous)
     previous_job.result = None
@@ -162,6 +165,7 @@ def test_previous_checkpoint_degradation_requires_coordinator(versiona_context, 
 def test_malformed_previous_degradation_keeps_legacy_fallback(
     versiona_context, pending_version_factory, invalid_flag,
 ):
+    """Malformed previous degradation keeps legacy fallback."""
     previous, current, job = _prepared_redelivery(versiona_context, pending_version_factory)
     previous_job = EngineJob.objects.get(document_version=previous)
     previous_job.result['degraded'] = invalid_flag
@@ -176,6 +180,7 @@ def test_malformed_previous_degradation_keeps_legacy_fallback(
 
 @pytest.mark.django_db
 def test_missing_previous_analysis_keeps_legacy_fallback(versiona_context, pending_version_factory):
+    """Missing previous analysis keeps legacy fallback."""
     previous, current, job = _prepared_redelivery(versiona_context, pending_version_factory)
     EngineJob.objects.filter(document_version=previous).delete()
 
@@ -186,6 +191,7 @@ def test_missing_previous_analysis_keeps_legacy_fallback(versiona_context, pendi
 
 @pytest.mark.django_db
 def test_degraded_d5_retry_preserves_coordinator_decision(versiona_context, pending_version_factory):
+    """Degraded d5 retry preserves coordinator decision."""
     _previous, current, job = _prepared_redelivery(versiona_context, pending_version_factory)
     calls = 0
 
