@@ -12,6 +12,7 @@ from accounts import twofactor
 
 @pytest.fixture
 def enrolled_user(django_user_model):
+    """Enroll an account with TOTP and fresh backup codes."""
     user = django_user_model.objects.create_user(
         email='backup-once@versiona.test', password='Violet-River!83',
     )
@@ -33,6 +34,7 @@ def consume_from_separate_connection(user_model, user_id, code, ready):
 
 @pytest.mark.django_db
 def test_backup_code_rejects_reuse_from_a_stale_user(enrolled_user):
+    """Reject a consumed backup code from a stale user instance."""
     user, codes = enrolled_user
     stale_user = type(user).objects.get(pk=user.pk)
 
@@ -47,6 +49,7 @@ def test_backup_code_rejects_reuse_from_a_stale_user(enrolled_user):
 
 @pytest.mark.django_db
 def test_distinct_backup_codes_preserve_previous_consumption(enrolled_user):
+    """Preserve previous consumption when a stale user uses another code."""
     user, codes = enrolled_user
     stale_user = type(user).objects.get(pk=user.pk)
     remaining = user.totp_backup_codes[2:]
@@ -62,6 +65,7 @@ def test_distinct_backup_codes_preserve_previous_consumption(enrolled_user):
 
 @pytest.mark.django_db
 def test_invalid_backup_code_preserves_available_codes(enrolled_user):
+    """Preserve available backup codes when verification rejects a code."""
     user, _ = enrolled_user
     available = list(user.totp_backup_codes)
 
@@ -74,6 +78,7 @@ def test_invalid_backup_code_preserves_available_codes(enrolled_user):
 
 @pytest.mark.django_db(transaction=True)
 def test_concurrent_backup_code_has_one_success(enrolled_user):
+    """Allow exactly one concurrent attempt to consume a backup code."""
     assert connection.vendor == 'mysql', 'This lock contract requires real MySQL.'
     user, codes = enrolled_user
     remaining = user.totp_backup_codes[1:]

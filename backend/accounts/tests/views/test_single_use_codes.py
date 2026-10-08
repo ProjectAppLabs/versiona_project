@@ -18,6 +18,7 @@ from accounts.models import PasswordCode
 
 @pytest.fixture
 def reset_account(django_user_model):
+    """Create an account with an unused password reset code."""
     user = django_user_model.objects.create_user(
         email='reset-once@versiona.test', password='Violet-River!83',
     )
@@ -26,6 +27,7 @@ def reset_account(django_user_model):
 
 
 def reset_from_separate_connection(email, code, password, ready):
+    """Submit a competing password reset from a separate database connection."""
     close_old_connections()
     try:
         client = APIClient()
@@ -42,6 +44,7 @@ def reset_from_separate_connection(email, code, password, ready):
 
 @pytest.mark.django_db(transaction=True)
 def test_concurrent_password_reset_has_one_success(reset_account):
+    """Allow exactly one concurrent attempt to reset the password."""
     assert connection.vendor == 'mysql', 'This lock contract requires real MySQL.'
     user, code = reset_account
     ready = Barrier(2)
@@ -66,13 +69,14 @@ def test_concurrent_password_reset_has_one_success(reset_account):
 @pytest.mark.django_db
 @pytest.mark.parametrize('failed_row', ['password', 'code'])
 def test_failed_reset_write_preserves_reusable_code(api_client, reset_account, failed_row):
+    """Preserve a reusable reset code when a password reset write fails."""
     user, code = reset_account
     original_password = user.password
     tables = {'password': user._meta.db_table, 'code': code._meta.db_table}
     update_prefix = f'UPDATE {connection.ops.quote_name(tables[failed_row])}'
 
     def fail_after_write(execute, sql, params, many, context):
-        """A storage failure after SQL execution must roll back the transaction."""
+        """Raise a storage failure after SQL execution to require rollback."""
         result = execute(sql, params, many, context)
         if sql.startswith(update_prefix):
             raise OperationalError('Injected storage failure after reset write')
