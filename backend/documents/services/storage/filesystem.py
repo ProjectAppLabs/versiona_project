@@ -245,7 +245,10 @@ def copy(source_key: str, dest_key: str) -> None:
 
 def delete(key: str) -> None:
     """Idempotent, like S3's delete_object — complete_upload and the public
-    comparison purge both call it on keys that may already be gone."""
+    comparison purge both call it on keys that may already be gone.
+
+    Other filesystem failures must reach the caller so a failed deletion never
+    gets mistaken for a missing object.
+    """
     path = resolve_path(key)
-    with contextlib.suppress(OSError):
-        path.unlink(missing_ok=True)
+    path.unlink(missing_ok=True)

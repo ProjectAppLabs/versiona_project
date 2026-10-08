@@ -1,5 +1,7 @@
 """Async processing + TTL cleanup for anonymous public comparisons."""
 
+import logging
+
 from celery import shared_task
 from django.utils import timezone
 
@@ -7,6 +9,8 @@ from documents.services import storage_service
 from engine.services.analysis import OcrRequiredError
 
 from .models import PublicComparison
+
+logger = logging.getLogger(__name__)
 
 PUBLIC_COMPARISON_PURGE_BATCH_SIZE = 100
 
@@ -40,7 +44,16 @@ def run_public_comparison(comparison_pk: int) -> None:
         comparison.error_code = 'processing_failed'
         comparison.save(update_fields=['status', 'error_code'])
     finally:
-        delete_stored_files(comparison)
+        try:
+            delete_stored_files(comparison)
+        except Exception as exc:
+            # Keep status/result and public_id: the TTL sweep can retry both
+            # keys, including a sibling already deleted by this attempt.
+            logger.warning(
+                'Public comparison cleanup deferred: phase=processing_cleanup error_class=%s',
+                type(exc).__name__,
+                extra={'phase': 'processing_cleanup', 'error_class': type(exc).__name__},
+            )
 
 
 @shared_task(name='public_tools.tasks.purge_expired_public_comparisons')
@@ -57,7 +70,15 @@ def purge_expired_public_comparisons() -> int:
     ):
         last_pk = batch[-1].pk
         for comparison in batch:
-            delete_stored_files(comparison)  # covers rows whose worker died mid-job
+            try:
+                delete_stored_files(comparison)  # covers workers that died mid-job
+            except Exception as exc:
+                logger.warning(
+                    'Public comparison cleanup deferred: phase=expired_purge error_class=%s',
+                    type(exc).__name__,
+                    extra={'phase': 'expired_purge', 'error_class': type(exc).__name__},
+                )
+                continue  # retain the keys for the next sweep, advance this one
             comparison.delete()
             purged += 1
     return purged
