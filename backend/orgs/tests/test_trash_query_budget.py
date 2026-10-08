@@ -104,19 +104,3 @@ def test_trash_omits_descendants_of_a_trashed_project(
     assert response.status_code == 200
     assert str(child.public_id) not in [row["public_id"] for row in response.data["results"]]
     assert len(response.data["results"]) == 3
-
-
-@pytest.mark.django_db
-def test_trash_hides_foreign_organization_from_non_members(versiona_context, client_as):
-    """Foreign users cannot discover the organization's trash."""
-    response = client_as("non_member").get(f"/api/orgs/{versiona_context.org.public_id}/trash/")
-
-    assert response.status_code == 404
-
-
-@pytest.mark.django_db
-def test_trash_rejects_regular_organization_members(versiona_context, client_as):
-    """Ordinary organization members cannot enter the admin-only trash."""
-    response = client_as("viewer").get(f"/api/orgs/{versiona_context.org.public_id}/trash/")
-
-    assert response.status_code == 403

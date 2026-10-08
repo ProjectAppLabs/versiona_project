@@ -52,7 +52,7 @@ otra sesión. La variante `improve/<frente>` fue solicitada por el operador.
 | v1 | 24 pytest locales: siete nuevos y 17 de regresión; dos conexiones MySQL reales, instancias obsoletas y rollback después de SQL. 20 Jest y dos E2E del ciclo de vida. |
 | v2 | 49 pytest en lotes de 17, 16 y 16: errores reales del filesystem, recuperación, progreso con 101 filas, OCR y post-promoción. |
 | v3 | 24 Jest de componentes y permisos; 35 casos de la matriz E2E pública/autenticada sobre las cinco dimensiones obligatorias. Su ejecución final corresponde al SHA del PR. |
-| v0 | Cinco pytest: presupuesto de consultas, metadatos/orden, exclusión de descendientes y permisos. Gate estricto, TypeScript y lint del harness. |
+| v0 | Tres nuevos pytest de presupuesto, metadatos/orden y descendientes; permisos se verifican con la matriz ya existente de `test_project_endpoints.py`, sin duplicar casos. Gate estricto, TypeScript y lint del harness. |
 
 El test de presupuesto falló antes de la corrección: `105 != 9`. Después debe
 mantener consultas constantes y un máximo de seis para tres o 75 elementos;
