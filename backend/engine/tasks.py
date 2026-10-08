@@ -9,9 +9,13 @@ C1-E04); infrastructure errors retry with backoff (3 retries).
 """
 
 import logging
+from time import monotonic
+from uuid import NAMESPACE_URL, uuid5
 
 from celery import shared_task
 from django.db import transaction
+from django.utils import timezone
+from kombu.exceptions import OperationalError as BrokerOperationalError
 
 from documents.models import DocumentVersion
 from documents.services import storage_service
@@ -26,6 +30,10 @@ ANALYSIS_PHASES = ('analysis', 'checks', 'comparison', 'd5', 'reanchor')
 RECOVERY_ERROR = (
     'No se puede reanudar este análisis antiguo sin un punto de recuperación verificado.'
 )
+DISPATCH_ERROR = 'No se pudo iniciar el análisis; se reintentará automáticamente.'
+DISPATCH_BATCH_SIZE = 20
+DISPATCH_MIN_AGE_SECONDS = 60
+DISPATCH_BUDGET_SECONDS = 30
 
 
 class _RecoveryBlocked(Exception):
@@ -34,7 +42,7 @@ class _RecoveryBlocked(Exception):
 
 def enqueue_analysis(version: DocumentVersion) -> EngineJob:
     """Create (or reuse) the analysis job for a version and dispatch it."""
-    job, created = EngineJob.objects.get_or_create(
+    job, _created = EngineJob.objects.get_or_create(
         idempotency_key=f'analysis:v{version.pk}',
         defaults={
             'job_type': EngineJob.Type.ANALYSIS,
@@ -42,12 +50,95 @@ def enqueue_analysis(version: DocumentVersion) -> EngineJob:
             'payload': {'version_id': version.pk, 'file_key': version.file_key},
         },
     )
-    if job.status == EngineJob.Status.DONE:
+    if job.status != EngineJob.Status.PENDING or job.celery_task_id:
         return job
-    async_result = run_analysis.apply_async(args=[job.pk], queue='engine_heavy')
-    EngineJob.objects.filter(pk=job.pk).update(celery_task_id=async_result.id or '')
+    if run_analysis.app.conf.task_always_eager:
+        async_result = run_analysis.apply_async(args=[job.pk], queue='engine_heavy')
+        EngineJob.objects.filter(pk=job.pk).update(celery_task_id=async_result.id or '')
+    else:
+        transaction.on_commit(lambda: _dispatch_pending_analysis(job.pk))
     job.refresh_from_db()
     return job
+
+
+def _publish_analysis(job: EngineJob) -> str:
+    """One broker attempt, without the shared producer pool or result backend IO."""
+    task_id = str(uuid5(NAMESPACE_URL, f'urn:versiona:analysis:{job.public_id}'))
+    options = {
+        **run_analysis.app.conf.broker_transport_options,
+        'socket_connect_timeout': 5,
+        'socket_timeout': 5,
+        'retry_on_timeout': False,
+        'max_retries': 0,
+    }
+    with run_analysis.app.connection_for_write(
+        connect_timeout=5, transport_options=options,
+    ) as connection:
+        with connection.Producer() as producer:
+            run_analysis.apply_async(
+                args=[job.pk], task_id=task_id, queue='engine_heavy',
+                producer=producer, retry=False, ignore_result=True,
+            )
+    return task_id
+
+
+@transaction.atomic
+def _dispatch_pending_analysis(job_id: int, *, skip_locked=False, cutoff=None) -> str:
+    # Lock only EngineJob: no document/version joins at this serialization boundary.
+    candidates = EngineJob.objects.select_for_update(skip_locked=skip_locked).filter(
+        pk=job_id, job_type=EngineJob.Type.ANALYSIS,
+        status=EngineJob.Status.PENDING, celery_task_id='',
+    )
+    if cutoff is not None:
+        candidates = candidates.filter(updated_at__lte=cutoff)
+    job = candidates.first()
+    if job is None or not DocumentVersion.objects.filter(
+        pk=job.document_version_id, document__deleted_at__isnull=True,
+        document__project__deleted_at__isnull=True,
+        analysis_status=DocumentVersion.AnalysisStatus.PENDING,
+    ).exists():
+        return 'skipped'
+    try:
+        task_id = _publish_analysis(job)
+    except BrokerOperationalError:
+        job.error_detail = DISPATCH_ERROR
+        job.save(update_fields=['error_detail', 'updated_at'])
+        logger.warning(
+            'Analysis dispatch deferred: phase=publish error_class=OperationalError',
+            extra={'phase': 'publish', 'error_class': 'OperationalError'},
+        )
+        return 'deferred'
+    job.celery_task_id = task_id
+    job.error_detail = ''
+    job.save(update_fields=['celery_task_id', 'error_detail', 'updated_at'])
+    return 'published'
+
+
+@shared_task(
+    name='engine.tasks.recover_pending_analysis',
+    soft_time_limit=30, time_limit=40, ignore_result=True,
+)
+def recover_pending_analysis() -> int:
+    """Retry unpublished intentions; acknowledged or started jobs never qualify."""
+    cutoff = timezone.now() - timezone.timedelta(seconds=DISPATCH_MIN_AGE_SECONDS)
+    candidates = EngineJob.objects.filter(
+        job_type=EngineJob.Type.ANALYSIS, status=EngineJob.Status.PENDING,
+        celery_task_id='', updated_at__lte=cutoff,
+        document_version__deleted_at__isnull=True,
+        document_version__document__deleted_at__isnull=True,
+        document_version__document__project__deleted_at__isnull=True,
+        document_version__analysis_status=DocumentVersion.AnalysisStatus.PENDING,
+    ).order_by('updated_at', 'pk').values_list('pk', flat=True)[:DISPATCH_BATCH_SIZE]
+    deadline = monotonic() + DISPATCH_BUDGET_SECONDS
+    published = 0
+    for job_id in list(candidates):
+        if monotonic() >= deadline:
+            break
+        outcome = _dispatch_pending_analysis(job_id, skip_locked=True, cutoff=cutoff)
+        if outcome == 'deferred':
+            break
+        published += outcome == 'published'
+    return published
 
 
 @shared_task(bind=True, max_retries=3, default_retry_delay=30)
@@ -291,13 +382,45 @@ def _complete_phase(job: EngineJob, version: DocumentVersion, progress: dict, ph
     elif phase == 'd5' and progress['comparison_pk'] is not None:
         from reviews.services.seal_service import apply_invalidation
 
-        apply_invalidation(_checkpoint_comparison(progress, version))
+        comparison = _checkpoint_comparison(progress, version)
+        apply_invalidation(
+            comparison,
+            analysis_degraded=(
+                progress['analysis_result']['degraded']
+                or _previous_analysis_degraded(comparison.from_version)
+            ),
+        )
     elif phase == 'reanchor' and progress['comparison_pk'] is not None:
         from observations.services import reanchor_observations
 
         reanchor_observations(version)
     progress['last_completed'] = phase
     _write_progress(job, progress)
+
+
+def _previous_analysis_degraded(version: DocumentVersion) -> bool:
+    """Forward verified degradation only; missing legacy evidence keeps domain fallback."""
+    job = EngineJob.objects.filter(
+        idempotency_key=f'analysis:v{version.pk}',
+        job_type=EngineJob.Type.ANALYSIS, document_version=version,
+    ).first()
+    if job is None:
+        return False
+    if job.status == EngineJob.Status.DONE:
+        result = job.result
+        if not isinstance(result, dict) or set(result) != {
+            'scenario', 'degraded', 'page_count', 'sections', 'comparison',
+        }:
+            return False
+        analysis = {key: result[key] for key in ('scenario', 'degraded', 'page_count', 'sections')}
+        return _valid_analysis_result(analysis, version) and analysis['degraded']
+    if job.result is not None:
+        return False
+    try:
+        progress = _read_progress(job, version)
+    except _RecoveryBlocked:
+        return False
+    return progress is not None and progress['analysis_result']['degraded']
 
 
 def _handle_failure(self, job_id: int, phase: str | None, exc: Exception):
