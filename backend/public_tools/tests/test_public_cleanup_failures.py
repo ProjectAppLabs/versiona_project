@@ -8,9 +8,9 @@ import pytest
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
+from documents.services import storage_service
 from freezegun import freeze_time
 
-from documents.services import storage_service
 from public_tools.models import PublicComparison
 from public_tools.services.public_comparison_service import storage_key_for
 from public_tools.tasks import purge_expired_public_comparisons, run_public_comparison
@@ -58,6 +58,7 @@ def _refuse_delete(monkeypatch, refused_key, error):
 
 @pytest.fixture
 def stored_comparison():
+    """Create a public comparison with both PDF objects stored."""
     comparison = PublicComparison.objects.create(
         file_a_name='private-a.pdf',
         file_b_name='private-b.pdf',
@@ -68,6 +69,7 @@ def stored_comparison():
 
 @pytest.fixture
 def expired_comparison(stored_comparison):
+    """Provide an expired public comparison with recoverable PDF objects."""
     comparison, keys = stored_comparison
     _expire(comparison)
     return comparison, keys
@@ -76,6 +78,7 @@ def expired_comparison(stored_comparison):
 @pytest.mark.parametrize('slot', ['a', 'b'])
 @pytest.mark.parametrize('error_type', [PermissionError, OSError])
 def test_failed_purge_remains_retryable(expired_comparison, monkeypatch, slot, error_type):
+    """Retain a comparison for a later purge after either deletion fails."""
     comparison, keys = expired_comparison
     retained_bytes = storage_service.get_bytes(keys[slot])
     sibling = {'a': 'b', 'b': 'a'}[slot]
@@ -102,6 +105,7 @@ def test_failed_purge_remains_retryable(expired_comparison, monkeypatch, slot, e
 @pytest.mark.parametrize('failed_index', [0, 99])
 @freeze_time('2026-10-08 12:00:00')
 def test_purge_progresses_past_retained_comparison(monkeypatch, failed_index):
+    """Purge later batches without retrying a retained comparison in this run."""
     PublicComparison.objects.bulk_create([
         PublicComparison(
             result={'private_result': 'x' * 4096},
@@ -138,6 +142,7 @@ def test_purge_progresses_past_retained_comparison(monkeypatch, failed_index):
 
 
 def test_purge_waits_for_both_deletions(expired_comparison, monkeypatch):
+    """Keep the comparison until both stored PDF objects are deleted."""
     comparison, keys = expired_comparison
 
     def unavailable_delete(key):
@@ -170,6 +175,7 @@ def test_purge_waits_for_both_deletions(expired_comparison, monkeypatch):
 
 @pytest.mark.parametrize('slot', ['a', 'b'])
 def test_processing_cleanup_failure_remains_recoverable(stored_comparison, monkeypatch, slot):
+    """Preserve a successful comparison for later recovery of failed cleanup."""
     comparison, keys = stored_comparison
     expires_at = comparison.expires_at
     sibling = {'a': 'b', 'b': 'a'}[slot]
@@ -196,6 +202,7 @@ def test_processing_cleanup_failure_remains_recoverable(stored_comparison, monke
 
 
 def test_failed_processing_retains_original_error_code(stored_comparison, monkeypatch):
+    """Preserve the original processing error when PDF cleanup also fails."""
     comparison, keys = stored_comparison
     expires_at = comparison.expires_at
 
@@ -217,6 +224,7 @@ def test_failed_processing_retains_original_error_code(stored_comparison, monkey
 
 
 def test_ocr_rejection_survives_cleanup_failure(stored_comparison, monkeypatch):
+    """Preserve OCR rejection when PDF cleanup fails."""
     comparison, keys = stored_comparison
     expires_at = comparison.expires_at
     storage_service.put_bytes(
@@ -236,6 +244,7 @@ def test_ocr_rejection_survives_cleanup_failure(stored_comparison, monkeypatch):
 
 
 def test_interrupted_processing_preserves_original_exception(stored_comparison, monkeypatch):
+    """Propagate the original interruption when PDF cleanup also fails."""
     comparison, keys = stored_comparison
     interrupted = KeyboardInterrupt('processing interrupted')
 
@@ -257,6 +266,7 @@ def test_interrupted_processing_preserves_original_exception(stored_comparison, 
 
 
 def test_cleanup_warning_contains_safe_diagnostics(expired_comparison, monkeypatch, caplog):
+    """Log cleanup failure diagnostics without exposing private PDF details."""
     comparison, keys = expired_comparison
     private_detail = '/private/objects/private-a.pdf %PDF-sensitive-content'
     _refuse_delete(monkeypatch, keys['a'], PermissionError(private_detail))
