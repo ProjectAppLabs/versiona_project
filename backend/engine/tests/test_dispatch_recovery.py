@@ -142,13 +142,17 @@ def test_recovery_waits_for_minimum_age(analysis_job_factory, broker):
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize('trashed_object', ['version', 'document'])
+@pytest.mark.parametrize('trashed_object', ['version', 'document', 'project'])
 def test_recovery_ignores_trashed_input(analysis_job_factory, broker, trashed_object):
     job = analysis_job_factory()
-    targets = {'version': job.document_version, 'document': job.document_version.document}
+    targets = {
+        'version': job.document_version, 'document': job.document_version.document,
+        'project': job.document_version.document.project,
+    }
     targets[trashed_object].soft_delete()
 
     assert tasks.recover_pending_analysis() == 0
+    assert tasks._dispatch_pending_analysis(job.pk) == 'skipped'
     broker.publish.assert_not_called()
 
 

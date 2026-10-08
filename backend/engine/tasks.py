@@ -94,6 +94,7 @@ def _dispatch_pending_analysis(job_id: int, *, skip_locked=False, cutoff=None) -
     job = candidates.first()
     if job is None or not DocumentVersion.objects.filter(
         pk=job.document_version_id, document__deleted_at__isnull=True,
+        document__project__deleted_at__isnull=True,
         analysis_status=DocumentVersion.AnalysisStatus.PENDING,
     ).exists():
         return 'skipped'
@@ -125,6 +126,7 @@ def recover_pending_analysis() -> int:
         celery_task_id='', updated_at__lte=cutoff,
         document_version__deleted_at__isnull=True,
         document_version__document__deleted_at__isnull=True,
+        document_version__document__project__deleted_at__isnull=True,
         document_version__analysis_status=DocumentVersion.AnalysisStatus.PENDING,
     ).order_by('updated_at', 'pk').values_list('pk', flat=True)[:DISPATCH_BATCH_SIZE]
     deadline = monotonic() + DISPATCH_BUDGET_SECONDS
