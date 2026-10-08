@@ -3,10 +3,12 @@
 from pathlib import Path
 
 import pytest
-
+from audit.models import AuditEvent
+from django.utils import timezone
 from documents.services import storage_service, version_service
 from notifications.models import Notification
 from projects.models import ProjectConfigVersion
+
 from reviews.models import SealValidityRecord
 from reviews.services import seal_service
 
@@ -49,12 +51,14 @@ def pending_plan(versiona_context):
 
 
 def plan_url(version):
+    """Return the coordinator plan route for one version."""
     return f'/api/versions/{version.public_id}/seal_plan/'
 
 
 @pytest.mark.django_db
 @pytest.mark.escenario('D5-A04')
 def test_coordinator_mode_leaves_the_decision_pending_and_notifies_admins(pending_plan):
+    """A coordinator proposal waits for confirmation before notifying its reviewer."""
     context, v2, seal = pending_plan
 
     record = SealValidityRecord.objects.get(seal=seal)
@@ -73,6 +77,7 @@ def test_coordinator_mode_leaves_the_decision_pending_and_notifies_admins(pendin
 @pytest.mark.django_db
 @pytest.mark.escenario('D5-A04')
 def test_admin_confirms_the_plan_and_the_reviewer_is_then_notified(client_as, pending_plan):
+    """Admin confirmation finalizes the proposed invalidation for its reviewer."""
     context, v2, seal = pending_plan
 
     response = client_as('admin').post(
@@ -94,6 +99,7 @@ def test_admin_confirms_the_plan_and_the_reviewer_is_then_notified(client_as, pe
 @pytest.mark.django_db
 @pytest.mark.escenario('D5-A06')
 def test_coordinator_can_preserve_explicitly_and_it_stays_on_the_record(client_as, pending_plan):
+    """Explicit preservation retains the machine proposal as audit evidence."""
     context, v2, seal = pending_plan
 
     response = client_as('admin').post(
@@ -112,6 +118,7 @@ def test_coordinator_can_preserve_explicitly_and_it_stays_on_the_record(client_a
 
 @pytest.mark.django_db
 def test_confirming_without_a_decision_per_seal_is_rejected(client_as, pending_plan):
+    """An incomplete set of coordinator decisions is rejected."""
     _, v2, _ = pending_plan
 
     response = client_as('admin').post(plan_url(v2), {'decisions': {}}, format='json')
@@ -120,7 +127,7 @@ def test_confirming_without_a_decision_per_seal_is_rejected(client_as, pending_p
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize('actor, expected', [
+@pytest.mark.parametrize(('actor', 'expected'), [
     pytest.param('admin', 200, id='d5-plan-p01-admin'),
     pytest.param('reviewer', 404, id='d5-plan-p02-reviewer-hidden'),
     pytest.param('editor', 404, id='d5-plan-p02-editor-hidden'),
@@ -129,6 +136,7 @@ def test_confirming_without_a_decision_per_seal_is_rejected(client_as, pending_p
 ])
 @pytest.mark.escenario('D5-P01')
 def test_confirm_plan_permission_matrix(client_as, pending_plan, actor, expected):
+    """Plan confirmation honors the permission outcome for each actor."""
     _, v2, seal = pending_plan
 
     response = client_as(actor).post(
@@ -142,6 +150,7 @@ def test_confirm_plan_permission_matrix(client_as, pending_plan, actor, expected
 
 @pytest.mark.django_db
 def test_pending_plan_listing_is_visible_to_members(client_as, pending_plan):
+    """A project member can inspect the pending invalidation proposal."""
     _, v2, seal = pending_plan
 
     response = client_as('viewer').get(plan_url(v2))
@@ -149,3 +158,95 @@ def test_pending_plan_listing_is_visible_to_members(client_as, pending_plan):
     assert response.status_code == 200
     assert len(response.data['pending']) == 1
     assert response.data['pending'][0]['proposed_decision'] == 'invalidated'
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('second_choice', ['invalidated', 'preserved'])
+def test_second_confirmation_preserves_the_first_final_record(client_as, pending_plan, second_choice):
+    """Catches: retrying a completed plan rewriting its actor, timestamp or effects."""
+    _, version, seal = pending_plan
+    client = client_as('admin')
+    first = client.post(
+        plan_url(version), {'decisions': {str(seal.public_id): 'invalidated'}}, format='json',
+    )
+    original = SealValidityRecord.objects.get(seal=seal)
+    snapshot = (original.decision, original.decided_by_id, original.decided_at)
+    audit_count = AuditEvent.objects.count()
+    notice_count = Notification.objects.count()
+
+    second = client.post(
+        plan_url(version), {'decisions': {str(seal.public_id): second_choice}}, format='json',
+    )
+
+    assert first.status_code == 200
+    assert second.status_code == 404
+    assert second.data == {'error': 'No hay plan de invalidación pendiente en esta versión.'}
+    original.refresh_from_db()
+    assert (original.decision, original.decided_by_id, original.decided_at) == snapshot
+    assert AuditEvent.objects.count() == audit_count
+    assert Notification.objects.count() == notice_count
+
+
+@pytest.mark.django_db
+def test_archived_project_rejects_plan_confirmation(client_as, pending_plan):
+    """Catches: coordinator finalizing a plan while its project is readonly."""
+    _, version, seal = pending_plan
+    project = version.document.project
+    project.status = 'archived'
+    project.save(update_fields=['status'])
+    audit_count = AuditEvent.objects.count()
+    notice_count = Notification.objects.count()
+
+    response = client_as('admin').post(
+        plan_url(version), {'decisions': {str(seal.public_id): 'invalidated'}}, format='json',
+    )
+
+    assert response.status_code == 409
+    assert response.data == {'error': 'El proyecto está archivado o en la papelera: es de solo lectura.'}
+    record = SealValidityRecord.objects.get(seal=seal)
+    assert (record.decision, record.decided_by_id, record.decided_at) == ('pending_confirmation', None, None)
+    assert AuditEvent.objects.count() == audit_count
+    assert Notification.objects.count() == notice_count
+
+
+@pytest.mark.django_db
+def test_trashed_project_rejects_plan_confirmation_in_the_service(pending_plan):
+    """Catches: a direct service caller bypassing the project's trash guard."""
+    context, version, seal = pending_plan
+    project = version.document.project
+    project.deleted_at = timezone.now()
+    project.save(update_fields=['deleted_at'])
+    audit_count = AuditEvent.objects.count()
+    notice_count = Notification.objects.count()
+
+    with pytest.raises(version_service.DomainError) as exc:
+        seal_service.confirm_seal_plan(version, context.users['admin'], {str(seal.public_id): 'invalidated'})
+
+    assert exc.value.status_code == 409
+    record = SealValidityRecord.objects.get(seal=seal)
+    assert (record.decision, record.decided_by_id, record.decided_at) == ('pending_confirmation', None, None)
+    assert AuditEvent.objects.count() == audit_count
+    assert Notification.objects.count() == notice_count
+
+
+@pytest.mark.django_db
+def test_restored_project_allows_plan_confirmation(client_as, pending_plan):
+    """Catches: archival permanently disabling a pending coordinator decision."""
+    _, version, seal = pending_plan
+    project = version.document.project
+    project.status = 'archived'
+    project.save(update_fields=['status'])
+    client = client_as('admin')
+    rejected = client.post(
+        plan_url(version), {'decisions': {str(seal.public_id): 'invalidated'}}, format='json',
+    )
+    project.status = 'active'
+    project.save(update_fields=['status'])
+
+    response = client.post(
+        plan_url(version), {'decisions': {str(seal.public_id): 'invalidated'}}, format='json',
+    )
+
+    assert rejected.status_code == 409
+    assert response.status_code == 200
+    assert SealValidityRecord.objects.get(seal=seal).decision == 'invalidated'
