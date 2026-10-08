@@ -25,7 +25,9 @@ export default function CompararResultPage() {
   const load = usePublicCompareStore((s) => s.load);
 
   useEffect(() => {
-    if (params?.id) void load(params.id);
+    const controller = new AbortController();
+    if (params?.id) void load(params.id, controller.signal);
+    return () => controller.abort();
   }, [params?.id, load]);
 
   const errorMessage =

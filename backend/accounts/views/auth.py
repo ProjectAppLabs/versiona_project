@@ -16,6 +16,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db import transaction
 
 import requests
 
@@ -390,43 +391,41 @@ def verify_passcode_and_reset_password(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    try:
-        user = User.objects.get(email=email)
-    except User.DoesNotExist:
-        return Response(
-            {'error': 'Invalid email or code'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    # Find valid code
-    try:
-        password_code = user.password_codes.filter(
-            code=code,
-            used=False
-        ).first()
-        
-        if not password_code or not password_code.is_valid():
+    with transaction.atomic():
+        try:
+            user = User.objects.select_for_update().get(email=email)
+        except User.DoesNotExist:
             return Response(
-                {'error': 'Invalid or expired code'},
+                {'error': 'Invalid email or code'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-    except Exception:
-        return Response(
-            {'error': 'Invalid or expired code'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
 
-    password_error = _password_validation_error(new_password, user)
-    if password_error:
-        return Response({'error': password_error}, status=status.HTTP_400_BAD_REQUEST)
-    
-    # Update password
-    user.password = make_password(new_password)
-    user.save()
-    
-    # Mark code as used
-    password_code.used = True
-    password_code.save()
+        # Serialize attempts for this user and re-read the code under its own
+        # lock. Password validation must succeed before either row changes.
+        try:
+            password_code = user.password_codes.select_for_update().filter(
+                code=code,
+                used=False,
+            ).first()
+            if not password_code or not password_code.is_valid():
+                return Response(
+                    {'error': 'Invalid or expired code'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        except Exception:
+            return Response(
+                {'error': 'Invalid or expired code'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        password_error = _password_validation_error(new_password, user)
+        if password_error:
+            return Response({'error': password_error}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.password = make_password(new_password)
+        user.save(update_fields=['password'])
+        password_code.used = True
+        password_code.save(update_fields=['used'])
     
     return Response(
         {'message': 'Password reset successfully'},

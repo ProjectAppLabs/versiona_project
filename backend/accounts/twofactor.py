@@ -17,6 +17,7 @@ import secrets
 import pyotp
 import qrcode
 from django.core import signing
+from django.db import transaction
 from django.utils import timezone
 
 from documents.services.version_service import DomainError
@@ -67,12 +68,17 @@ def enable(user, code: str) -> list[str]:
 
 def _consume_backup_code(user, code: str) -> bool:
     hashed = _hash_code(code)
-    codes = list(user.totp_backup_codes or [])
-    if hashed not in codes:
-        return False
-    codes.remove(hashed)  # single-use
+    with transaction.atomic():
+        # Requests can hold different instances of the same user. Only the
+        # locked, current row can decide whether a code is still available.
+        current_user = type(user).objects.select_for_update().get(pk=user.pk)
+        codes = list(current_user.totp_backup_codes or [])
+        if hashed not in codes:
+            return False
+        codes.remove(hashed)
+        current_user.totp_backup_codes = codes
+        current_user.save(update_fields=['totp_backup_codes'])
     user.totp_backup_codes = codes
-    user.save(update_fields=['totp_backup_codes'])
     return True
 
 
