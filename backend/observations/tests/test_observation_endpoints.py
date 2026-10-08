@@ -12,7 +12,11 @@ from django.db import connection
 from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
 
+from audit.models import AuditEvent
+from documents.services.version_service import DomainError
+from notifications.models import Notification
 from observations.models import Observation, ObservationAnchor, ObservationReply
+from observations import services
 
 FIXED_TIME = timezone.make_aware(datetime(2026, 10, 2, 12, 0, 0))
 
@@ -251,6 +255,162 @@ def test_invalid_status_transition_returns_conflict(client_as, open_observation)
 
     assert response.status_code == 409
     assert 'I14' in response.data['error']
+
+
+@pytest.fixture
+def read_only_observation(request, open_observation):
+    """Provide an existing thread retained by an archived/trashed project."""
+    project = open_observation.document.project
+    field, value = request.param
+    setattr(project, field, value)
+    project.save(update_fields=[field])
+    return open_observation
+
+
+READ_ONLY_STATES = [('status', 'archived'), ('deleted_at', FIXED_TIME)]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('read_only_observation', READ_ONLY_STATES, indirect=True)
+def test_create_observation_rejects_read_only_project(
+    versiona_context, read_only_observation,
+):
+    """Read-only projects cannot acquire another thread or anchor."""
+    observation = read_only_observation
+    observation_count = Observation.objects.count()
+    anchor_count = ObservationAnchor.objects.count()
+    audit_count = AuditEvent.objects.count()
+    notification_count = Notification.objects.count()
+
+    with pytest.raises(DomainError) as exc:
+        services.create_observation(
+            observation.created_on_version, versiona_context.users['reviewer'], body='rechazada',
+        )
+
+    assert exc.value.status_code == 409
+    assert Observation.objects.count() == observation_count
+    assert ObservationAnchor.objects.count() == anchor_count
+    assert Observation.objects.get(pk=observation.pk).body == 'La multa del 2% parece baja.'
+    assert AuditEvent.objects.count() == audit_count
+    assert Notification.objects.count() == notification_count
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('read_only_observation', READ_ONLY_STATES, indirect=True)
+def test_reply_rejects_read_only_project(versiona_context, read_only_observation):
+    """Rejected replies preserve the original open thread."""
+    observation = read_only_observation
+    audit_count = AuditEvent.objects.count()
+    notification_count = Notification.objects.count()
+
+    with pytest.raises(DomainError) as exc:
+        services.reply_to_observation(observation, versiona_context.users['editor'], 'rechazada')
+
+    assert exc.value.status_code == 409
+    observation.refresh_from_db()
+    assert observation.status == Observation.Status.OPEN
+    assert observation.body == 'La multa del 2% parece baja.'
+    assert not ObservationReply.objects.filter(observation=observation).exists()
+    assert AuditEvent.objects.count() == audit_count
+    assert Notification.objects.count() == notification_count
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('read_only_observation', READ_ONLY_STATES, indirect=True)
+def test_status_change_rejects_read_only_project(versiona_context, read_only_observation):
+    """Read-only projects retain a thread's state and resolution pointer."""
+    observation = read_only_observation
+    audit_count = AuditEvent.objects.count()
+    notification_count = Notification.objects.count()
+
+    with pytest.raises(DomainError) as exc:
+        services.set_observation_status(observation, versiona_context.users['reviewer'], 'answered')
+
+    assert exc.value.status_code == 409
+    observation.refresh_from_db()
+    assert observation.status == Observation.Status.OPEN
+    assert observation.resolved_in_version is None
+    assert not ObservationReply.objects.filter(observation=observation).exists()
+    assert AuditEvent.objects.count() == audit_count
+    assert Notification.objects.count() == notification_count
+
+
+@pytest.mark.django_db
+def test_archived_project_rejects_observation_creation_via_api(
+    client_as, versiona_context, doc_version,
+):
+    """The existing create endpoint returns the domain conflict for archived projects."""
+    _, version = doc_version
+    project = versiona_context.project
+    project.status = 'archived'
+    project.save(update_fields=['status'])
+
+    response = client_as('reviewer').post(
+        f'/api/versions/{version.public_id}/observations/', {'body': 'rechazada'}, format='json',
+    )
+
+    assert response.status_code == 409
+    assert 'solo lectura' in response.data['error']
+    assert not Observation.objects.filter(document=version.document).exists()
+
+
+@pytest.mark.django_db
+def test_archived_project_rejects_observation_reply_via_api(
+    client_as, versiona_context, open_observation,
+):
+    """The reply endpoint cannot advance an archived project's thread."""
+    project = versiona_context.project
+    project.status = 'archived'
+    project.save(update_fields=['status'])
+
+    response = client_as('editor').post(
+        f'/api/observations/{open_observation.public_id}/replies/',
+        {'body': 'rechazada'}, format='json',
+    )
+
+    assert response.status_code == 409
+    open_observation.refresh_from_db()
+    assert open_observation.status == Observation.Status.OPEN
+    assert not ObservationReply.objects.filter(observation=open_observation).exists()
+
+
+@pytest.mark.django_db
+def test_archived_project_rejects_observation_status_via_api(
+    client_as, versiona_context, open_observation,
+):
+    """The status endpoint preserves the archived project's open thread."""
+    project = versiona_context.project
+    project.status = 'archived'
+    project.save(update_fields=['status'])
+
+    response = client_as('reviewer').post(
+        f'/api/observations/{open_observation.public_id}/status/',
+        {'status': 'answered'}, format='json',
+    )
+
+    assert response.status_code == 409
+    open_observation.refresh_from_db()
+    assert open_observation.status == Observation.Status.OPEN
+
+
+@pytest.mark.django_db
+def test_observation_creation_resumes_after_unarchive(client_as, versiona_context, doc_version):
+    """Unarchiving makes the same reviewer action writable again."""
+    _, version = doc_version
+    project = versiona_context.project
+    project.status = 'archived'
+    project.save(update_fields=['status'])
+    client = client_as('reviewer')
+    url = f'/api/versions/{version.public_id}/observations/'
+    rejected = client.post(url, {'body': 'rechazada'}, format='json')
+    project.status = 'active'
+    project.save(update_fields=['status'])
+
+    response = client.post(url, {'body': 'permitida'}, format='json')
+
+    assert rejected.status_code == 409
+    assert response.status_code == 201
+    assert Observation.objects.get(document=version.document).body == 'permitida'
 
 
 @pytest.mark.django_db

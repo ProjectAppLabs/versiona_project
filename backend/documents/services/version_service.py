@@ -101,6 +101,16 @@ def complete_upload(document: Document, upload_id: str, message: str, user, requ
         )
 
     data = storage_service.get_bytes(staging)
+    # Metadata and staging may change between reads. This captured object is
+    # the only authority for validation, its persisted metadata and promotion.
+    size = len(data)
+    if size <= 0:
+        raise DomainError('El archivo subido está vacío.', 400)
+    if size > max_upload_bytes():
+        raise DomainError(
+            f'El archivo supera el límite de {max_upload_bytes() // (1024 * 1024)} MB del plan.',
+            413,
+        )
     if not data.startswith(b'%PDF-'):
         raise DomainError('El archivo no es un PDF válido.', 400)
     try:
@@ -116,9 +126,9 @@ def complete_upload(document: Document, upload_id: str, message: str, user, requ
     sha256 = storage_service.sha256_of(data)
 
     try:
-        version = _create_locked_version(document, staging, sha256, size, message, user, request)
+        version = _create_locked_version(document, data, sha256, size, message, user, request)
     except OperationalError as exc:
-        # _create_locked_version holds its row lock across storage_service.copy(),
+        # _create_locked_version holds its row lock across storage_service.put_bytes(),
         # so a second
         # upload to the same document waits on network I/O. PostgreSQL waited
         # forever; InnoDB gives up after innodb_lock_wait_timeout (50s) with
@@ -145,7 +155,7 @@ def complete_upload(document: Document, upload_id: str, message: str, user, requ
     return version, job
 
 
-def _create_locked_version(document, staging, sha256, size, message, user, request):
+def _create_locked_version(document, data, sha256, size, message, user, request):
     """I1: allocating the version number and writing the object happen under one
     document-row lock, so two concurrent uploads cannot claim the same number."""
     with transaction.atomic():
@@ -161,7 +171,9 @@ def _create_locked_version(document, staging, sha256, size, message, user, reque
             )
         number = locked.latest_number + 1
         final_key = storage_service.version_key(locked, number)
-        storage_service.copy(staging, final_key)
+        # Promote precisely the bytes validated above, even if the signed PUT
+        # token replaces the staging object before this row lock is acquired.
+        storage_service.put_bytes(final_key, data, 'application/pdf')
         version = DocumentVersion.objects.create(
             document=locked,
             number=number,

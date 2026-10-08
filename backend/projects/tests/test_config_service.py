@@ -3,6 +3,9 @@
 from pathlib import Path
 
 import pytest
+from django.utils import timezone
+
+from audit.models import AuditEvent
 from checks.models import ChecklistTemplate
 from documents.services import storage_service, version_service
 from reviews.services import seal_service
@@ -219,3 +222,87 @@ def test_config_get_exposes_current_state(client_as, versiona_context):
     assert response.data['number'] >= 1
     assert response.data['d5_mode'] in ('auto', 'coordinator')
     assert 'checklist' in response.data
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(('field', 'value'), [
+    ('status', 'archived'), ('deleted_at', timezone.now()),
+])
+def test_config_update_rejects_read_only_project(versiona_context, field, value):
+    """Rejected configuration changes retain the previous version and rules."""
+    context = versiona_context
+    original = ProjectConfigVersion.current_for(context.project)
+    setattr(context.project, field, value)
+    context.project.save(update_fields=[field])
+    audit_count = AuditEvent.objects.count()
+
+    with pytest.raises(version_service.DomainError) as exc:
+        config_service.update_config(context.project, context.users['admin'], d5_mode='coordinator')
+
+    assert exc.value.status_code == 409
+    assert ProjectConfigVersion.objects.filter(project=context.project).count() == 1
+    original.refresh_from_db()
+    assert original.d5_mode == 'auto'
+    assert original.approval_policy == context.config.approval_policy
+    assert AuditEvent.objects.count() == audit_count
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(('field', 'value'), [
+    ('status', 'archived'), ('deleted_at', timezone.now()),
+])
+def test_template_application_rejects_read_only_project(versiona_context, field, value):
+    """Applying a template cannot bypass the configuration writability guard."""
+    context = versiona_context
+    original = ProjectConfigVersion.current_for(context.project)
+    template = ChecklistTemplate.objects.create(
+        organization=context.org, name='Plantilla retenida', items=[],
+    )
+    setattr(context.project, field, value)
+    context.project.save(update_fields=[field])
+    audit_count = AuditEvent.objects.count()
+
+    with pytest.raises(version_service.DomainError) as exc:
+        config_service.apply_template(context.project, context.users['admin'], template)
+
+    assert exc.value.status_code == 409
+    assert ProjectConfigVersion.objects.filter(project=context.project).count() == 1
+    assert ProjectConfigVersion.current_for(context.project).pk == original.pk
+    assert ChecklistTemplate.objects.get(pk=template.pk).name == 'Plantilla retenida'
+    assert AuditEvent.objects.count() == audit_count
+
+
+@pytest.mark.django_db
+def test_archived_config_remains_readable(client_as, versiona_context):
+    """Archiving protects writes while retaining the current governance view."""
+    project = versiona_context.project
+    project.status = 'archived'
+    project.save(update_fields=['status'])
+
+    response = client_as('admin').get(f'/api/projects/{project.public_id}/config/')
+
+    assert response.status_code == 200
+    assert response.data['number'] == versiona_context.config.number
+    assert response.data['d5_mode'] == 'auto'
+
+
+@pytest.mark.django_db
+def test_config_update_resumes_after_unarchive(client_as, versiona_context):
+    """The same admin update succeeds after the project is made writable again."""
+    project = versiona_context.project
+    project.status = 'archived'
+    project.save(update_fields=['status'])
+    client = client_as('admin')
+    url = f'/api/projects/{project.public_id}/config/'
+    rejected = client.post(url, {'d5_mode': 'coordinator'}, format='json')
+    project.status = 'active'
+    project.save(update_fields=['status'])
+
+    response = client.post(url, {'d5_mode': 'coordinator'}, format='json')
+
+    assert rejected.status_code == 409
+    assert response.status_code == 201
+    current = ProjectConfigVersion.current_for(project)
+    assert current.d5_mode == 'coordinator'
+    assert current.number == versiona_context.config.number + 1
+    assert response.data['number'] == current.number

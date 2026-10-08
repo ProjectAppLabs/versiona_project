@@ -4,7 +4,7 @@ from django.db import transaction
 
 from audit import services as audit
 from documents.models import DocumentVersion, SectionVersion
-from documents.services.version_service import DomainError
+from documents.services.version_service import DomainError, ensure_writable
 from notifications.services import notify
 
 from .models import Observation, ObservationAnchor, ObservationReply
@@ -29,6 +29,7 @@ def create_observation(
     page: int = 1, quads=None, snippet: str = '', request=None,
 ) -> Observation:
     document = version.document
+    ensure_writable(document.project)
     if not body.strip():
         raise DomainError('La observación necesita un texto.', 400)
 
@@ -88,6 +89,7 @@ def create_observation(
 def reply_to_observation(
     observation: Observation, author, body: str, request=None
 ) -> ObservationReply:
+    ensure_writable(observation.document.project)
     if not body.strip():
         raise DomainError('La respuesta necesita un texto.', 400)
     reply = ObservationReply.objects.create(
@@ -124,6 +126,7 @@ def set_observation_status(
 ) -> Observation:
     """I14 state machine. Resolution belongs to the thread author (their doubt,
     their sign-off) or a project admin."""
+    ensure_writable(observation.document.project)
     current = observation.status
     if (current, new_status) not in VALID_TRANSITIONS:
         raise DomainError(

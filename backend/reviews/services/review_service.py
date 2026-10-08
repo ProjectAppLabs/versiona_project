@@ -89,6 +89,7 @@ def cancel_review_request(review: ReviewRequest, actor, request=None) -> ReviewR
         role = resolve_effective_role(actor, review.document_version.document.project)
         if role != 'admin':
             raise DomainError('Solo quien la abrió (o un admin) puede cancelarla.', 403)
+    ensure_writable(review.document_version.document.project)
     review.status = ReviewRequest.Status.CANCELLED
     review.closed_at = timezone.now()
     review.save(update_fields=['status', 'closed_at', 'updated_at'])

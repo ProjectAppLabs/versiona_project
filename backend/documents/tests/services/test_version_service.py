@@ -8,6 +8,7 @@ import pytest
 from audit.models import AuditEvent
 from documents.models import DocumentVersion, SectionVersion
 from documents.services import storage_service, version_service
+from documents.services.storage import filesystem
 
 TESTDATA = Path(__file__).resolve().parents[4] / 'testdata' / 'pdfs'
 
@@ -28,6 +29,17 @@ def upload(document, user, fixture='contrato_v1.pdf', message='primera entrega')
     intent = version_service.create_upload_intent(document, user)
     storage_service.put_bytes(intent.key, (TESTDATA / fixture).read_bytes(), 'application/pdf')
     return version_service.complete_upload(document, intent.upload_id, message, user)
+
+
+def _replace_staging_after_read(operation, staging_key, replacement):
+    """Interleave a real staging write after an existing storage read."""
+    def replacing_read(key):
+        result = operation(key)
+        if key == staging_key:
+            storage_service.put_bytes(key, replacement, 'application/pdf')
+        return result
+
+    return replacing_read
 
 
 @pytest.mark.django_db
@@ -145,3 +157,147 @@ def test_archived_project_rejects_uploads(document, versiona_context):
         upload(document, versiona_context.users['editor'])
 
     assert excinfo.value.status_code == 409
+
+
+@pytest.mark.django_db
+def test_promotion_keeps_captured_bytes_after_staging_replaced(
+    document, versiona_context, monkeypatch,
+):
+    """A reusable PUT token cannot swap the already-validated PDF."""
+    editor = versiona_context.users['editor']
+    intent = version_service.create_upload_intent(document, editor)
+    captured = (TESTDATA / 'contrato_v1.pdf').read_bytes()
+    replacement = (TESTDATA / 'contrato_v2.pdf').read_bytes()
+    storage_service.put_bytes(intent.key, captured, 'application/pdf')
+    read_bytes = storage_service.get_bytes
+
+    monkeypatch.setattr(
+        storage_service, 'get_bytes',
+        _replace_staging_after_read(read_bytes, intent.key, replacement),
+    )
+
+    version, job = version_service.complete_upload(document, intent.upload_id, 'captura', editor)
+
+    assert read_bytes(version.file_key) == captured
+    assert version.sha256 == storage_service.sha256_of(captured)
+    assert version.size_bytes == len(captured)
+    assert job.status == 'done'
+    assert version.section_versions.filter(section__stable_key='plazo-de-ejecucion').exists()
+
+
+@pytest.mark.django_db
+def test_promotion_measures_bytes_replaced_after_metadata(
+    document, versiona_context, monkeypatch,
+):
+    """Persisted size comes from the captured PDF rather than older metadata."""
+    editor = versiona_context.users['editor']
+    intent = version_service.create_upload_intent(document, editor)
+    original = (TESTDATA / 'contrato_v1.pdf').read_bytes()
+    replacement = (TESTDATA / 'contrato_v2.pdf').read_bytes()
+    storage_service.put_bytes(intent.key, original, 'application/pdf')
+    object_head = storage_service.head
+
+    monkeypatch.setattr(
+        storage_service, 'head',
+        _replace_staging_after_read(object_head, intent.key, replacement),
+    )
+
+    version, _ = version_service.complete_upload(document, intent.upload_id, 'captura', editor)
+
+    assert storage_service.get_bytes(version.file_key) == replacement
+    assert version.sha256 == storage_service.sha256_of(replacement)
+    assert version.size_bytes == len(replacement)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(('replacement', 'expected_status'), [
+    pytest.param(b'', 400, id='empty'),
+    pytest.param(b'%PDF-' + b'x' * (1024 * 1024), 413, id='oversized'),
+])
+def test_capture_rejects_invalid_size_after_metadata(
+    document, versiona_context, monkeypatch, settings, replacement, expected_status,
+):
+    """A stale successful head cannot authorize an empty/oversized capture."""
+    settings.MAX_PDF_SIZE_MB = 1
+    editor = versiona_context.users['editor']
+    intent = version_service.create_upload_intent(document, editor)
+    storage_service.put_bytes(intent.key, (TESTDATA / 'contrato_v1.pdf').read_bytes(), 'application/pdf')
+    object_head = storage_service.head
+
+    monkeypatch.setattr(
+        storage_service, 'head',
+        _replace_staging_after_read(object_head, intent.key, replacement),
+    )
+
+    with pytest.raises(version_service.DomainError) as exc:
+        version_service.complete_upload(document, intent.upload_id, 'rechazada', editor)
+
+    assert exc.value.status_code == expected_status
+    assert not DocumentVersion.objects.filter(document=document).exists()
+    document.refresh_from_db()
+    assert document.latest_number == 0
+    assert storage_service.get_bytes(intent.key) == replacement
+
+
+@pytest.mark.django_db
+def test_promotion_write_failure_preserves_staging(
+    document, versiona_context, monkeypatch,
+):
+    """An atomic filesystem failure cannot allocate a version or lose staging."""
+    editor = versiona_context.users['editor']
+    intent = version_service.create_upload_intent(document, editor)
+    payload = (TESTDATA / 'contrato_v1.pdf').read_bytes()
+    storage_service.put_bytes(intent.key, payload, 'application/pdf')
+    final_key = storage_service.version_key(document, 1)
+    provisional = b'previous provisional object'
+    storage_service.put_bytes(final_key, provisional, 'application/pdf')
+
+    def unavailable_fsync(_fd):
+        raise OSError('private storage write failed')
+
+    monkeypatch.setattr(filesystem.os, 'fsync', unavailable_fsync)
+
+    with pytest.raises(OSError, match='storage write failed'):
+        version_service.complete_upload(document, intent.upload_id, 'rechazada', editor)
+
+    assert not DocumentVersion.objects.filter(document=document).exists()
+    document.refresh_from_db()
+    assert document.latest_number == 0
+    assert storage_service.get_bytes(intent.key) == payload
+    assert storage_service.get_bytes(final_key) == provisional
+    assert list(filesystem.resolve_path(final_key).parent.glob('.tmp-*')) == []
+
+
+@pytest.mark.django_db
+def test_retry_replaces_uncommitted_promotion_after_database_failure(
+    document, versiona_context, monkeypatch,
+):
+    """A failed DB write cannot make the next version reuse a stale binary."""
+    editor = versiona_context.users['editor']
+    intent = version_service.create_upload_intent(document, editor)
+    first = (TESTDATA / 'contrato_v1.pdf').read_bytes()
+    retry = (TESTDATA / 'contrato_v2.pdf').read_bytes()
+    storage_service.put_bytes(intent.key, first, 'application/pdf')
+    create_version = DocumentVersion.objects.create
+
+    def unavailable_database(**_kwargs):
+        raise RuntimeError('private database write failed')
+
+    monkeypatch.setattr(DocumentVersion.objects, 'create', unavailable_database)
+    with pytest.raises(RuntimeError, match='database write failed'):
+        version_service.complete_upload(document, intent.upload_id, 'fallida', editor)
+    monkeypatch.setattr(DocumentVersion.objects, 'create', create_version)
+    document.refresh_from_db()
+    assert document.latest_number == 0
+    assert not DocumentVersion.objects.filter(document=document).exists()
+    assert storage_service.get_bytes(intent.key) == first
+    assert storage_service.get_bytes(storage_service.version_key(document, 1)) == first
+    storage_service.put_bytes(intent.key, retry, 'application/pdf')
+
+    version, job = version_service.complete_upload(document, intent.upload_id, 'reintento', editor)
+
+    assert version.number == 1
+    assert storage_service.get_bytes(version.file_key) == retry
+    assert version.sha256 == storage_service.sha256_of(retry)
+    assert version.size_bytes == len(retry)
+    assert job.status == 'done'

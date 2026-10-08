@@ -41,6 +41,8 @@ def test_staging_cleanup_failure_preserves_completed_upload(
     assert version.section_versions.exists()
     assert job.status == 'done'
     assert storage_service.get_bytes(version.file_key) == payload
+    assert version.sha256 == storage_service.sha256_of(payload)
+    assert version.size_bytes == len(payload)
     assert storage_service.get_bytes(intent.key) == payload
     records = [
         record for record in caplog.records
