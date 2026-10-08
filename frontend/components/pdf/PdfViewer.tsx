@@ -50,8 +50,25 @@ export function PdfViewer({
   const [pageCount, setPageCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [pageSize, setPageSize] = useState<{ width: number; height: number } | null>(null);
+  const [availableWidth, setAvailableWidth] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
   const pageRefs = useRef<Record<number, HTMLDivElement | null>>({});
   const byPage = groupByPage(highlights);
+  // ResizeObserver measures the content box after the caller's paddings. Each
+  // page has a one-pixel border on both sides; width remains a maximum.
+  const renderedWidth = Math.max(0, Math.min(width, availableWidth - 2));
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const style = getComputedStyle(container);
+    setAvailableWidth(container.clientWidth - parseFloat(style.paddingLeft || '0') - parseFloat(style.paddingRight || '0'));
+    const observer = new ResizeObserver(([entry]) => {
+      setAvailableWidth(entry.contentRect.width);
+    });
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!scrollToPage) return;
@@ -73,7 +90,8 @@ export function PdfViewer({
   const pagesToRender = maxPages ? Math.min(pageCount, maxPages) : pageCount;
 
   return (
-    <div data-testid="pdf-viewer" className="flex flex-col items-center gap-4">
+    <div ref={containerRef} data-testid="pdf-viewer" className="flex w-full min-w-0 flex-col items-center gap-4">
+      {renderedWidth > 0 ? (
       <Document
         file={file}
         loading={<Skeleton className="h-[480px] w-full max-w-[760px]" />}
@@ -105,18 +123,18 @@ export function PdfViewer({
             >
               <Page
                 pageNumber={pageNumber}
-                width={width}
+                width={renderedWidth}
                 renderAnnotationLayer={false}
                 onRenderSuccess={(page) => {
                   const viewport = page.getViewport({ scale: 1 });
-                  const scale = width / viewport.width;
-                  setPageSize({ width, height: viewport.height * scale });
+                  const scale = renderedWidth / viewport.width;
+                  setPageSize({ width: renderedWidth, height: viewport.height * scale });
                 }}
               />
               {pageSize && boxes.length > 0 ? (
                 <div className="pointer-events-none absolute inset-0" data-testid="highlight-layer">
                   {boxes.map((bbox, boxIndex) => {
-                    const css = bboxToCss(bbox, pageSize.width, pageSize.height);
+                    const css = bboxToCss(bbox, renderedWidth, pageSize.height * renderedWidth / pageSize.width);
                     return (
                       <div
                         key={boxIndex}
@@ -137,6 +155,7 @@ export function PdfViewer({
           );
         })}
       </Document>
+      ) : <Skeleton className="h-[480px] w-full max-w-[760px]" />}
       {maxPages && pageCount > maxPages ? (
         <p className="text-xs text-muted-foreground">
           +{pageCount - maxPages} páginas más en el documento completo
