@@ -3,10 +3,9 @@
 from pathlib import Path
 
 import pytest
-from django.utils import timezone
-
 from audit.models import AuditEvent
 from checks.models import ChecklistTemplate
+from django.utils import timezone
 from documents.services import storage_service, version_service
 from reviews.services import seal_service
 
