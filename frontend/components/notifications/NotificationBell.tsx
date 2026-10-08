@@ -33,11 +33,12 @@ export function NotificationBell() {
   }, [open]);
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="relative w-fit shrink-0">
       <button
         data-testid="notification-bell"
         aria-label={t.title}
-        className="relative rounded-full p-2 hover:bg-accent"
+        aria-expanded={open}
+        className="relative inline-flex h-11 w-11 items-center justify-center rounded-full p-2 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         onClick={() => setOpen((value) => !value)}
         type="button"
       >
@@ -68,16 +69,16 @@ export function NotificationBell() {
       {open ? (
         <div
           data-testid="notification-dropdown"
-          className="absolute right-0 z-50 mt-2 w-80 rounded-2xl border border-border bg-card p-2 shadow-lg"
+          className="absolute left-0 z-50 mt-2 w-80 max-w-[calc(100vw-3rem)] rounded-2xl border border-border bg-card p-2 shadow-lg lg:left-auto lg:right-0"
         >
           {items.length === 0 ? (
             <p className="px-3 py-4 text-sm text-muted-foreground">{t.empty}</p>
           ) : (
-            <ul className="flex max-h-96 flex-col gap-1 overflow-y-auto">
+            <ul className="flex max-h-96 flex-col gap-2 overflow-y-auto">
               {items.slice(0, 6).map((item) => (
                 <li key={item.public_id}>
                   <Link
-                    className={`block rounded-xl px-3 py-2 text-sm hover:bg-accent ${
+                    className={`block min-h-11 rounded-xl px-3 py-2 text-sm hover:bg-accent ${
                       item.read_at ? 'opacity-60' : ''
                     }`}
                     href={item.link || '/inbox'}
@@ -94,7 +95,7 @@ export function NotificationBell() {
             </ul>
           )}
           <Link
-            className="mt-1 block rounded-xl px-3 py-2 text-center text-sm text-primary hover:bg-accent"
+            className="mt-2 flex min-h-11 items-center justify-center rounded-xl px-3 py-2 text-center text-sm text-primary hover:bg-accent"
             href="/inbox"
             onClick={() => setOpen(false)}
           >
