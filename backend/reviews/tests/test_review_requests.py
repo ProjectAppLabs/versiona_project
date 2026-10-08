@@ -3,9 +3,13 @@
 from pathlib import Path
 
 import pytest
-
+from audit.models import AuditEvent
+from django.utils import timezone
 from documents.services import storage_service, version_service
 from notifications.models import Notification
+from orgs.models import OrganizationMembership
+from projects.models import ProjectMembership
+
 from reviews.models import ReviewAssignment, ReviewRequest
 from reviews.services import review_service, seal_service
 
@@ -19,6 +23,7 @@ def _test_env(settings, tmp_path):
 
 
 def upload(document, fixture, message, author):
+    """Upload a real fixture as a fully analyzed document version."""
     intent = version_service.create_upload_intent(document, author)
     storage_service.put_bytes(intent.key, (TESTDATA / fixture).read_bytes(), 'application/pdf')
     version, _ = version_service.complete_upload(document, intent.upload_id, message, author)
@@ -27,6 +32,7 @@ def upload(document, fixture, message, author):
 
 @pytest.fixture
 def analyzed_v1(versiona_context):
+    """Provide a ready first version for review-service integration tests."""
     editor = versiona_context.users['editor']
     document = version_service.create_document(versiona_context.project, 'Revisable', editor)
     return versiona_context, document, upload(document, 'contrato_v1.pdf', 'v1', editor)
@@ -35,6 +41,7 @@ def analyzed_v1(versiona_context):
 @pytest.mark.django_db
 @pytest.mark.escenario('D1-F01')
 def test_request_assigns_reviewers_and_notifies_them(analyzed_v1):
+    """Expose the requested review to its selected reviewer."""
     context, document, v1 = analyzed_v1
     editor = context.users['editor']
     reviewer = context.users['reviewer']
@@ -55,6 +62,7 @@ def test_request_assigns_reviewers_and_notifies_them(analyzed_v1):
 @pytest.mark.django_db
 @pytest.mark.escenario('D1-F02')
 def test_open_request_freezes_the_draft_message(analyzed_v1):
+    """Prevent draft-message edits once a review request is open."""
     context, document, v1 = analyzed_v1
     editor = context.users['editor']
     review_service.create_review_request(v1, editor, [context.users['reviewer'].pk])
@@ -68,6 +76,7 @@ def test_open_request_freezes_the_draft_message(analyzed_v1):
 @pytest.mark.django_db
 @pytest.mark.escenario('D1-F03')
 def test_seal_completes_the_assignment_and_the_request(analyzed_v1):
+    """Complete the outstanding review when its reviewer places a seal."""
     context, document, v1 = analyzed_v1
     editor = context.users['editor']
     reviewer = context.users['reviewer']
@@ -86,6 +95,7 @@ def test_seal_completes_the_assignment_and_the_request(analyzed_v1):
 @pytest.mark.django_db
 @pytest.mark.escenario('D1-A02')
 def test_new_version_supersedes_the_open_request(analyzed_v1):
+    """Supersede an open review request when a newer version is uploaded."""
     context, document, v1 = analyzed_v1
     editor = context.users['editor']
     review = review_service.create_review_request(v1, editor, [context.users['reviewer'].pk])
@@ -107,6 +117,7 @@ def test_new_version_supersedes_the_open_request(analyzed_v1):
 @pytest.mark.django_db
 @pytest.mark.escenario('D1-E01')
 def test_reviewer_selection_is_validated(analyzed_v1):
+    """Reject reviewers who cannot be assigned to the requested review."""
     context, document, v1 = analyzed_v1
     editor = context.users['editor']
 
@@ -124,6 +135,7 @@ def test_reviewer_selection_is_validated(analyzed_v1):
 @pytest.mark.django_db
 @pytest.mark.escenario('D1-E02')
 def test_second_open_request_on_the_same_version_is_rejected(analyzed_v1):
+    """Reject a second open review request for the same version."""
     context, document, v1 = analyzed_v1
     editor = context.users['editor']
     review_service.create_review_request(v1, editor, [context.users['reviewer'].pk])
@@ -137,8 +149,10 @@ def test_second_open_request_on_the_same_version_is_rejected(analyzed_v1):
 @pytest.mark.escenario('D2-F01')
 @pytest.mark.escenario('D2-F02')
 def test_review_context_marks_changed_and_unchanged_since_my_seal(analyzed_v1):
-    """The heart of D2: reviewer sealed §1-2 on v1; v2 changes §3/§5 — the
-    context says exactly which sections deserve their attention."""
+    """Identify sections needing attention since the reviewer's previous seal.
+
+    The reviewer sealed §1-2 on v1; v2 changes §3/§5.
+    """
     context, document, v1 = analyzed_v1
     editor = context.users['editor']
     reviewer = context.users['reviewer']
@@ -161,6 +175,7 @@ def test_review_context_marks_changed_and_unchanged_since_my_seal(analyzed_v1):
 @pytest.mark.django_db
 @pytest.mark.escenario('D2-L01')
 def test_review_context_is_empty_without_a_previous_seal(analyzed_v1):
+    """Return an empty comparison context without a previous reviewer seal."""
     context, _, v1 = analyzed_v1
 
     payload = review_service.review_context(v1, context.users['reviewer'])
@@ -171,6 +186,7 @@ def test_review_context_is_empty_without_a_previous_seal(analyzed_v1):
 @pytest.mark.django_db
 @pytest.mark.escenario('D1-F04')
 def test_inbox_lists_pending_assignments_via_api(client_as, analyzed_v1):
+    """Expose the reviewer's own pending assignment in the inbox."""
     context, document, v1 = analyzed_v1
     review_service.create_review_request(
         v1, context.users['editor'], [context.users['reviewer'].pk], message='urgente'
@@ -187,7 +203,7 @@ def test_inbox_lists_pending_assignments_via_api(client_as, analyzed_v1):
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize('actor, expected', [
+@pytest.mark.parametrize(('actor', 'expected'), [
     pytest.param('editor', 201, id='d1-p01-editor'),
     pytest.param('admin', 201, id='d1-p01-admin'),
     pytest.param('reviewer', 404, id='d1-p02-reviewer-hidden'),
@@ -197,6 +213,7 @@ def test_inbox_lists_pending_assignments_via_api(client_as, analyzed_v1):
 ])
 @pytest.mark.escenario('D1-P01')
 def test_create_review_permission_matrix(client_as, analyzed_v1, actor, expected):
+    """Enforce each actor's minimum role for opening a review request."""
     context, document, v1 = analyzed_v1
 
     response = client_as(actor).post(
@@ -210,6 +227,7 @@ def test_create_review_permission_matrix(client_as, analyzed_v1, actor, expected
 
 @pytest.mark.django_db
 def test_members_endpoint_feeds_the_reviewer_picker(client_as, versiona_context):
+    """Expose project members with their roles for the reviewer picker."""
     response = client_as('editor').get(
         f'/api/projects/{versiona_context.project.public_id}/members/'
     )
@@ -217,3 +235,131 @@ def test_members_endpoint_feeds_the_reviewer_picker(client_as, versiona_context)
     assert response.status_code == 200
     roles = {row['email']: row['role'] for row in response.data['results']}
     assert roles[versiona_context.users['reviewer'].email] == 'reviewer'
+
+
+@pytest.fixture
+def pending_review(versiona_context, document_with_versions):
+    """Keep a real request pending without invoking the PDF engine."""
+    _, versions = document_with_versions()
+    return review_service.create_review_request(
+        versions[0], versiona_context.users['editor'],
+        [versiona_context.users['reviewer'].pk], message='Información reservada',
+    )
+
+
+@pytest.mark.django_db
+def test_inbox_hides_assignment_after_project_access_removed(
+    client_as, versiona_context, pending_review,
+):
+    """A historical assignment cannot retain access to its former project."""
+    reviewer = versiona_context.users['reviewer']
+    ProjectMembership.objects.filter(project=versiona_context.project, user=reviewer).delete()
+
+    response = client_as('reviewer').get('/api/me/review_assignments/')
+
+    assert response.status_code == 200
+    assert response.data['results'] == []
+    assert pending_review.assignments.get(reviewer=reviewer).status == 'pending'
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('org_role', ['member', 'admin', 'owner'])
+def test_inbox_hides_assignment_after_org_access_disabled(
+    client_as, versiona_context, pending_review, org_role,
+):
+    """Inactive organization membership removes every implicit or explicit role."""
+    reviewer = versiona_context.users['reviewer']
+    OrganizationMembership.objects.filter(organization=versiona_context.org, user=reviewer).update(
+        role=org_role, is_active=False,
+    )
+
+    response = client_as('reviewer').get('/api/me/review_assignments/')
+
+    assert response.status_code == 200
+    assert response.data['results'] == []
+    assert pending_review.assignments.get(reviewer=reviewer).status == 'pending'
+    assert ProjectMembership.objects.filter(project=versiona_context.project, user=reviewer).exists()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('org_role', ['owner', 'admin'])
+def test_inbox_preserves_implicit_org_admin_access(
+    client_as, versiona_context, pending_review, org_role,
+):
+    """Active owners/admins do not require an explicit project membership."""
+    reviewer = versiona_context.users['reviewer']
+    OrganizationMembership.objects.filter(organization=versiona_context.org, user=reviewer).update(
+        role=org_role,
+    )
+    ProjectMembership.objects.filter(project=versiona_context.project, user=reviewer).delete()
+
+    response = client_as('reviewer').get('/api/me/review_assignments/')
+
+    assert response.status_code == 200
+    assert [row['review'] for row in response.data['results']] == [str(pending_review.public_id)]
+    assert response.data['results'][0]['message'] == 'Información reservada'
+
+
+@pytest.mark.django_db
+def test_inbox_preserves_assignment_after_viewer_downgrade(
+    client_as, versiona_context, pending_review,
+):
+    """A viewer still has read access to an existing review assignment."""
+    ProjectMembership.objects.filter(
+        project=versiona_context.project, user=versiona_context.users['reviewer'],
+    ).update(role='viewer')
+
+    response = client_as('reviewer').get('/api/me/review_assignments/')
+
+    assert response.status_code == 200
+    assert [row['review'] for row in response.data['results']] == [str(pending_review.public_id)]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(('field', 'value'), [
+    ('status', 'archived'), ('deleted_at', timezone.now()),
+])
+def test_cancel_review_rejects_read_only_project(
+    versiona_context, pending_review, field, value,
+):
+    """Cancel cannot change an archived/trashed project's retained request."""
+    project = pending_review.document_version.document.project
+    setattr(project, field, value)
+    project.save(update_fields=[field])
+    audit_count = AuditEvent.objects.count()
+    notifications = list(Notification.objects.values_list('pk', 'body'))
+
+    with pytest.raises(version_service.DomainError) as exc:
+        review_service.cancel_review_request(pending_review, versiona_context.users['editor'])
+
+    assert exc.value.status_code == 409
+    pending_review.refresh_from_db()
+    assert pending_review.status == ReviewRequest.Status.OPEN
+    assert pending_review.closed_at is None
+    assert pending_review.assignments.get().status == ReviewAssignment.Status.PENDING
+    assert AuditEvent.objects.count() == audit_count
+    assert list(Notification.objects.values_list('pk', 'body')) == notifications
+
+
+@pytest.mark.django_db
+def test_cancel_review_resumes_after_unarchive(client_as, versiona_context, pending_review):
+    """Unarchiving restores cancellation through the same authorized endpoint."""
+    project = versiona_context.project
+    project.status = 'archived'
+    project.save(update_fields=['status'])
+    url = (
+        f'/api/versions/{pending_review.document_version.public_id}/reviews/'
+        f'{pending_review.public_id}/cancel/'
+    )
+    client = client_as('editor')
+    rejected = client.post(url)
+    project.status = 'active'
+    project.save(update_fields=['status'])
+
+    response = client.post(url)
+
+    assert rejected.status_code == 409
+    assert response.status_code == 200
+    pending_review.refresh_from_db()
+    assert pending_review.status == ReviewRequest.Status.CANCELLED
+    assert pending_review.closed_at is not None

@@ -5,7 +5,7 @@ config; new rules only govern versions uploaded after them)."""
 from django.db import transaction
 
 from audit import services as audit
-from documents.services.version_service import DomainError
+from documents.services.version_service import DomainError, ensure_writable
 
 from ..models import ProjectConfigVersion, ProjectMembership
 
@@ -54,6 +54,7 @@ def validate_owners(project, owners: dict) -> dict:
 @transaction.atomic
 def update_config(project, actor, *, checklist=None, d5_mode=None,
                   approval_policy=None, section_owners=None, request=None) -> ProjectConfigVersion:
+    ensure_writable(project)
     current = ProjectConfigVersion.current_for(project)
 
     if d5_mode is not None and d5_mode not in ProjectConfigVersion.D5Mode.values:

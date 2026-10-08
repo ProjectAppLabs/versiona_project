@@ -1,12 +1,15 @@
 """Review request endpoints (D1) + assisted-review context (D2)."""
 
 from django.http import Http404
+from django.db.models import Exists, OuterRef, Q
 from rest_framework import serializers, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from core.permissions import require_project_role
 from documents.services.version_service import DomainError
+from orgs.models import OrganizationMembership
+from projects.models import ProjectMembership
 
 from .models import ReviewAssignment, ReviewRequest
 from .services import review_service
@@ -91,13 +94,31 @@ def version_review_context(request, ver):
 @api_view(['GET'])
 def my_review_assignments(request):
     """The reviewer's inbox: pending work across every project (I12: only
-    what my memberships reach — assignments are created against members)."""
+    what my current memberships reach, including implicit org admins)."""
+    org_memberships = OrganizationMembership.objects.filter(
+        organization_id=OuterRef(
+            'review_request__document_version__document__project__organization_id'
+        ),
+        user=request.user,
+        is_active=True,
+    )
+    project_memberships = ProjectMembership.objects.filter(
+        project_id=OuterRef('review_request__document_version__document__project_id'),
+        user=request.user,
+    )
     assignments = (
         ReviewAssignment.objects.filter(
             reviewer=request.user,
             status=ReviewAssignment.Status.PENDING,
             review_request__status=ReviewRequest.Status.OPEN,
         )
+        .annotate(
+            _has_org_membership=Exists(org_memberships),
+            _is_org_admin=Exists(org_memberships.filter(role__in=('owner', 'admin'))),
+            _has_project_membership=Exists(project_memberships),
+        )
+        .filter(_has_org_membership=True)
+        .filter(Q(_is_org_admin=True) | Q(_has_project_membership=True))
         .select_related(
             'review_request__document_version__document__project',
             'review_request__requested_by',
