@@ -84,7 +84,8 @@ class DocumentListSerializer(serializers.ModelSerializer):
         fields = ('public_id', 'title', 'slug', 'latest_number', 'latest_version', 'created_at', 'updated_at')
 
     def get_latest_version(self, obj):
-        latest = obj.versions.order_by('-number').first()
+        latest = (obj._list_latest_version if hasattr(obj, '_list_latest_version')
+                  else obj.versions.order_by('-number').first())
         return VersionListSerializer(latest).data if latest else None
 
 
