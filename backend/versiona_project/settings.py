@@ -10,6 +10,7 @@ from datetime import timedelta
 from pathlib import Path
 
 from celery.schedules import crontab
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
 from .db import build_db_config
@@ -267,6 +268,12 @@ STORAGES = {
 EMAIL_HOST = os.getenv('DJANGO_EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = int(os.getenv('DJANGO_EMAIL_PORT', '587'))
 EMAIL_USE_TLS = os.getenv('DJANGO_EMAIL_USE_TLS', 'true').lower() in {'1', 'true', 'yes', 'on'}
+try:
+    EMAIL_TIMEOUT = int(os.getenv('DJANGO_EMAIL_TIMEOUT', '5'))
+except ValueError as exc:
+    raise ImproperlyConfigured('DJANGO_EMAIL_TIMEOUT debe ser un entero positivo.') from exc
+if EMAIL_TIMEOUT <= 0:
+    raise ImproperlyConfigured('DJANGO_EMAIL_TIMEOUT debe ser un entero positivo.')
 EMAIL_HOST_USER = os.getenv('DJANGO_EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('DJANGO_EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.getenv('DJANGO_DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
@@ -359,6 +366,11 @@ CELERY_TASK_DEFAULT_QUEUE = 'default'
 
 # Operational periodic tasks inherited from the template (formerly Huey).
 CELERY_BEAT_SCHEDULE = {
+    'recover-pending-analysis-minute': {
+        'task': 'engine.tasks.recover_pending_analysis',
+        'schedule': 60.0,
+        'options': {'queue': 'default', 'expires': 60},
+    },
     'scheduled-backup-weekly': {
         'task': 'versiona_project.tasks.scheduled_backup',
         'schedule': crontab(day_of_week='0', hour='3', minute='0'),

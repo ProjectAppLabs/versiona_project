@@ -1,5 +1,5 @@
 {
-  "version": "2.4.0",
+  "version": "2.4.1",
   "lastUpdated": "2026-10-08",
   "flows": {
     "home-loads": {
@@ -316,10 +316,12 @@
         "admin"
       ],
       "priority": "P1",
-      "description": "New version invalidates only seals over changed sections, preserves the rest with validity records, and notifies only affected reviewers (docs/plan/01 D5; queen test docs/plan/06 SS5.4)",
-      "expectedSpecs": 1,
+      "description": "Re-delivery preserves inherited seals across three versions, invalidates changed coverage, and requires coordinator confirmation for verified degraded analysis; reviewers are notified only after final invalidation.",
+      "expectedSpecs": 2,
       "outcomes": [
-        "success"
+        "success",
+        "display",
+        "failure"
       ]
     },
     "e1-compare": {

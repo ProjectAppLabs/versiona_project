@@ -5,6 +5,39 @@
 
 **Last updated**: 2026-10-08
 
+## Segunda ronda coordinada — R2 (2026-10-08)
+
+Base `master@cc4c2f1`; seis dueños de implementación, ramas independientes y
+configuración/registros compartidos del conductor. La QA combinada y el tren de
+integración determinan la entrega; el reporte canónico es
+`docs/audits/2026-10-08-versiona_project_staging-improvement-pass-project-r2.md`
+en el toolkit.
+
+La bandeja filtra pertenencia vigente sin borrar asignaciones; la promoción
+persiste los mismos bytes usados para validar, medir y calcular la huella.
+Observaciones, configuración y revisión respetan el estado de solo lectura.
+D5 reutiliza I11 para sellos heredados, serializa confirmaciones y valida el
+plan completo antes de producir efectos. El motor transmite degradación
+verificada de ambas versiones; la falta de metadatos antiguos conserva el
+fallback existente por escenario.
+
+Una intención de análisis pendiente sin publicación confirmada se recupera
+cada minuto, por lotes de veinte. SMTP tiene un plazo configurable de cinco
+segundos. Los listados y la elegibilidad de papelera eliminan consultas por
+fila; el PDF usa el espacio disponible para página y resaltados. La nueva
+prueba D5 del coordinador complementa la cadena automática hasta v3.
+
+Verificación aislada en MySQL 8, Redis, almacenamiento y Mailpit privados.
+La carrera se reprodujo antes del bloqueo y sus seis regresiones pasan.
+Las contraseñas de fixtures usan un hasher rápido sólo en settings externos
+protegidos por la coordenada de DB privada; la configuración del producto no
+cambia. No se ejecutan migraciones desde un `.env` enlazado al deploy.
+
+Pendientes separados: sellabilidad ante pérdida estructural, otros escritores
+en proyectos archivados, archivado concurrente, replay pending sin una entrada
+productiva demostrada y carga del reporte/reanclaje sin presupuesto medido.
+Ningún frente se declara suficiente globalmente.
+
 ## Ronda coordinada de mejora (2026-10-08)
 
 Implementación y QA completadas: 114 casos pasan en `4d06781`, con gate estricto

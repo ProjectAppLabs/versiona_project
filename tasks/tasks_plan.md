@@ -21,9 +21,17 @@
 
 **MVP feature-complete**: 19 flows E2E green (`docs/audit/05-cierre.md` "MISIÓN
 CUMPLIDA") + It9 public surfaces. Flow contract: `frontend/e2e/flow-definitions.json`
-v2.4.0 (40 flows).
+v2.4.1 (40 flows).
 
 ## Rondas de mantenimiento
+
+- **2026-10-08 — R2:** doce causas de valor demostrado, seleccionadas por el
+  operador sin cupo global; propiedad exclusiva por archivo y QA conjunta.
+  Permisos de bandeja, integridad de PDF, guardas de archivado, continuidad D5,
+  confirmación única, señal degradada, recuperación de publicación, timeout
+  SMTP, consultas constantes y geometría del visor. Entrega mediante PR por
+  frente y tren combinado; evidencia y veredicto en el reporte R2 del toolkit.
+  La sellabilidad estructural y los otros escritores permanecen abiertos.
 
 - **2026-10-08 — QA conjunta aprobada:** 114 casos sobre `4d06781`, sin skips ni
   reintentos; gate estricto cero errores. Seis candidatos verificados y entregas
