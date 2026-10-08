@@ -5,10 +5,10 @@ from pathlib import Path
 import pytest
 from audit.models import AuditEvent
 from django.utils import timezone
-
 from documents.services import storage_service, version_service
 from notifications.models import Notification
 from projects.models import ProjectConfigVersion
+
 from reviews.models import SealValidityRecord
 from reviews.services import seal_service
 
@@ -51,12 +51,14 @@ def pending_plan(versiona_context):
 
 
 def plan_url(version):
+    """Return the coordinator plan route for one version."""
     return f'/api/versions/{version.public_id}/seal_plan/'
 
 
 @pytest.mark.django_db
 @pytest.mark.escenario('D5-A04')
 def test_coordinator_mode_leaves_the_decision_pending_and_notifies_admins(pending_plan):
+    """A coordinator proposal waits for confirmation before notifying its reviewer."""
     context, v2, seal = pending_plan
 
     record = SealValidityRecord.objects.get(seal=seal)
@@ -75,6 +77,7 @@ def test_coordinator_mode_leaves_the_decision_pending_and_notifies_admins(pendin
 @pytest.mark.django_db
 @pytest.mark.escenario('D5-A04')
 def test_admin_confirms_the_plan_and_the_reviewer_is_then_notified(client_as, pending_plan):
+    """Admin confirmation finalizes the proposed invalidation for its reviewer."""
     context, v2, seal = pending_plan
 
     response = client_as('admin').post(
@@ -96,6 +99,7 @@ def test_admin_confirms_the_plan_and_the_reviewer_is_then_notified(client_as, pe
 @pytest.mark.django_db
 @pytest.mark.escenario('D5-A06')
 def test_coordinator_can_preserve_explicitly_and_it_stays_on_the_record(client_as, pending_plan):
+    """Explicit preservation retains the machine proposal as audit evidence."""
     context, v2, seal = pending_plan
 
     response = client_as('admin').post(
@@ -114,6 +118,7 @@ def test_coordinator_can_preserve_explicitly_and_it_stays_on_the_record(client_a
 
 @pytest.mark.django_db
 def test_confirming_without_a_decision_per_seal_is_rejected(client_as, pending_plan):
+    """An incomplete set of coordinator decisions is rejected."""
     _, v2, _ = pending_plan
 
     response = client_as('admin').post(plan_url(v2), {'decisions': {}}, format='json')
@@ -122,7 +127,7 @@ def test_confirming_without_a_decision_per_seal_is_rejected(client_as, pending_p
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize('actor, expected', [
+@pytest.mark.parametrize(('actor', 'expected'), [
     pytest.param('admin', 200, id='d5-plan-p01-admin'),
     pytest.param('reviewer', 404, id='d5-plan-p02-reviewer-hidden'),
     pytest.param('editor', 404, id='d5-plan-p02-editor-hidden'),
@@ -131,6 +136,7 @@ def test_confirming_without_a_decision_per_seal_is_rejected(client_as, pending_p
 ])
 @pytest.mark.escenario('D5-P01')
 def test_confirm_plan_permission_matrix(client_as, pending_plan, actor, expected):
+    """Plan confirmation honors the permission outcome for each actor."""
     _, v2, seal = pending_plan
 
     response = client_as(actor).post(
@@ -144,6 +150,7 @@ def test_confirm_plan_permission_matrix(client_as, pending_plan, actor, expected
 
 @pytest.mark.django_db
 def test_pending_plan_listing_is_visible_to_members(client_as, pending_plan):
+    """A project member can inspect the pending invalidation proposal."""
     _, v2, seal = pending_plan
 
     response = client_as('viewer').get(plan_url(v2))

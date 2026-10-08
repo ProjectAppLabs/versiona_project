@@ -4,12 +4,12 @@ from concurrent.futures import ThreadPoolExecutor
 from threading import Event
 
 import pytest
-from django.db import close_old_connections, connections
-
 from audit.models import AuditEvent
+from django.db import close_old_connections, connections
 from documents.models import DocumentVersion
 from documents.services.version_service import DomainError
 from notifications.models import Notification
+
 from reviews.models import Seal, SealValidityRecord
 from reviews.services import seal_service
 

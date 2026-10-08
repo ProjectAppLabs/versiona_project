@@ -8,12 +8,12 @@ The separate structural-sealability contract remains an explicit expected failur
 from pathlib import Path
 
 import pytest
-
 from documents.models import DocumentVersion
 from documents.services import storage_service, version_service
 from engine.services.analysis import analyze_bytes
 from engine.services.persistence import persist_analysis
 from notifications.models import Notification
+
 from reviews.models import SealValidityRecord
 from reviews.services import seal_service
 
@@ -27,6 +27,7 @@ def _test_env(settings, tmp_path):
 
 
 def upload(document, fixture, message, author):
+    """Upload a PDF fixture through the complete analyzed-version lifecycle."""
     intent = version_service.create_upload_intent(document, author)
     storage_service.put_bytes(intent.key, (TESTDATA / fixture).read_bytes(), 'application/pdf')
     version, _ = version_service.complete_upload(document, intent.upload_id, message, author)
@@ -35,8 +36,10 @@ def upload(document, fixture, message, author):
 
 @pytest.fixture
 def total_section_loss(versiona_context):
-    """v1 = contrato_v1 with a scoped seal and a covers_all seal; v2 = headless
-    prose, which retires every section of v1."""
+    """Create a page-fallback delivery after scoped and whole-document seals.
+
+    The headless PDF retires the original stable section identities of v1.
+    """
     context = versiona_context
     editor = context.users['editor']
     document = version_service.create_document(context.project, 'Sin secciones', editor)
@@ -53,6 +56,7 @@ def total_section_loss(versiona_context):
 @pytest.mark.django_db
 @pytest.mark.escenario('D5-L01')
 def test_the_new_version_keeps_none_of_the_previous_stable_keys(total_section_loss):
+    """The page fallback removes the original stable section identities."""
     _, document, v1, v2, _, _ = total_section_loss
 
     keys_v1 = set(
@@ -67,6 +71,7 @@ def test_the_new_version_keeps_none_of_the_previous_stable_keys(total_section_lo
 @pytest.mark.django_db
 @pytest.mark.escenario('D5-L01')
 def test_every_lost_scope_requires_an_invalidation_confirmation(total_section_loss):
+    """Each lost seal scope remains a pending invalidation proposal."""
     _, _, _, v2, _, _ = total_section_loss
 
     decisions = set(
@@ -79,6 +84,7 @@ def test_every_lost_scope_requires_an_invalidation_confirmation(total_section_lo
 @pytest.mark.django_db
 @pytest.mark.escenario('D5-L01')
 def test_the_scoped_seal_proposal_records_its_removed_sections(total_section_loss):
+    """A scoped seal retains the removed-section reason in its proposal."""
     _, _, _, v2, scoped, _ = total_section_loss
 
     record = SealValidityRecord.objects.get(seal=scoped, to_document_version=v2)
@@ -89,6 +95,7 @@ def test_the_scoped_seal_proposal_records_its_removed_sections(total_section_los
 @pytest.mark.django_db
 @pytest.mark.escenario('D5-L01')
 def test_the_covers_all_seal_proposal_records_the_document_change(total_section_loss):
+    """A whole-document seal retains the document-change reason in its proposal."""
     _, _, _, v2, _, whole = total_section_loss
 
     record = SealValidityRecord.objects.get(seal=whole, to_document_version=v2)
@@ -99,6 +106,7 @@ def test_the_covers_all_seal_proposal_records_the_document_change(total_section_
 @pytest.mark.django_db
 @pytest.mark.escenario('D5-L01')
 def test_no_seal_of_the_previous_version_stays_valid_at_the_new_one(total_section_loss):
+    """A pending invalidation does not preserve validity at the target version."""
     _, _, _, v2, scoped, _ = total_section_loss
 
     assert seal_service.seal_is_valid_at(scoped, v2) is False
@@ -117,6 +125,7 @@ def test_native_page_fallback_forces_coordinator_confirmation(total_section_loss
 @pytest.mark.django_db
 @pytest.mark.escenario('D5-L01')
 def test_the_degraded_plan_records_coordinator_mode(total_section_loss):
+    """The degraded proposal records coordinator ownership of its decision."""
     _, _, _, v2, scoped, _ = total_section_loss
 
     record = SealValidityRecord.objects.get(seal=scoped, to_document_version=v2)
