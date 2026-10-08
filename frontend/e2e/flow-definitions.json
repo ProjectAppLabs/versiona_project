@@ -319,7 +319,9 @@
       "description": "Re-delivery preserves inherited seals across three versions, invalidates changed coverage, and requires coordinator confirmation for verified degraded analysis; reviewers are notified only after final invalidation.",
       "expectedSpecs": 2,
       "outcomes": [
-        "success"
+        "success",
+        "display",
+        "failure"
       ]
     },
     "e1-compare": {

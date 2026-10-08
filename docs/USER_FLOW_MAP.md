@@ -4,10 +4,10 @@
 
 Use this document to understand each flow's steps, branching conditions, role restrictions,
 and API contracts before writing or reviewing E2E tests. Flow ids map 1:1 to
-`frontend/e2e/flow-definitions.json` (v2.4.0) and to the founding-artifact flow ids
+`frontend/e2e/flow-definitions.json` (v2.4.1) and to the founding-artifact flow ids
 (A1…F1) planned in `docs/plan/01-alcance-mvp.md`.
 
-**Version:** 2.4.0
+**Version:** 2.4.1
 **Last Updated:** 2026-10-08
 
 > Maintenance rule (docs/plan/09 DoD #4): each vertical iteration rewrites the sheets of the
@@ -34,7 +34,7 @@ and API contracts before writing or reviewing E2E tests. Flow ids map 1:1 to
 ## Module Index
 
 > **Status governance (updated 2026-10-08)**: the authoritative registry is
-> `frontend/e2e/flow-definitions.json` (v2.4.0, 40 flows). Implementation, authored
+> `frontend/e2e/flow-definitions.json` (v2.4.1, 40 flows). Implementation, authored
 > specs and executed coverage are separate: qualifying tests and their live/CI
 > artifacts determine coverage. A row in this map never grants it by itself.
 
@@ -400,7 +400,10 @@ presence of these rows. No unrelated route has been reclassified as mature.
 | Vista | Interacción | Clase | Cobertura de esta ronda |
 |---|---|---|---|
 | Visor y sellos | Nueva entrega nativa conserva el sello original hasta v3 | success | D5-F06 en el E2E automático existente |
-| Bandeja y plan D5 | Administrador confirma una entrega degradada; el revisor recibe el aviso posterior | success | Nuevo D5-A04, pendiente de ejecución hasta la QA combinada |
+| Bandeja y plan D5 | Administrador confirma una entrega degradada; el revisor recibe el aviso posterior | success | D5-A04 y cadena D5 hasta v3 validados en la aplicación real en `97ea262`: dos casos, sin reintentos; la QA final corresponde al SHA combinado del reporte |
+| Plan D5 | Administrador ve el plan pendiente, propuesta y evidencia | display | Observado dentro del recorrido de éxito; sin crédito E2E propio para display |
+| Plan D5 | Si falla el POST de confirmación, el plan permanece y aparece el error | failure | Brecha E2E conservada fuera de la autoría aprobada de R2 |
+| Plan D5 | Validación de elecciones en el formulario | error | n/a: cada sello pendiente llega con una elección válida preseleccionada; los rechazos de API se prueban en backend |
 | Vista previa, visor y comparación | Subir el PDF y seleccionar una sección conserva contenido y resaltados al cambiar el ancho | display/success | C1/E1 en los cinco viewports del estándar |
 
 La repetición concurrente, elecciones incompletas y proyectos archivados se
@@ -408,3 +411,7 @@ comprueban en API/servicios MySQL. No se adjudica cobertura E2E negativa por
 esas pruebas. La sellabilidad estructural sigue pendiente y no recibe crédito
 D5-L01 por el nuevo recorrido. Las ejecuciones efectivas y los gaps restantes
 se acreditan en el reporte R2, no mediante el registro por sí solo.
+Los dos specs D5 ejecutados llevan `@outcome:success`; no conceden crédito
+cualificado a display ni failure. El registro declara ambos comportamientos
+existentes para conservar visibles esas brechas, sin inventar pruebas ni ampliar
+la implementación del producto.
