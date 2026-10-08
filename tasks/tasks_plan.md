@@ -21,7 +21,7 @@
 
 **MVP feature-complete**: 19 flows E2E green (`docs/audit/05-cierre.md` "MISIÓN
 CUMPLIDA") + It9 public surfaces. Flow contract: `frontend/e2e/flow-definitions.json`
-v2.4.0 (40 flows).
+v2.4.1 (40 flows).
 
 ## Rondas de mantenimiento
 
