@@ -129,6 +129,7 @@ def revoke_seal(seal: Seal, actor, request=None) -> Seal:
     version = seal.document_version
     if seal.reviewer != actor:
         raise DomainError('Solo el autor del sello puede retirarlo.', 403)
+    ensure_writable(version.document.project)
     if seal.revoked_at is not None:
         raise DomainError('Este sello ya fue retirado.', 409)
     if version.is_approved:
@@ -256,16 +257,25 @@ def _changes_from_comparison(comparison: Comparison) -> dict:
 
 
 @transaction.atomic
-def apply_invalidation(comparison: Comparison) -> list[SealValidityRecord]:
-    """Runs D5 for every ACTIVE seal on the comparison's `from_version` against
-    its `to_version`. Idempotent per (seal, to_version) — I15."""
+def apply_invalidation(
+    comparison: Comparison, *, analysis_degraded: bool = False,
+) -> list[SealValidityRecord]:
+    """Runs D5 for every seal valid at `from_version` per I11, including seals
+    inherited from earlier versions. Idempotent per (seal, to_version) — I15.
+
+    The engine supplies verified degradation evidence from either analysis;
+    older callers retain the source-scenario safety override.
+    """
     from_version = comparison.from_version
     to_version = comparison.to_version
     document = comparison.document
     project = document.project
 
     seal_rows = list(
-        Seal.objects.filter(document_version=from_version, revoked_at__isnull=True)
+        valid_seals_at_number(
+            Seal.objects.filter(document_version__document=document),
+            Value(from_version.number),
+        )
         .prefetch_related('covered_sections__section')
         .select_related('reviewer')
     )
@@ -275,7 +285,11 @@ def apply_invalidation(comparison: Comparison) -> list[SealValidityRecord]:
     # The NEW version's pinned config governs (I8 — never retroactive).
     mode = to_version.config_version.d5_mode
     # Degraded analysis forces a human decision (DP-03/DP-09).
-    if from_version.source_scenario != 'text_native' or to_version.source_scenario != 'text_native':
+    if (
+        analysis_degraded
+        or from_version.source_scenario != 'text_native'
+        or to_version.source_scenario != 'text_native'
+    ):
         mode = MODE_COORDINATOR
 
     inputs = [
@@ -364,23 +378,32 @@ def confirm_seal_plan(
     """Coordinator resolves the pending records. decisions: {seal_public_id:
     'preserved'|'invalidated'}. Confirming `preserved` against hash-different
     evidence is allowed ONLY explicitly — and it stays on the record."""
+    project = to_version.document.project
+    ensure_writable(project)
+    # One version row serializes the complete plan without locking joined
+    # reviewers or projects. Read pending records only after this lock: a
+    # contender must observe the first coordinator's committed final choices.
+    DocumentVersion.all_objects.select_for_update().only('pk').get(pk=to_version.pk)
     pending = list(
         SealValidityRecord.objects.filter(
             to_document_version=to_version,
             decision=SealValidityRecord.Decision.PENDING,
-        ).select_related('seal__reviewer', 'seal__document_version')
+        ).select_related('seal__reviewer', 'seal__document_version').order_by('pk')
     )
     if not pending:
         raise DomainError('No hay plan de invalidación pendiente en esta versión.', 404)
 
-    project = to_version.document.project
-    resolved = []
+    # Validate the whole submission before any audit or SMTP side effect;
+    # rolling back database writes cannot retract a previously sent email.
     for record in pending:
         choice = decisions.get(str(record.seal.public_id))
         if choice not in ('preserved', 'invalidated'):
             raise DomainError(
                 f'Falta decisión para el sello {record.seal.public_id}.', 400
             )
+    resolved = []
+    for record in pending:
+        choice = decisions[str(record.seal.public_id)]
         record.decision = choice
         record.decided_mode = SealValidityRecord.Mode.COORDINATOR
         record.decided_by = actor

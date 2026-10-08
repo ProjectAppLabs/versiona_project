@@ -11,11 +11,11 @@ import { openSeededProject, uniqueName, uploadPdf } from '../../helpers/versiona
  */
 
 test.describe('D5 — Invalidación selectiva 💎', () => {
-  test.slow(); // two uploads + analysis + three browser contexts
+  test.slow(); // three uploads + analysis + three browser contexts
 
   test(
-    'D5-F01/F02/F05 — v2 conserva el sello de A, invalida el de B y notifica SOLO a B',
-    { tag: [...D5_SELECTIVE_INVALIDATION, '@scenario:d5-f01', '@scenario:d5-f02', '@scenario:d5-f05', '@outcome:success'] },
+    'D5-F01/F02/F05/F06 — conserva el sello original de A hasta v3',
+    { tag: [...D5_SELECTIVE_INVALIDATION, '@scenario:d5-f01', '@scenario:d5-f02', '@scenario:d5-f05', '@scenario:d5-f06', '@outcome:success'] },
     async ({ browser }) => {
       await purgeMailbox();
 
@@ -98,6 +98,22 @@ test.describe('D5 — Invalidación selectiva 💎', () => {
       // ── A no tiene notificación de invalidación (su sello vive) ───────
       await pageA.goto('/inbox');
       await expect(pageA.getByTestId('inbox-list')).toHaveCount(0, { timeout: 15_000 });
+
+      // ── v3 conserva el MISMO sello de v1 sin volver a sellar v2 ───────
+      await editorPage.goto(timelineUrl);
+      await uploadPdf(editorPage, 'contrato_v3.pdf', { message: 'v3: notificación previa' });
+      await expect(editorPage.getByTestId('version-item-3')).toBeVisible({ timeout: 90_000 });
+      await editorPage
+        .getByTestId('version-item-3')
+        .getByRole('link', { name: 'Ver documento' })
+        .click();
+      await editorPage.waitForURL(/versions\//);
+      const inheritedCard = editorPage.getByTestId('validity-reviewer@versiona.test');
+      await expect(inheritedCard).toHaveAttribute('data-decision', 'preserved', { timeout: 30_000 });
+      await expect(inheritedCard).toContainText('v1');
+      await expect(inheritedCard).toContainText('igualdad de hash verificada');
+      await expect(editorPage.getByTestId('validity-admin@versiona.test')).toHaveCount(0);
+      await assertNoEmailFor('reviewer@versiona.test');
 
       await editorContext.close();
       await contextA.close();

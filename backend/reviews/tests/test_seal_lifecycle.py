@@ -13,6 +13,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+from audit.models import AuditEvent
 from django.db.models import Value
 from django.utils import timezone
 from documents.services import storage_service, version_service
@@ -178,6 +179,130 @@ def test_validity_chain_i11_across_versions(sealed_v1):
 
 
 @pytest.mark.django_db
+def test_third_delivery_preserves_the_original_seal(sealed_v1):
+    """Catches: D5 forgetting a v1 seal after its preservation at v2."""
+    context, document, _, seal_a, _ = sealed_v1
+    upload(document, 'contrato_v2.pdf', 'v2', context.users['editor'])
+
+    v3 = upload(document, 'contrato_v3.pdf', 'v3', context.users['editor'])
+
+    record = SealValidityRecord.objects.get(seal=seal_a, to_document_version=v3)
+    assert record.decision == SealValidityRecord.Decision.PRESERVED
+    assert {entry['stable_key'] for entry in record.evidence['verified']} == {
+        'objeto-del-contrato', 'definiciones',
+    }
+    assert seal_service.seal_is_valid_at(seal_a, v3) is True
+    assert Notification.objects.filter(user=seal_a.reviewer, event_key='seal.invalidated').count() == 0
+
+
+@pytest.mark.django_db
+def test_third_delivery_does_not_revive_an_invalidated_seal(sealed_v1):
+    """Catches: the inherited-seal query ignoring an earlier broken chain."""
+    context, document, _, _, seal_b = sealed_v1
+    upload(document, 'contrato_v2.pdf', 'v2', context.users['editor'])
+
+    v3 = upload(document, 'contrato_v3.pdf', 'v3', context.users['editor'])
+
+    assert seal_service.seal_is_valid_at(seal_b, v3) is False
+    assert list(seal_b.validity_records.values_list('decision', flat=True)) == ['invalidated']
+    assert Notification.objects.filter(user=seal_b.reviewer, event_key='seal.invalidated').count() == 1
+
+
+@pytest.mark.django_db
+def test_third_delivery_replay_keeps_one_original_seal_record(sealed_v1):
+    """Catches: inherited seals duplicating evidence when D5 is replayed."""
+    from comparisons.models import Comparison
+
+    context, document, _, seal_a, _ = sealed_v1
+    upload(document, 'contrato_v2.pdf', 'v2', context.users['editor'])
+    v3 = upload(document, 'contrato_v3.pdf', 'v3', context.users['editor'])
+    comparison = Comparison.objects.get(to_version=v3, trigger=Comparison.Trigger.AUTO)
+    record = SealValidityRecord.objects.get(seal=seal_a, to_document_version=v3)
+    original = (record.pk, record.decision, record.evidence, record.decided_at)
+
+    seal_service.apply_invalidation(comparison)
+
+    stored = SealValidityRecord.objects.get(seal=seal_a, to_document_version=v3)
+    assert (stored.pk, stored.decision, stored.evidence, stored.decided_at) == original
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(('prior_decision', 'expected_decisions'), [
+    (None, []),
+    ('pending_confirmation', ['pending_confirmation']),
+    ('invalidated', ['invalidated']),
+    ('superseded', ['superseded']),
+])
+def test_d5_excludes_inherited_seals_without_a_preserved_chain(
+    versiona_context, document_with_versions, prior_decision, expected_decisions,
+):
+    """Catches: selecting historical seals without checking the complete I11 chain."""
+    from comparisons.models import Comparison
+
+    document, versions = document_with_versions(n_versions=3)
+    seal = Seal.objects.create(
+        document_version=versions[0], reviewer=versiona_context.users['reviewer'],
+        signed_payload={}, signature='chain-selection', key_id='chain-selection',
+    )
+    _add_validity_records(seal, versions[1:2], [prior_decision])
+    comparison = Comparison.objects.create(
+        document=document, from_version=versions[1], to_version=versions[2],
+        status=Comparison.Status.DONE,
+    )
+
+    resolved = seal_service.apply_invalidation(comparison)
+
+    assert resolved == []
+    assert list(seal.validity_records.values_list('decision', flat=True)) == expected_decisions
+
+
+@pytest.mark.django_db
+def test_d5_excludes_a_revoked_inherited_seal(versiona_context, document_with_versions):
+    """Catches: extending validity after the reviewer withdrew the original seal."""
+    from comparisons.models import Comparison
+
+    document, versions = document_with_versions(n_versions=3)
+    seal = Seal.objects.create(
+        document_version=versions[0], reviewer=versiona_context.users['reviewer'],
+        signed_payload={}, signature='revoked-selection', key_id='revoked-selection',
+        revoked_at=timezone.now(),
+    )
+    _add_validity_records(seal, versions[1:2], ['preserved'])
+    comparison = Comparison.objects.create(
+        document=document, from_version=versions[1], to_version=versions[2],
+        status=Comparison.Status.DONE,
+    )
+
+    resolved = seal_service.apply_invalidation(comparison)
+
+    assert resolved == []
+    assert list(seal.validity_records.values_list('decision', flat=True)) == ['preserved']
+
+
+@pytest.mark.django_db
+def test_d5_excludes_a_valid_seal_from_another_document(versiona_context, document_with_versions):
+    """Catches: reusing I11 without restricting its seals to the compared document."""
+    from comparisons.models import Comparison
+
+    document, versions = document_with_versions(n_versions=2, document_slug='comparado')
+    _, other_versions = document_with_versions(n_versions=1, document_slug='ajeno')
+    seal = Seal.objects.create(
+        document_version=other_versions[0], reviewer=versiona_context.users['reviewer'],
+        covers_all=True, signed_payload={}, signature='foreign-selection', key_id='foreign-selection',
+    )
+    comparison = Comparison.objects.create(
+        document=document, from_version=versions[0], to_version=versions[1],
+        status=Comparison.Status.DONE,
+    )
+
+    resolved = seal_service.apply_invalidation(comparison)
+
+    assert resolved == []
+    assert list(seal.validity_records.values_list('decision', flat=True)) == []
+    assert Seal.objects.get(pk=seal.pk).document_version_id == other_versions[0].pk
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     ('case', 'records', 'revoked', 'target_number', 'trash_intermediate', 'expected'),
     [
@@ -275,6 +400,52 @@ def test_seal_can_be_withdrawn_before_approval_but_not_after(sealed_v1):
     with pytest.raises(version_service.DomainError) as exc:
         seal_service.revoke_seal(remaining, remaining.reviewer)
     assert exc.value.status_code == 409
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('project_state', ['archived', 'trashed'])
+def test_readonly_project_rejects_seal_withdrawal(sealed_v1, project_state):
+    """Catches: a reviewer changing evidence in an archived or trashed project."""
+    _, _, _, seal, _ = sealed_v1
+    project = seal.document_version.document.project
+    project.status = {'archived': 'archived', 'trashed': 'active'}[project_state]
+    project.deleted_at = {'archived': None, 'trashed': timezone.now()}[project_state]
+    project.save(update_fields=['status', 'deleted_at'])
+    audit_count = AuditEvent.objects.count()
+    notice_count = Notification.objects.count()
+
+    with pytest.raises(version_service.DomainError) as exc:
+        seal_service.revoke_seal(seal, seal.reviewer)
+
+    assert exc.value.status_code == 409
+    assert str(exc.value) == 'El proyecto está archivado o en la papelera: es de solo lectura.'
+    seal.refresh_from_db()
+    assert seal.revoked_at is None
+    assert AuditEvent.objects.count() == audit_count
+    assert Notification.objects.count() == notice_count
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('project_state', ['archived', 'trashed'])
+def test_restored_project_allows_seal_withdrawal(sealed_v1, project_state):
+    """Catches: readonly rejection permanently disabling the reversible withdrawal."""
+    _, _, _, seal, _ = sealed_v1
+    project = seal.document_version.document.project
+    project.status = {'archived': 'archived', 'trashed': 'active'}[project_state]
+    project.deleted_at = {'archived': None, 'trashed': timezone.now()}[project_state]
+    project.save(update_fields=['status', 'deleted_at'])
+    with pytest.raises(version_service.DomainError) as rejection:
+        seal_service.revoke_seal(seal, seal.reviewer)
+    project.status = 'active'
+    project.deleted_at = None
+    project.save(update_fields=['status', 'deleted_at'])
+
+    seal_service.revoke_seal(seal, seal.reviewer)
+
+    assert rejection.value.status_code == 409
+    seal.refresh_from_db()
+    assert seal.revoked_at is not None
+    assert AuditEvent.objects.filter(event_type='seal.revoked', object_id_ref=str(seal.public_id)).count() == 1
 
 
 @pytest.mark.django_db
