@@ -28,6 +28,7 @@ def _read_email_settings(value=None):
 
 
 def test_smtp_default_timeout_is_five_seconds():
+    """Smtp default timeout is five seconds."""
     result = _read_email_settings()
 
     assert result.returncode == 0, result.stderr
@@ -35,6 +36,7 @@ def test_smtp_default_timeout_is_five_seconds():
 
 
 def test_smtp_accepts_a_positive_timeout_override():
+    """Smtp accepts a positive timeout override."""
     result = _read_email_settings('9')
 
     assert result.returncode == 0, result.stderr
@@ -43,6 +45,7 @@ def test_smtp_accepts_a_positive_timeout_override():
 
 @pytest.mark.parametrize('value', ['0', '-1', 'infinite', 'nan'])
 def test_smtp_rejects_an_invalid_timeout(value):
+    """Smtp rejects an invalid timeout."""
     result = _read_email_settings(value)
 
     assert result.returncode != 0
@@ -50,6 +53,7 @@ def test_smtp_rejects_an_invalid_timeout(value):
 
 
 def test_smtp_passes_the_timeout_to_its_socket(settings, monkeypatch):
+    """Smtp passes the timeout to its socket."""
     settings.EMAIL_TIMEOUT = 5
     settings.EMAIL_USE_TLS = False
     settings.EMAIL_USE_SSL = False
@@ -60,18 +64,19 @@ def test_smtp_passes_the_timeout_to_its_socket(settings, monkeypatch):
     connection.open()
     connection.close()
 
+    smtp.assert_called_once()
     assert smtp.call_args.kwargs['timeout'] == 5
 
 
 @pytest.mark.django_db
 def test_smtp_timeout_preserves_the_in_app_notification(versiona_context, settings, monkeypatch):
+    """Smtp timeout preserves the in app notification."""
     settings.EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     settings.EMAIL_TIMEOUT = 5
     settings.EMAIL_USE_TLS = False
     settings.EMAIL_USE_SSL = False
-    monkeypatch.setattr(
-        'django.core.mail.backends.smtp.smtplib.SMTP', MagicMock(side_effect=TimeoutError('smtp stalled')),
-    )
+    smtp = MagicMock(side_effect=TimeoutError('smtp stalled'))
+    monkeypatch.setattr('django.core.mail.backends.smtp.smtplib.SMTP', smtp)
 
     notification = notify(
         user=versiona_context.users['reviewer'], event_key='seal.invalidated',
@@ -79,3 +84,4 @@ def test_smtp_timeout_preserves_the_in_app_notification(versiona_context, settin
     )
 
     assert Notification.objects.filter(pk=notification.pk, event_key='seal.invalidated').exists()
+    smtp.assert_called_once()

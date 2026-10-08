@@ -10,15 +10,17 @@ from uuid import NAMESPACE_URL, uuid5
 import pytest
 from django.db import close_old_connections, transaction
 from django.utils import timezone
+from documents.models import Document, DocumentVersion
+from freezegun import freeze_time
 from kombu.exceptions import OperationalError
 
-from documents.models import Document, DocumentVersion
 from engine import tasks
 from engine.models import EngineJob
 
 
 @pytest.fixture
 def analysis_job_factory(versiona_context):
+    """Create isolated pending analysis intentions with eligible timestamps."""
     def create(**overrides):
         document = Document.objects.create(
             project=versiona_context.project, title='Pendiente', slug=f'pending-{EngineJob.objects.count()}',
@@ -41,6 +43,7 @@ def analysis_job_factory(versiona_context):
 
 @pytest.fixture
 def broker(monkeypatch, settings):
+    """Simulate the broker publication boundary without network access."""
     settings.CELERY_TASK_ALWAYS_EAGER = False
     connection = MagicMock()
     connection.__enter__.return_value = connection
@@ -55,6 +58,7 @@ def broker(monkeypatch, settings):
 
 @pytest.mark.django_db
 def test_broker_failure_keeps_an_unpublished_intention(analysis_job_factory, broker, caplog):
+    """Broker failure keeps an unpublished intention."""
     job = analysis_job_factory()
     broker.publish.side_effect = OperationalError('redis://private-password@internal-host')
 
@@ -71,6 +75,7 @@ def test_broker_failure_keeps_an_unpublished_intention(analysis_job_factory, bro
 
 @pytest.mark.django_db
 def test_recovery_publishes_the_existing_job(analysis_job_factory, broker):
+    """Recovery publishes the existing job."""
     job = analysis_job_factory(error_detail=tasks.DISPATCH_ERROR)
 
     published = tasks.recover_pending_analysis()
@@ -84,6 +89,7 @@ def test_recovery_publishes_the_existing_job(analysis_job_factory, broker):
 
 @pytest.mark.django_db
 def test_publisher_uses_local_bounded_transport(analysis_job_factory, broker):
+    """Publisher uses local bounded transport."""
     job = analysis_job_factory()
 
     tasks._dispatch_pending_analysis(job.pk)
@@ -101,6 +107,7 @@ def test_publisher_uses_local_bounded_transport(analysis_job_factory, broker):
 
 @pytest.mark.django_db
 def test_lost_ack_reuses_the_task_uuid(analysis_job_factory, broker):
+    """Lost ack reuses the task uuid."""
     job = analysis_job_factory()
     broker.publish.side_effect = [OperationalError('ack lost'), None]
 
@@ -116,6 +123,7 @@ def test_lost_ack_reuses_the_task_uuid(analysis_job_factory, broker):
 @pytest.mark.django_db
 @pytest.mark.parametrize('state', ['running', 'failed', 'done'])
 def test_recovery_ignores_nonpending_jobs(analysis_job_factory, broker, state):
+    """Recovery ignores nonpending jobs."""
     job = analysis_job_factory(status=state)
 
     assert tasks.recover_pending_analysis() == 0
@@ -126,6 +134,7 @@ def test_recovery_ignores_nonpending_jobs(analysis_job_factory, broker, state):
 
 @pytest.mark.django_db
 def test_recovery_never_republishes_an_acknowledged_job(analysis_job_factory, broker):
+    """Recovery never republishes an acknowledged job."""
     analysis_job_factory(celery_task_id='acknowledged-task')
 
     assert tasks.recover_pending_analysis() == 0
@@ -133,7 +142,9 @@ def test_recovery_never_republishes_an_acknowledged_job(analysis_job_factory, br
 
 
 @pytest.mark.django_db
+@freeze_time('2026-10-08T12:00:00Z')
 def test_recovery_waits_for_minimum_age(analysis_job_factory, broker):
+    """Recovery waits for minimum age."""
     job = analysis_job_factory()
     EngineJob.objects.filter(pk=job.pk).update(updated_at=timezone.now())
 
@@ -144,6 +155,7 @@ def test_recovery_waits_for_minimum_age(analysis_job_factory, broker):
 @pytest.mark.django_db
 @pytest.mark.parametrize('trashed_object', ['version', 'document', 'project'])
 def test_recovery_ignores_trashed_input(analysis_job_factory, broker, trashed_object):
+    """Recovery ignores trashed input."""
     job = analysis_job_factory()
     targets = {
         'version': job.document_version, 'document': job.document_version.document,
@@ -158,6 +170,7 @@ def test_recovery_ignores_trashed_input(analysis_job_factory, broker, trashed_ob
 
 @pytest.mark.django_db
 def test_recovery_ignores_an_already_processed_version(analysis_job_factory, broker):
+    """Recovery ignores an already processed version."""
     job = analysis_job_factory()
     DocumentVersion.objects.filter(pk=job.document_version_id).update(analysis_status='processing')
 
@@ -166,7 +179,8 @@ def test_recovery_ignores_an_already_processed_version(analysis_job_factory, bro
 
 
 @pytest.mark.django_db
-def test_recovery_limits_the_batch(analysis_job_factory, broker):
+def test_recovery_publishes_at_most_twenty_jobs(analysis_job_factory, broker):
+    """Recovery publishes at most twenty jobs."""
     jobs = [analysis_job_factory() for _ in range(21)]
 
     assert tasks.recover_pending_analysis() == 20
@@ -176,6 +190,7 @@ def test_recovery_limits_the_batch(analysis_job_factory, broker):
 
 @pytest.mark.django_db
 def test_recovery_stops_after_broker_failure(analysis_job_factory, broker):
+    """Recovery stops after broker failure."""
     analysis_job_factory()
     analysis_job_factory()
     broker.publish.side_effect = OperationalError('unavailable')
@@ -186,16 +201,20 @@ def test_recovery_stops_after_broker_failure(analysis_job_factory, broker):
 
 @pytest.mark.django_db
 def test_recovery_stops_at_the_round_budget(analysis_job_factory, broker, monkeypatch):
+    """Recovery stops at the round budget."""
     analysis_job_factory()
     analysis_job_factory()
-    monkeypatch.setattr(tasks, 'monotonic', MagicMock(side_effect=[0, 0, 30]))
+    clock = MagicMock(side_effect=[0, 0, 30])
+    monkeypatch.setattr(tasks, 'monotonic', clock)
 
     assert tasks.recover_pending_analysis() == 1
     assert broker.publish.call_count == 1
+    clock.assert_called()
 
 
 @pytest.mark.django_db
 def test_nonbroker_errors_are_not_suppressed(analysis_job_factory, broker):
+    """Nonbroker errors are not suppressed."""
     job = analysis_job_factory()
     broker.publish.side_effect = ValueError('bad task arguments')
 
@@ -205,6 +224,7 @@ def test_nonbroker_errors_are_not_suppressed(analysis_job_factory, broker):
 
 @pytest.mark.django_db(transaction=True)
 def test_concurrent_publishers_confirm_one_dispatch(analysis_job_factory, broker):
+    """Concurrent publishers confirm one dispatch."""
     job = analysis_job_factory()
     entered = Event()
     release = Event()
@@ -235,6 +255,7 @@ def test_concurrent_publishers_confirm_one_dispatch(analysis_job_factory, broker
 
 @pytest.mark.django_db
 def test_enqueue_waits_for_outer_commit(analysis_job_factory, broker, django_capture_on_commit_callbacks):
+    """Enqueue waits for outer commit."""
     job = analysis_job_factory()
 
     with django_capture_on_commit_callbacks(execute=True):
@@ -248,13 +269,18 @@ def test_enqueue_waits_for_outer_commit(analysis_job_factory, broker, django_cap
 
 @pytest.mark.django_db
 def test_rolled_back_enqueue_has_no_phantom_dispatch(analysis_job_factory, broker):
+    """Rolled back enqueue has no phantom dispatch."""
     job = analysis_job_factory()
     EngineJob.objects.filter(pk=job.pk).delete()
 
     with pytest.raises(ValueError, match='cancelled'):
-        with transaction.atomic():
-            tasks.enqueue_analysis(job.document_version)
-            raise ValueError('cancelled')
+        _enqueue_then_rollback(job.document_version)
 
     broker.publish.assert_not_called()
     assert not EngineJob.objects.exists()
+
+
+def _enqueue_then_rollback(version):
+    with transaction.atomic():
+        tasks.enqueue_analysis(version)
+        raise ValueError('cancelled')
