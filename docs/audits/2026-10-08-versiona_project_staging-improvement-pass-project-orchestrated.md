@@ -42,16 +42,26 @@ motor canónico; las asociaciones de QA se registran en grupos de hasta tres.
   para cumplir el tipo de Playwright.
 
 Las sesiones sólo escriben sus archivos. v2 recibió una ampliación explícita
-para el caller de limpieza post-promoción; no se compartió su propiedad con
-otra sesión. La variante `improve/<frente>` fue solicitada por el operador.
+para el caller de limpieza post-promoción; v3 para adaptar únicamente la entrada
+al panel en B2-R01 después del nuevo menú compacto. No se compartió su propiedad
+con otra sesión. La variante `improve/<frente>` fue solicitada por el operador.
+
+## Entregas
+
+| Sesión | Frentes | PR | Base |
+|---|---|---|---|
+| v1 | Seguridad y mantenibilidad del comparador | [#42](https://github.com/ProjectAppLabs/versiona_project/pull/42) | `master` |
+| v2 | Observabilidad y recuperación de limpieza | [#41](https://github.com/ProjectAppLabs/versiona_project/pull/41) | `master` |
+| v3 | Responsividad pública y autenticada | [#43](https://github.com/ProjectAppLabs/versiona_project/pull/43) | `master` |
+| v0 | Rendimiento, archivos compartidos y cierre QA | [#44](https://github.com/ProjectAppLabs/versiona_project/pull/44) | `master` |
 
 ## Pruebas y evidencia
 
 | Dueño | Evidencia conductual |
 |---|---|
-| v1 | 24 pytest locales: siete nuevos y 17 de regresión; dos conexiones MySQL reales, instancias obsoletas y rollback después de SQL. 20 Jest y dos E2E del ciclo de vida. |
+| v1 | 24 pytest locales: siete nuevos y 17 de regresión; dos conexiones MySQL reales, instancias obsoletas y rollback después de SQL. 20 Jest y tres E2E: dos respuestas tardías y un fallo vigente. |
 | v2 | 49 pytest en lotes de 17, 16 y 16: errores reales del filesystem, recuperación, progreso con 101 filas, OCR y post-promoción. |
-| v3 | 24 Jest de componentes y permisos; 35 casos de la matriz E2E pública/autenticada sobre las cinco dimensiones obligatorias. Su ejecución final corresponde al SHA del PR. |
+| v3 | 24 Jest de componentes y permisos; 35 casos de la matriz E2E pública/autenticada sobre las cinco dimensiones obligatorias. En el SHA `713c835` del PR pasan esos 35 y tres casos de regresión B2 sin retry; 26 mediciones verifican la geometría. |
 | v0 | Tres nuevos pytest de presupuesto, metadatos/orden y descendientes; permisos se verifican con la matriz ya existente de `test_project_endpoints.py`, sin duplicar casos. Gate estricto, TypeScript y lint del harness. |
 
 El test de presupuesto falló antes de la corrección: `105 != 9`. Después debe
@@ -70,6 +80,35 @@ Los artefactos locales quedan gitignored en los worktrees respectivos. La
 evidencia remota y el veredicto de cada SHA se consultan en sus PR; el tren de
 integración valida la combinación antes de integrar los PR originales.
 
+QA revisó las pruebas contra el código real. Se retiraron dos casos nuevos de
+permisos que duplicaban la matriz existente y se congeló el reloj de la prueba
+que crea comparaciones vencidas. El gate local ejecuta Ruff real; detectó y
+corrigió docstrings/imports que el runner remoto sin Ruff no había comprobado.
+Las advertencias de cantidad de aserciones se conservan porque cada prueba
+verifica un único contrato atómico de recuperación, no casos independientes.
+
+## QA conjunta verificada
+
+El QA Verifier aprobó el commit limpio
+`4d067815589b348c3bfd3deba6319ee833ab79f0`: **29 backend, 44 unitarios y 41 E2E**
+(114 casos), sin skips, fallos ni retries. El gate estricto obtuvo **98/100**,
+cero errores y seis advertencias KEEP del Auditor. Se ejecutaron Ruff y ESLint
+reales; no se elevó el baseline ni se desactivaron reglas.
+
+La [evidencia publicada](2026-10-08-improvement-evidence/QA.md) conserva resultados,
+comandos y hashes. El [snapshot del ledger](2026-10-08-improvement-evidence/ledger-snapshot.yml)
+fue producido por el motor canónico: los seis candidatos figuran `verified` en
+dos asociaciones de hasta tres IDs, con el mismo commit y cierre QA.
+
+Los E2E se ejecutaron con `localhost`; el ensayo anterior con 127.0.0.1 produjo
+una conexión de desarrollo inválida y no se usa como prueba aprobada. v1 aisló
+la diferencia de hidratación y confirmó los tres casos de comparación sin
+cambiar producto, spec ni timeouts para ese fallo.
+
+El empaquetado de evidencia es posterior a ese commit probado y sólo modifica
+documentación/artefactos. El tren remoto verifica el árbol combinado completo;
+los PR originales mantienen su atribución y la rama draft sólo valida.
+
 ## Flujos y límites
 
 El registro 2.4.0 incorpora `layout-public-navigation`,
@@ -82,6 +121,10 @@ mutaciones en proyectos archivados, concurrencia/replay de decisiones D5,
 listados/historias sin cota y otras superficies responsive sin revisar. La
 limpieza fallida de uploads temporales mantiene el objeto y deja diagnóstico,
 pero aún no existe un barrido propio de esos residuales.
+
+El control remoto actual de calidad no instala Ruff y puede omitir esa parte
+del lint. Esta ronda lo ejecuta localmente sobre las pruebas modificadas; alinear
+el runner y auditar el corpus anterior queda pendiente para la próxima ronda.
 
 El remoto del toolkit canónico está archivado en GitHub y no admite pushes.
 La evidencia de esta ronda se conserva aquí para disponer de un destino

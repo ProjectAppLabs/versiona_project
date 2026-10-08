@@ -7,6 +7,11 @@
 
 ## Ronda coordinada de mejora (2026-10-08)
 
+Implementación y QA completadas: 114 casos pasan en `4d06781`, con gate estricto
+sin errores. Entregas #41–#44, integración mediante el tren de `$merge-queue`.
+La evidencia y el ledger verificado están en
+`docs/audits/2026-10-08-improvement-evidence/QA.md`.
+
 La ronda parte de `master@5b373ef`, con las entregas anteriores #37–#39 ya
 integradas. Se asignaron ramas independientes para consumo único de códigos y
 ciclo de vida del comparador público, recuperación de la limpieza de archivos,
