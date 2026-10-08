@@ -1,11 +1,13 @@
-"""End-to-end backend slice of C1/C2 (real MinIO + eager Celery) and the
-draft-message rule I2b. Scenario ids per docs/audit/03."""
+"""End-to-end backend slice of C1/C2 and the draft-message rule I2b.
+
+Use real storage and eager Celery. Scenario ids follow docs/audit/03.
+"""
 
 from pathlib import Path
 
 import pytest
-
 from audit.models import AuditEvent
+
 from documents.models import DocumentVersion, SectionVersion
 from documents.services import storage_service, version_service
 from documents.services.storage import filesystem
@@ -20,12 +22,14 @@ def _test_storage_prefix(settings):
 
 @pytest.fixture
 def document(versiona_context):
+    """Provide a document owned by the editor's project."""
     return version_service.create_document(
         versiona_context.project, 'Contrato de obra', versiona_context.users['editor']
     )
 
 
 def upload(document, user, fixture='contrato_v1.pdf', message='primera entrega'):
+    """Upload the selected fixture through the complete version lifecycle."""
     intent = version_service.create_upload_intent(document, user)
     storage_service.put_bytes(intent.key, (TESTDATA / fixture).read_bytes(), 'application/pdf')
     return version_service.complete_upload(document, intent.upload_id, message, user)
@@ -45,6 +49,7 @@ def _replace_staging_after_read(operation, staging_key, replacement):
 @pytest.mark.django_db
 @pytest.mark.escenario('C1-F01')
 def test_complete_upload_analyzes_and_indexes_sections(document, versiona_context):
+    """Persist analysis and section identities for the first uploaded PDF."""
     version, job = upload(document, versiona_context.users['editor'])
 
     version.refresh_from_db()
@@ -64,6 +69,7 @@ def test_complete_upload_analyzes_and_indexes_sections(document, versiona_contex
 @pytest.mark.django_db
 @pytest.mark.escenario('C2-F01')
 def test_second_version_matches_identity_and_retires_removed(document, versiona_context):
+    """Retain section identities across a new version's content changes."""
     editor = versiona_context.users['editor']
     upload(document, editor)
 
@@ -81,6 +87,7 @@ def test_second_version_matches_identity_and_retires_removed(document, versiona_
 @pytest.mark.django_db
 @pytest.mark.escenario('C2-E01')
 def test_identical_binary_is_rejected(document, versiona_context):
+    """Reject another upload of the document's current binary."""
     editor = versiona_context.users['editor']
     upload(document, editor)
 
@@ -93,6 +100,7 @@ def test_identical_binary_is_rejected(document, versiona_context):
 @pytest.mark.django_db
 @pytest.mark.escenario('C1-E01')
 def test_protected_pdf_is_rejected_with_actionable_message(document, versiona_context):
+    """Reject password-protected PDFs with a password-specific explanation."""
     with pytest.raises(version_service.DomainError, match='contraseña'):
         upload(document, versiona_context.users['editor'], 'protegido.pdf')
 
@@ -100,6 +108,7 @@ def test_protected_pdf_is_rejected_with_actionable_message(document, versiona_co
 @pytest.mark.django_db
 @pytest.mark.escenario('C1-E02')
 def test_corrupt_file_is_rejected(document, versiona_context):
+    """Reject a file that cannot be parsed as a valid PDF."""
     with pytest.raises(version_service.DomainError, match='PDF'):
         upload(document, versiona_context.users['editor'], 'corrupto.pdf')
 
@@ -108,6 +117,7 @@ def test_corrupt_file_is_rejected(document, versiona_context):
 @pytest.mark.escenario('C1-E03')
 @pytest.mark.escenario('C2-E03')
 def test_oversized_upload_is_rejected(document, versiona_context, settings):
+    """Reject an upload beyond the configured size limit."""
     settings.MAX_PDF_SIZE_MB = 0
 
     with pytest.raises(version_service.DomainError) as excinfo:
@@ -119,6 +129,7 @@ def test_oversized_upload_is_rejected(document, versiona_context, settings):
 @pytest.mark.django_db
 @pytest.mark.escenario('C2-A01')
 def test_message_editable_while_draft_with_audit_trail(document, versiona_context):
+    """Record the editable draft message's change in its audit event."""
     editor = versiona_context.users['editor']
     version, _ = upload(document, editor)
 
@@ -133,6 +144,7 @@ def test_message_editable_while_draft_with_audit_trail(document, versiona_contex
 @pytest.mark.django_db
 @pytest.mark.escenario('C2-E02')
 def test_message_frozen_once_approved(document, versiona_context):
+    """Prevent editing the message of an approved document version."""
     editor = versiona_context.users['editor']
     version, _ = upload(document, editor)
     DocumentVersion.all_objects.filter(pk=version.pk).update(is_approved=True)
@@ -147,6 +159,7 @@ def test_message_frozen_once_approved(document, versiona_context):
 @pytest.mark.django_db
 @pytest.mark.escenario('B4-L01')
 def test_archived_project_rejects_uploads(document, versiona_context):
+    """Prevent new uploads while the document's project is archived."""
     from documents.services.trash_service import archive_project
 
     archive_project(versiona_context.project, versiona_context.users['admin'])

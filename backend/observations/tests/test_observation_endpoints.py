@@ -8,15 +8,15 @@ from datetime import datetime
 from uuid import uuid4
 
 import pytest
+from audit.models import AuditEvent
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
-
-from audit.models import AuditEvent
 from documents.services.version_service import DomainError
 from notifications.models import Notification
-from observations.models import Observation, ObservationAnchor, ObservationReply
+
 from observations import services
+from observations.models import Observation, ObservationAnchor, ObservationReply
 
 FIXED_TIME = timezone.make_aware(datetime(2026, 10, 2, 12, 0, 0))
 
