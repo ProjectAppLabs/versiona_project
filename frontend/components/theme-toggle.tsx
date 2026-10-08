@@ -31,7 +31,7 @@ export function ThemeToggle() {
   }, [open]);
 
   if (!mounted) {
-    return <div className="h-9 w-9" aria-hidden />;
+    return <div className="h-11 w-11" aria-hidden />;
   }
 
   const Current = OPTIONS.find((o) => o.value === theme)?.Icon ?? Monitor;
@@ -76,7 +76,7 @@ export function ThemeToggle() {
   }
 
   return (
-    <div className="relative">
+    <div className="relative w-fit shrink-0">
       <button
         ref={buttonRef}
         type="button"
@@ -85,18 +85,21 @@ export function ThemeToggle() {
         aria-label="Toggle theme"
         aria-haspopup="menu"
         aria-expanded={open}
-        className="inline-flex h-9 w-9 items-center justify-center rounded-full text-foreground hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-full text-foreground hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
       >
         <Current className="h-5 w-5" />
       </button>
       {open && (
         <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} aria-hidden />
+          <div className="fixed inset-0 z-40" onClick={() => {
+            setOpen(false);
+            buttonRef.current?.focus();
+          }} aria-hidden />
           <div
             role="menu"
             aria-label="Theme"
             onKeyDown={handleMenuKeyDown}
-            className="absolute right-0 z-50 mt-2 w-36 overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-lg"
+            className="absolute left-0 z-50 mt-2 flex w-36 flex-col gap-2 overflow-hidden rounded-md border border-border bg-popover p-2 text-popover-foreground shadow-lg lg:left-auto lg:right-0"
           >
             {OPTIONS.map(({ value, label, Icon }, i) => (
               <button
@@ -111,7 +114,7 @@ export function ThemeToggle() {
                   setOpen(false);
                   buttonRef.current?.focus();
                 }}
-                className={`flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none ${
+                className={`flex min-h-11 w-full items-center gap-2 px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none ${
                   theme === value ? 'text-primary font-medium' : ''
                 }`}
               >
