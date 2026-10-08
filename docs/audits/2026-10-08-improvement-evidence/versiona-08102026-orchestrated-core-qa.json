@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "kind": "improvement-qa",
+  "round_id": "versiona-08102026-orchestrated-core",
+  "codebase": "versiona_project",
+  "commit": "4d067815589b348c3bfd3deba6319ee833ab79f0",
+  "artifact_directory": "docs/audits/2026-10-08-improvement-evidence",
+  "executions": [
+    {
+      "layer": "backend",
+      "command": "cd /home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/backend && source /home/dev_env/webapps/.wt/versiona_project/improve-performance/backend/venv/bin/activate && DJANGO_SETTINGS_MODULE=versiona_project.settings_dev DJANGO_ENV=development DJANGO_DB_ENGINE=django.db.backends.mysql DJANGO_DB_NAME=versiona_improve_root DB_USER=root DB_PASSWORD='' DB_HOST=127.0.0.1 DB_PORT=3309 DJANGO_SECRET_KEY=versiona-improve-local-test-only REDIS_URL=redis://127.0.0.1:6383/4 CELERY_TASK_ALWAYS_EAGER=1 pytest --no-cov --reuse-db --junitxml=/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/test-results/improvement/2026-10-08-versiona-combined/final-4d067815/backend-batch-a-junit.xml accounts/tests/services/test_single_use_codes.py accounts/tests/views/test_single_use_codes.py orgs/tests/test_trash_query_budget.py 'projects/tests/views/test_project_endpoints.py::test_org_trash_permission_matrix[trash-p02-viewer]' 'projects/tests/views/test_project_endpoints.py::test_org_trash_permission_matrix[trash-p04-non-member]' -vv",
+      "exit_code": 0,
+      "executed": true,
+      "count": 12,
+      "artifact": "docs/audits/2026-10-08-improvement-evidence/backend-batch-a-junit.xml",
+      "format": "junit",
+      "live": false,
+      "report": "docs/audits/2026-10-08-improvement-evidence/QA.md",
+      "candidate_ids": [
+        "I-S-f729cb68b016"
+      ]
+    },
+    {
+      "layer": "backend",
+      "command": "cd /home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/backend && source /home/dev_env/webapps/.wt/versiona_project/improve-performance/backend/venv/bin/activate && DJANGO_SETTINGS_MODULE=versiona_project.settings_dev DJANGO_ENV=development DJANGO_DB_ENGINE=django.db.backends.mysql DJANGO_DB_NAME=versiona_improve_root DB_USER=root DB_PASSWORD='' DB_HOST=127.0.0.1 DB_PORT=3309 DJANGO_SECRET_KEY=versiona-improve-local-test-only REDIS_URL=redis://127.0.0.1:6383/4 CELERY_TASK_ALWAYS_EAGER=1 pytest --no-cov --reuse-db --junitxml=/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/test-results/improvement/2026-10-08-versiona-combined/final-4d067815/backend-batch-b-junit.xml documents/tests/services/test_storage_delete_failures.py documents/tests/services/test_upload_cleanup_failures.py public_tools/tests/test_public_cleanup_failures.py -vv",
+      "exit_code": 0,
+      "executed": true,
+      "count": 17,
+      "artifact": "docs/audits/2026-10-08-improvement-evidence/backend-batch-b-junit.xml",
+      "format": "junit",
+      "live": false,
+      "report": "docs/audits/2026-10-08-improvement-evidence/QA.md",
+      "candidate_ids": [
+        "I-O-d1612d51180a"
+      ]
+    },
+    {
+      "layer": "frontend-unit",
+      "command": "cd /home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend && npm test -- --runTestsByPath --runInBand lib/stores/__tests__/publicCompareStore.test.ts 'app/comparar/[id]/__tests__/page.test.tsx' --json --outputFile=/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/test-results/improvement/2026-10-08-versiona-combined/final-4d067815/frontend-unit-store-page.json",
+      "exit_code": 0,
+      "executed": true,
+      "count": 20,
+      "artifact": "docs/audits/2026-10-08-improvement-evidence/frontend-unit-store-page-junit.xml",
+      "source_artifact": "docs/audits/2026-10-08-improvement-evidence/frontend-unit-store-page.json",
+      "format": "junit",
+      "live": false,
+      "report": "docs/audits/2026-10-08-improvement-evidence/QA.md",
+      "candidate_ids": [
+        "I-M-4a835d9294ef"
+      ]
+    },
+    {
+      "layer": "e2e",
+      "command": "cd /home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend && source /home/dev_env/webapps/.wt/versiona_project/improve-performance/test-results/improvement/2026-10-08-versiona-improve/combined-e2e-env.sh && PLAYWRIGHT_JSON_OUTPUT_NAME=/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/test-results/improvement/2026-10-08-versiona-combined/final-4d067815/e2e-public.json npx playwright test e2e/public/public-navigation.spec.ts e2e/public/public-compare-lifecycle.spec.ts --workers=1 --retries=0",
+      "exit_code": 0,
+      "executed": true,
+      "count": 20,
+      "artifact": "docs/audits/2026-10-08-improvement-evidence/e2e-public.json",
+      "format": "playwright-json",
+      "live": true,
+      "report": "docs/audits/2026-10-08-improvement-evidence/QA.md",
+      "candidate_ids": [
+        "I-M-4a835d9294ef"
+      ]
+    },
+    {
+      "layer": "gate",
+      "command": "cd /home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147 && source /home/dev_env/webapps/.wt/versiona_project/improve-performance/backend/venv/bin/activate && python3 scripts/test_quality_gate.py --repo-root . --report-path test-results/improvement/2026-10-08-versiona-combined/final-4d067815/gate-strict.json --semantic-rules strict --junk-severity error --external-lint run --include-file backend/accounts/tests/services/test_single_use_codes.py --include-file backend/accounts/tests/views/test_single_use_codes.py --include-file backend/orgs/tests/test_trash_query_budget.py --include-file backend/documents/tests/services/test_storage_delete_failures.py --include-file backend/documents/tests/services/test_upload_cleanup_failures.py --include-file backend/public_tools/tests/test_public_cleanup_failures.py --include-file frontend/app/comparar/[id]/__tests__/page.test.tsx --include-file frontend/components/__tests__/navigation-toggles.test.tsx --include-file frontend/components/layout/__tests__/header-navigation.test.tsx --include-file frontend/components/marketing/__tests__/public-header-navigation.test.tsx --include-file frontend/lib/stores/__tests__/publicCompareStore.test.ts --include-file frontend/e2e/app/layout/authenticated-navigation.spec.ts --include-file frontend/e2e/app/projects/b2-board-search.spec.ts --include-file frontend/e2e/public/public-compare-lifecycle.spec.ts --include-file frontend/e2e/public/public-navigation.spec.ts",
+      "exit_code": 0,
+      "executed": true,
+      "count": 72,
+      "artifact": "docs/audits/2026-10-08-improvement-evidence/gate-strict.json",
+      "format": "gate-json",
+      "live": false,
+      "report": "docs/audits/2026-10-08-improvement-evidence/QA.md",
+      "candidate_ids": [
+        "I-S-f729cb68b016",
+        "I-M-4a835d9294ef",
+        "I-O-d1612d51180a"
+      ]
+    }
+  ],
+  "candidate_ids": [
+    "I-S-f729cb68b016",
+    "I-M-4a835d9294ef",
+    "I-O-d1612d51180a"
+  ],
+  "report": "docs/audits/2026-10-08-improvement-evidence/QA.md"
+}

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="20" failures="0" skipped="0" errors="0" time="0.989">
+  <properties>
+    <property name="source_json" value="test-results/improvement/2026-10-08-versiona-combined/final-4d067815/frontend-unit-store-page.json"/>
+    <property name="commit" value="4d067815589b348c3bfd3deba6319ee833ab79f0"/>
+    <property name="converter" value="json-to-junit.mjs: assertion-result preserving"/>
+  </properties>
+  <testsuite name="frontend/lib/stores/__tests__/publicCompareStore.test.ts" tests="18" failures="0" skipped="0" errors="0" time="0.617">
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/lib/stores/__tests__/publicCompareStore.test.ts" name="publicCompareStore returns the public id after uploading two files" time="0.013"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/lib/stores/__tests__/publicCompareStore.test.ts" name="publicCompareStore rejects a non-pdf file client-side before uploading" time="0.006"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/lib/stores/__tests__/publicCompareStore.test.ts" name="publicCompareStore maps the 422 ocr_required response to the upsell error key" time="0.003"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/lib/stores/__tests__/publicCompareStore.test.ts" name="publicCompareStore maps a 429 response to the rate-limited error key" time="0.003"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/lib/stores/__tests__/publicCompareStore.test.ts" name="publicCompareStore loads a done comparison into the done phase" time="0.003"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/lib/stores/__tests__/publicCompareStore.test.ts" name="publicCompareStore marks the expired result from a 410 response" time="0.002"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/lib/stores/__tests__/publicCompareStore.test.ts" name="publicCompareStore preserves the newer result after an older done response" time="0.035"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/lib/stores/__tests__/publicCompareStore.test.ts" name="publicCompareStore preserves the newer result after an older failed response" time="0.105"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/lib/stores/__tests__/publicCompareStore.test.ts" name="publicCompareStore preserves the newer result after an older processing response" time="0.009"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/lib/stores/__tests__/publicCompareStore.test.ts" name="publicCompareStore preserves the newer result after an older transport failure" time="0.006"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/lib/stores/__tests__/publicCompareStore.test.ts" name="publicCompareStore keeps the reset state after an outstanding response" time="0.038"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/lib/stores/__tests__/publicCompareStore.test.ts" name="publicCompareStore discards a response after its caller aborts" time="0.004"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/lib/stores/__tests__/publicCompareStore.test.ts" name="publicCompareStore cancels the polling delay when reset" time="0.013"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/lib/stores/__tests__/publicCompareStore.test.ts" name="publicCompareStore cancels the polling delay when its caller aborts" time="0.098"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/lib/stores/__tests__/publicCompareStore.test.ts" name="publicCompareStore backs off polling to the ten-second cap" time="0.194"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/lib/stores/__tests__/publicCompareStore.test.ts" name="publicCompareStore stops processing after the five-minute timeout" time="0.079"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/lib/stores/__tests__/publicCompareStore.test.ts" name="publicCompareStore maps a failed comparison to its domain error" time="0.005"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/lib/stores/__tests__/publicCompareStore.test.ts" name="publicCompareStore does not request a result with an already aborted signal" time="0.001"/>
+  </testsuite>
+  <testsuite name="frontend/app/comparar/[id]/__tests__/page.test.tsx" tests="2" failures="0" skipped="0" errors="0" time="0.372">
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/app/comparar/[id]/__tests__/page.test.tsx" name="public comparison result lifecycle stops polling when the result page unmounts" time="0.287"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/app/comparar/[id]/__tests__/page.test.tsx" name="public comparison result lifecycle keeps the selected result after the previous page request settles" time="0.085"/>
+  </testsuite>
+</testsuites>

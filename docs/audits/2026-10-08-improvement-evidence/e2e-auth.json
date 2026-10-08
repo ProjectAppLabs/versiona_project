@@ -1,0 +1,968 @@
+{
+  "stats": {
+    "startTime": "2026-10-08T12:50:24.718Z",
+    "duration": 145128.769,
+    "expected": 18,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "suites": [
+    {
+      "title": "app/layout/authenticated-navigation.spec.ts",
+      "file": "app/layout/authenticated-navigation.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Navegación del miembro @viewport:compact",
+          "file": "app/layout/authenticated-navigation.spec.ts",
+          "line": 69,
+          "column": 8,
+          "specs": [
+            {
+              "title": "el miembro abre plan y uso desde el menú",
+              "ok": true,
+              "tags": [
+                "viewport:compact",
+                "flow:layout-authenticated-navigation",
+                "module:org",
+                "priority:P2",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 18154,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:50:35.038Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "navigation-geometry",
+                          "contentType": "application/json",
+                          "body": "ewogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDQxMiwKICAgICJoZWlnaHQiOiA5MTUKICB9LAogICJzY3JvbGxXaWR0aCI6IDQxMiwKICAiYm94ZXMiOiBbCiAgICB7CiAgICAgICJsYWJlbCI6ICJBeXVkYSIsCiAgICAgICJ3aWR0aCI6IDU5LjI2NTYyNSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDI0LAogICAgICAicmlnaHQiOiA4My4yNjU2MjUsCiAgICAgICJ0b3AiOiA5MywKICAgICAgImJvdHRvbSI6IDEzNwogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlRvZ2dsZSB0aGVtZSIsCiAgICAgICJ3aWR0aCI6IDQ0LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMjQsCiAgICAgICJyaWdodCI6IDY4LAogICAgICAidG9wIjogMTQ1LAogICAgICAiYm90dG9tIjogMTg5CiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiUGFuZWwiLAogICAgICAid2lkdGgiOiA1My43ODEyNSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDI0LAogICAgICAicmlnaHQiOiA3Ny43ODEyNSwKICAgICAgInRvcCI6IDE5NywKICAgICAgImJvdHRvbSI6IDI0MQogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlBsYW4geSB1c28iLAogICAgICAid2lkdGgiOiA4Ny43MDMxMjUsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiAyNCwKICAgICAgInJpZ2h0IjogMTExLjcwMzEyNSwKICAgICAgInRvcCI6IDI0OSwKICAgICAgImJvdHRvbSI6IDI5MwogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIkNvbmZpZ3VyYWNpw7NuIiwKICAgICAgIndpZHRoIjogMTEzLjE1NjI1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMjQsCiAgICAgICJyaWdodCI6IDEzNy4xNTYyNSwKICAgICAgInRvcCI6IDMwMSwKICAgICAgImJvdHRvbSI6IDM0NQogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIk5vdGlmaWNhY2lvbmVzIiwKICAgICAgIndpZHRoIjogNDQsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiAyNCwKICAgICAgInJpZ2h0IjogNjgsCiAgICAgICJ0b3AiOiAzNTMsCiAgICAgICJib3R0b20iOiAzOTcKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJTYWxpciIsCiAgICAgICJ3aWR0aCI6IDY1LjAxNTYyNSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDI0LAogICAgICAicmlnaHQiOiA4OS4wMTU2MjUsCiAgICAgICJ0b3AiOiA0MDUsCiAgICAgICJib3R0b20iOiA0NDkKICAgIH0KICBdCn0="
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "030359114b4f44a8b625-7a3e73e2a5be9d5f10fd",
+              "file": "app/layout/authenticated-navigation.spec.ts",
+              "line": 72,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Navegación del propietario @viewport:compact",
+          "file": "app/layout/authenticated-navigation.spec.ts",
+          "line": 92,
+          "column": 8,
+          "specs": [
+            {
+              "title": "el propietario abre la papelera desde el menú",
+              "ok": true,
+              "tags": [
+                "viewport:compact",
+                "flow:layout-authenticated-navigation",
+                "module:org",
+                "priority:P2",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8401,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:50:54.168Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "navigation-geometry",
+                          "contentType": "application/json",
+                          "body": "ewogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDQxMiwKICAgICJoZWlnaHQiOiA5MTUKICB9LAogICJzY3JvbGxXaWR0aCI6IDQxMiwKICAiYm94ZXMiOiBbCiAgICB7CiAgICAgICJsYWJlbCI6ICJBeXVkYSIsCiAgICAgICJ3aWR0aCI6IDU5LjI2NTYyNSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDI0LAogICAgICAicmlnaHQiOiA4My4yNjU2MjUsCiAgICAgICJ0b3AiOiA5MywKICAgICAgImJvdHRvbSI6IDEzNwogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlRvZ2dsZSB0aGVtZSIsCiAgICAgICJ3aWR0aCI6IDQ0LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMjQsCiAgICAgICJyaWdodCI6IDY4LAogICAgICAidG9wIjogMTQ1LAogICAgICAiYm90dG9tIjogMTg5CiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiUGFuZWwiLAogICAgICAid2lkdGgiOiA1My43ODEyNSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDI0LAogICAgICAicmlnaHQiOiA3Ny43ODEyNSwKICAgICAgInRvcCI6IDE5NywKICAgICAgImJvdHRvbSI6IDI0MQogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlBsYW4geSB1c28iLAogICAgICAid2lkdGgiOiA4Ny43MDMxMjUsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiAyNCwKICAgICAgInJpZ2h0IjogMTExLjcwMzEyNSwKICAgICAgInRvcCI6IDI0OSwKICAgICAgImJvdHRvbSI6IDI5MwogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlBhcGVsZXJhIiwKICAgICAgIndpZHRoIjogNzYuNzM0Mzc1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMjQsCiAgICAgICJyaWdodCI6IDEwMC43MzQzNzUsCiAgICAgICJ0b3AiOiAzMDEsCiAgICAgICJib3R0b20iOiAzNDUKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJDb25maWd1cmFjacOzbiIsCiAgICAgICJ3aWR0aCI6IDExMy4xNTYyNSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDI0LAogICAgICAicmlnaHQiOiAxMzcuMTU2MjUsCiAgICAgICJ0b3AiOiAzNTMsCiAgICAgICJib3R0b20iOiAzOTcKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJOb3RpZmljYWNpb25lcyIsCiAgICAgICJ3aWR0aCI6IDQ0LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMjQsCiAgICAgICJyaWdodCI6IDY4LAogICAgICAidG9wIjogNDA1LAogICAgICAiYm90dG9tIjogNDQ5CiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiU2FsaXIiLAogICAgICAid2lkdGgiOiA2NS4wMTU2MjUsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiAyNCwKICAgICAgInJpZ2h0IjogODkuMDE1NjI1LAogICAgICAidG9wIjogNDU3LAogICAgICAiYm90dG9tIjogNTAxCiAgICB9CiAgXQp9"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "030359114b4f44a8b625-6435a7622236c23de604",
+              "file": "app/layout/authenticated-navigation.spec.ts",
+              "line": 95,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Notificaciones del encabezado @viewport:compact",
+          "file": "app/layout/authenticated-navigation.spec.ts",
+          "line": 114,
+          "column": 8,
+          "specs": [
+            {
+              "title": "la campana permite abrir una notificación",
+              "ok": true,
+              "tags": [
+                "viewport:compact",
+                "flow:layout-authenticated-navigation",
+                "module:org",
+                "priority:P2",
+                "outcome:display"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7805,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:51:02.688Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "navigation-geometry",
+                          "contentType": "application/json",
+                          "body": "ewogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDQxMiwKICAgICJoZWlnaHQiOiA5MTUKICB9LAogICJzY3JvbGxXaWR0aCI6IDQxMiwKICAiYm94ZXMiOiBbCiAgICB7CiAgICAgICJsYWJlbCI6ICJVc28gZGUgQWNtZSBFMkUgYWN0dWFsaXphZG9SZXZpc2EgZWwgcGxhbiB5IHVzbyBkZSB0dSBvcmdhbml6YWNpw7NuLiIsCiAgICAgICJ3aWR0aCI6IDMwMiwKICAgICAgImhlaWdodCI6IDUyLAogICAgICAibGVmdCI6IDMzLAogICAgICAicmlnaHQiOiAzMzUsCiAgICAgICJ0b3AiOiA0MTQsCiAgICAgICJib3R0b20iOiA0NjYKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJWZXIgdG9kYXMiLAogICAgICAid2lkdGgiOiAzMDIsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiAzMywKICAgICAgInJpZ2h0IjogMzM1LAogICAgICAidG9wIjogNDc0LAogICAgICAiYm90dG9tIjogNTE4CiAgICB9CiAgXQp9"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "030359114b4f44a8b625-fb32978c03d922fa69d7",
+              "file": "app/layout/authenticated-navigation.spec.ts",
+              "line": 117,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Navegación del miembro @viewport:portrait",
+          "file": "app/layout/authenticated-navigation.spec.ts",
+          "line": 69,
+          "column": 8,
+          "specs": [
+            {
+              "title": "el miembro abre plan y uso desde el menú",
+              "ok": true,
+              "tags": [
+                "viewport:portrait",
+                "flow:layout-authenticated-navigation",
+                "module:org",
+                "priority:P2",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6792,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:51:10.605Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "navigation-geometry",
+                          "contentType": "application/json",
+                          "body": "ewogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDgzNSwKICAgICJoZWlnaHQiOiAxMTk0CiAgfSwKICAic2Nyb2xsV2lkdGgiOiA4MzUsCiAgImJveGVzIjogWwogICAgewogICAgICAibGFiZWwiOiAiQXl1ZGEiLAogICAgICAid2lkdGgiOiA1OS4yNjU2MjUsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiAyNCwKICAgICAgInJpZ2h0IjogODMuMjY1NjI1LAogICAgICAidG9wIjogOTMsCiAgICAgICJib3R0b20iOiAxMzcKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJUb2dnbGUgdGhlbWUiLAogICAgICAid2lkdGgiOiA0NCwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDI0LAogICAgICAicmlnaHQiOiA2OCwKICAgICAgInRvcCI6IDE0NSwKICAgICAgImJvdHRvbSI6IDE4OQogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlBhbmVsIiwKICAgICAgIndpZHRoIjogNTMuNzgxMjUsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiAyNCwKICAgICAgInJpZ2h0IjogNzcuNzgxMjUsCiAgICAgICJ0b3AiOiAxOTcsCiAgICAgICJib3R0b20iOiAyNDEKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJQbGFuIHkgdXNvIiwKICAgICAgIndpZHRoIjogODcuNzAzMTI1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMjQsCiAgICAgICJyaWdodCI6IDExMS43MDMxMjUsCiAgICAgICJ0b3AiOiAyNDksCiAgICAgICJib3R0b20iOiAyOTMKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJDb25maWd1cmFjacOzbiIsCiAgICAgICJ3aWR0aCI6IDExMy4xNTYyNSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDI0LAogICAgICAicmlnaHQiOiAxMzcuMTU2MjUsCiAgICAgICJ0b3AiOiAzMDEsCiAgICAgICJib3R0b20iOiAzNDUKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJOb3RpZmljYWNpb25lcyIsCiAgICAgICJ3aWR0aCI6IDQ0LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMjQsCiAgICAgICJyaWdodCI6IDY4LAogICAgICAidG9wIjogMzUzLAogICAgICAiYm90dG9tIjogMzk3CiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiU2FsaXIiLAogICAgICAid2lkdGgiOiA2NS4wMTU2MjUsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiAyNCwKICAgICAgInJpZ2h0IjogODkuMDE1NjI1LAogICAgICAidG9wIjogNDA1LAogICAgICAiYm90dG9tIjogNDQ5CiAgICB9CiAgXQp9"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "030359114b4f44a8b625-c807993f6f386268b142",
+              "file": "app/layout/authenticated-navigation.spec.ts",
+              "line": 72,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Navegación del propietario @viewport:portrait",
+          "file": "app/layout/authenticated-navigation.spec.ts",
+          "line": 92,
+          "column": 8,
+          "specs": [
+            {
+              "title": "el propietario abre la papelera desde el menú",
+              "ok": true,
+              "tags": [
+                "viewport:portrait",
+                "flow:layout-authenticated-navigation",
+                "module:org",
+                "priority:P2",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4763,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:51:17.504Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "navigation-geometry",
+                          "contentType": "application/json",
+                          "body": "ewogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDgzNSwKICAgICJoZWlnaHQiOiAxMTk0CiAgfSwKICAic2Nyb2xsV2lkdGgiOiA4MzUsCiAgImJveGVzIjogWwogICAgewogICAgICAibGFiZWwiOiAiQXl1ZGEiLAogICAgICAid2lkdGgiOiA1OS4yNjU2MjUsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiAyNCwKICAgICAgInJpZ2h0IjogODMuMjY1NjI1LAogICAgICAidG9wIjogOTMsCiAgICAgICJib3R0b20iOiAxMzcKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJUb2dnbGUgdGhlbWUiLAogICAgICAid2lkdGgiOiA0NCwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDI0LAogICAgICAicmlnaHQiOiA2OCwKICAgICAgInRvcCI6IDE0NSwKICAgICAgImJvdHRvbSI6IDE4OQogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlBhbmVsIiwKICAgICAgIndpZHRoIjogNTMuNzgxMjUsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiAyNCwKICAgICAgInJpZ2h0IjogNzcuNzgxMjUsCiAgICAgICJ0b3AiOiAxOTcsCiAgICAgICJib3R0b20iOiAyNDEKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJQbGFuIHkgdXNvIiwKICAgICAgIndpZHRoIjogODcuNzAzMTI1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMjQsCiAgICAgICJyaWdodCI6IDExMS43MDMxMjUsCiAgICAgICJ0b3AiOiAyNDksCiAgICAgICJib3R0b20iOiAyOTMKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJQYXBlbGVyYSIsCiAgICAgICJ3aWR0aCI6IDc2LjczNDM3NSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDI0LAogICAgICAicmlnaHQiOiAxMDAuNzM0Mzc1LAogICAgICAidG9wIjogMzAxLAogICAgICAiYm90dG9tIjogMzQ1CiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiQ29uZmlndXJhY2nDs24iLAogICAgICAid2lkdGgiOiAxMTMuMTU2MjUsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiAyNCwKICAgICAgInJpZ2h0IjogMTM3LjE1NjI1LAogICAgICAidG9wIjogMzUzLAogICAgICAiYm90dG9tIjogMzk3CiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiTm90aWZpY2FjaW9uZXMiLAogICAgICAid2lkdGgiOiA0NCwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDI0LAogICAgICAicmlnaHQiOiA2OCwKICAgICAgInRvcCI6IDQwNSwKICAgICAgImJvdHRvbSI6IDQ0OQogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlNhbGlyIiwKICAgICAgIndpZHRoIjogNjUuMDE1NjI1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMjQsCiAgICAgICJyaWdodCI6IDg5LjAxNTYyNSwKICAgICAgInRvcCI6IDQ1NywKICAgICAgImJvdHRvbSI6IDUwMQogICAgfQogIF0KfQ=="
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "030359114b4f44a8b625-489ac852cfa6189a1cbb",
+              "file": "app/layout/authenticated-navigation.spec.ts",
+              "line": 95,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Notificaciones del encabezado @viewport:portrait",
+          "file": "app/layout/authenticated-navigation.spec.ts",
+          "line": 114,
+          "column": 8,
+          "specs": [
+            {
+              "title": "la campana permite abrir una notificación",
+              "ok": true,
+              "tags": [
+                "viewport:portrait",
+                "flow:layout-authenticated-navigation",
+                "module:org",
+                "priority:P2",
+                "outcome:display"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7302,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:51:22.348Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "navigation-geometry",
+                          "contentType": "application/json",
+                          "body": "ewogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDgzNSwKICAgICJoZWlnaHQiOiAxMTk0CiAgfSwKICAic2Nyb2xsV2lkdGgiOiA4MzUsCiAgImJveGVzIjogWwogICAgewogICAgICAibGFiZWwiOiAiVXNvIGRlIEFjbWUgRTJFIGFjdHVhbGl6YWRvUmV2aXNhIGVsIHBsYW4geSB1c28gZGUgdHUgb3JnYW5pemFjacOzbi4iLAogICAgICAid2lkdGgiOiAzMDIsCiAgICAgICJoZWlnaHQiOiA1MiwKICAgICAgImxlZnQiOiAzMywKICAgICAgInJpZ2h0IjogMzM1LAogICAgICAidG9wIjogNDE0LAogICAgICAiYm90dG9tIjogNDY2CiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiVmVyIHRvZGFzIiwKICAgICAgIndpZHRoIjogMzAyLAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMzMsCiAgICAgICJyaWdodCI6IDMzNSwKICAgICAgInRvcCI6IDQ3NCwKICAgICAgImJvdHRvbSI6IDUxOAogICAgfQogIF0KfQ=="
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "030359114b4f44a8b625-0dda705c6aa39da5ba05",
+              "file": "app/layout/authenticated-navigation.spec.ts",
+              "line": 117,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Navegación del miembro @viewport:landscape",
+          "file": "app/layout/authenticated-navigation.spec.ts",
+          "line": 69,
+          "column": 8,
+          "specs": [
+            {
+              "title": "el miembro abre plan y uso desde el menú",
+              "ok": true,
+              "tags": [
+                "viewport:landscape",
+                "flow:layout-authenticated-navigation",
+                "module:org",
+                "priority:P2",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9964,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:51:29.695Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "navigation-geometry",
+                          "contentType": "application/json",
+                          "body": "ewogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDExOTUsCiAgICAiaGVpZ2h0IjogODM1CiAgfSwKICAic2Nyb2xsV2lkdGgiOiAxMTk1LAogICJib3hlcyI6IFsKICAgIHsKICAgICAgImxhYmVsIjogIkF5dWRhIiwKICAgICAgIndpZHRoIjogNTkuMjY1NjI1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogNTg2LjU3ODEyNSwKICAgICAgInJpZ2h0IjogNjQ1Ljg0Mzc1LAogICAgICAidG9wIjogMTYsCiAgICAgICJib3R0b20iOiA2MAogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlRvZ2dsZSB0aGVtZSIsCiAgICAgICJ3aWR0aCI6IDQ0LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogNjYxLjg0Mzc1LAogICAgICAicmlnaHQiOiA3MDUuODQzNzUsCiAgICAgICJ0b3AiOiAxNiwKICAgICAgImJvdHRvbSI6IDYwCiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiUGFuZWwiLAogICAgICAid2lkdGgiOiA1My43ODEyNSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDcyMS44NDM3NSwKICAgICAgInJpZ2h0IjogNzc1LjYyNSwKICAgICAgInRvcCI6IDE2LAogICAgICAiYm90dG9tIjogNjAKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJQbGFuIHkgdXNvIiwKICAgICAgIndpZHRoIjogODcuNzAzMTI1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogNzkxLjYyNSwKICAgICAgInJpZ2h0IjogODc5LjMyODEyNSwKICAgICAgInRvcCI6IDE2LAogICAgICAiYm90dG9tIjogNjAKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJDb25maWd1cmFjacOzbiIsCiAgICAgICJ3aWR0aCI6IDExMy4xNTYyNSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDg5NS4zMjgxMjUsCiAgICAgICJyaWdodCI6IDEwMDguNDg0Mzc1LAogICAgICAidG9wIjogMTYsCiAgICAgICJib3R0b20iOiA2MAogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIk5vdGlmaWNhY2lvbmVzIiwKICAgICAgIndpZHRoIjogNDQsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiAxMDI0LjQ4NDM3NSwKICAgICAgInJpZ2h0IjogMTA2OC40ODQzNzUsCiAgICAgICJ0b3AiOiAxNiwKICAgICAgImJvdHRvbSI6IDYwCiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiU2FsaXIiLAogICAgICAid2lkdGgiOiA2NS4wMTU2MjUsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiAxMDg0LjQ4NDM3NSwKICAgICAgInJpZ2h0IjogMTE0OS41LAogICAgICAidG9wIjogMTYsCiAgICAgICJib3R0b20iOiA2MAogICAgfQogIF0KfQ=="
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "030359114b4f44a8b625-0dee9d664f26b290cc50",
+              "file": "app/layout/authenticated-navigation.spec.ts",
+              "line": 72,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Navegación del propietario @viewport:landscape",
+          "file": "app/layout/authenticated-navigation.spec.ts",
+          "line": 92,
+          "column": 8,
+          "specs": [
+            {
+              "title": "el propietario abre la papelera desde el menú",
+              "ok": true,
+              "tags": [
+                "viewport:landscape",
+                "flow:layout-authenticated-navigation",
+                "module:org",
+                "priority:P2",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5329,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:51:39.803Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "navigation-geometry",
+                          "contentType": "application/json",
+                          "body": "ewogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDExOTUsCiAgICAiaGVpZ2h0IjogODM1CiAgfSwKICAic2Nyb2xsV2lkdGgiOiAxMTk1LAogICJib3hlcyI6IFsKICAgIHsKICAgICAgImxhYmVsIjogIkF5dWRhIiwKICAgICAgIndpZHRoIjogNTkuMjY1NjI1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogNDkzLjg0Mzc1LAogICAgICAicmlnaHQiOiA1NTMuMTA5Mzc1LAogICAgICAidG9wIjogMTYsCiAgICAgICJib3R0b20iOiA2MAogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlRvZ2dsZSB0aGVtZSIsCiAgICAgICJ3aWR0aCI6IDQ0LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogNTY5LjEwOTM3NSwKICAgICAgInJpZ2h0IjogNjEzLjEwOTM3NSwKICAgICAgInRvcCI6IDE2LAogICAgICAiYm90dG9tIjogNjAKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJQYW5lbCIsCiAgICAgICJ3aWR0aCI6IDUzLjc4MTI1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogNjI5LjEwOTM3NSwKICAgICAgInJpZ2h0IjogNjgyLjg5MDYyNSwKICAgICAgInRvcCI6IDE2LAogICAgICAiYm90dG9tIjogNjAKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJQbGFuIHkgdXNvIiwKICAgICAgIndpZHRoIjogODcuNzAzMTI1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogNjk4Ljg5MDYyNSwKICAgICAgInJpZ2h0IjogNzg2LjU5Mzc1LAogICAgICAidG9wIjogMTYsCiAgICAgICJib3R0b20iOiA2MAogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlBhcGVsZXJhIiwKICAgICAgIndpZHRoIjogNzYuNzM0Mzc1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogODAyLjU5Mzc1LAogICAgICAicmlnaHQiOiA4NzkuMzI4MTI1LAogICAgICAidG9wIjogMTYsCiAgICAgICJib3R0b20iOiA2MAogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIkNvbmZpZ3VyYWNpw7NuIiwKICAgICAgIndpZHRoIjogMTEzLjE1NjI1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogODk1LjMyODEyNSwKICAgICAgInJpZ2h0IjogMTAwOC40ODQzNzUsCiAgICAgICJ0b3AiOiAxNiwKICAgICAgImJvdHRvbSI6IDYwCiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiTm90aWZpY2FjaW9uZXMiLAogICAgICAid2lkdGgiOiA0NCwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDEwMjQuNDg0Mzc1LAogICAgICAicmlnaHQiOiAxMDY4LjQ4NDM3NSwKICAgICAgInRvcCI6IDE2LAogICAgICAiYm90dG9tIjogNjAKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJTYWxpciIsCiAgICAgICJ3aWR0aCI6IDY1LjAxNTYyNSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDEwODQuNDg0Mzc1LAogICAgICAicmlnaHQiOiAxMTQ5LjUsCiAgICAgICJ0b3AiOiAxNiwKICAgICAgImJvdHRvbSI6IDYwCiAgICB9CiAgXQp9"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "030359114b4f44a8b625-19336a064d018023123b",
+              "file": "app/layout/authenticated-navigation.spec.ts",
+              "line": 95,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Notificaciones del encabezado @viewport:landscape",
+          "file": "app/layout/authenticated-navigation.spec.ts",
+          "line": 114,
+          "column": 8,
+          "specs": [
+            {
+              "title": "la campana permite abrir una notificación",
+              "ok": true,
+              "tags": [
+                "viewport:landscape",
+                "flow:layout-authenticated-navigation",
+                "module:org",
+                "priority:P2",
+                "outcome:display"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4471,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:51:45.225Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "navigation-geometry",
+                          "contentType": "application/json",
+                          "body": "ewogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDExOTUsCiAgICAiaGVpZ2h0IjogODM1CiAgfSwKICAic2Nyb2xsV2lkdGgiOiAxMTk1LAogICJib3hlcyI6IFsKICAgIHsKICAgICAgImxhYmVsIjogIlVzbyBkZSBBY21lIEUyRSBhY3R1YWxpemFkb1JldmlzYSBlbCBwbGFuIHkgdXNvIGRlIHR1IG9yZ2FuaXphY2nDs24uIiwKICAgICAgIndpZHRoIjogMzAyLAogICAgICAiaGVpZ2h0IjogNTIsCiAgICAgICJsZWZ0IjogNzU3LjQ4NDM3NSwKICAgICAgInJpZ2h0IjogMTA1OS40ODQzNzUsCiAgICAgICJ0b3AiOiA3NywKICAgICAgImJvdHRvbSI6IDEyOQogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlZlciB0b2RhcyIsCiAgICAgICJ3aWR0aCI6IDMwMiwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDc1Ny40ODQzNzUsCiAgICAgICJyaWdodCI6IDEwNTkuNDg0Mzc1LAogICAgICAidG9wIjogMTM3LAogICAgICAiYm90dG9tIjogMTgxCiAgICB9CiAgXQp9"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "030359114b4f44a8b625-0b28ea842ccb991f28eb",
+              "file": "app/layout/authenticated-navigation.spec.ts",
+              "line": 117,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Navegación del miembro @viewport:desktop",
+          "file": "app/layout/authenticated-navigation.spec.ts",
+          "line": 69,
+          "column": 8,
+          "specs": [
+            {
+              "title": "el miembro abre plan y uso desde el menú",
+              "ok": true,
+              "tags": [
+                "viewport:desktop",
+                "flow:layout-authenticated-navigation",
+                "module:org",
+                "priority:P2",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4336,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:51:49.830Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "navigation-geometry",
+                          "contentType": "application/json",
+                          "body": "ewogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDE0NDAsCiAgICAiaGVpZ2h0IjogOTAwCiAgfSwKICAic2Nyb2xsV2lkdGgiOiAxNDQwLAogICJib3hlcyI6IFsKICAgIHsKICAgICAgImxhYmVsIjogIkF5dWRhIiwKICAgICAgIndpZHRoIjogNTkuMjY1NjI1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogNzA5LjA3ODEyNSwKICAgICAgInJpZ2h0IjogNzY4LjM0Mzc1LAogICAgICAidG9wIjogMTYsCiAgICAgICJib3R0b20iOiA2MAogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlRvZ2dsZSB0aGVtZSIsCiAgICAgICJ3aWR0aCI6IDQ0LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogNzg0LjM0Mzc1LAogICAgICAicmlnaHQiOiA4MjguMzQzNzUsCiAgICAgICJ0b3AiOiAxNiwKICAgICAgImJvdHRvbSI6IDYwCiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiUGFuZWwiLAogICAgICAid2lkdGgiOiA1My43ODEyNSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDg0NC4zNDM3NSwKICAgICAgInJpZ2h0IjogODk4LjEyNSwKICAgICAgInRvcCI6IDE2LAogICAgICAiYm90dG9tIjogNjAKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJQbGFuIHkgdXNvIiwKICAgICAgIndpZHRoIjogODcuNzAzMTI1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogOTE0LjEyNSwKICAgICAgInJpZ2h0IjogMTAwMS44MjgxMjUsCiAgICAgICJ0b3AiOiAxNiwKICAgICAgImJvdHRvbSI6IDYwCiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiQ29uZmlndXJhY2nDs24iLAogICAgICAid2lkdGgiOiAxMTMuMTU2MjUsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiAxMDE3LjgyODEyNSwKICAgICAgInJpZ2h0IjogMTEzMC45ODQzNzUsCiAgICAgICJ0b3AiOiAxNiwKICAgICAgImJvdHRvbSI6IDYwCiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiTm90aWZpY2FjaW9uZXMiLAogICAgICAid2lkdGgiOiA0NCwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDExNDYuOTg0Mzc1LAogICAgICAicmlnaHQiOiAxMTkwLjk4NDM3NSwKICAgICAgInRvcCI6IDE2LAogICAgICAiYm90dG9tIjogNjAKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJTYWxpciIsCiAgICAgICJ3aWR0aCI6IDY1LjAxNTYyNSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDEyMDYuOTg0Mzc1LAogICAgICAicmlnaHQiOiAxMjcyLAogICAgICAidG9wIjogMTYsCiAgICAgICJib3R0b20iOiA2MAogICAgfQogIF0KfQ=="
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "030359114b4f44a8b625-f5fb1452f237f3453930",
+              "file": "app/layout/authenticated-navigation.spec.ts",
+              "line": 72,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Navegación del propietario @viewport:desktop",
+          "file": "app/layout/authenticated-navigation.spec.ts",
+          "line": 92,
+          "column": 8,
+          "specs": [
+            {
+              "title": "el propietario abre la papelera desde el menú",
+              "ok": true,
+              "tags": [
+                "viewport:desktop",
+                "flow:layout-authenticated-navigation",
+                "module:org",
+                "priority:P2",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4212,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:51:54.270Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "navigation-geometry",
+                          "contentType": "application/json",
+                          "body": "ewogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDE0NDAsCiAgICAiaGVpZ2h0IjogOTAwCiAgfSwKICAic2Nyb2xsV2lkdGgiOiAxNDQwLAogICJib3hlcyI6IFsKICAgIHsKICAgICAgImxhYmVsIjogIkF5dWRhIiwKICAgICAgIndpZHRoIjogNTkuMjY1NjI1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogNjE2LjM0Mzc1LAogICAgICAicmlnaHQiOiA2NzUuNjA5Mzc1LAogICAgICAidG9wIjogMTYsCiAgICAgICJib3R0b20iOiA2MAogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlRvZ2dsZSB0aGVtZSIsCiAgICAgICJ3aWR0aCI6IDQ0LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogNjkxLjYwOTM3NSwKICAgICAgInJpZ2h0IjogNzM1LjYwOTM3NSwKICAgICAgInRvcCI6IDE2LAogICAgICAiYm90dG9tIjogNjAKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJQYW5lbCIsCiAgICAgICJ3aWR0aCI6IDUzLjc4MTI1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogNzUxLjYwOTM3NSwKICAgICAgInJpZ2h0IjogODA1LjM5MDYyNSwKICAgICAgInRvcCI6IDE2LAogICAgICAiYm90dG9tIjogNjAKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJQbGFuIHkgdXNvIiwKICAgICAgIndpZHRoIjogODcuNzAzMTI1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogODIxLjM5MDYyNSwKICAgICAgInJpZ2h0IjogOTA5LjA5Mzc1LAogICAgICAidG9wIjogMTYsCiAgICAgICJib3R0b20iOiA2MAogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlBhcGVsZXJhIiwKICAgICAgIndpZHRoIjogNzYuNzM0Mzc1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogOTI1LjA5Mzc1LAogICAgICAicmlnaHQiOiAxMDAxLjgyODEyNSwKICAgICAgInRvcCI6IDE2LAogICAgICAiYm90dG9tIjogNjAKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJDb25maWd1cmFjacOzbiIsCiAgICAgICJ3aWR0aCI6IDExMy4xNTYyNSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDEwMTcuODI4MTI1LAogICAgICAicmlnaHQiOiAxMTMwLjk4NDM3NSwKICAgICAgInRvcCI6IDE2LAogICAgICAiYm90dG9tIjogNjAKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJOb3RpZmljYWNpb25lcyIsCiAgICAgICJ3aWR0aCI6IDQ0LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMTE0Ni45ODQzNzUsCiAgICAgICJyaWdodCI6IDExOTAuOTg0Mzc1LAogICAgICAidG9wIjogMTYsCiAgICAgICJib3R0b20iOiA2MAogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlNhbGlyIiwKICAgICAgIndpZHRoIjogNjUuMDE1NjI1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMTIwNi45ODQzNzUsCiAgICAgICJyaWdodCI6IDEyNzIsCiAgICAgICJ0b3AiOiAxNiwKICAgICAgImJvdHRvbSI6IDYwCiAgICB9CiAgXQp9"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "030359114b4f44a8b625-d87806041aa98f935a0e",
+              "file": "app/layout/authenticated-navigation.spec.ts",
+              "line": 95,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Notificaciones del encabezado @viewport:desktop",
+          "file": "app/layout/authenticated-navigation.spec.ts",
+          "line": 114,
+          "column": 8,
+          "specs": [
+            {
+              "title": "la campana permite abrir una notificación",
+              "ok": true,
+              "tags": [
+                "viewport:desktop",
+                "flow:layout-authenticated-navigation",
+                "module:org",
+                "priority:P2",
+                "outcome:display"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 14223,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:51:58.644Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "navigation-geometry",
+                          "contentType": "application/json",
+                          "body": "ewogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDE0NDAsCiAgICAiaGVpZ2h0IjogOTAwCiAgfSwKICAic2Nyb2xsV2lkdGgiOiAxNDQwLAogICJib3hlcyI6IFsKICAgIHsKICAgICAgImxhYmVsIjogIlVzbyBkZSBBY21lIEUyRSBhY3R1YWxpemFkb1JldmlzYSBlbCBwbGFuIHkgdXNvIGRlIHR1IG9yZ2FuaXphY2nDs24uIiwKICAgICAgIndpZHRoIjogMzAyLAogICAgICAiaGVpZ2h0IjogNTIsCiAgICAgICJsZWZ0IjogODc5Ljk4NDM3NSwKICAgICAgInJpZ2h0IjogMTE4MS45ODQzNzUsCiAgICAgICJ0b3AiOiA3NywKICAgICAgImJvdHRvbSI6IDEyOQogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlZlciB0b2RhcyIsCiAgICAgICJ3aWR0aCI6IDMwMiwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDg3OS45ODQzNzUsCiAgICAgICJyaWdodCI6IDExODEuOTg0Mzc1LAogICAgICAidG9wIjogMTM3LAogICAgICAiYm90dG9tIjogMTgxCiAgICB9CiAgXQp9"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "030359114b4f44a8b625-e03b3dc7ca7ca381b247",
+              "file": "app/layout/authenticated-navigation.spec.ts",
+              "line": 117,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Navegación del miembro @viewport:wide",
+          "file": "app/layout/authenticated-navigation.spec.ts",
+          "line": 69,
+          "column": 8,
+          "specs": [
+            {
+              "title": "el miembro abre plan y uso desde el menú",
+              "ok": true,
+              "tags": [
+                "viewport:wide",
+                "flow:layout-authenticated-navigation",
+                "module:org",
+                "priority:P2",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10000,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:52:13.039Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "navigation-geometry",
+                          "contentType": "application/json",
+                          "body": "ewogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDI1NjAsCiAgICAiaGVpZ2h0IjogMTQ0MAogIH0sCiAgInNjcm9sbFdpZHRoIjogMjU2MCwKICAiYm94ZXMiOiBbCiAgICB7CiAgICAgICJsYWJlbCI6ICJBeXVkYSIsCiAgICAgICJ3aWR0aCI6IDU5LjI2NTYyNSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDEyNjkuMDc4MTI1LAogICAgICAicmlnaHQiOiAxMzI4LjM0Mzc1LAogICAgICAidG9wIjogMTYsCiAgICAgICJib3R0b20iOiA2MAogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlRvZ2dsZSB0aGVtZSIsCiAgICAgICJ3aWR0aCI6IDQ0LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMTM0NC4zNDM3NSwKICAgICAgInJpZ2h0IjogMTM4OC4zNDM3NSwKICAgICAgInRvcCI6IDE2LAogICAgICAiYm90dG9tIjogNjAKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJQYW5lbCIsCiAgICAgICJ3aWR0aCI6IDUzLjc4MTI1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMTQwNC4zNDM3NSwKICAgICAgInJpZ2h0IjogMTQ1OC4xMjUsCiAgICAgICJ0b3AiOiAxNiwKICAgICAgImJvdHRvbSI6IDYwCiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiUGxhbiB5IHVzbyIsCiAgICAgICJ3aWR0aCI6IDg3LjcwMzEyNSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDE0NzQuMTI1LAogICAgICAicmlnaHQiOiAxNTYxLjgyODEyNSwKICAgICAgInRvcCI6IDE2LAogICAgICAiYm90dG9tIjogNjAKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJDb25maWd1cmFjacOzbiIsCiAgICAgICJ3aWR0aCI6IDExMy4xNTYyNSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDE1NzcuODI4MTI1LAogICAgICAicmlnaHQiOiAxNjkwLjk4NDM3NSwKICAgICAgInRvcCI6IDE2LAogICAgICAiYm90dG9tIjogNjAKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJOb3RpZmljYWNpb25lcyIsCiAgICAgICJ3aWR0aCI6IDQ0LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMTcwNi45ODQzNzUsCiAgICAgICJyaWdodCI6IDE3NTAuOTg0Mzc1LAogICAgICAidG9wIjogMTYsCiAgICAgICJib3R0b20iOiA2MAogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlNhbGlyIiwKICAgICAgIndpZHRoIjogNjUuMDE1NjI1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMTc2Ni45ODQzNzUsCiAgICAgICJyaWdodCI6IDE4MzIsCiAgICAgICJ0b3AiOiAxNiwKICAgICAgImJvdHRvbSI6IDYwCiAgICB9CiAgXQp9"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "030359114b4f44a8b625-7749ce5c37af24798610",
+              "file": "app/layout/authenticated-navigation.spec.ts",
+              "line": 72,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Navegación del propietario @viewport:wide",
+          "file": "app/layout/authenticated-navigation.spec.ts",
+          "line": 92,
+          "column": 8,
+          "specs": [
+            {
+              "title": "el propietario abre la papelera desde el menú",
+              "ok": true,
+              "tags": [
+                "viewport:wide",
+                "flow:layout-authenticated-navigation",
+                "module:org",
+                "priority:P2",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7588,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:52:23.144Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "navigation-geometry",
+                          "contentType": "application/json",
+                          "body": "ewogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDI1NjAsCiAgICAiaGVpZ2h0IjogMTQ0MAogIH0sCiAgInNjcm9sbFdpZHRoIjogMjU2MCwKICAiYm94ZXMiOiBbCiAgICB7CiAgICAgICJsYWJlbCI6ICJBeXVkYSIsCiAgICAgICJ3aWR0aCI6IDU5LjI2NTYyNSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDExNzYuMzQzNzUsCiAgICAgICJyaWdodCI6IDEyMzUuNjA5Mzc1LAogICAgICAidG9wIjogMTYsCiAgICAgICJib3R0b20iOiA2MAogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlRvZ2dsZSB0aGVtZSIsCiAgICAgICJ3aWR0aCI6IDQ0LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMTI1MS42MDkzNzUsCiAgICAgICJyaWdodCI6IDEyOTUuNjA5Mzc1LAogICAgICAidG9wIjogMTYsCiAgICAgICJib3R0b20iOiA2MAogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlBhbmVsIiwKICAgICAgIndpZHRoIjogNTMuNzgxMjUsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiAxMzExLjYwOTM3NSwKICAgICAgInJpZ2h0IjogMTM2NS4zOTA2MjUsCiAgICAgICJ0b3AiOiAxNiwKICAgICAgImJvdHRvbSI6IDYwCiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiUGxhbiB5IHVzbyIsCiAgICAgICJ3aWR0aCI6IDg3LjcwMzEyNSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDEzODEuMzkwNjI1LAogICAgICAicmlnaHQiOiAxNDY5LjA5Mzc1LAogICAgICAidG9wIjogMTYsCiAgICAgICJib3R0b20iOiA2MAogICAgfSwKICAgIHsKICAgICAgImxhYmVsIjogIlBhcGVsZXJhIiwKICAgICAgIndpZHRoIjogNzYuNzM0Mzc1LAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMTQ4NS4wOTM3NSwKICAgICAgInJpZ2h0IjogMTU2MS44MjgxMjUsCiAgICAgICJ0b3AiOiAxNiwKICAgICAgImJvdHRvbSI6IDYwCiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiQ29uZmlndXJhY2nDs24iLAogICAgICAid2lkdGgiOiAxMTMuMTU2MjUsCiAgICAgICJoZWlnaHQiOiA0NCwKICAgICAgImxlZnQiOiAxNTc3LjgyODEyNSwKICAgICAgInJpZ2h0IjogMTY5MC45ODQzNzUsCiAgICAgICJ0b3AiOiAxNiwKICAgICAgImJvdHRvbSI6IDYwCiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiTm90aWZpY2FjaW9uZXMiLAogICAgICAid2lkdGgiOiA0NCwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDE3MDYuOTg0Mzc1LAogICAgICAicmlnaHQiOiAxNzUwLjk4NDM3NSwKICAgICAgInRvcCI6IDE2LAogICAgICAiYm90dG9tIjogNjAKICAgIH0sCiAgICB7CiAgICAgICJsYWJlbCI6ICJTYWxpciIsCiAgICAgICJ3aWR0aCI6IDY1LjAxNTYyNSwKICAgICAgImhlaWdodCI6IDQ0LAogICAgICAibGVmdCI6IDE3NjYuOTg0Mzc1LAogICAgICAicmlnaHQiOiAxODMyLAogICAgICAidG9wIjogMTYsCiAgICAgICJib3R0b20iOiA2MAogICAgfQogIF0KfQ=="
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "030359114b4f44a8b625-03d9a4bbf35cde3482d2",
+              "file": "app/layout/authenticated-navigation.spec.ts",
+              "line": 95,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Notificaciones del encabezado @viewport:wide",
+          "file": "app/layout/authenticated-navigation.spec.ts",
+          "line": 114,
+          "column": 8,
+          "specs": [
+            {
+              "title": "la campana permite abrir una notificación",
+              "ok": true,
+              "tags": [
+                "viewport:wide",
+                "flow:layout-authenticated-navigation",
+                "module:org",
+                "priority:P2",
+                "outcome:display"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6251,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:52:31.271Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "navigation-geometry",
+                          "contentType": "application/json",
+                          "body": "ewogICJ2aWV3cG9ydCI6IHsKICAgICJ3aWR0aCI6IDI1NjAsCiAgICAiaGVpZ2h0IjogMTQ0MAogIH0sCiAgInNjcm9sbFdpZHRoIjogMjU2MCwKICAiYm94ZXMiOiBbCiAgICB7CiAgICAgICJsYWJlbCI6ICJVc28gZGUgQWNtZSBFMkUgYWN0dWFsaXphZG9SZXZpc2EgZWwgcGxhbiB5IHVzbyBkZSB0dSBvcmdhbml6YWNpw7NuLiIsCiAgICAgICJ3aWR0aCI6IDMwMiwKICAgICAgImhlaWdodCI6IDUyLAogICAgICAibGVmdCI6IDE0MzkuOTg0Mzc1LAogICAgICAicmlnaHQiOiAxNzQxLjk4NDM3NSwKICAgICAgInRvcCI6IDc3LAogICAgICAiYm90dG9tIjogMTI5CiAgICB9LAogICAgewogICAgICAibGFiZWwiOiAiVmVyIHRvZGFzIiwKICAgICAgIndpZHRoIjogMzAyLAogICAgICAiaGVpZ2h0IjogNDQsCiAgICAgICJsZWZ0IjogMTQzOS45ODQzNzUsCiAgICAgICJyaWdodCI6IDE3NDEuOTg0Mzc1LAogICAgICAidG9wIjogMTM3LAogICAgICAiYm90dG9tIjogMTgxCiAgICB9CiAgXQp9"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "030359114b4f44a8b625-df2c56fdceaac9ec1e1e",
+              "file": "app/layout/authenticated-navigation.spec.ts",
+              "line": 117,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "Cierre autenticado @viewport:portrait",
+          "file": "app/layout/authenticated-navigation.spec.ts",
+          "line": 147,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Escape desde un enlace cierra el menú",
+              "ok": true,
+              "tags": [
+                "viewport:portrait",
+                "flow:layout-authenticated-navigation",
+                "module:org",
+                "priority:P2",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2470,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:52:37.617Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "030359114b4f44a8b625-95a4417a38d251be8b53",
+              "file": "app/layout/authenticated-navigation.spec.ts",
+              "line": 150,
+              "column": 7
+            },
+            {
+              "title": "un toque fuera cierra el menú",
+              "ok": true,
+              "tags": [
+                "viewport:portrait",
+                "flow:layout-authenticated-navigation",
+                "module:org",
+                "priority:P2",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3971,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:52:40.139Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "030359114b4f44a8b625-216f0e8e32f2ca056ce8",
+              "file": "app/layout/authenticated-navigation.spec.ts",
+              "line": 165,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "Salida autenticada @viewport:compact",
+          "file": "app/layout/authenticated-navigation.spec.ts",
+          "line": 179,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Salir termina la sesión desde el menú compacto",
+              "ok": true,
+              "tags": [
+                "viewport:compact",
+                "flow:layout-authenticated-navigation",
+                "module:org",
+                "priority:P2",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4984,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:52:44.153Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "030359114b4f44a8b625-c31743d4dd72da6b5b30",
+              "file": "app/layout/authenticated-navigation.spec.ts",
+              "line": 182,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

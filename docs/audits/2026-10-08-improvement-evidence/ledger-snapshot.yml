@@ -1,0 +1,2814 @@
+schema: 1
+codebase: versiona_project
+instances:
+- versiona_project
+- versiona_project_staging
+context:
+  standards:
+    improvement: workflows/improvement/IMPROVEMENT_STANDARDS.md
+    responsive: workflows/testing/RESPONSIVE_STANDARDS.md
+    performance: workflows/testing/PERFORMANCE_STANDARDS.md
+  requirements:
+    identity: docs/plan/08-seguridad.md
+    idempotency: docs/plan/02-modelo-datos.md
+  compute_profile:
+    id: vps-projectapp-staging
+    calibrated_on: '2026-09-14'
+candidates:
+- front: security
+  module: accounts
+  root_cause: google-identity-not-bound-to-validated-claims
+  process: POST /api/google_login/
+  problem: Un payload validado sin email mantiene la identidad aportada por el cliente; faltan comprobaciones de email verificado
+    y audience configurado.
+  paths:
+  - backend/accounts/views/auth.py
+  evidence: &id001
+  - backend/accounts/views/auth.py:167
+  - backend/accounts/views/auth.py:188
+  - backend/accounts/views/auth.py:199
+  - backend/accounts/views/auth.py:219
+  severity: bloqueante
+  confidence: inferred
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  id: I-S-cae2f9667fc6
+  status: verified
+  depends_on: []
+  tests_declared:
+  - backend/accounts/tests/views/test_auth_endpoints.py
+  - backend/orgs/tests/test_onboarding.py
+  value_decision:
+    policy_version: 1.0.0
+    required: true
+    decision: proceed
+    reason: a requirement, blocking risk or regression cannot be deferred for ROI
+  context_fingerprint: 1d256a791b2bcd922198d5f77f76ea1b3b26b13b35e5a54fa73cd1b910c2d124
+  first_seen: '2026-10-01T00:23:35Z'
+  updated_at: '2026-10-01T02:28:43Z'
+  report: docs/audits/2026-10-01-versiona_project_staging-improvement-pass-project-transversal.md
+  value_assessment:
+    benefit: material
+    effort: S
+    change_risk: low
+    mandatory: true
+    reason: La identidad autenticada debe corresponder al token validado, nunca a una cuenta elegida desde el request.
+    evidence: *id001
+    cosmetic_only: false
+  qa:
+    status: verified
+    round_id: 2026-10-01-versiona-transversal
+    commit: 49d7ba85e76ec05cd4165b5573d5ae3f5b11df08
+    report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+    reason: exact round, commit, passing test artifacts and live E2E where required are verified
+    recorded_at: '2026-10-01T02:28:43Z'
+    executions:
+    - layer: gate
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-gate.json
+      format: gate-json
+      live: false
+      candidate_ids:
+      - I-S-cae2f9667fc6
+      - I-S-f775b80c4455
+      - I-O-478a8866d0d5
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-backend-auth-claims.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-cae2f9667fc6
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-backend-auth-admission.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-cae2f9667fc6
+      - I-S-f775b80c4455
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-backend-security.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-f775b80c4455
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-backend-engine-recovery.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-O-478a8866d0d5
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-backend-engine-phases.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-O-478a8866d0d5
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-backend-onboarding-google.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-cae2f9667fc6
+    - layer: frontend-unit
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-unit-authstore-a.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-f775b80c4455
+    - layer: frontend-unit
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-unit-authstore-b.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-f775b80c4455
+    - layer: frontend-unit
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-unit-signin.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-f775b80c4455
+    - layer: frontend-unit
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-unit-signup.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-f775b80c4455
+    - layer: e2e
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-e2e.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-S-f775b80c4455
+- front: security
+  module: accounts
+  root_cause: google-login-bypasses-local-twofactor-admission
+  process: Acceso Google con TOTP activo
+  problem: Google emite JWT para una cuenta con TOTP sin devolver el desafío requerido por el login con contraseña.
+  paths:
+  - backend/accounts/twofactor.py
+  - backend/accounts/views/auth.py
+  - frontend/app/sign-in/page.tsx
+  - frontend/app/sign-up/page.tsx
+  - frontend/lib/stores/authStore.ts
+  evidence: &id002
+  - backend/accounts/views/auth.py:135
+  - backend/accounts/views/auth.py:245
+  - docs/audit/03-mapa-flujos.md:97
+  - frontend/app/sign-in/page.tsx:91
+  - frontend/app/sign-up/page.tsx:108
+  - frontend/lib/stores/authStore.ts:104
+  severity: bloqueante
+  confidence: inferred
+  e2e_required: true
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  id: I-S-f775b80c4455
+  status: verified
+  depends_on: []
+  tests_declared:
+  - backend/accounts/tests/views/test_auth_endpoints.py
+  - backend/accounts/tests/views/test_security_endpoints.py
+  - frontend/app/sign-in/__tests__/page.test.tsx
+  - frontend/app/sign-up/__tests__/page.test.tsx
+  - frontend/e2e/app/onboarding/a3-account-security.spec.ts
+  - frontend/lib/stores/__tests__/authStore.test.ts
+  value_decision:
+    policy_version: 1.0.0
+    required: true
+    decision: proceed
+    reason: a requirement, blocking risk or regression cannot be deferred for ROI
+  context_fingerprint: e20905733e0664ccc3d084d34b911bd9b64627cb108d3026109206b1103170da
+  first_seen: '2026-10-01T00:23:35Z'
+  updated_at: '2026-10-01T02:28:43Z'
+  report: docs/audits/2026-10-01-versiona_project_staging-improvement-pass-project-transversal.md
+  value_assessment:
+    benefit: material
+    effort: M
+    change_risk: medium
+    mandatory: true
+    reason: Activar TOTP exige el segundo factor antes de emitir tokens independientemente del primer factor.
+    evidence: *id002
+    cosmetic_only: false
+  qa:
+    status: verified
+    round_id: 2026-10-01-versiona-transversal
+    commit: 49d7ba85e76ec05cd4165b5573d5ae3f5b11df08
+    report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+    reason: exact round, commit, passing test artifacts and live E2E where required are verified
+    recorded_at: '2026-10-01T02:28:43Z'
+    executions:
+    - layer: gate
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-gate.json
+      format: gate-json
+      live: false
+      candidate_ids:
+      - I-S-cae2f9667fc6
+      - I-S-f775b80c4455
+      - I-O-478a8866d0d5
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-backend-auth-claims.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-cae2f9667fc6
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-backend-auth-admission.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-cae2f9667fc6
+      - I-S-f775b80c4455
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-backend-security.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-f775b80c4455
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-backend-engine-recovery.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-O-478a8866d0d5
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-backend-engine-phases.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-O-478a8866d0d5
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-backend-onboarding-google.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-cae2f9667fc6
+    - layer: frontend-unit
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-unit-authstore-a.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-f775b80c4455
+    - layer: frontend-unit
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-unit-authstore-b.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-f775b80c4455
+    - layer: frontend-unit
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-unit-signin.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-f775b80c4455
+    - layer: frontend-unit
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-unit-signup.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-f775b80c4455
+    - layer: e2e
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-e2e.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-S-f775b80c4455
+- front: security
+  module: accounts
+  root_cause: auth-throttle-rate-configured-without-enforcement
+  process: La cuota auth declarada no se aplica a los accesos públicos
+  problem: La cuota auth declarada no se aplica a los accesos públicos
+  paths:
+  - backend/accounts/throttles.py
+  - backend/accounts/views/auth.py
+  - backend/accounts/views/security.py
+  - backend/versiona_project/urls.py
+  evidence: &id003
+  - backend/accounts/tests/views/test_auth_throttles.py:62
+  - backend/accounts/throttles.py:7
+  severity: bloqueante
+  confidence: measured
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  id: I-S-f426eb46bd37
+  status: verified
+  depends_on: []
+  tests_declared:
+  - backend/accounts/tests/views/test_auth_throttles.py
+  value_decision:
+    policy_version: 1.0.0
+    required: true
+    decision: proceed
+    reason: a requirement, blocking risk or regression cannot be deferred for ROI
+  context_fingerprint: 4f5876e81728196a66b0edb23d576406e064439f084a16cb6a24bc42578682f9
+  first_seen: '2026-10-01T00:23:35Z'
+  updated_at: '2026-10-02T13:04:07Z'
+  report: docs/audits/2026-10-02-versiona_project_staging-improvement-pass-project-auth-purge.md
+  e2e_required: true
+  value_assessment:
+    benefit: material
+    effort: S
+    change_risk: low
+    mandatory: true
+    reason: La cuota auth declarada no se aplica a los accesos públicos; evidencia actual del mecanismo y contrato citado.
+    evidence: *id003
+    cosmetic_only: false
+  qa:
+    status: verified
+    round_id: 2026-10-02-versiona-auth-purge
+    commit: 731fa0d4e004ced4e9d427b7d883a5ac4f39f19f
+    report: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/qa.md
+    reason: exact round, commit, passing test artifacts and live E2E where required are verified
+    recorded_at: '2026-10-02T13:04:07Z'
+    executions:
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/final-backend-auth.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-b1096995f2b4
+      - I-S-f426eb46bd37
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/final-backend-purge.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - P-backend-tasks-03
+    - layer: e2e
+      report: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/final-e2e.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-S-b1096995f2b4
+      - I-S-f426eb46bd37
+    - layer: gate
+      report: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/final-gate.json
+      format: gate-json
+      live: false
+      candidate_ids:
+      - I-S-b1096995f2b4
+      - I-S-f426eb46bd37
+      - P-backend-tasks-03
+- front: security
+  module: accounts
+  root_cause: single-use-auth-code-consumption-is-not-atomic
+  process: Consumo de códigos de respaldo y recuperación
+  problem: Lecturas concurrentes o instancias antiguas permiten aceptar dos veces un código de uso único.
+  paths:
+  - backend/accounts/twofactor.py
+  - backend/accounts/views/auth.py
+  evidence:
+  - backend/accounts/twofactor.py:68
+  - backend/accounts/views/auth.py:328
+  - backend/accounts/views/auth.py:344
+  - backend/accounts/views/auth.py:346
+  - docs/audit/03-mapa-flujos.md:99
+  severity: mayor
+  confidence: measured
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  id: I-S-f729cb68b016
+  status: verified
+  depends_on: []
+  tests_declared:
+  - backend/accounts/tests/services/test_single_use_codes.py
+  - backend/accounts/tests/views/test_single_use_codes.py
+  value_assessment:
+    benefit: material
+    effort: M
+    change_risk: medium
+    mandatory: true
+    reason: La evidencia de código y las pruebas conductuales referidas en el reporte demuestran el mecanismo y su mejora;
+      QA viva combinada aún pendiente.
+    evidence:
+    - backend/accounts/twofactor.py:68
+    - backend/accounts/views/auth.py:328
+    - backend/accounts/views/auth.py:344
+    - backend/accounts/views/auth.py:346
+    - docs/audit/03-mapa-flujos.md:99
+    cosmetic_only: false
+  value_decision:
+    policy_version: 1.0.0
+    required: true
+    decision: proceed
+    reason: a requirement, blocking risk or regression cannot be deferred for ROI
+  context_fingerprint: 92d103a7ccfcd411afb8b9008a27a756abf8199c0efbc030cbeb523b375ff3cd
+  first_seen: '2026-10-01T00:23:35Z'
+  updated_at: '2026-10-08T12:59:02Z'
+  report: docs/audits/2026-10-08-versiona_project_staging-improvement-pass-project-orchestrated.md
+  qa:
+    status: verified
+    round_id: versiona-08102026-orchestrated-core
+    commit: 4d067815589b348c3bfd3deba6319ee833ab79f0
+    report: docs/audits/2026-10-08-improvement-evidence/QA.md
+    reason: exact round, commit, passing test artifacts and live E2E where required are verified
+    recorded_at: '2026-10-08T12:59:02Z'
+    executions:
+    - layer: backend
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/backend-batch-a-junit.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-f729cb68b016
+    - layer: backend
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/backend-batch-b-junit.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-O-d1612d51180a
+    - layer: frontend-unit
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/frontend-unit-store-page-junit.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-M-4a835d9294ef
+    - layer: e2e
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/e2e-public.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-M-4a835d9294ef
+    - layer: gate
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/gate-strict.json
+      format: gate-json
+      live: false
+      candidate_ids:
+      - I-S-f729cb68b016
+      - I-M-4a835d9294ef
+      - I-O-d1612d51180a
+- front: maintainability
+  module: frontend-error-handling
+  root_cause: api-error-message-extraction-divergence
+  process: Mostrar errores de comparación y subida
+  problem: Extractores duplicados aceptan objetos aunque el estado público debe ser string.
+  paths:
+  - frontend/lib/services/errors.ts
+  - frontend/lib/stores/compareStore.ts
+  - frontend/lib/stores/documentStore.ts
+  - frontend/lib/stores/versionStore.ts
+  evidence:
+  - frontend/components/versions/UploadDropzone.tsx:192
+  - frontend/lib/services/errors.ts:13
+  - frontend/lib/stores/compareStore.ts:39
+  - frontend/lib/stores/documentStore.ts:40
+  - frontend/lib/stores/versionStore.ts:22
+  severity: menor
+  confidence: measured
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  id: I-M-f925ade201d9
+  status: candidate
+  depends_on: []
+  tests_declared: []
+  value_assessment:
+    benefit: minor
+    effort: S
+    change_risk: low
+    mandatory: false
+    reason: Centralizar el narrowing conserva mensajes válidos y evita estados no renderizables.
+    evidence:
+    - frontend/components/versions/UploadDropzone.tsx:192
+    - frontend/lib/services/errors.ts:13
+    - frontend/lib/stores/compareStore.ts:39
+    - frontend/lib/stores/documentStore.ts:40
+    - frontend/lib/stores/versionStore.ts:22
+    cosmetic_only: false
+  value_decision:
+    policy_version: 1.0.0
+    required: false
+    decision: proceed
+    reason: minor benefit is justified by a localized, low risk change
+  context_fingerprint: 577849e1027f402d626bb0d479cbd9c85ed068d26eefd0fc2b5cd7ed99987328
+  first_seen: '2026-10-01T00:23:35Z'
+  updated_at: '2026-10-01T00:23:35Z'
+- front: maintainability
+  module: backend-domain-errors
+  root_cause: shared-domain-error-owned-by-upload-service
+  process: Cargar rechazos de negocio transversales
+  problem: Importar DomainError obliga a cargar parser PDF y tareas del servicio de versiones.
+  paths:
+  - backend/accounts/twofactor.py
+  - backend/billing/services.py
+  - backend/documents/services/version_service.py
+  - backend/orgs/invitations.py
+  evidence:
+  - backend/accounts/twofactor.py:22
+  - backend/billing/services.py:8
+  - backend/documents/services/version_service.py:20
+  - backend/documents/services/version_service.py:29
+  severity: menor
+  confidence: inferred
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  id: I-M-1174be80441d
+  status: candidate
+  depends_on: []
+  tests_declared: []
+  value_assessment:
+    benefit: unknown
+    effort: M
+    change_risk: medium
+    mandatory: false
+    reason: El acoplamiento existe pero falta demostrar un fallo o coste operativo material.
+    evidence:
+    - backend/accounts/twofactor.py:22
+    - backend/billing/services.py:8
+    - backend/documents/services/version_service.py:20
+    - backend/documents/services/version_service.py:29
+    cosmetic_only: false
+  value_decision:
+    policy_version: 1.0.0
+    required: false
+    decision: needs-evidence
+    reason: benefit has not been demonstrated
+  context_fingerprint: 1bf5299bcc4ceb0ec8eca552ce6aa10cbd65b1c8803804e7777d6c4235eac25d
+  first_seen: '2026-10-01T00:23:35Z'
+  updated_at: '2026-10-01T00:23:35Z'
+- front: observability
+  module: engine
+  root_cause: analysis-retry-replays-committed-snapshots
+  process: Reintento de análisis tras fallar un paso derivado
+  problem: Después de persistir snapshots el retry vuelve a insertarlos y viola su unicidad.
+  paths:
+  - backend/engine/services/persistence.py
+  - backend/engine/tasks.py
+  evidence: &id004
+  - backend/documents/models/section.py:71
+  - backend/engine/services/persistence.py:71
+  - backend/engine/tasks.py:60
+  - backend/engine/tasks.py:65
+  - backend/engine/tasks.py:79
+  - docs/plan/02-modelo-datos.md:152
+  severity: bloqueante
+  confidence: inferred
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  id: I-O-478a8866d0d5
+  status: verified
+  depends_on: []
+  tests_declared:
+  - backend/engine/tests/test_tasks.py
+  value_decision:
+    policy_version: 1.0.0
+    required: true
+    decision: proceed
+    reason: a requirement, blocking risk or regression cannot be deferred for ROI
+  context_fingerprint: d5e17293e9caded05df7163172b7e3c54b7ec19fc85148eddbf1d178750c913a
+  first_seen: '2026-10-01T00:23:35Z'
+  updated_at: '2026-10-01T02:28:43Z'
+  report: docs/audits/2026-10-01-versiona_project_staging-improvement-pass-project-transversal.md
+  value_assessment:
+    benefit: material
+    effort: M
+    change_risk: medium
+    mandatory: true
+    reason: I15 exige reejecución idempotente y que un fallo transitorio no convierta un análisis persistido en fallo permanente.
+    evidence: *id004
+    cosmetic_only: false
+  qa:
+    status: verified
+    round_id: 2026-10-01-versiona-transversal
+    commit: 49d7ba85e76ec05cd4165b5573d5ae3f5b11df08
+    report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+    reason: exact round, commit, passing test artifacts and live E2E where required are verified
+    recorded_at: '2026-10-01T02:28:43Z'
+    executions:
+    - layer: gate
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-gate.json
+      format: gate-json
+      live: false
+      candidate_ids:
+      - I-S-cae2f9667fc6
+      - I-S-f775b80c4455
+      - I-O-478a8866d0d5
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-backend-auth-claims.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-cae2f9667fc6
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-backend-auth-admission.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-cae2f9667fc6
+      - I-S-f775b80c4455
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-backend-security.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-f775b80c4455
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-backend-engine-recovery.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-O-478a8866d0d5
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-backend-engine-phases.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-O-478a8866d0d5
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-backend-onboarding-google.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-cae2f9667fc6
+    - layer: frontend-unit
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-unit-authstore-a.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-f775b80c4455
+    - layer: frontend-unit
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-unit-authstore-b.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-f775b80c4455
+    - layer: frontend-unit
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-unit-signin.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-f775b80c4455
+    - layer: frontend-unit
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-unit-signup.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-f775b80c4455
+    - layer: e2e
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-e2e.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-S-f775b80c4455
+- front: observability
+  module: public_tools
+  root_cause: cleanup-error-suppression-discards-retry-reference
+  process: Purga de comparaciones públicas
+  problem: Errores de eliminación se silencian y la fila se borra perdiendo la referencia al PDF retenido.
+  paths:
+  - backend/documents/services/storage/filesystem.py
+  - backend/public_tools/services/public_comparison_service.py
+  - backend/public_tools/tasks.py
+  evidence:
+  - backend/documents/services/storage/filesystem.py:246
+  - backend/public_tools/services/public_comparison_service.py:169
+  - backend/public_tools/tasks.py:60
+  - docs/audit/03-mapa-flujos.md:447
+  - docs/methodology/product_requirement_docs.md:35
+  severity: mayor
+  confidence: measured
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  id: I-O-d1612d51180a
+  status: verified
+  depends_on: []
+  tests_declared:
+  - backend/documents/tests/services/test_storage_delete_failures.py
+  - backend/documents/tests/services/test_upload_cleanup_failures.py
+  - backend/public_tools/tests/test_public_cleanup_failures.py
+  value_assessment:
+    benefit: material
+    effort: S
+    change_risk: medium
+    mandatory: true
+    reason: La evidencia de código y las pruebas conductuales referidas en el reporte demuestran el mecanismo y su mejora;
+      QA viva combinada aún pendiente.
+    evidence:
+    - backend/documents/services/storage/filesystem.py:246
+    - backend/public_tools/services/public_comparison_service.py:169
+    - backend/public_tools/tasks.py:60
+    - docs/audit/03-mapa-flujos.md:447
+    - docs/methodology/product_requirement_docs.md:35
+    cosmetic_only: false
+  value_decision:
+    policy_version: 1.0.0
+    required: true
+    decision: proceed
+    reason: a requirement, blocking risk or regression cannot be deferred for ROI
+  context_fingerprint: 5668827ac2f1bd54b1dbb73a5f6bd11ecc27232b0cb0fe7937a504b46a70551f
+  first_seen: '2026-10-01T00:23:35Z'
+  updated_at: '2026-10-08T12:59:02Z'
+  report: docs/audits/2026-10-08-versiona_project_staging-improvement-pass-project-orchestrated.md
+  qa:
+    status: verified
+    round_id: versiona-08102026-orchestrated-core
+    commit: 4d067815589b348c3bfd3deba6319ee833ab79f0
+    report: docs/audits/2026-10-08-improvement-evidence/QA.md
+    reason: exact round, commit, passing test artifacts and live E2E where required are verified
+    recorded_at: '2026-10-08T12:59:02Z'
+    executions:
+    - layer: backend
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/backend-batch-a-junit.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-f729cb68b016
+    - layer: backend
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/backend-batch-b-junit.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-O-d1612d51180a
+    - layer: frontend-unit
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/frontend-unit-store-page-junit.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-M-4a835d9294ef
+    - layer: e2e
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/e2e-public.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-M-4a835d9294ef
+    - layer: gate
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/gate-strict.json
+      format: gate-json
+      live: false
+      candidate_ids:
+      - I-S-f729cb68b016
+      - I-M-4a835d9294ef
+      - I-O-d1612d51180a
+- front: observability
+  module: notifications
+  root_cause: email-success-recorded-without-delivery-ack
+  process: Enviar notificación
+  problem: Se marca fecha de envío aun cuando SMTP devuelve cero; el fallo queda oculto.
+  paths:
+  - backend/notifications/services.py
+  evidence:
+  - backend/notifications/services.py:53
+  - backend/notifications/services.py:55
+  - backend/notifications/services.py:60
+  - backend/notifications/services.py:62
+  severity: mayor
+  confidence: inferred
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  id: I-O-b60a907a6e5c
+  status: candidate
+  depends_on: []
+  tests_declared: []
+  value_assessment:
+    benefit: material
+    effort: S
+    change_risk: low
+    mandatory: false
+    reason: Distinguir envío real de fallo conserva diagnóstico correcto sin romper la notificación interna.
+    evidence:
+    - backend/notifications/services.py:53
+    - backend/notifications/services.py:55
+    - backend/notifications/services.py:60
+    - backend/notifications/services.py:62
+    cosmetic_only: false
+  value_decision:
+    policy_version: 1.0.0
+    required: false
+    decision: proceed
+    reason: material benefit is supported by evidence
+  context_fingerprint: 123afe6054899a77bac4ed1482d499a05499c00707e51d74449b4692d1def746
+  first_seen: '2026-10-01T00:23:35Z'
+  updated_at: '2026-10-01T00:23:35Z'
+- front: observability
+  module: reviews
+  root_cause: pending-plan-notification-replayed-after-idempotent-records
+  process: Reejecución D5 coordinator
+  problem: Registros existentes pending disparan notificaciones nuevas en cada replay.
+  paths:
+  - backend/reviews/services/seal_service.py
+  evidence:
+  - backend/reviews/services/seal_service.py:298
+  - backend/reviews/services/seal_service.py:336
+  - backend/reviews/services/seal_service.py:342
+  - docs/plan/02-modelo-datos.md:152
+  severity: mayor
+  confidence: inferred
+  regression_pending: false
+  required_pending: true
+  obligation_open: false
+  id: I-O-b045a02e7097
+  status: candidate
+  depends_on: []
+  tests_declared: []
+  value_assessment:
+    benefit: material
+    effort: S
+    change_risk: low
+    mandatory: true
+    reason: I15 incluye no producir nuevos avisos al reejecutar el mismo plan.
+    evidence:
+    - backend/reviews/services/seal_service.py:298
+    - backend/reviews/services/seal_service.py:336
+    - backend/reviews/services/seal_service.py:342
+    - docs/plan/02-modelo-datos.md:152
+    cosmetic_only: false
+  value_decision:
+    policy_version: 1.0.0
+    required: true
+    decision: proceed
+    reason: a requirement, blocking risk or regression cannot be deferred for ROI
+  context_fingerprint: 6943c04c6e60d59037c7052e55792c8118a9d8dc4aa5d94d62f8578bd9126824
+  first_seen: '2026-10-01T00:23:35Z'
+  updated_at: '2026-10-01T00:23:35Z'
+- front: observability
+  module: notifications
+  root_cause: smtp-boundary-has-no-explicit-timeout
+  process: SMTP dentro de operaciones de dominio
+  problem: La llamada síncrona no define timeout y puede mantener locks de la transacción.
+  paths:
+  - backend/notifications/services.py
+  - backend/versiona_project/settings.py
+  evidence:
+  - backend/notifications/services.py:55
+  - backend/reviews/services/seal_service.py:359
+  - backend/versiona_project/settings.py:266
+  severity: mayor
+  confidence: inferred
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  id: I-O-3dfc33ad9684
+  status: candidate
+  depends_on: []
+  tests_declared: []
+  value_assessment:
+    benefit: material
+    effort: S
+    change_risk: low
+    mandatory: false
+    reason: Acotar el bloqueo de una dependencia permite continuar ante fallo de red.
+    evidence:
+    - backend/notifications/services.py:55
+    - backend/reviews/services/seal_service.py:359
+    - backend/versiona_project/settings.py:266
+    cosmetic_only: false
+  value_decision:
+    policy_version: 1.0.0
+    required: false
+    decision: proceed
+    reason: material benefit is supported by evidence
+  context_fingerprint: e564d1853baee8d0bfb63d56f84d62a7e6f3871d51013a585c2693a936be9d31
+  first_seen: '2026-10-01T00:23:35Z'
+  updated_at: '2026-10-01T00:23:35Z'
+- front: performance
+  module: documents
+  root_cause: trash-seal-eligibility-per-version-lookups
+  process: Elegibilidad para enviar documento o proyecto a papelera
+  problem: La comprobación de existencia recorre versiones y documentos consultando por fila.
+  paths:
+  - backend/documents/services/trash_service.py
+  evidence:
+  - backend/documents/services/trash_service.py:101
+  - backend/documents/services/trash_service.py:22
+  severity: mayor
+  confidence: inferred
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  id: I-P-ca5f8d85da7f
+  status: candidate
+  depends_on: []
+  tests_declared: []
+  value_assessment:
+    benefit: material
+    effort: S
+    change_risk: low
+    mandatory: false
+    reason: Consultas globales de existencia conservan la prohibición de borrar evidencia sin materializar todas las versiones.
+    evidence:
+    - backend/documents/services/trash_service.py:101
+    - backend/documents/services/trash_service.py:22
+    cosmetic_only: false
+  value_decision:
+    policy_version: 1.0.0
+    required: false
+    decision: proceed
+    reason: material benefit is supported by evidence
+  context_fingerprint: 4b899e477f2e5a71e1440a285aefd122b39de7e6c99c12a3d3153cd8ea484dd9
+  first_seen: '2026-10-01T00:23:35Z'
+  updated_at: '2026-10-01T00:23:35Z'
+- front: responsive
+  module: layout
+  root_cause: authenticated-navigation-has-no-compact-presentation
+  process: Navegación global autenticada
+  problem: Una fila horizontal sin variante compact ni portrait incumple NAV-1 y contiene controles menores que el mínimo
+    táctil.
+  paths:
+  - frontend/components/layout/Header.tsx
+  evidence:
+  - docs/RESPONSIVE_STANDARDS.md:97
+  - frontend/components/layout/Header.tsx:44
+  - frontend/components/layout/Header.tsx:45
+  - frontend/components/layout/Header.tsx:52
+  - frontend/components/notifications/NotificationBell.tsx:40
+  - frontend/components/theme-toggle.tsx:88
+  severity: mayor
+  confidence: measured
+  e2e_required: true
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  id: I-R-5689a0c7c4a0
+  status: verified
+  depends_on: []
+  tests_declared:
+  - frontend/components/__tests__/navigation-toggles.test.tsx
+  - frontend/components/layout/__tests__/header-navigation.test.tsx
+  - frontend/e2e/app/layout/authenticated-navigation.spec.ts
+  value_assessment:
+    benefit: material
+    effort: S
+    change_risk: low
+    mandatory: true
+    reason: La evidencia de código y las pruebas conductuales referidas en el reporte demuestran el mecanismo y su mejora;
+      QA viva combinada aún pendiente.
+    evidence:
+    - docs/RESPONSIVE_STANDARDS.md:97
+    - frontend/components/layout/Header.tsx:44
+    - frontend/components/layout/Header.tsx:45
+    - frontend/components/layout/Header.tsx:52
+    - frontend/components/notifications/NotificationBell.tsx:40
+    - frontend/components/theme-toggle.tsx:88
+    cosmetic_only: false
+  value_decision:
+    policy_version: 1.0.0
+    required: true
+    decision: proceed
+    reason: a requirement, blocking risk or regression cannot be deferred for ROI
+  context_fingerprint: 5a98e0394fd73cfa6a749b2f104174e3abe6e2fdc7cd26e5860d3544c7bd11b8
+  first_seen: '2026-10-01T00:23:35Z'
+  updated_at: '2026-10-08T12:59:34Z'
+  report: docs/audits/2026-10-08-versiona_project_staging-improvement-pass-project-orchestrated.md
+  qa:
+    status: verified
+    round_id: versiona-08102026-orchestrated-interface
+    commit: 4d067815589b348c3bfd3deba6319ee833ab79f0
+    report: docs/audits/2026-10-08-improvement-evidence/QA.md
+    reason: exact round, commit, passing test artifacts and live E2E where required are verified
+    recorded_at: '2026-10-08T12:59:34Z'
+    executions:
+    - layer: backend
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/backend-batch-a-junit.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-P-14e4122069ea
+    - layer: frontend-unit
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/frontend-unit-header-roles-junit.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-R-5689a0c7c4a0
+    - layer: frontend-unit
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/frontend-unit-public-header-toggles-junit.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-R-4aa36c0d5fa1
+    - layer: e2e
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/e2e-public.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-R-4aa36c0d5fa1
+    - layer: e2e
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/e2e-auth.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-R-5689a0c7c4a0
+    - layer: e2e
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/e2e-b2-board.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-R-5689a0c7c4a0
+    - layer: gate
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/gate-strict.json
+      format: gate-json
+      live: false
+      candidate_ids:
+      - I-P-14e4122069ea
+      - I-R-5689a0c7c4a0
+      - I-R-4aa36c0d5fa1
+- front: responsive
+  module: layout
+  root_cause: public-navigation-switches-too-early-and-has-small-toggle
+  process: Navegación pública en tablet vertical
+  problem: El menú usa md en vez del corte requerido para portrait y su trigger queda por debajo del mínimo táctil.
+  paths:
+  - frontend/components/marketing/PublicHeader.tsx
+  evidence:
+  - docs/RESPONSIVE_STANDARDS.md:97
+  - frontend/components/marketing/PublicHeader.tsx:33
+  - frontend/components/marketing/PublicHeader.tsx:59
+  - frontend/components/marketing/PublicHeader.tsx:68
+  - frontend/components/marketing/PublicHeader.tsx:69
+  - frontend/components/marketing/PublicHeader.tsx:79
+  severity: mayor
+  confidence: measured
+  e2e_required: true
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  id: I-R-4aa36c0d5fa1
+  status: verified
+  depends_on: []
+  tests_declared:
+  - frontend/components/__tests__/navigation-toggles.test.tsx
+  - frontend/components/marketing/__tests__/public-header-navigation.test.tsx
+  - frontend/e2e/public/public-navigation.spec.ts
+  value_assessment:
+    benefit: material
+    effort: S
+    change_risk: low
+    mandatory: true
+    reason: La evidencia de código y las pruebas conductuales referidas en el reporte demuestran el mecanismo y su mejora;
+      QA viva combinada aún pendiente.
+    evidence:
+    - docs/RESPONSIVE_STANDARDS.md:97
+    - frontend/components/marketing/PublicHeader.tsx:33
+    - frontend/components/marketing/PublicHeader.tsx:59
+    - frontend/components/marketing/PublicHeader.tsx:68
+    - frontend/components/marketing/PublicHeader.tsx:69
+    - frontend/components/marketing/PublicHeader.tsx:79
+    cosmetic_only: false
+  value_decision:
+    policy_version: 1.0.0
+    required: true
+    decision: proceed
+    reason: a requirement, blocking risk or regression cannot be deferred for ROI
+  context_fingerprint: 09daae3b90bedabce37648121a7574ff9aa09a610aceb8a124b2b81b176e4288
+  first_seen: '2026-10-01T00:23:35Z'
+  updated_at: '2026-10-08T12:59:34Z'
+  report: docs/audits/2026-10-08-versiona_project_staging-improvement-pass-project-orchestrated.md
+  qa:
+    status: verified
+    round_id: versiona-08102026-orchestrated-interface
+    commit: 4d067815589b348c3bfd3deba6319ee833ab79f0
+    report: docs/audits/2026-10-08-improvement-evidence/QA.md
+    reason: exact round, commit, passing test artifacts and live E2E where required are verified
+    recorded_at: '2026-10-08T12:59:34Z'
+    executions:
+    - layer: backend
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/backend-batch-a-junit.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-P-14e4122069ea
+    - layer: frontend-unit
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/frontend-unit-header-roles-junit.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-R-5689a0c7c4a0
+    - layer: frontend-unit
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/frontend-unit-public-header-toggles-junit.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-R-4aa36c0d5fa1
+    - layer: e2e
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/e2e-public.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-R-4aa36c0d5fa1
+    - layer: e2e
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/e2e-auth.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-R-5689a0c7c4a0
+    - layer: e2e
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/e2e-b2-board.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-R-5689a0c7c4a0
+    - layer: gate
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/gate-strict.json
+      format: gate-json
+      live: false
+      candidate_ids:
+      - I-P-14e4122069ea
+      - I-R-5689a0c7c4a0
+      - I-R-4aa36c0d5fa1
+- front: security
+  module: accounts
+  root_cause: stock-jwt-token-endpoint-bypasses-second-factor-admission
+  process: La ruta JWT alternativa emite sesión sin admisión TOTP
+  problem: La ruta JWT alternativa emite sesión sin admisión TOTP
+  paths:
+  - backend/accounts/views/auth.py
+  - backend/versiona_project/urls.py
+  evidence: &id005
+  - backend/accounts/tests/views/test_jwt_endpoints.py:32
+  - backend/accounts/views/auth.py:47
+  severity: bloqueante
+  confidence: measured
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  id: I-S-b1096995f2b4
+  status: verified
+  depends_on: []
+  tests_declared:
+  - backend/accounts/tests/views/test_jwt_endpoints.py
+  value_decision:
+    policy_version: 1.0.0
+    required: true
+    decision: proceed
+    reason: a requirement, blocking risk or regression cannot be deferred for ROI
+  context_fingerprint: 85f22f949e1062cb0afe185a9f3ffe128ad775027cad28191ba1b04080cc1e0a
+  first_seen: '2026-10-02T11:54:27Z'
+  updated_at: '2026-10-02T13:04:07Z'
+  report: docs/audits/2026-10-02-versiona_project_staging-improvement-pass-project-auth-purge.md
+  e2e_required: true
+  value_assessment:
+    benefit: material
+    effort: S
+    change_risk: low
+    mandatory: true
+    reason: La ruta JWT alternativa emite sesión sin admisión TOTP; evidencia actual del mecanismo y contrato citado.
+    evidence: *id005
+    cosmetic_only: false
+  qa:
+    status: verified
+    round_id: 2026-10-02-versiona-auth-purge
+    commit: 731fa0d4e004ced4e9d427b7d883a5ac4f39f19f
+    report: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/qa.md
+    reason: exact round, commit, passing test artifacts and live E2E where required are verified
+    recorded_at: '2026-10-02T13:04:07Z'
+    executions:
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/final-backend-auth.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-b1096995f2b4
+      - I-S-f426eb46bd37
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/final-backend-purge.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - P-backend-tasks-03
+    - layer: e2e
+      report: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/final-e2e.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-S-b1096995f2b4
+      - I-S-f426eb46bd37
+    - layer: gate
+      report: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/final-gate.json
+      format: gate-json
+      live: false
+      candidate_ids:
+      - I-S-b1096995f2b4
+      - I-S-f426eb46bd37
+      - P-backend-tasks-03
+- front: security
+  module: documents
+  root_cause: upload-scoped-throttle-has-no-view-throttle-scope
+  process: La cuota de upload obligatoria no se aplica al FBV
+  problem: La cuota de upload obligatoria no se aplica al FBV
+  paths:
+  - .github/workflows/ci.yml
+  - backend/documents/views.py
+  - frontend/lib/stores/documentStore.ts
+  evidence:
+  - .github/workflows/ci.yml
+  - backend/documents/tests/views/test_upload_throttle.py
+  - backend/documents/views.py
+  - frontend/e2e/app/documents/c1-upload-first-document.spec.ts
+  - frontend/e2e/app/documents/c2-upload-new-version.spec.ts
+  - frontend/lib/stores/__tests__/documentStore.test.ts
+  - frontend/lib/stores/documentStore.ts
+  severity: mayor
+  confidence: measured
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  id: I-S-26718d316862
+  status: verified
+  depends_on: []
+  tests_declared:
+  - backend/documents/tests/views/test_upload_throttle.py
+  - frontend/e2e/app/documents/c1-upload-first-document.spec.ts
+  - frontend/e2e/app/documents/c2-upload-new-version.spec.ts
+  - frontend/lib/stores/__tests__/documentStore.test.ts
+  value_assessment:
+    benefit: material
+    effort: S
+    change_risk: low
+    mandatory: true
+    reason: La cuota de upload obligatoria no se aplica al FBV; evidencia actual del mecanismo y contrato citado.
+    evidence:
+    - backend/documents/views.py
+    - frontend/lib/stores/documentStore.ts
+    - .github/workflows/ci.yml
+    - backend/documents/tests/views/test_upload_throttle.py
+    - frontend/lib/stores/__tests__/documentStore.test.ts
+    - frontend/e2e/app/documents/c1-upload-first-document.spec.ts
+    - frontend/e2e/app/documents/c2-upload-new-version.spec.ts
+    cosmetic_only: false
+  value_decision:
+    policy_version: 1.0.0
+    required: true
+    decision: proceed
+    reason: a requirement, blocking risk or regression cannot be deferred for ROI
+  context_fingerprint: 5089890eaea91e75fcc1cb08da666a25ceeb44ab479cd78e0bc7690fc35af06b
+  first_seen: '2026-10-02T11:54:27Z'
+  updated_at: '2026-10-03T02:09:37Z'
+  report: docs/audits/2026-10-02-versiona_project_staging-improvement-pass-project-document-load.md
+  e2e_required: true
+  why_pending: Implementación y pruebas guardadas; falta validación final sobre 2dc8238112392acc661d8d2da318d1d54074f1ef.
+  qa:
+    status: verified
+    round_id: 2026-10-02-versiona-document-load
+    commit: f056215ef861d33ea209e2a0e9d671d18dee8f5e
+    report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+    reason: exact round, commit, passing test artifacts and live E2E where required are verified
+    recorded_at: '2026-10-03T02:09:37Z'
+    executions:
+    - layer: backend
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/ci-f056215/backend-shard-0/pytest-results.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-P-b9b80760481e
+    - layer: backend
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/ci-f056215/backend-shard-1/pytest-results.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-26718d316862
+      - P-backend-views-01
+    - layer: backend
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/ci-f056215/backend-shard-2/pytest-results.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - P-backend-views-01
+      - I-P-b9b80760481e
+    - layer: frontend-unit
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/final-unit-f056215.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-26718d316862
+      - I-P-b9b80760481e
+    - layer: e2e
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/final-d3-f056215.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-P-b9b80760481e
+    - layer: e2e
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/final-uploads-e2e-f056215.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-S-26718d316862
+    - layer: gate
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/final-gate-backend-f056215.json
+      format: gate-json
+      live: false
+    - layer: gate
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/final-gate-unit-f056215.json
+      format: gate-json
+      live: false
+    - layer: gate
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/final-gate-e2e-f056215.json
+      format: gate-json
+      live: false
+- front: security
+  module: documents
+  root_cause: upload-validation-and-promotion-read-different-staging-snapshots
+  process: Validación y promoción vuelven a leer una clave staging mutable
+  problem: Validación y promoción vuelven a leer una clave staging mutable
+  paths:
+  - backend/documents/services/storage/filesystem.py
+  - backend/documents/services/version_service.py
+  evidence: &id006
+  - backend/documents/services/version_service.py:100
+  - backend/documents/services/version_service.py:151
+  severity: mayor
+  confidence: inferred
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  id: I-S-b1770db24124
+  status: candidate
+  depends_on: []
+  tests_declared: []
+  value_assessment:
+    benefit: unknown
+    effort: M
+    change_risk: medium
+    mandatory: false
+    reason: Validación y promoción vuelven a leer una clave staging mutable; evidencia actual del mecanismo y contrato citado.
+    evidence: *id006
+    cosmetic_only: false
+  value_decision:
+    policy_version: 1.0.0
+    required: false
+    decision: needs-evidence
+    reason: benefit has not been demonstrated
+  context_fingerprint: 8348b37dc3d631455637586f282a205a5a93b778c68cfc79a0222980ffb9cb49
+  first_seen: '2026-10-02T11:54:27Z'
+  updated_at: '2026-10-02T11:54:27Z'
+- front: security
+  module: accounts
+  root_cause: password-change-and-reset-bypass-configured-password-validation
+  process: Las escrituras de contraseña omiten validadores configurados
+  problem: Las escrituras de contraseña omiten validadores configurados
+  paths:
+  - backend/accounts/views/auth.py
+  evidence:
+  - backend/accounts/views/auth.py:30
+  - backend/accounts/views/auth.py:382
+  - backend/accounts/views/auth.py:427
+  - backend/accounts/views/auth.py:97
+  - backend/versiona_project/settings.py:190
+  severity: mayor
+  confidence: measured
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  id: I-S-0c3d7ee8c75e
+  status: verified
+  depends_on: []
+  tests_declared:
+  - backend/accounts/tests/views/test_auth_endpoints.py
+  - backend/billing/tests/test_trial.py
+  - frontend/e2e/auth/auth.spec.ts
+  value_decision:
+    policy_version: 1.0.0
+    required: true
+    decision: proceed
+    reason: a requirement, blocking risk or regression cannot be deferred for ROI
+  context_fingerprint: 1c4e6ce52f3a48c37562a89537a8a0c6a63c6dcdf590ecf7393e836b10eea1c0
+  first_seen: '2026-10-02T11:54:27Z'
+  updated_at: '2026-10-02T15:07:06Z'
+  report: docs/audits/2026-10-02-versiona_project_staging-improvement-pass-project-password-profile.md
+  e2e_required: true
+  value_assessment:
+    benefit: material
+    effort: S
+    change_risk: medium
+    mandatory: true
+    reason: Las tres escrituras ejecutan los validadores configurados antes de persistir; la política y la conservación de
+      credenciales son requisitos obligatorios.
+    evidence:
+    - backend/accounts/views/auth.py:30
+    - backend/accounts/views/auth.py:382
+    - backend/accounts/views/auth.py:427
+    - backend/accounts/views/auth.py:97
+    - backend/versiona_project/settings.py:190
+    cosmetic_only: false
+  qa:
+    status: verified
+    round_id: 2026-10-02-versiona-password-profile
+    commit: 22126859f8a7c325dd086ca11fc95873817170e2
+    report: test-results/improvement/2026-10-02-versiona-password-profile/qa.md
+    reason: exact round, commit, passing test artifacts and live E2E where required are verified
+    recorded_at: '2026-10-02T15:07:06Z'
+    executions:
+    - layer: backend
+      report: test-results/improvement/2026-10-02-versiona-password-profile/qa.md
+      artifact: test-results/improvement/2026-10-02-versiona-password-profile/final-backend.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-0c3d7ee8c75e
+    - layer: backend
+      report: test-results/improvement/2026-10-02-versiona-password-profile/qa.md
+      artifact: test-results/improvement/2026-10-02-versiona-password-profile/final-billing.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-0c3d7ee8c75e
+    - layer: e2e
+      report: test-results/improvement/2026-10-02-versiona-password-profile/qa.md
+      artifact: test-results/improvement/2026-10-02-versiona-password-profile/final-e2e.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-S-0c3d7ee8c75e
+    - layer: gate
+      report: test-results/improvement/2026-10-02-versiona-password-profile/qa.md
+      artifact: test-results/improvement/2026-10-02-versiona-password-profile/final-gate.json
+      format: gate-json
+      live: false
+      candidate_ids:
+      - I-S-0c3d7ee8c75e
+- front: security
+  module: archived-project-mutations
+  root_cause: archived-project-mutations-bypass-readonly-guard
+  process: Servicios de mutación omiten el bloqueo de proyectos archivados
+  problem: Servicios de mutación omiten el bloqueo de proyectos archivados
+  paths:
+  - backend/observations/services.py
+  - backend/projects/services/config_service.py
+  - backend/reviews/services/review_service.py
+  - backend/reviews/services/seal_service.py
+  evidence: &id007
+  - backend/observations/services.py:27
+  - backend/projects/services/config_service.py:55
+  - docs/audit/03-mapa-flujos.md:162
+  severity: mayor
+  confidence: inferred
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  id: I-S-18e25030ccf7
+  status: candidate
+  depends_on: []
+  tests_declared: []
+  value_assessment:
+    benefit: material
+    effort: M
+    change_risk: medium
+    mandatory: true
+    reason: Servicios de mutación omiten el bloqueo de proyectos archivados; evidencia actual del mecanismo y contrato citado.
+    evidence: *id007
+    cosmetic_only: false
+  value_decision:
+    policy_version: 1.0.0
+    required: true
+    decision: proceed
+    reason: a requirement, blocking risk or regression cannot be deferred for ROI
+  context_fingerprint: 3af7b7607eb9d76a264e799acccabc407d270b94065efd5ce9f28dc9d333341d
+  first_seen: '2026-10-02T11:54:27Z'
+  updated_at: '2026-10-02T11:54:27Z'
+- front: observability
+  module: reviews
+  root_cause: seal-plan-confirmation-read-write-race
+  process: Confirmaciones concurrentes sobrescriben una decisión final del plan
+  problem: Confirmaciones concurrentes sobrescriben una decisión final del plan
+  paths:
+  - backend/reviews/services/seal_service.py
+  evidence: &id008
+  - backend/reviews/services/seal_service.py:366
+  - docs/plan/02-modelo-datos.md:141
+  severity: mayor
+  confidence: inferred
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  id: I-O-471c257cfce9
+  status: candidate
+  depends_on: []
+  tests_declared: []
+  value_assessment:
+    benefit: material
+    effort: S
+    change_risk: medium
+    mandatory: true
+    reason: Confirmaciones concurrentes sobrescriben una decisión final del plan; evidencia actual del mecanismo y contrato
+      citado.
+    evidence: *id008
+    cosmetic_only: false
+  value_decision:
+    policy_version: 1.0.0
+    required: true
+    decision: proceed
+    reason: a requirement, blocking risk or regression cannot be deferred for ROI
+  context_fingerprint: 6943c04c6e60d59037c7052e55792c8118a9d8dc4aa5d94d62f8578bd9126824
+  first_seen: '2026-10-02T11:54:27Z'
+  updated_at: '2026-10-02T11:54:27Z'
+- front: observability
+  module: public_tools
+  root_cause: public-comparison-processing-exception-swallowed-without-diagnostic
+  process: Los fallos del comparador público no dejan diagnóstico de fase
+  problem: Los fallos del comparador público no dejan diagnóstico de fase
+  paths:
+  - backend/public_tools/tasks.py
+  evidence: &id009
+  - backend/public_tools/tasks.py:28
+  severity: mayor
+  confidence: inferred
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  id: I-O-42a58784c64c
+  status: candidate
+  depends_on: []
+  tests_declared: []
+  value_assessment:
+    benefit: material
+    effort: S
+    change_risk: low
+    mandatory: false
+    reason: Los fallos del comparador público no dejan diagnóstico de fase; evidencia actual del mecanismo y contrato citado.
+    evidence: *id009
+    cosmetic_only: false
+  value_decision:
+    policy_version: 1.0.0
+    required: false
+    decision: proceed
+    reason: material benefit is supported by evidence
+  context_fingerprint: d177d9bd30fbd78b0c8b16bbc2f08ba5e733f05b83f7965c468ab7861b7ded1e
+  first_seen: '2026-10-02T11:54:27Z'
+  updated_at: '2026-10-02T11:54:27Z'
+- front: performance
+  module: documents
+  root_cause: performance:P-backend-queries-01
+  process: La lista de documentos consulta metadatos por fila y necesita autorización compartida
+  problem: La lista de documentos consulta metadatos por fila y necesita autorización compartida
+  paths:
+  - backend/core/permissions.py
+  - backend/documents/serializers.py
+  - backend/documents/views.py
+  evidence: &id010
+  - backend/documents/serializers.py:86
+  - backend/documents/views.py:36
+  severity: mayor
+  confidence: inferred
+  id: P-backend-queries-01
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  status: candidate
+  depends_on: []
+  tests_declared: []
+  value_assessment:
+    benefit: material
+    effort: M
+    change_risk: medium
+    mandatory: true
+    reason: La lista de documentos consulta metadatos por fila y necesita autorización compartida; evidencia actual del mecanismo
+      y contrato citado.
+    evidence: *id010
+    cosmetic_only: false
+  value_decision:
+    policy_version: 1.0.0
+    required: true
+    decision: proceed
+    reason: a requirement, blocking risk or regression cannot be deferred for ROI
+  context_fingerprint: bc16887a8bf890fea05437f111e416796679b6b221799eea6c512ecbf2baf114
+  first_seen: '2026-10-02T11:54:27Z'
+  updated_at: '2026-10-02T11:54:27Z'
+- front: performance
+  module: projects
+  root_cause: performance:P-backend-views-01
+  process: Generar el reporte de documentos de un proyecto.
+  problem: El reporte consulta metadatos y cadenas de validez por documento; el diagnóstico confirma crecimiento de consultas
+    con el alcance del proyecto.
+  paths:
+  - backend/projects/queries.py
+  - backend/projects/views.py
+  - backend/reviews/services/seal_service.py
+  evidence:
+  - backend/projects/queries.py
+  - backend/projects/tests/views/test_project_report_queries.py
+  - backend/projects/views.py
+  - backend/reviews/services/seal_service.py
+  - backend/reviews/tests/test_seal_lifecycle.py
+  severity: bloqueante
+  confidence: measured
+  id: P-backend-views-01
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  status: verified
+  depends_on: []
+  tests_declared:
+  - backend/projects/tests/views/test_project_report_queries.py
+  - backend/reviews/tests/test_seal_lifecycle.py
+  value_decision:
+    policy_version: 1.0.0
+    required: true
+    decision: proceed
+    reason: a requirement, blocking risk or regression cannot be deferred for ROI
+  context_fingerprint: 9a860069d0e842f4fcb8c129ec7dc00552a152072b63828585ce4105150e2590
+  first_seen: '2026-10-02T11:54:27Z'
+  updated_at: '2026-10-03T02:09:37Z'
+  report: docs/audits/2026-10-02-versiona_project_staging-improvement-pass-project-document-load.md
+  why_pending: Implementación y pruebas guardadas; falta validación final sobre 2dc8238112392acc661d8d2da318d1d54074f1ef.
+  value_assessment:
+    benefit: material
+    effort: L
+    change_risk: medium
+    mandatory: true
+    reason: La medición aislada demuestra consultas por documento y su cadena; agrupar cargas debe preservar la resolución
+      D5 y el contrato público.
+    evidence:
+    - backend/projects/views.py
+    - backend/projects/queries.py
+    - backend/reviews/services/seal_service.py
+    - backend/projects/tests/views/test_project_report_queries.py
+    - backend/reviews/tests/test_seal_lifecycle.py
+    cosmetic_only: false
+  e2e_required: false
+  qa:
+    status: verified
+    round_id: 2026-10-02-versiona-document-load
+    commit: f056215ef861d33ea209e2a0e9d671d18dee8f5e
+    report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+    reason: exact round, commit, passing test artifacts and live E2E where required are verified
+    recorded_at: '2026-10-03T02:09:37Z'
+    executions:
+    - layer: backend
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/ci-f056215/backend-shard-0/pytest-results.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-P-b9b80760481e
+    - layer: backend
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/ci-f056215/backend-shard-1/pytest-results.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-26718d316862
+      - P-backend-views-01
+    - layer: backend
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/ci-f056215/backend-shard-2/pytest-results.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - P-backend-views-01
+      - I-P-b9b80760481e
+    - layer: frontend-unit
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/final-unit-f056215.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-26718d316862
+      - I-P-b9b80760481e
+    - layer: e2e
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/final-d3-f056215.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-P-b9b80760481e
+    - layer: e2e
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/final-uploads-e2e-f056215.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-S-26718d316862
+    - layer: gate
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/final-gate-backend-f056215.json
+      format: gate-json
+      live: false
+    - layer: gate
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/final-gate-unit-f056215.json
+      format: gate-json
+      live: false
+    - layer: gate
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/final-gate-e2e-f056215.json
+      format: gate-json
+      live: false
+- front: performance
+  module: documents
+  root_cause: performance:P-backend-tasks-02
+  process: El reanclaje consulta relaciones por observación
+  problem: El reanclaje consulta relaciones por observación
+  paths:
+  - backend/engine/tasks.py
+  - backend/observations/services.py
+  evidence: &id011
+  - backend/observations/services.py:197
+  severity: mayor
+  confidence: inferred
+  id: P-backend-tasks-02
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  status: candidate
+  depends_on: []
+  tests_declared: []
+  value_assessment:
+    benefit: material
+    effort: M
+    change_risk: medium
+    mandatory: false
+    reason: El reanclaje consulta relaciones por observación; evidencia actual del mecanismo y contrato citado.
+    evidence: *id011
+    cosmetic_only: false
+  value_decision:
+    policy_version: 1.0.0
+    required: false
+    decision: proceed
+    reason: material benefit is supported by evidence
+  context_fingerprint: 46561845eb9ffc33cc1c75b6e4079c62b6fbc5708e10b45d04522fd146a66d36
+  first_seen: '2026-10-02T11:54:27Z'
+  updated_at: '2026-10-02T11:54:27Z'
+- front: performance
+  module: orgs
+  root_cause: trash-list-per-row-relations
+  process: El listado de papelera consulta relaciones por elemento
+  problem: El listado de papelera consulta relaciones por elemento
+  paths:
+  - backend/orgs/views.py
+  evidence:
+  - backend/orgs/views.py:45
+  - backend/orgs/views.py:62
+  severity: mayor
+  confidence: measured
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  id: I-P-14e4122069ea
+  status: verified
+  depends_on: []
+  tests_declared:
+  - backend/orgs/tests/test_trash_query_budget.py
+  value_assessment:
+    benefit: material
+    effort: S
+    change_risk: low
+    mandatory: true
+    reason: La evidencia de código y las pruebas conductuales referidas en el reporte demuestran el mecanismo y su mejora;
+      QA viva combinada aún pendiente.
+    evidence:
+    - backend/orgs/views.py:45
+    - backend/orgs/views.py:62
+    cosmetic_only: false
+  value_decision:
+    policy_version: 1.0.0
+    required: true
+    decision: proceed
+    reason: a requirement, blocking risk or regression cannot be deferred for ROI
+  context_fingerprint: d3031849ccdae42c66f78d703259a335256251d3776a8f12ab2e540d5dfa0c77
+  first_seen: '2026-10-02T11:54:27Z'
+  updated_at: '2026-10-08T12:59:34Z'
+  report: docs/audits/2026-10-08-versiona_project_staging-improvement-pass-project-orchestrated.md
+  qa:
+    status: verified
+    round_id: versiona-08102026-orchestrated-interface
+    commit: 4d067815589b348c3bfd3deba6319ee833ab79f0
+    report: docs/audits/2026-10-08-improvement-evidence/QA.md
+    reason: exact round, commit, passing test artifacts and live E2E where required are verified
+    recorded_at: '2026-10-08T12:59:34Z'
+    executions:
+    - layer: backend
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/backend-batch-a-junit.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-P-14e4122069ea
+    - layer: frontend-unit
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/frontend-unit-header-roles-junit.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-R-5689a0c7c4a0
+    - layer: frontend-unit
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/frontend-unit-public-header-toggles-junit.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-R-4aa36c0d5fa1
+    - layer: e2e
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/e2e-public.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-R-4aa36c0d5fa1
+    - layer: e2e
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/e2e-auth.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-R-5689a0c7c4a0
+    - layer: e2e
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/e2e-b2-board.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-R-5689a0c7c4a0
+    - layer: gate
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/gate-strict.json
+      format: gate-json
+      live: false
+      candidate_ids:
+      - I-P-14e4122069ea
+      - I-R-5689a0c7c4a0
+      - I-R-4aa36c0d5fa1
+- front: performance
+  module: observations
+  root_cause: observation-history-response-unbounded
+  process: Leer los hilos con respuestas y anclas históricas de una versión.
+  problem: La respuesta materializa el historial anidado sin cota; el diagnóstico confirma crecimiento de payload y memoria
+    por request.
+  paths:
+  - backend/observations/pagination.py
+  - backend/observations/queries.py
+  - backend/observations/urls.py
+  - backend/observations/views.py
+  - frontend/components/observations/ObservationThread.tsx
+  - frontend/components/observations/ObservationsPanel.tsx
+  - frontend/components/observations/ProgressiveObservationText.tsx
+  - frontend/lib/i18n/dictionaries.ts
+  - frontend/lib/stores/observationStore.ts
+  - frontend/lib/types/observations.ts
+  evidence:
+  - backend/observations/pagination.py
+  - backend/observations/queries.py
+  - backend/observations/tests/test_observation_endpoints.py
+  - backend/observations/tests/test_observations.py
+  - backend/observations/tests/test_progressive_content.py
+  - backend/observations/urls.py
+  - backend/observations/views.py
+  - frontend/components/observations/ObservationThread.tsx
+  - frontend/components/observations/ObservationsPanel.tsx
+  - frontend/components/observations/ProgressiveObservationText.tsx
+  - frontend/components/observations/__tests__/ObservationsPanel.test.tsx
+  - frontend/e2e/app/reviews/d3-anchored-observations.spec.ts
+  - frontend/lib/i18n/dictionaries.ts
+  - frontend/lib/stores/__tests__/observationStore.test.ts
+  - frontend/lib/stores/observationStore.ts
+  - frontend/lib/types/observations.ts
+  severity: bloqueante
+  confidence: measured
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  id: I-P-b9b80760481e
+  status: verified
+  depends_on: []
+  tests_declared:
+  - backend/observations/tests/test_observation_endpoints.py
+  - backend/observations/tests/test_observations.py
+  - backend/observations/tests/test_progressive_content.py
+  - frontend/components/observations/__tests__/ObservationsPanel.test.tsx
+  - frontend/e2e/app/reviews/d3-anchored-observations.spec.ts
+  - frontend/lib/stores/__tests__/observationStore.test.ts
+  value_decision:
+    policy_version: 1.0.0
+    required: true
+    decision: proceed
+    reason: a requirement, blocking risk or regression cannot be deferred for ROI
+  context_fingerprint: e26f4635c2a779f8b6bfc62eec314a81326717deeecb4f89b73974abc8e8ad18
+  first_seen: '2026-10-02T11:54:27Z'
+  updated_at: '2026-10-03T02:09:37Z'
+  report: docs/audits/2026-10-02-versiona_project_staging-improvement-pass-project-document-load.md
+  why_pending: Implementación y pruebas guardadas; falta validación final sobre 2dc8238112392acc661d8d2da318d1d54074f1ef.
+  value_assessment:
+    benefit: material
+    effort: L
+    change_risk: high
+    mandatory: true
+    reason: La medición aislada demuestra crecimiento sin cota del volumen anidado y rebasa los presupuestos operativos; resolverlo
+      requiere acordar un contrato acotado.
+    evidence:
+    - backend/observations/urls.py
+    - backend/observations/views.py
+    - backend/observations/queries.py
+    - backend/observations/pagination.py
+    - frontend/lib/stores/observationStore.ts
+    - frontend/lib/types/observations.ts
+    - frontend/components/observations/ObservationsPanel.tsx
+    - frontend/components/observations/ObservationThread.tsx
+    - frontend/components/observations/ProgressiveObservationText.tsx
+    - frontend/lib/i18n/dictionaries.ts
+    - backend/observations/tests/test_observation_endpoints.py
+    - backend/observations/tests/test_progressive_content.py
+    - backend/observations/tests/test_observations.py
+    - frontend/lib/stores/__tests__/observationStore.test.ts
+    - frontend/components/observations/__tests__/ObservationsPanel.test.tsx
+    - frontend/e2e/app/reviews/d3-anchored-observations.spec.ts
+    cosmetic_only: false
+  e2e_required: true
+  qa:
+    status: verified
+    round_id: 2026-10-02-versiona-document-load
+    commit: f056215ef861d33ea209e2a0e9d671d18dee8f5e
+    report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+    reason: exact round, commit, passing test artifacts and live E2E where required are verified
+    recorded_at: '2026-10-03T02:09:37Z'
+    executions:
+    - layer: backend
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/ci-f056215/backend-shard-0/pytest-results.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-P-b9b80760481e
+    - layer: backend
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/ci-f056215/backend-shard-1/pytest-results.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-26718d316862
+      - P-backend-views-01
+    - layer: backend
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/ci-f056215/backend-shard-2/pytest-results.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - P-backend-views-01
+      - I-P-b9b80760481e
+    - layer: frontend-unit
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/final-unit-f056215.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-26718d316862
+      - I-P-b9b80760481e
+    - layer: e2e
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/final-d3-f056215.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-P-b9b80760481e
+    - layer: e2e
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/final-uploads-e2e-f056215.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-S-26718d316862
+    - layer: gate
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/final-gate-backend-f056215.json
+      format: gate-json
+      live: false
+    - layer: gate
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/final-gate-unit-f056215.json
+      format: gate-json
+      live: false
+    - layer: gate
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/final-gate-e2e-f056215.json
+      format: gate-json
+      live: false
+- id: P-backend-tasks-03
+  front: performance
+  module: documents
+  root_cause: performance:P-backend-tasks-03
+  process: purge_trashed daily
+  problem: La purga de papelera materializa querysets completos de raíces y descendientes sin lotes acotados.
+  paths:
+  - backend/documents/services/trash_service.py
+  - backend/versiona_project/tasks.py
+  evidence: &id012
+  - backend/documents/services/trash_service.py:24
+  - backend/documents/tests/services/test_trash_purge_batches.py:102
+  severity: bloqueante
+  confidence: measured
+  status: verified
+  report: docs/audits/2026-10-02-versiona_project_staging-improvement-pass-project-auth-purge.md
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  depends_on: []
+  tests_declared:
+  - backend/documents/tests/services/test_trash_purge_batches.py
+  value_decision:
+    policy_version: 1.0.0
+    required: true
+    decision: proceed
+    reason: a requirement, blocking risk or regression cannot be deferred for ROI
+  context_fingerprint: 29a0e65a44d774ec87eeffb4305a4d56bde0feb798ea205adec39505453c776a
+  first_seen: '2026-10-02T11:54:27Z'
+  updated_at: '2026-10-02T13:04:07Z'
+  e2e_required: false
+  value_assessment:
+    benefit: material
+    effort: M
+    change_risk: medium
+    mandatory: true
+    reason: Lotes keyset de 100 acotan la materialización del ORM sin cambiar fases ni delete/soft_delete por instancia; conservar
+      Certificate.PROTECT y triggers. No acredita tiempo total ni memoria del collector por objeto.
+    evidence: *id012
+    cosmetic_only: false
+  qa:
+    status: verified
+    round_id: 2026-10-02-versiona-auth-purge
+    commit: 731fa0d4e004ced4e9d427b7d883a5ac4f39f19f
+    report: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/qa.md
+    reason: exact round, commit, passing test artifacts and live E2E where required are verified
+    recorded_at: '2026-10-02T13:04:07Z'
+    executions:
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/final-backend-auth.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-b1096995f2b4
+      - I-S-f426eb46bd37
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/final-backend-purge.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - P-backend-tasks-03
+    - layer: e2e
+      report: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/final-e2e.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-S-b1096995f2b4
+      - I-S-f426eb46bd37
+    - layer: gate
+      report: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/final-gate.json
+      format: gate-json
+      live: false
+      candidate_ids:
+      - I-S-b1096995f2b4
+      - I-S-f426eb46bd37
+      - P-backend-tasks-03
+- front: maintainability
+  module: public_tools
+  root_cause: public-comparison-polling-missing-lifecycle-ownership
+  process: Seguimiento del comparador público al cambiar o abandonar la página
+  problem: El bucle asíncrono de polling no expone cancelación ni vincula sus respuestas a la página o job vigente.
+  paths:
+  - frontend/app/comparar/[id]/page.tsx
+  - frontend/lib/stores/publicCompareStore.ts
+  evidence:
+  - frontend/app/comparar/[id]/page.tsx:27
+  - frontend/lib/stores/publicCompareStore.ts:168
+  severity: menor
+  confidence: measured
+  report: docs/audits/2026-10-08-versiona_project_staging-improvement-pass-project-orchestrated.md
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  id: I-M-4a835d9294ef
+  status: verified
+  depends_on: []
+  tests_declared:
+  - frontend/app/comparar/[id]/__tests__/page.test.tsx
+  - frontend/e2e/public/public-compare-lifecycle.spec.ts
+  - frontend/lib/stores/__tests__/publicCompareStore.test.ts
+  value_assessment:
+    benefit: material
+    effort: M
+    change_risk: medium
+    mandatory: false
+    reason: La evidencia de código y las pruebas conductuales referidas en el reporte demuestran el mecanismo y su mejora;
+      QA viva combinada aún pendiente.
+    evidence:
+    - frontend/app/comparar/[id]/page.tsx:27
+    - frontend/lib/stores/publicCompareStore.ts:142
+    - frontend/lib/stores/publicCompareStore.ts:168
+    cosmetic_only: false
+  value_decision:
+    policy_version: 1.0.0
+    required: false
+    decision: proceed
+    reason: material benefit is supported by evidence
+  context_fingerprint: 90b8139280df63b02928579e7c635fc291386affec9f1cdd2ae7843edcaceca2
+  first_seen: '2026-10-02T23:38:53Z'
+  updated_at: '2026-10-08T12:59:02Z'
+  qa:
+    status: verified
+    round_id: versiona-08102026-orchestrated-core
+    commit: 4d067815589b348c3bfd3deba6319ee833ab79f0
+    report: docs/audits/2026-10-08-improvement-evidence/QA.md
+    reason: exact round, commit, passing test artifacts and live E2E where required are verified
+    recorded_at: '2026-10-08T12:59:02Z'
+    executions:
+    - layer: backend
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/backend-batch-a-junit.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-f729cb68b016
+    - layer: backend
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/backend-batch-b-junit.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-O-d1612d51180a
+    - layer: frontend-unit
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/frontend-unit-store-page-junit.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-M-4a835d9294ef
+    - layer: e2e
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/e2e-public.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-M-4a835d9294ef
+    - layer: gate
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/gate-strict.json
+      format: gate-json
+      live: false
+      candidate_ids:
+      - I-S-f729cb68b016
+      - I-M-4a835d9294ef
+      - I-O-d1612d51180a
+- front: security
+  module: dependencies
+  root_cause: dependency-alert-runtime-reachability-unverified
+  process: Evaluar las alertas del lockfile frontend
+  problem: npm audit informa alertas en el lockfile existente; falta determinar exposición y parche apropiado del runtime
+    utilizado.
+  paths:
+  - frontend/package-lock.json
+  - frontend/package.json
+  evidence: &id013
+  - docs/audits/2026-10-02-versiona_project_staging-improvement-pass-project-document-load.md
+  - test-results/improvement/2026-10-02-versiona-document-load/dependencies-audit.json
+  severity: mayor
+  confidence: inferred
+  report: docs/audits/2026-10-02-versiona_project_staging-improvement-pass-project-document-load.md
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  id: I-S-783dfa62c7cf
+  status: candidate
+  depends_on: []
+  tests_declared: []
+  value_assessment:
+    benefit: unknown
+    effort: M
+    change_risk: medium
+    mandatory: false
+    reason: La severidad del scanner no demuestra alcance explotable; requiere diagnóstico con fuentes primarias y configuración
+      real.
+    evidence: *id013
+    cosmetic_only: false
+  value_decision:
+    policy_version: 1.0.0
+    required: false
+    decision: needs-evidence
+    reason: benefit has not been demonstrated
+  context_fingerprint: 714ab9a417aa364d6f9b5a66101ceb6c70ac132732c561bf78dd662a442c2a4f
+  first_seen: '2026-10-02T23:38:53Z'
+  updated_at: '2026-10-02T23:38:53Z'
+- front: performance
+  module: projects
+  root_cause: project-report-document-payload-unbounded
+  process: Generar y descargar el reporte completo de un proyecto.
+  problem: La respuesta conserva una lista con todos los documentos del proyecto. La proyección agrupada elimina consultas
+    por documento, pero la lista y su JSON siguen creciendo sin paginación o exportación por lotes.
+  paths:
+  - backend/projects/queries.py
+  - backend/projects/views.py
+  evidence:
+  - backend/projects/queries.py:85
+  - backend/projects/views.py:241
+  severity: mayor
+  confidence: inferred
+  value_assessment:
+    benefit: material
+    effort: L
+    change_risk: medium
+    mandatory: true
+    reason: La obligación de acotar el payload permanece separada de agrupar consultas. Requiere diagnóstico de carga y acuerdo
+      de paginación/exportación fuera de los tres cambios autorizados de esta ronda.
+    evidence:
+    - backend/projects/queries.py:85
+    - backend/projects/views.py:241
+    cosmetic_only: false
+  report: docs/audits/2026-10-02-versiona_project_staging-improvement-pass-project-document-load.md
+  why_pending: Fuera del cupo de esta ronda. Contrato del reporte preservado; falta medir y acordar paginación o exportación
+    por lotes.
+  regression_pending: false
+  required_pending: false
+  obligation_open: false
+  id: I-P-0d85aabe7a24
+  status: candidate
+  depends_on: []
+  tests_declared: []
+  value_decision:
+    policy_version: 1.0.0
+    required: true
+    decision: proceed
+    reason: a requirement, blocking risk or regression cannot be deferred for ROI
+  context_fingerprint: f29024932f41f7caf161c0fbdd068b89b07ef1e8936dc1cd4d5242f566ca4d09
+  first_seen: '2026-10-03T00:18:35Z'
+  updated_at: '2026-10-03T00:18:35Z'
+scopes:
+- front: security
+  module: project
+  paths:
+  - backend/documents
+  - backend/observations
+  report: docs/audits/2026-10-02-versiona_project_staging-improvement-pass-project-document-load.md
+  complete: false
+  context_fingerprint: 582e3976ce99fc734647cfcbe48d508c6c0a8ec9d6541703abe88e493a7c0ffa
+  updated_at: '2026-10-02T23:38:53Z'
+- front: maintainability
+  module: project
+  paths:
+  - backend
+  - frontend/lib/stores
+  report: docs/audits/2026-10-02-versiona_project_staging-improvement-pass-project-document-load.md
+  complete: false
+  context_fingerprint: 6b1dd7294c8c07e99108b34d38a95d976a06cf15992c1b54d4151e42b26d9dda
+  updated_at: '2026-10-02T23:38:53Z'
+- front: observability
+  module: project
+  paths:
+  - backend
+  report: docs/audits/2026-10-02-versiona_project_staging-improvement-pass-project-document-load.md
+  complete: false
+  context_fingerprint: 2f40fd142736249ac29cfd8eb3206f4e95ba6c4e761606129d644cc13ed9e25f
+  updated_at: '2026-10-02T23:38:53Z'
+- front: performance
+  module: project
+  paths:
+  - backend/observations
+  - backend/projects
+  - backend/reviews
+  report: docs/audits/2026-10-02-versiona_project_staging-improvement-pass-project-document-load.md
+  complete: false
+  context_fingerprint: 734b0945df48684692b1f4c1b6abf371e67c6d81e2a17c8a7ebf511b080ccdc5
+  updated_at: '2026-10-02T23:38:53Z'
+- front: responsive
+  module: project
+  paths:
+  - frontend/components/layout
+  - frontend/components/marketing
+  report: docs/audits/2026-10-02-versiona_project_staging-improvement-pass-project-document-load.md
+  complete: false
+  context_fingerprint: 889a27060905039c1df9fea722a272c90b327e105f496fe5110764a8c31300a3
+  updated_at: '2026-10-02T23:38:53Z'
+rounds:
+- id: 2026-10-01-versiona-transversal
+  commit: 49d7ba85e76ec05cd4165b5573d5ae3f5b11df08
+  candidates:
+  - I-S-cae2f9667fc6
+  - I-S-f775b80c4455
+  - I-O-478a8866d0d5
+  fronts:
+  - security
+  - observability
+  module: project
+  report: docs/audits/2026-10-01-versiona_project_staging-improvement-pass-project-transversal.md
+  e2e_required: true
+  required_layers:
+  - backend
+  - e2e
+  - frontend-unit
+  - gate
+  codebase: versiona_project
+  status: verified
+  created_at: '2026-10-01T01:42:04Z'
+  updated_at: '2026-10-01T02:07:03Z'
+  qa:
+    status: verified
+    round_id: 2026-10-01-versiona-transversal
+    commit: 49d7ba85e76ec05cd4165b5573d5ae3f5b11df08
+    report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+    reason: exact round, commit, passing test artifacts and live E2E where required are verified
+    recorded_at: '2026-10-01T02:28:43Z'
+    executions:
+    - layer: gate
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-gate.json
+      format: gate-json
+      live: false
+      candidate_ids:
+      - I-S-cae2f9667fc6
+      - I-S-f775b80c4455
+      - I-O-478a8866d0d5
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-backend-auth-claims.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-cae2f9667fc6
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-backend-auth-admission.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-cae2f9667fc6
+      - I-S-f775b80c4455
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-backend-security.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-f775b80c4455
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-backend-engine-recovery.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-O-478a8866d0d5
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-backend-engine-phases.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-O-478a8866d0d5
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-backend-onboarding-google.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-cae2f9667fc6
+    - layer: frontend-unit
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-unit-authstore-a.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-f775b80c4455
+    - layer: frontend-unit
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-unit-authstore-b.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-f775b80c4455
+    - layer: frontend-unit
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-unit-signin.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-f775b80c4455
+    - layer: frontend-unit
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-unit-signup.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-f775b80c4455
+    - layer: e2e
+      report: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-01-versiona-transversal/verification-v3-e2e.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-S-f775b80c4455
+- id: 2026-10-02-versiona-auth-purge
+  commit: 731fa0d4e004ced4e9d427b7d883a5ac4f39f19f
+  candidates:
+  - I-S-b1096995f2b4
+  - I-S-f426eb46bd37
+  - P-backend-tasks-03
+  fronts:
+  - security
+  - performance
+  module: project
+  report: docs/audits/2026-10-02-versiona_project_staging-improvement-pass-project-auth-purge.md
+  e2e_required: true
+  required_layers:
+  - backend
+  - e2e
+  - gate
+  codebase: versiona_project
+  status: verified
+  created_at: '2026-10-02T12:33:33Z'
+  updated_at: '2026-10-02T12:33:33Z'
+  qa:
+    status: verified
+    round_id: 2026-10-02-versiona-auth-purge
+    commit: 731fa0d4e004ced4e9d427b7d883a5ac4f39f19f
+    report: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/qa.md
+    reason: exact round, commit, passing test artifacts and live E2E where required are verified
+    recorded_at: '2026-10-02T13:04:07Z'
+    executions:
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/final-backend-auth.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-b1096995f2b4
+      - I-S-f426eb46bd37
+    - layer: backend
+      report: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/final-backend-purge.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - P-backend-tasks-03
+    - layer: e2e
+      report: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/final-e2e.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-S-b1096995f2b4
+      - I-S-f426eb46bd37
+    - layer: gate
+      report: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/qa.md
+      artifact: frontend/e2e-results/improvement/2026-10-02-versiona-auth-purge/final-gate.json
+      format: gate-json
+      live: false
+      candidate_ids:
+      - I-S-b1096995f2b4
+      - I-S-f426eb46bd37
+      - P-backend-tasks-03
+- id: 2026-10-02-versiona-password-profile
+  commit: 22126859f8a7c325dd086ca11fc95873817170e2
+  candidates:
+  - I-S-0c3d7ee8c75e
+  fronts:
+  - security
+  module: accounts
+  report: docs/audits/2026-10-02-versiona_project_staging-improvement-pass-project-password-profile.md
+  e2e_required: true
+  required_layers:
+  - backend
+  - e2e
+  - gate
+  codebase: versiona_project
+  status: verified
+  created_at: '2026-10-02T14:51:49Z'
+  updated_at: '2026-10-02T15:00:37Z'
+  qa:
+    status: verified
+    round_id: 2026-10-02-versiona-password-profile
+    commit: 22126859f8a7c325dd086ca11fc95873817170e2
+    report: test-results/improvement/2026-10-02-versiona-password-profile/qa.md
+    reason: exact round, commit, passing test artifacts and live E2E where required are verified
+    recorded_at: '2026-10-02T15:07:06Z'
+    executions:
+    - layer: backend
+      report: test-results/improvement/2026-10-02-versiona-password-profile/qa.md
+      artifact: test-results/improvement/2026-10-02-versiona-password-profile/final-backend.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-0c3d7ee8c75e
+    - layer: backend
+      report: test-results/improvement/2026-10-02-versiona-password-profile/qa.md
+      artifact: test-results/improvement/2026-10-02-versiona-password-profile/final-billing.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-0c3d7ee8c75e
+    - layer: e2e
+      report: test-results/improvement/2026-10-02-versiona-password-profile/qa.md
+      artifact: test-results/improvement/2026-10-02-versiona-password-profile/final-e2e.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-S-0c3d7ee8c75e
+    - layer: gate
+      report: test-results/improvement/2026-10-02-versiona-password-profile/qa.md
+      artifact: test-results/improvement/2026-10-02-versiona-password-profile/final-gate.json
+      format: gate-json
+      live: false
+      candidate_ids:
+      - I-S-0c3d7ee8c75e
+- id: 2026-10-02-versiona-document-load
+  commit: f056215ef861d33ea209e2a0e9d671d18dee8f5e
+  candidates:
+  - I-S-26718d316862
+  - P-backend-views-01
+  - I-P-b9b80760481e
+  fronts:
+  - security
+  - performance
+  module: project
+  report: docs/audits/2026-10-02-versiona_project_staging-improvement-pass-project-document-load.md
+  e2e_required: true
+  required_layers:
+  - backend
+  - e2e
+  - frontend-unit
+  - gate
+  codebase: versiona_project
+  status: verified
+  created_at: '2026-10-03T00:16:06Z'
+  updated_at: '2026-10-03T01:35:00Z'
+  qa:
+    status: verified
+    round_id: 2026-10-02-versiona-document-load
+    commit: f056215ef861d33ea209e2a0e9d671d18dee8f5e
+    report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+    reason: exact round, commit, passing test artifacts and live E2E where required are verified
+    recorded_at: '2026-10-03T02:09:37Z'
+    executions:
+    - layer: backend
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/ci-f056215/backend-shard-0/pytest-results.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-P-b9b80760481e
+    - layer: backend
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/ci-f056215/backend-shard-1/pytest-results.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-26718d316862
+      - P-backend-views-01
+    - layer: backend
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/ci-f056215/backend-shard-2/pytest-results.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - P-backend-views-01
+      - I-P-b9b80760481e
+    - layer: frontend-unit
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/final-unit-f056215.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-26718d316862
+      - I-P-b9b80760481e
+    - layer: e2e
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/final-d3-f056215.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-P-b9b80760481e
+    - layer: e2e
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/final-uploads-e2e-f056215.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-S-26718d316862
+    - layer: gate
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/final-gate-backend-f056215.json
+      format: gate-json
+      live: false
+    - layer: gate
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/final-gate-unit-f056215.json
+      format: gate-json
+      live: false
+    - layer: gate
+      report: test-results/improvement/2026-10-02-versiona-document-load/qa-f056215.md
+      artifact: test-results/improvement/2026-10-02-versiona-document-load/final-gate-e2e-f056215.json
+      format: gate-json
+      live: false
+- id: versiona-08102026-orchestrated-core
+  commit: 4d067815589b348c3bfd3deba6319ee833ab79f0
+  candidates:
+  - I-S-f729cb68b016
+  - I-M-4a835d9294ef
+  - I-O-d1612d51180a
+  fronts:
+  - security
+  - maintainability
+  - observability
+  report: docs/audits/2026-10-08-versiona_project_staging-improvement-pass-project-orchestrated.md
+  e2e_required: true
+  required_layers:
+  - backend
+  - e2e
+  - frontend-unit
+  - gate
+  codebase: versiona_project
+  status: verified
+  created_at: '2026-10-08T12:47:53Z'
+  updated_at: '2026-10-08T12:47:53Z'
+  qa:
+    status: verified
+    round_id: versiona-08102026-orchestrated-core
+    commit: 4d067815589b348c3bfd3deba6319ee833ab79f0
+    report: docs/audits/2026-10-08-improvement-evidence/QA.md
+    reason: exact round, commit, passing test artifacts and live E2E where required are verified
+    recorded_at: '2026-10-08T12:59:02Z'
+    executions:
+    - layer: backend
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/backend-batch-a-junit.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-S-f729cb68b016
+    - layer: backend
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/backend-batch-b-junit.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-O-d1612d51180a
+    - layer: frontend-unit
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/frontend-unit-store-page-junit.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-M-4a835d9294ef
+    - layer: e2e
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/e2e-public.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-M-4a835d9294ef
+    - layer: gate
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/gate-strict.json
+      format: gate-json
+      live: false
+      candidate_ids:
+      - I-S-f729cb68b016
+      - I-M-4a835d9294ef
+      - I-O-d1612d51180a
+- id: versiona-08102026-orchestrated-interface
+  commit: 4d067815589b348c3bfd3deba6319ee833ab79f0
+  candidates:
+  - I-P-14e4122069ea
+  - I-R-5689a0c7c4a0
+  - I-R-4aa36c0d5fa1
+  fronts:
+  - performance
+  - responsive
+  report: docs/audits/2026-10-08-versiona_project_staging-improvement-pass-project-orchestrated.md
+  e2e_required: true
+  required_layers:
+  - backend
+  - e2e
+  - frontend-unit
+  - gate
+  codebase: versiona_project
+  status: verified
+  created_at: '2026-10-08T12:47:55Z'
+  updated_at: '2026-10-08T12:47:55Z'
+  qa:
+    status: verified
+    round_id: versiona-08102026-orchestrated-interface
+    commit: 4d067815589b348c3bfd3deba6319ee833ab79f0
+    report: docs/audits/2026-10-08-improvement-evidence/QA.md
+    reason: exact round, commit, passing test artifacts and live E2E where required are verified
+    recorded_at: '2026-10-08T12:59:34Z'
+    executions:
+    - layer: backend
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/backend-batch-a-junit.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-P-14e4122069ea
+    - layer: frontend-unit
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/frontend-unit-header-roles-junit.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-R-5689a0c7c4a0
+    - layer: frontend-unit
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/frontend-unit-public-header-toggles-junit.xml
+      format: junit
+      live: false
+      candidate_ids:
+      - I-R-4aa36c0d5fa1
+    - layer: e2e
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/e2e-public.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-R-4aa36c0d5fa1
+    - layer: e2e
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/e2e-auth.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-R-5689a0c7c4a0
+    - layer: e2e
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/e2e-b2-board.json
+      format: playwright-json
+      live: true
+      candidate_ids:
+      - I-R-5689a0c7c4a0
+    - layer: gate
+      report: docs/audits/2026-10-08-improvement-evidence/QA.md
+      artifact: docs/audits/2026-10-08-improvement-evidence/gate-strict.json
+      format: gate-json
+      live: false
+      candidate_ids:
+      - I-P-14e4122069ea
+      - I-R-5689a0c7c4a0
+      - I-R-4aa36c0d5fa1

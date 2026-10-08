@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="13" failures="0" skipped="0" errors="0" time="3.854">
+  <properties>
+    <property name="source_json" value="test-results/improvement/2026-10-08-versiona-combined/final-4d067815/frontend-unit-public-header-toggles.json"/>
+    <property name="commit" value="4d067815589b348c3bfd3deba6319ee833ab79f0"/>
+    <property name="converter" value="json-to-junit.mjs: assertion-result preserving"/>
+  </properties>
+  <testsuite name="frontend/components/marketing/__tests__/public-header-navigation.test.tsx" tests="7" failures="0" skipped="0" errors="0" time="2.576">
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/components/marketing/__tests__/public-header-navigation.test.tsx" name="Public header navigation opens the navigation with its original destinations" time="0.990"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/components/marketing/__tests__/public-header-navigation.test.tsx" name="Public header navigation returns focus to the opener after Escape from a navigation link" time="0.400"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/components/marketing/__tests__/public-header-navigation.test.tsx" name="Public header navigation returns focus to the opener after a pointer outside the header" time="0.374"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/components/marketing/__tests__/public-header-navigation.test.tsx" name="Public header navigation closes the navigation with the same menu button" time="0.213"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/components/marketing/__tests__/public-header-navigation.test.tsx" name="Public header navigation closes the navigation when its destination is chosen" time="0.156"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/components/marketing/__tests__/public-header-navigation.test.tsx" name="Public header navigation keeps the expanded navigation translated after changing locale" time="0.217"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/components/marketing/__tests__/public-header-navigation.test.tsx" name="Public header navigation keeps the navigation open after selecting a theme" time="0.226"/>
+  </testsuite>
+  <testsuite name="frontend/components/__tests__/navigation-toggles.test.tsx" tests="6" failures="0" skipped="0" errors="0" time="1.278">
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/components/__tests__/navigation-toggles.test.tsx" name="Navigation preferences applies the light theme from the menu" time="0.404"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/components/__tests__/navigation-toggles.test.tsx" name="Navigation preferences applies the dark theme from the menu" time="0.216"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/components/__tests__/navigation-toggles.test.tsx" name="Navigation preferences applies the system theme from the menu" time="0.289"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/components/__tests__/navigation-toggles.test.tsx" name="Navigation preferences returns focus to the theme opener after keyboard dismissal" time="0.226"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/components/__tests__/navigation-toggles.test.tsx" name="Navigation preferences switches the es locale from its accessible control" time="0.097"/>
+    <testcase classname="/home/dev_env/webapps/.wt/versiona_project/queue-08102026-1147/frontend/components/__tests__/navigation-toggles.test.tsx" name="Navigation preferences switches the en locale from its accessible control" time="0.046"/>
+  </testsuite>
+</testsuites>

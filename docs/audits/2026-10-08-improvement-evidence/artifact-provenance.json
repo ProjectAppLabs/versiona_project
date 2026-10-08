@@ -1,0 +1,81 @@
+{
+  "commit": "4d067815589b348c3bfd3deba6319ee833ab79f0",
+  "artifacts": {
+    "backend-batch-a-junit.xml": {
+      "source": "test-results/improvement/2026-10-08-versiona-combined/final-4d067815/backend-batch-a-junit.xml",
+      "source_sha256": "2a65a6a4f054d83acb10774fea826f35ef616e487dd38ab1dbd490fa14c9a471",
+      "artifact_sha256": "2a65a6a4f054d83acb10774fea826f35ef616e487dd38ab1dbd490fa14c9a471"
+    },
+    "backend-batch-b-junit.xml": {
+      "source": "test-results/improvement/2026-10-08-versiona-combined/final-4d067815/backend-batch-b-junit.xml",
+      "source_sha256": "d562a45d4bde3bd3a28d6171480fef65d642f9b798c57076ab700614e91187fc",
+      "artifact_sha256": "d562a45d4bde3bd3a28d6171480fef65d642f9b798c57076ab700614e91187fc"
+    },
+    "frontend-unit-store-page.json": {
+      "source": "test-results/improvement/2026-10-08-versiona-combined/final-4d067815/frontend-unit-store-page.json",
+      "source_sha256": "05019ba4fb254db67d89718340fca7277342ad08298645330f0ae5e0a7e55d2c",
+      "artifact_sha256": "05019ba4fb254db67d89718340fca7277342ad08298645330f0ae5e0a7e55d2c"
+    },
+    "frontend-unit-store-page-junit.xml": {
+      "source": "test-results/improvement/2026-10-08-versiona-combined/final-4d067815/frontend-unit-store-page-junit.xml",
+      "source_sha256": "e554c86c92d7115501cb102a07838278557b0df0e1a814d8d657386936c956f8",
+      "artifact_sha256": "e554c86c92d7115501cb102a07838278557b0df0e1a814d8d657386936c956f8"
+    },
+    "frontend-unit-header-roles.json": {
+      "source": "test-results/improvement/2026-10-08-versiona-combined/final-4d067815/frontend-unit-header-roles.json",
+      "source_sha256": "b2750a2a1d9c3818723dc114252717d2fc238429fb6e14616961dca092950f99",
+      "artifact_sha256": "b2750a2a1d9c3818723dc114252717d2fc238429fb6e14616961dca092950f99"
+    },
+    "frontend-unit-header-roles-junit.xml": {
+      "source": "test-results/improvement/2026-10-08-versiona-combined/final-4d067815/frontend-unit-header-roles-junit.xml",
+      "source_sha256": "4620d35c2c99960bca0aedd82ccc686707072b12d8c0885bba2fcb13b41506b9",
+      "artifact_sha256": "4620d35c2c99960bca0aedd82ccc686707072b12d8c0885bba2fcb13b41506b9"
+    },
+    "frontend-unit-public-header-toggles.json": {
+      "source": "test-results/improvement/2026-10-08-versiona-combined/final-4d067815/frontend-unit-public-header-toggles.json",
+      "source_sha256": "d617d41dde8dba77073753413a02a8d637f0c13410d9bdfe016acbcd4eaf419a",
+      "artifact_sha256": "d617d41dde8dba77073753413a02a8d637f0c13410d9bdfe016acbcd4eaf419a"
+    },
+    "frontend-unit-public-header-toggles-junit.xml": {
+      "source": "test-results/improvement/2026-10-08-versiona-combined/final-4d067815/frontend-unit-public-header-toggles-junit.xml",
+      "source_sha256": "ff9dca943810a42645a95f72aed1df54b39e4539fb04881073a5755c19334ce2",
+      "artifact_sha256": "ff9dca943810a42645a95f72aed1df54b39e4539fb04881073a5755c19334ce2"
+    },
+    "gate-strict.json": {
+      "source": "test-results/improvement/2026-10-08-versiona-combined/final-4d067815/gate-strict.json",
+      "source_sha256": "19ed821395bc509d032f7e309a53bc55393aeb80dced22ea65dc31c481a74feb",
+      "artifact_sha256": "19ed821395bc509d032f7e309a53bc55393aeb80dced22ea65dc31c481a74feb"
+    },
+    "e2e-public.json": {
+      "source": "test-results/improvement/2026-10-08-versiona-combined/final-4d067815/e2e-public.json",
+      "source_sha256": "6b0f052522fcec0ed5987897f271539800e6c4175b8f6780771156f6ed43e6ad",
+      "artifact_sha256": "03468a5a35f74e9166d5f1554e0d9d9afeb94f80d5c9b9c540d2b3c7f984bec0",
+      "export": "All stats, suites and errors preserved; runtime configuration omitted."
+    },
+    "e2e-auth.json": {
+      "source": "test-results/improvement/2026-10-08-versiona-combined/final-4d067815/e2e-auth.json",
+      "source_sha256": "f6d7d023c56beb1e7c98667d09bb98af5322ca8eae5294dff941572945b0a4cc",
+      "artifact_sha256": "d8bb0906c5f4a8775ab48c3057580de22ab77e882647a19d9b15bac6d3c51197",
+      "export": "All stats, suites and errors preserved; runtime configuration omitted."
+    },
+    "e2e-b2-board.json": {
+      "source": "test-results/improvement/2026-10-08-versiona-combined/final-4d067815/e2e-b2-board.json",
+      "source_sha256": "18aa939c98c0a8f5a883f78a7c7f55b572eff8bbc37c5c6e9632b6c26300899b",
+      "artifact_sha256": "a67e54a31a6224208716a54b275ccaffb28ed09bb0f0c5163d5f05c91831aacc",
+      "export": "All stats, suites and errors preserved; runtime configuration omitted."
+    },
+    "json-to-junit.mjs": {
+      "source": "test-results/improvement/2026-10-08-versiona-combined/json-to-junit.mjs",
+      "artifact_sha256": "a12f5245ab8b29aee43bd145da8ec7862d92febf7a9c1e08e4966afe392d77a1"
+    }
+  },
+  "verifier_report": {
+    "source": "test-results/improvement/2026-10-08-versiona-combined/final-4d067815/qa-report.md",
+    "sha256": "f51cfc12ab2ae81c3b3ab0972da5843d8423723efe64de1b9ab04fb692ab7aaa",
+    "verdict": "APPROVED"
+  },
+  "verifier_manifest": {
+    "source": "test-results/improvement/2026-10-08-versiona-combined/final-4d067815/verification-manifest.json",
+    "sha256": "75e0af541bcee53a94dfc2fbfa44922b869e4654fbce4a520e6f86584e05b537"
+  }
+}

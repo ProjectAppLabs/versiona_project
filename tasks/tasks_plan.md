@@ -25,6 +25,10 @@ v2.4.0 (40 flows).
 
 ## Rondas de mantenimiento
 
+- **2026-10-08 — QA conjunta aprobada:** 114 casos sobre `4d06781`, sin skips ni
+  reintentos; gate estricto cero errores. Seis candidatos verificados y entregas
+  #41–#44 mediante tren de integración. Evidencia en
+  `docs/audits/2026-10-08-improvement-evidence/QA.md`.
 - **2026-10-08 — ronda coordinada:** consumo atómico de códigos de respaldo y
   recuperación, polling vinculado a la comparación vigente, limpieza pública
   recuperable, navegación accesible en cinco anchos y consultas constantes en
