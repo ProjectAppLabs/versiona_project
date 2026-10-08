@@ -105,6 +105,20 @@ describe('Authenticated header navigation', () => {
     expect(useAuthStore.getState().isAuthenticated).toBe(false);
   });
 
+  it('keeps the navigation open after selecting a theme', async () => {
+    const user = userEvent.setup();
+    render(<Header />);
+    const toggle = screen.getByTestId('app-nav-toggle');
+    await user.click(toggle);
+    const themeToggle = screen.getByRole('button', { name: 'Toggle theme' });
+    await user.click(themeToggle);
+
+    await user.click(screen.getByRole('menuitemradio', { name: 'Dark' }));
+
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(themeToggle).toHaveFocus();
+  });
+
   it('renders the public header before the browser has mounted', () => {
     const html = renderToString(<Header />);
 

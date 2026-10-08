@@ -92,4 +92,18 @@ describe('Public header navigation', () => {
     ))).toEqual(['Compare PDFs', 'Pricing', 'Manual', 'Sign in', 'Create free account']);
     expect(screen.getByTestId('public-nav-toggle')).toHaveAttribute('aria-expanded', 'true');
   });
+
+  it('keeps the navigation open after selecting a theme', async () => {
+    const user = userEvent.setup();
+    render(<PublicHeader />);
+    const toggle = screen.getByTestId('public-nav-toggle');
+    await user.click(toggle);
+    const themeToggle = screen.getByRole('button', { name: 'Toggle theme' });
+    await user.click(themeToggle);
+
+    await user.click(screen.getByRole('menuitemradio', { name: 'Dark' }));
+
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(themeToggle).toHaveFocus();
+  });
 });

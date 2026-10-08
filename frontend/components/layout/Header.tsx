@@ -44,7 +44,9 @@ export default function Header() {
       menuButtonRef.current?.focus();
     };
     const onClick = (event: MouseEvent) => {
-      if (!headerRef.current?.contains(event.target as Node)) close();
+      // A popover can unmount its clicked item before this listener runs.
+      const header = headerRef.current;
+      if (header && !event.composedPath().includes(header)) close();
     };
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && !event.defaultPrevented) {
