@@ -1,5 +1,6 @@
 """Document & version endpoints (flows C1/C2/C3/C4 — docs/plan/03 §3)."""
 
+from django.db.models import Prefetch, prefetch_related_objects
 from rest_framework import status
 from rest_framework.decorators import api_view, throttle_classes
 from rest_framework.pagination import PageNumberPagination
@@ -8,7 +9,7 @@ from rest_framework.throttling import UserRateThrottle
 
 from core.permissions import require_project_role
 
-from .models import Document, DocumentVersion
+from .models import Document, DocumentVersion, SectionVersion
 from .queries import prepare_document_list_versions, with_document_list_data
 from .serializers import (
     DocumentCreateSerializer,
@@ -147,6 +148,9 @@ def version_detail(request, ver):
     version: DocumentVersion = request.resolved_object
 
     if request.method == 'GET':
+        prefetch_related_objects([version], Prefetch(
+            'section_versions', queryset=SectionVersion.objects.select_related('section')
+        ))
         data = VersionDetailSerializer(version).data
         # The screen decides what to render by role (seal bar, plan card).
         data['effective_role'] = request.effective_role
