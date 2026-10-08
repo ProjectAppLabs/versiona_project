@@ -7,6 +7,7 @@ import { backendE2eEnv } from './e2e/helpers/backend-env';
 //   E2E_FRONTEND_PORT=3100 E2E_BACKEND_PORT=8100 npx playwright test ...
 const FRONTEND_PORT = Number(process.env.E2E_FRONTEND_PORT ?? 3000);
 const BACKEND_PORT = Number(process.env.E2E_BACKEND_PORT ?? 8000);
+const PYTHON_BIN = process.env.E2E_PYTHON_BIN ?? '../backend/venv/bin/python';
 
 export default defineConfig({
   testDir: './e2e',
@@ -27,7 +28,7 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: `../backend/venv/bin/python ../backend/manage.py runserver 127.0.0.1:${BACKEND_PORT}`,
+      command: `${PYTHON_BIN} ../backend/manage.py runserver 127.0.0.1:${BACKEND_PORT}`,
       url: `http://127.0.0.1:${BACKEND_PORT}/api/health/`,
       reuseExistingServer: !process.env.CI,
       timeout: 180_000, // 3 minutes for server startup

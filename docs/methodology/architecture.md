@@ -35,6 +35,16 @@ flowchart LR
 
 ## Current workflow (updated per iteration)
 
+**Ronda coordinada — 2026-10-08:** los códigos de respaldo y recuperación se
+consumen desde filas vigentes bloqueadas; contraseña y código comparten la
+transacción. El polling público tiene identidad de carga y cancelación de
+transporte/timer al cambiar de página. Las comparaciones públicas conservan su
+referencia cuando falla la eliminación de archivos y la siguiente purga puede
+reintentar sin detener las demás filas. La navegación compartida adapta su
+presentación en celular/tableta y mantiene los mismos destinos por rol. Papelera
+precarga autor y contexto para evitar consultas por fila. QA registra la
+combinación de los PR antes de integrar; no cambia el árbol desplegado.
+
 **It0 (bootstrap) — DONE 2026-07-12**: services provisioned (database, MinIO +
 `versiona-media` bucket, mailpit), Huey→Celery (static beat schedule),
 FileSystem→S3-when-bucket-set, monolith split into bounded contexts

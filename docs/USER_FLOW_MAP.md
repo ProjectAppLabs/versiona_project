@@ -4,11 +4,11 @@
 
 Use this document to understand each flow's steps, branching conditions, role restrictions,
 and API contracts before writing or reviewing E2E tests. Flow ids map 1:1 to
-`frontend/e2e/flow-definitions.json` (v2.3.0) and to the founding-artifact flow ids
+`frontend/e2e/flow-definitions.json` (v2.4.0) and to the founding-artifact flow ids
 (A1…F1) planned in `docs/plan/01-alcance-mvp.md`.
 
-**Version:** 2.3.0
-**Last Updated:** 2026-10-05
+**Version:** 2.4.0
+**Last Updated:** 2026-10-08
 
 > Maintenance rule (docs/plan/09 DoD #4): each vertical iteration rewrites the sheets of the
 > flows it ships and flips them from *Planned* to *Implemented*. Acceptance criteria live in
@@ -26,22 +26,17 @@ and API contracts before writing or reviewing E2E tests. Flow ids map 1:1 to
 6. [Roles and Conventions](#roles-and-conventions)
 7. [Projects — interactions by role](#projects--interactions-by-role)
 8. [Document and review — interactions by role](#document-and-review--interactions-by-role)
-9. [E2E Coverage Index](#e2e-coverage-index)
+9. [Shared navigation and public comparison](#shared-navigation-and-public-comparison)
+10. [E2E Coverage Index](#e2e-coverage-index)
 
 ---
 
 ## Module Index
 
-> **Status governance (updated 2026-08-13)**: the authoritative status per flow is
-> `frontend/e2e/flow-definitions.json` (v2.2.1, 37 flows) + the flow-coverage CI report;
-> the audit trail lives in `docs/audit/`. Every flow below is **Implemented** and E2E
-> covered; the "(ItN)" suffix records the iteration that shipped it, not a pending
-> target — the previous revision of this table still read "Planned (ItN)" for 15 flows
-> that had in fact shipped and been covered since It1–It6, which this refresh corrects.
-> Verified against the real routes/components/endpoints on 2026-08-13 (`git log
-> --since=2026-08-02`): no flow was added, removed, or changed shape since the prior
-> map (2026-08-02) — the corrections in this revision are metadata fixes (stale
-> route/status/role text caught by reading the real code), not new coverage.
+> **Status governance (updated 2026-10-08)**: the authoritative registry is
+> `frontend/e2e/flow-definitions.json` (v2.4.0, 40 flows). Implementation, authored
+> specs and executed coverage are separate: qualifying tests and their live/CI
+> artifacts determine coverage. A row in this map never grants it by itself.
 
 | Flow ID | Name | Module | Priority | Roles | Frontend Route | Status |
 |---------|------|--------|----------|-------|----------------|--------|
@@ -81,6 +76,9 @@ and API contracts before writing or reviewing E2E tests. Flow ids map 1:1 to
 | `public-pricing` | Public pricing page | billing | P1 | guest | `/precios` | Implemented (It9) |
 | `trial-visibility` | Trial banner + days left | billing | P2 | user | global banner + `/org/usage` | Implemented (It9) |
 | `public-compare` | Anonymous public PDF comparison | public | P1 | guest | `/comparar` → `/comparar/[id]` | Implemented (It9) |
+| `layout-public-navigation` | Public navigation at every reference width | home | P1 | guest | public header | Implemented — owner spec: public/public-navigation |
+| `layout-authenticated-navigation` | Authenticated navigation at every reference width | org | P1 | owner/admin/member | authenticated header | Implemented — owner spec: app/layout/authenticated-navigation |
+| `public-compare-lifecycle` | Public comparison loading follows current page | public | P1 | guest | `/comparar/[id]` → `/comparar` → `/comparar/[id]` | Implemented — owner spec: public/public-compare-lifecycle |
 | `f3-org-audit` | F3 Org audit log + CSV export | org | P2 | owner/admin | `/org/audit` | Implemented (It7) — spec added 2026-07-22 |
 
 ---
@@ -328,6 +326,48 @@ Selectores D3: `observations-panel`, `show-resolved`, `add-observation`,
 `observation-history-more-<id>`, `observation-anchor-<id>` y
 `observation-anchor-more-<id>`.
 
+## Shared navigation and public comparison
+
+### Guest — public navigation (`layout-public-navigation`)
+
+| Class | Interaction | Observable result |
+|---|---|---|
+| success | Open the menu on phone/portrait tablet, follow a link, change language; close with its button, Escape or outside click. | Same destinations and order as desktop; selected destination reached; closing returns focus. |
+| display | Open the theme control and choose Dark. | Dark mode and the local preference change while navigation remains usable. |
+| error | n/a: these local controls expose no validation or permission response. | Destination-page validation belongs to its owning flow. |
+| failure | n/a: this component displays no asynchronous server failure. | Server outcomes belong to destination pages. |
+
+Selectors: `public-header`, `public-nav-toggle`, `public-nav-menu`,
+`locale-toggle`; accessible navigation/menu/link roles.
+
+### Owner/admin/member — authenticated navigation (`layout-authenticated-navigation`)
+
+| Class | Interaction | Observable result |
+|---|---|---|
+| success | Open the compact menu, follow Plan y uso or permitted Papelera, close it and sign out. | Same role-appropriate destinations at each width; only org owner/admin see Papelera; closing restores focus; sign-out removes the session. |
+| display | Open the bell, inspect the notification and follow its link. | The concrete title/badge is visible, the notification is marked read and its destination is reached. |
+| error | n/a: lack of org administration hides Papelera before an attempted header action. | Permission errors in the destination remain part of that page's flow. |
+| failure | No observable header outcome: notification fetch/read failures are stored or treated as best effort. | Those branches require store/unit evidence rather than invented UI alerts. |
+
+Selectors: `app-header`, `app-nav-toggle`, `app-nav-menu`, `notification-bell`,
+`notification-badge`, `notification-dropdown`, `nav-plan-usage`.
+
+### Guest — comparison lifecycle (`public-compare-lifecycle`)
+
+| Class | Interaction | Observable result |
+|---|---|---|
+| success | Start comparison A, navigate through the header to another comparison, start B and let A settle late. | A is aborted; B's file names and result remain; stale success/failure cannot replace them. |
+| error | Invalid uploads, OCR rejection and rate limiting belong to `public-compare`. | An obsolete error must be discarded; out-of-order errors are also tested at the unit layer. |
+| failure | A current failed job/HTTP response/timeout belongs to `public-compare` failure. | Current failure shows the alert and offers a new comparison; it is distinct from ignoring a stale response. |
+| display | No separate lifecycle interaction. | Processing/result data are assertions proving replacement succeeds. |
+
+The page aborts on route cleanup; the store cancels the previous transport and
+poll timer and protects publication with load identity. The browser lifecycle
+spec controls only HTTP: form interaction, header navigation, cancellation and
+rendering execute in the app. Navigation acceptance uses exactly 412×915,
+835×1194, 1195×835, 1440×900 and 2560×1440. Geometry assertions supplement user
+interactions and do not count as standalone coverage.
+
 ## E2E Coverage Index
 
 | Flujo | Outcomes declarados | Spec dueño |
@@ -342,3 +382,15 @@ Selectores D3: `observations-panel`, `show-resolved`, `add-observation`,
 
 La auditoría automática calcula la cobertura real. Estas filas declaran qué se
 debe validar; mencionar un spec aquí no le otorga crédito de cobertura.
+
+### Owners added in the 2026-10-08 round
+
+| Flow | Outcomes | Owning spec |
+|---|---|---|
+| `layout-public-navigation` | success, display | `e2e/public/public-navigation.spec.ts` |
+| `layout-authenticated-navigation` | success, display | `e2e/app/layout/authenticated-navigation.spec.ts` |
+| `public-compare-lifecycle` | success | `e2e/public/public-compare-lifecycle.spec.ts` |
+| `public-compare` | success, error, failure | `e2e/public/public-compare.spec.ts` and the current-job failure case in `public-compare-lifecycle.spec.ts` |
+
+Execution evidence belongs to the exact PR/integration commit artifacts, not the
+presence of these rows. No unrelated route has been reclassified as mature.
