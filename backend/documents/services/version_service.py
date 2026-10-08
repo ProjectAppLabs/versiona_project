@@ -8,6 +8,7 @@ duplicates (C2-E01/F6), serializes the version number (I1) and enqueues the
 analysis job.
 """
 
+import logging
 from dataclasses import dataclass
 
 from django.conf import settings
@@ -20,6 +21,8 @@ from documents.services import storage_service
 from engine.services.analysis import EncryptedPdfError, InvalidPdfError, open_pdf
 from engine.tasks import enqueue_analysis
 from projects.models import Project, ProjectConfigVersion
+
+logger = logging.getLogger(__name__)
 
 
 # MySQL ER_LOCK_WAIT_TIMEOUT.
@@ -126,7 +129,17 @@ def complete_upload(document: Document, upload_id: str, message: str, user, requ
             ) from exc
         raise
 
-    storage_service.delete(staging)
+    try:
+        storage_service.delete(staging)
+    except OSError as exc:
+        # Promotion is committed; cleanup must not prevent analysis or turn a
+        # completed upload into a failure response. Leave the temporary object
+        # intact and report only safe diagnostics.
+        logger.warning(
+            'Staging upload cleanup failed after promotion: phase=upload_cleanup error_class=%s',
+            type(exc).__name__,
+            extra={'phase': 'upload_cleanup', 'error_class': type(exc).__name__},
+        )
     job = enqueue_analysis(version)
     version.refresh_from_db()
     return version, job

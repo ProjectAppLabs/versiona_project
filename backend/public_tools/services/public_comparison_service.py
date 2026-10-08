@@ -167,8 +167,13 @@ def create_public_comparison(file_a, file_b, ip: str) -> PublicComparison:
 
 
 def delete_stored_files(comparison: PublicComparison) -> None:
+    """Attempt both objects; report failure so callers retain the recovery row."""
+    first_error: Exception | None = None
     for slot in ('a', 'b'):
         try:
             storage_service.delete(storage_key_for(comparison.public_id, slot))
-        except Exception:  # best-effort: the purge task is the safety net
-            pass
+        except Exception as exc:
+            if first_error is None:
+                first_error = exc
+    if first_error is not None:
+        raise first_error
