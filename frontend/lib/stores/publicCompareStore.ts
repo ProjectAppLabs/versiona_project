@@ -74,7 +74,7 @@ interface PublicCompareState {
   swap: () => void;
   clientValidate: (file: File) => PublicCompareErrorKey | null;
   submit: () => Promise<string | null>;
-  load: (publicId: string) => Promise<void>;
+  load: (publicId: string, signal?: AbortSignal) => Promise<void>;
   reset: () => void;
 }
 
@@ -86,6 +86,21 @@ function mapAxiosError(err: unknown): PublicCompareErrorKey {
   const code = response?.data?.error_code;
   return (code && ERROR_CODE_TO_KEY[code]) || 'genericFailed';
 }
+
+function waitForPoll(interval: number, signal: AbortSignal): Promise<void> {
+  return new Promise((resolve) => {
+    const finish = () => {
+      clearTimeout(timer);
+      signal.removeEventListener('abort', finish);
+      resolve();
+    };
+    const timer = setTimeout(finish, interval);
+    signal.addEventListener('abort', finish, { once: true });
+    if (signal.aborted) finish();
+  });
+}
+
+let activeLoad: AbortController | null = null;
 
 export const usePublicCompareStore = create<PublicCompareState>((set, get) => ({
   slotA: null,
@@ -139,15 +154,28 @@ export const usePublicCompareStore = create<PublicCompareState>((set, get) => ({
     }
   },
 
-  load: async (publicId) => {
+  load: async (publicId, signal) => {
+    activeLoad?.abort();
+    const controller = new AbortController();
+    activeLoad = controller;
+    const cancel = () => controller.abort();
+    signal?.addEventListener('abort', cancel, { once: true });
+    if (signal?.aborted) cancel();
+    const isCurrent = () => activeLoad === controller && !controller.signal.aborted;
     const startedAt = Date.now();
     let interval = INITIAL_INTERVAL_MS;
 
-    const fetchOnce = async (): Promise<void> => {
-      try {
+    try {
+      if (!isCurrent()) return;
+      set({ detail: null, phase: 'processing', errorKey: null });
+      while (isCurrent()) {
         const { data } = await publicApi.get<PublicComparisonDetail>(
-          `public/comparisons/${publicId}/`
+          `public/comparisons/${publicId}/`,
+          { signal: controller.signal }
         );
+        // Aborted transports can still settle. An older load never owns the
+        // visible result or another polling request after it is superseded.
+        if (!isCurrent()) return;
         if (data.status === 'done') {
           set({ detail: data, phase: 'done', errorKey: null });
           return;
@@ -165,18 +193,20 @@ export const usePublicCompareStore = create<PublicCompareState>((set, get) => ({
           return;
         }
         set({ detail: data, phase: 'processing' });
-        await new Promise((resolve) => setTimeout(resolve, interval));
+        await waitForPoll(interval, controller.signal);
         interval = Math.min(interval * 1.5, MAX_INTERVAL_MS);
-        return fetchOnce();
-      } catch (err) {
-        set({ phase: 'error', errorKey: mapAxiosError(err) });
       }
-    };
-
-    await fetchOnce();
+    } catch (err) {
+      if (isCurrent()) set({ phase: 'error', errorKey: mapAxiosError(err) });
+    } finally {
+      signal?.removeEventListener('abort', cancel);
+      if (activeLoad === controller) activeLoad = null;
+    }
   },
 
-  reset: () =>
+  reset: () => {
+    activeLoad?.abort();
+    activeLoad = null;
     set({
       slotA: null,
       slotB: null,
@@ -184,5 +214,6 @@ export const usePublicCompareStore = create<PublicCompareState>((set, get) => ({
       progress: 0,
       detail: null,
       errorKey: null,
-    }),
+    });
+  },
 }));
