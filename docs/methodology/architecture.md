@@ -127,6 +127,23 @@ su contenido y no ofrecen un enlace inutilizable. El contrato anterior anidado
 se sustituye coordinadamente en API/UI, sin nuevas migraciones ni dependencias.
 La evidencia de QA y entrega se conserva en el reporte de esta ronda del toolkit.
 
+**R2 — 2026-10-08:** la promoción escribe la captura validada mediante el
+backend de almacenamiento existente. La bandeja usa pertenencia vigente y no
+elimina evidencia histórica. D5 selecciona sellos válidos mediante I11 y usa
+la fila de versión como mutex del plan; todas las elecciones se validan antes
+de cambios o correo. `apply_invalidation(..., analysis_degraded=False)` acepta
+la señal interna verificada por el motor, sin cambiar el contrato público.
+Las confirmaciones repetidas conservan el rechazo 404 existente.
+
+El publicador asíncrono actúa después del commit. Un trabajo pendiente sin ACK
+conserva su intención y se recupera por la tarea periódica; un UUID estable y
+los checkpoints mantienen efectos únicos ante entregas duplicadas. La espera
+de sockets se limita localmente, sin certificar un tiempo total HTTP. SMTP usa
+`DJANGO_EMAIL_TIMEOUT`, entero positivo con default 5 segundos. No hay nuevas
+migraciones ni dependencias. La preparación de metadatos documentales y
+secciones conserva los helpers de autorización y los payloads; la página PDF
+y sus resaltados comparten ancho efectivo de contenedor.
+
 **Next**: operator-gated go-public items — deployment (DP-21), domain+SMTP (DP-22),
 Ed25519 key rotation/custody (DP-24), Wompi checkout keys (F1 payment leg), optional
 It10: public certificate verification (/verificar + QR).

@@ -234,7 +234,7 @@ it (see the Module Index status column for the shipping iteration).
 | D2 | `d2-assisted-review` | It4 | `e2e/app/reviews/d2-assisted-review.spec.ts` |
 | D3 | `d3-anchored-observations` | It4 | `e2e/app/reviews/d3-anchored-observations.spec.ts` |
 | D4 | `d4-seal-approve` | It3 | `e2e/app/seals/d4-seal-approve.spec.ts` |
-| D5 | `d5-selective-invalidation` | It3 | `e2e/app/seals/d5-selective-invalidation.spec.ts` |
+| D5 | `d5-selective-invalidation` | It3 | `e2e/app/seals/d5-selective-invalidation.spec.ts`, `e2e/app/seals/d5-coordinator-confirmation.spec.ts` |
 | E1 | `e1-compare` | It2 | `e2e/app/compare/e1-compare-versions.spec.ts` |
 | E3 | `e3-configurable-checks` | It5 | `e2e/app/projects/b3-e3-governance.spec.ts` (shared with B3) |
 | F1 | `f1-billing` | It7 | `e2e/app/billing/f1-f2-limits-usage.spec.ts` (shared with F2) |
@@ -394,3 +394,17 @@ debe validar; mencionar un spec aquí no le otorga crédito de cobertura.
 
 Execution evidence belongs to the exact PR/integration commit artifacts, not the
 presence of these rows. No unrelated route has been reclassified as mature.
+
+## R2 — validación de D5 y PDF (2026-10-08)
+
+| Vista | Interacción | Clase | Cobertura de esta ronda |
+|---|---|---|---|
+| Visor y sellos | Nueva entrega nativa conserva el sello original hasta v3 | success | D5-F06 en el E2E automático existente |
+| Bandeja y plan D5 | Administrador confirma una entrega degradada; el revisor recibe el aviso posterior | success | Nuevo D5-A04, pendiente de ejecución hasta la QA combinada |
+| Vista previa, visor y comparación | Subir el PDF y seleccionar una sección conserva contenido y resaltados al cambiar el ancho | display/success | C1/E1 en los cinco viewports del estándar |
+
+La repetición concurrente, elecciones incompletas y proyectos archivados se
+comprueban en API/servicios MySQL. No se adjudica cobertura E2E negativa por
+esas pruebas. La sellabilidad estructural sigue pendiente y no recibe crédito
+D5-L01 por el nuevo recorrido. Las ejecuciones efectivas y los gaps restantes
+se acreditan en el reporte R2, no mediante el registro por sí solo.
