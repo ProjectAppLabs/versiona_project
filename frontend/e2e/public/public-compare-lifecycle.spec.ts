@@ -103,3 +103,30 @@ for (const lateStatus of ['done', 'failed'] as const) {
     }
   );
 }
+
+test(
+  'shows a failure alert for the current comparison',
+  { tag: [
+    '@flow:public-compare', '@module:public', '@priority:P1', '@outcome:failure',
+  ] },
+  async ({ page }) => {
+    await page.route('**/public/comparisons/', (route) => route.fulfill({
+      json: { public_id: FIRST_ID, status: 'processing' },
+    }));
+    await page.route(`**/public/comparisons/${FIRST_ID}/`, (route) => route.fulfill({
+      json: { ...comparison(FIRST_ID, 'failed'), result: null },
+    }));
+    await page.goto('/');
+    await page.getByTestId('public-header').getByRole('link', {
+      name: 'Comparar PDFs',
+    }).click();
+
+    await uploadComparison(page);
+
+    await expect(page.getByTestId('public-compare-error')).toHaveText(
+      'No pudimos comparar estos PDF. Inténtalo de nuevo.'
+    );
+    await expect(page.getByTestId('public-compare-result')).toHaveCount(0);
+    await expect(page).toHaveURL(`/comparar/${FIRST_ID}`);
+  }
+);
