@@ -42,15 +42,18 @@ def org_trash(request, org):
     from projects.models import Project
     from projects.serializers import TrashItemSerializer
 
-    projects = Project.all_objects.trashed().filter(organization=request.org)
+    projects = (
+        Project.all_objects.trashed().filter(organization=request.org)
+        .select_related('organization', 'deleted_by')
+    )
     documents = Document.all_objects.trashed().filter(
         project__organization=request.org, project__deleted_at__isnull=True
-    ).select_related('project')
+    ).select_related('project', 'deleted_by')
     versions = DocumentVersion.all_objects.trashed().filter(
         document__project__organization=request.org,
         document__deleted_at__isnull=True,
         document__project__deleted_at__isnull=True,
-    ).select_related('document__project')
+    ).select_related('document__project', 'deleted_by')
 
     def item(obj, type_name, name, context):
         return {

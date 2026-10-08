@@ -21,9 +21,16 @@
 
 **MVP feature-complete**: 19 flows E2E green (`docs/audit/05-cierre.md` "MISIÓN
 CUMPLIDA") + It9 public surfaces. Flow contract: `frontend/e2e/flow-definitions.json`
-v2.3.0 (37 flows).
+v2.4.0 (40 flows).
 
 ## Rondas de mantenimiento
+
+- **2026-10-08 — ronda coordinada:** consumo atómico de códigos de respaldo y
+  recuperación, polling vinculado a la comparación vigente, limpieza pública
+  recuperable, navegación accesible en cinco anchos y consultas constantes en
+  papelera. Cada frente tiene PR propio; QA y registros se coordinan una vez
+  sobre la combinación. La integración requiere checks verdes y el tren de
+  `merge-queue`, sin actualizar el clon desplegado.
 
 - **2026-10-02 — carga de documentos:** cuota por usuario en uploads, reporte
   mediante proyecciones agrupadas y lectura progresiva de observaciones,

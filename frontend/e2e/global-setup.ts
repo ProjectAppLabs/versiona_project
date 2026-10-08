@@ -14,7 +14,7 @@ import path from 'node:path';
 import { E2E_ENV_HINT, backendE2eEnv, hasDedicatedE2eEnv } from './helpers/backend-env';
 
 const BACKEND = path.resolve(__dirname, '../../backend');
-const PYTHON = path.join(BACKEND, 'venv/bin/python');
+const PYTHON = process.env.E2E_PYTHON_BIN ?? path.join(BACKEND, 'venv/bin/python');
 const AUTH_DIR = path.resolve(__dirname, '.auth');
 const MAILPIT_API = process.env.MAILPIT_API ?? 'http://127.0.0.1:8025';
 

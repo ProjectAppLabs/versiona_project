@@ -44,8 +44,12 @@ export function backendE2eOverrides(): Record<string, string> {
 }
 
 /** Full child environment: the current one, with the E2E overrides applied. */
-export function backendE2eEnv(): NodeJS.ProcessEnv {
-  return { ...process.env, ...backendE2eOverrides() };
+export function backendE2eEnv(): Record<string, string> {
+  const inherited: Record<string, string> = {};
+  for (const [key, value] of Object.entries(process.env)) {
+    if (value !== undefined) inherited[key] = value;
+  }
+  return { ...inherited, ...backendE2eOverrides() };
 }
 
 /** Whether a dedicated E2E environment file is in play, for diagnostics. */

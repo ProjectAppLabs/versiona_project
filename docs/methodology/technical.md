@@ -31,6 +31,11 @@
 
 ## Key constraints & decisions
 
+- El harness Playwright admite `E2E_PYTHON_BIN` absoluto para reutilizar un venv
+  externo sin enlazar `backend/venv`. El entorno de sus procesos omite valores
+  `undefined`; se mantiene el Python local como default. En worktrees, las
+  pruebas usan nombres de DB descartables explícitos y puertos UI/API propios.
+
 - Docker/compose deferred (DP-21) — kept as blueprint in `docs/plan/07` §2.2.
 - Payment gateway: **Wompi** behind a `PaymentGateway` adapter (DP-01, It7).
 - `d5_mode` default **auto** (DP-03); free-plan retention locks access, never deletes (DP-04).
