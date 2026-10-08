@@ -52,6 +52,10 @@ describe('PdfViewer available width', () => {
     render(<PdfViewer file="/contract.pdf" />);
 
     expect(screen.queryByTestId('rendered-pdf')).not.toBeInTheDocument();
+
+    resizeContent(364);
+
+    expect(screen.getByTestId('rendered-pdf')).toHaveStyle({ width: '362px' });
   });
 
   it.each([
