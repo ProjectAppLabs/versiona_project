@@ -1,4 +1,3 @@
-// qa: draft-unvalidated
 import { expect, test } from '../../test-with-coverage';
 import { D5_SELECTIVE_INVALIDATION } from '../../helpers/flow-tags';
 import { assertNoEmailFor, purgeMailbox, waitForEmail } from '../../helpers/mailpit';
