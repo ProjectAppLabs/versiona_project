@@ -8,6 +8,7 @@ import pytest
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
+from freezegun import freeze_time
 
 from documents.services import storage_service
 from public_tools.models import PublicComparison
@@ -99,6 +100,7 @@ def test_failed_purge_remains_retryable(expired_comparison, monkeypatch, slot, e
 
 
 @pytest.mark.parametrize('failed_index', [0, 99])
+@freeze_time('2026-10-08 12:00:00')
 def test_purge_progresses_past_retained_comparison(monkeypatch, failed_index):
     PublicComparison.objects.bulk_create([
         PublicComparison(
