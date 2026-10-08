@@ -97,7 +97,8 @@ test.describe('B2 — Tablero completo', () => {
         const description = 'Descripción extensa del proyecto para confirmar que la tarjeta conserva todo el contenido visible '.repeat(3);
         await createProjectWithLongDescription(page, name, description);
 
-        await page.getByRole('link', { name: 'Panel' }).click();
+        await page.getByTestId('app-nav-toggle').click();
+        await page.getByTestId('app-nav-menu').getByRole('link', { name: 'Panel', exact: true }).click();
         await page.waitForURL(/\/projects$/);
         await page.getByTestId('board-search').fill(name);
         await page.getByTestId('board-status-filter').selectOption('active');
