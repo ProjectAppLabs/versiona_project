@@ -52,6 +52,18 @@ def test_generate_code_supersedes_the_pending_code():
 
 
 @pytest.mark.django_db
+def test_two_consecutive_issuances_leave_exactly_one_live_code():
+    """Fails if issuing codes back to back leaves more than one usable code."""
+    User = get_user_model()
+    user = User.objects.create_user(email='one-live@example.com', password='pass1234')
+    PasswordCode.generate_code(user)
+
+    PasswordCode.generate_code(user)
+
+    assert PasswordCode.objects.filter(user=user, used=False).count() == 1
+
+
+@pytest.mark.django_db
 def test_password_code_is_valid_false_when_used():
     User = get_user_model()
     user = User.objects.create_user(email='used@example.com', password='pass1234')

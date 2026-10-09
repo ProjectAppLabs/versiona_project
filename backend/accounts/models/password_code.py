@@ -1,6 +1,6 @@
 import secrets
 
-from django.db import models
+from django.db import models, transaction
 from .user import User
 
 class PasswordCode(models.Model):
@@ -27,10 +27,14 @@ class PasswordCode(models.Model):
 
         Codes still pending are superseded first: an account holds at most one
         live code, so requesting more codes never multiplies the odds of a guess.
+        Issuing takes the same user-row lock as the reset verification, so
+        concurrent issuances and verifications run one after another.
         """
-        cls.objects.filter(user=user, used=False).update(used=True)
-        code = f'{secrets.randbelow(1_000_000):06d}'
-        return cls.objects.create(user=user, code=code)
+        with transaction.atomic():
+            User.objects.select_for_update().get(pk=user.pk)
+            cls.objects.filter(user=user, used=False).update(used=True)
+            code = f'{secrets.randbelow(1_000_000):06d}'
+            return cls.objects.create(user=user, code=code)
     
     def is_valid(self):
         """
