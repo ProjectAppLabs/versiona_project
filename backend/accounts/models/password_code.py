@@ -1,3 +1,5 @@
+import secrets
+
 from django.db import models
 from .user import User
 
@@ -21,10 +23,13 @@ class PasswordCode(models.Model):
     @classmethod
     def generate_code(cls, user):
         """
-        Generate a new 6-digit code for the user.
+        Issue a new 6-digit code for the user, drawn from the CSPRNG.
+
+        Codes still pending are superseded first: an account holds at most one
+        live code, so requesting more codes never multiplies the odds of a guess.
         """
-        import random
-        code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+        cls.objects.filter(user=user, used=False).update(used=True)
+        code = f'{secrets.randbelow(1_000_000):06d}'
         return cls.objects.create(user=user, code=code)
     
     def is_valid(self):

@@ -1,4 +1,4 @@
-import random
+import secrets
 from datetime import timedelta
 
 import pytest
@@ -19,15 +19,36 @@ def test_password_code_str_representation():
 
 
 @pytest.mark.django_db
-def test_password_code_generate_code_creates_six_digits(monkeypatch):
+def test_generate_code_draws_six_digits_from_the_csprng(monkeypatch):
+    """Fails if reset codes stop coming from `secrets` or lose leading zeros."""
     User = get_user_model()
     user = User.objects.create_user(email='generate@example.com', password='pass1234')
+    bounds = []
 
-    monkeypatch.setattr(random, 'randint', lambda *_: 1)
+    def fake_randbelow(bound):
+        bounds.append(bound)
+        return 42
+
+    monkeypatch.setattr(secrets, 'randbelow', fake_randbelow)
 
     password_code = PasswordCode.generate_code(user)
 
-    assert password_code.code == '111111'
+    assert password_code.code == '000042'
+    assert bounds == [1_000_000]
+
+
+@pytest.mark.django_db
+def test_generate_code_supersedes_the_pending_code():
+    """Fails if issuing a code leaves an earlier one usable (several live codes)."""
+    User = get_user_model()
+    user = User.objects.create_user(email='reissue@example.com', password='pass1234')
+    first = PasswordCode.generate_code(user)
+
+    second = PasswordCode.generate_code(user)
+
+    first.refresh_from_db()
+    assert first.is_valid() is False
+    assert second.is_valid() is True
 
 
 @pytest.mark.django_db
