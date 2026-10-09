@@ -51,7 +51,9 @@ commit `07a62349`, fuera de toda rama.
 - Documentos, comparación y revisión cumplen 44 px y 16 px en celular y tableta,
   sin desborde horizontal; lo mismo para los controles de aviso, modal y
   confirmación.
-- Next.js pasó a 16.4.0, y `npm audit` de producción queda en 0.
+- Next.js pasó a 16.3.8, y `npm audit` de producción queda en 0. La 16.4.0 se
+  descartó: rompe el E2E de cierre de sesión desde el menú compacto
+  (`authenticated-navigation.spec.ts:182`).
 - Los chips de «Lo que cambió» llevan el visor a la sección.
 
 **Pendientes registrados**
