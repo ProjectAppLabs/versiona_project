@@ -129,6 +129,11 @@ def restore_project(project: Project, user, request=None):
         raise DomainError('El proyecto no está en la papelera.', 400)
     if Project.objects.filter(organization=project.organization, slug=project.slug).exists():
         raise DomainError('Hay un proyecto activo con el mismo identificador: renómbralo primero.', 409)
+    if project.status == Project.Status.ACTIVE:
+        # I13: bringing an active project back adds to the plan's active count.
+        from billing.services import check_project_limit
+
+        check_project_limit(project.organization)
     project.restore()
     audit.record(org=project.organization, project=project, actor=user,
                  event_type='project.restored', obj=project,
@@ -143,6 +148,12 @@ def archive_project(project: Project, user, request=None):
 
 
 def unarchive_project(project: Project, user, request=None):
+    if project.status != Project.Status.ACTIVE and not project.is_trashed:
+        # I13: reactivation is checked like creation. A trashed project does
+        # not count yet; restore_project checks it when it comes back.
+        from billing.services import check_project_limit
+
+        check_project_limit(project.organization)
     project.status = Project.Status.ACTIVE
     project.save(update_fields=['status', 'updated_at'])
     audit.record(org=project.organization, project=project, actor=user,

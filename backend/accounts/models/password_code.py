@@ -1,4 +1,6 @@
-from django.db import models
+import secrets
+
+from django.db import models, transaction
 from .user import User
 
 class PasswordCode(models.Model):
@@ -21,11 +23,18 @@ class PasswordCode(models.Model):
     @classmethod
     def generate_code(cls, user):
         """
-        Generate a new 6-digit code for the user.
+        Issue a new 6-digit code for the user, drawn from the CSPRNG.
+
+        Codes still pending are superseded first: an account holds at most one
+        live code, so requesting more codes never multiplies the odds of a guess.
+        Issuing takes the same user-row lock as the reset verification, so
+        concurrent issuances and verifications run one after another.
         """
-        import random
-        code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
-        return cls.objects.create(user=user, code=code)
+        with transaction.atomic():
+            User.objects.select_for_update().get(pk=user.pk)
+            cls.objects.filter(user=user, used=False).update(used=True)
+            code = f'{secrets.randbelow(1_000_000):06d}'
+            return cls.objects.create(user=user, code=code)
     
     def is_valid(self):
         """

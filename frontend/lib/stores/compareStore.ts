@@ -3,6 +3,7 @@
 import { create } from 'zustand';
 
 import { api } from '@/lib/services/http';
+import { maybeShowUpgradeDialog } from '@/lib/stores/upgradeDialogStore';
 import type { NormalizedBBox } from '@/lib/pdf/coords';
 import type { SectionChange } from '@/lib/compare/sync';
 
@@ -60,6 +61,7 @@ export const useCompareStore = create<CompareState>((set, get) => ({
       );
       set({ comparison: data, isLoading: false });
     } catch (err) {
+      maybeShowUpgradeDialog(err); // DP-04 history lock → upgrade path
       set({ isLoading: false, error: extractError(err) });
     }
   },

@@ -18,6 +18,19 @@ from .serializers import (
 from .services import build_comparison, validate_pair
 
 
+def _history_lock_response(*versions):
+    """DP-04: a diff reveals both of its versions, so each one must pass the
+    plan's history lock. Returns the 402 to answer, or None when all pass."""
+    from billing.services import check_history_access
+
+    try:
+        for version in versions:
+            check_history_access(version)
+    except DomainError as exc:
+        return Response({'error': str(exc), 'upgrade': True}, status=exc.status_code)
+    return None
+
+
 @api_view(['GET', 'POST'])
 @require_project_role('viewer')
 def document_comparisons(request, doc):
@@ -47,6 +60,10 @@ def document_comparisons(request, doc):
     to_version = versions.get(str(serializer.validated_data['to_version']))
     if from_version is None or to_version is None:
         raise Http404
+
+    locked = _history_lock_response(from_version, to_version)
+    if locked is not None:
+        return locked
 
     try:
         # Guards first: a stale cache is never served for an uncomparable pair.
@@ -85,12 +102,18 @@ def _load_comparison(request, cmp_id):
 @api_view(['GET'])
 def comparison_detail(request, cmp):
     comparison = _load_comparison(request, cmp)
+    locked = _history_lock_response(comparison.from_version, comparison.to_version)
+    if locked is not None:
+        return locked
     return Response(ComparisonDetailSerializer(comparison).data)
 
 
 @api_view(['GET'])
 def comparison_section_diff(request, cmp, sec):
     comparison = _load_comparison(request, cmp)
+    locked = _history_lock_response(comparison.from_version, comparison.to_version)
+    if locked is not None:
+        return locked
     diff = comparison.diffs.filter(stable_key=sec).first()
     if diff is None:
         raise Http404
