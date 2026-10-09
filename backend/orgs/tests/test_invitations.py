@@ -1,6 +1,7 @@
 """A2: invitations — email, token, exact-email accept, landing, revoke."""
 
 from datetime import timedelta
+from unittest.mock import MagicMock
 
 import pytest
 from django.utils import timezone
@@ -237,3 +238,39 @@ def test_members_endpoint_does_not_expose_member_removal(client_as, versiona_con
     )
 
     assert response.status_code == 405
+
+
+@pytest.fixture
+def refused_smtp(settings, monkeypatch):
+    """SMTP boundary that refuses the connection, like a relay that is down."""
+    settings.EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    settings.EMAIL_USE_TLS = False
+    settings.EMAIL_USE_SSL = False
+    monkeypatch.setattr(
+        'django.core.mail.backends.smtp.smtplib.SMTP',
+        MagicMock(side_effect=ConnectionRefusedError(111, 'Connection refused')),
+    )
+
+
+@pytest.mark.django_db
+def test_invitation_survives_an_undelivered_email(versiona_context, refused_smtp):
+    """Catches: an SMTP outage rolling back the invitation the admin just created."""
+    invitation = create_invitation(
+        versiona_context.project, versiona_context.users['admin'],
+        email='invitada@externa.co', role='reviewer',
+    )
+
+    assert Invitation.objects.get(pk=invitation.pk).status == Invitation.Status.PENDING
+
+
+@pytest.mark.django_db
+def test_undelivered_invitation_logs_a_sanitized_warning(versiona_context, refused_smtp, caplog):
+    """Catches: a silent invitation failure, or a warning with the address, token or link."""
+    create_invitation(
+        versiona_context.project, versiona_context.users['admin'],
+        email='invitada@externa.co', role='reviewer',
+    )
+
+    assert [
+        record.getMessage() for record in caplog.records if record.name == 'orgs.invitations'
+    ] == ['Invitation email not delivered: phase=invitation_email error_class=ConnectionRefusedError']

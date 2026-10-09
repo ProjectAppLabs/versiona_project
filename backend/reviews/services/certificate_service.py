@@ -16,9 +16,11 @@ from reportlab.lib.units import cm
 from reportlab.pdfgen import canvas as pdf_canvas
 
 from audit import services as audit
+from core.models import uuid7
 from documents.models import DocumentVersion
 from documents.services import storage_service
 from documents.services.version_service import DomainError
+from orgs.models import Organization
 
 from ..models import Certificate, Seal
 from . import signing
@@ -135,14 +137,21 @@ def issue_certificate(version: DocumentVersion, issued_by, request=None) -> Cert
             f'Firma(s) que no verifican: {", ".join(invalid)}. No se emite constancia.', 409
         )
 
+    # The serial counts committed rows: the organization row serializes every
+    # issuance in it, so a contender counts only after the previous commit.
+    Organization.objects.select_for_update().only('pk').get(pk=org.pk)
     serial = _serial_for(org)
     public_key = signing.public_key_b64()
     pdf_bytes = _render_pdf(serial, version, seals, public_key, issued_by)
+    # The object key belongs to this certificate alone: no serial collision can
+    # replace the PDF of a certificate that is already issued (E4-F03).
+    public_id = uuid7()
     pdf_key = (f'{storage_service._env_prefix()}/orgs/{org.public_id}/certificates/'
-               f'{serial}.pdf')
+               f'{serial}-{public_id}.pdf')
     storage_service.put_bytes(pdf_key, pdf_bytes, 'application/pdf')
 
     certificate = Certificate.objects.create(
+        public_id=public_id,
         organization=org,
         document_version=version,
         serial=serial,

@@ -1,9 +1,23 @@
 """
 Authentication utility functions.
 """
+import logging
+
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.mail import send_mail
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
+
+
+def _log_undelivered(label: str, phase: str, exc: Exception):
+    # Phase and error class only: an SMTP error message can name the
+    # recipient, and the email body carries the one-time code.
+    logger.warning(
+        '%s email not delivered: phase=%s error_class=%s',
+        label, phase, type(exc).__name__,
+        extra={'phase': phase, 'error_class': type(exc).__name__},
+    )
 
 
 def generate_auth_tokens(user):
@@ -61,8 +75,8 @@ The Team
             fail_silently=False,
         )
         return True
-    except Exception as e:
-        print(f"Error sending email: {e}")
+    except Exception as exc:
+        _log_undelivered('Password reset', 'password_reset_email', exc)
         return False
 
 
@@ -96,6 +110,6 @@ The Team
             fail_silently=False,
         )
         return True
-    except Exception as e:
-        print(f"Error sending email: {e}")
+    except Exception as exc:
+        _log_undelivered('Verification', 'verification_email', exc)
         return False

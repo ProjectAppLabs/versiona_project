@@ -5,7 +5,9 @@ Contract: the domain enqueues an EngineJob and consumes its `result`.
 Idempotency by natural key (I15): a `done` job re-dispatched returns its
 stored result without side effects. Each persisted phase confirms a private
 checkpoint in the same transaction. Parse errors are PERMANENT (no retry,
-C1-E04); infrastructure errors retry with backoff (3 retries).
+C1-E04); infrastructure errors retry with backoff (3 retries). A delivery
+that stops checkpointing is republished by the minute recovery task, up to a
+delivery cap that ends in a readable failure.
 """
 
 import logging
@@ -14,6 +16,7 @@ from uuid import NAMESPACE_URL, uuid5
 
 from celery import shared_task
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 from kombu.exceptions import OperationalError as BrokerOperationalError
 
@@ -34,6 +37,19 @@ DISPATCH_ERROR = 'No se pudo iniciar el análisis; se reintentará automáticame
 DISPATCH_BATCH_SIZE = 20
 DISPATCH_MIN_AGE_SECONDS = 60
 DISPATCH_BUDGET_SECONDS = 30
+# A started or acknowledged delivery without a checkpoint for longer than the
+# plan's 15-minute analysis ceiling (docs/plan/05 §7) lost its worker, its
+# broker message or its database: recovery republishes it under the same task
+# id. A duplicate of a live delivery is harmless: each phase re-reads its
+# checkpoint under the job lock.
+STALLED_AFTER_SECONDS = 20 * 60
+# Started deliveries a stalled job may consume (the first run, three Celery
+# retries and one recovery) before it fails with a readable cause.
+MAX_ANALYSIS_DELIVERIES = 5
+STALLED_ERROR = 'El análisis se interrumpió varias veces y no pudo completarse.'
+STALLED_STATE = Q(status=EngineJob.Status.RUNNING) | (
+    Q(status=EngineJob.Status.PENDING) & ~Q(celery_task_id='')
+)
 
 
 class _RecoveryBlocked(Exception):
@@ -114,27 +130,92 @@ def _dispatch_pending_analysis(job_id: int, *, skip_locked=False, cutoff=None) -
     return 'published'
 
 
+@transaction.atomic
+def _resume_stalled_analysis(job_id: int, *, cutoff) -> str:
+    # Lock only EngineJob, like the unpublished dispatch boundary above.
+    job = EngineJob.objects.select_for_update(skip_locked=True).filter(
+        STALLED_STATE, pk=job_id, job_type=EngineJob.Type.ANALYSIS, updated_at__lte=cutoff,
+    ).first()
+    if job is None or not DocumentVersion.objects.filter(
+        pk=job.document_version_id, document__deleted_at__isnull=True,
+        document__project__deleted_at__isnull=True,
+    ).exists():
+        return 'skipped'
+    if job.attempts >= MAX_ANALYSIS_DELIVERIES:
+        _fail_stalled(job)
+        return 'failed'
+    try:
+        task_id = _publish_analysis(job)
+    except BrokerOperationalError:
+        # Leave the job untouched: it stays eligible for the next round.
+        logger.warning(
+            'Stalled analysis recovery deferred: phase=stalled_recovery '
+            'error_class=OperationalError',
+            extra={'phase': 'stalled_recovery', 'error_class': 'OperationalError'},
+        )
+        return 'deferred'
+    job.celery_task_id = task_id
+    job.save(update_fields=['celery_task_id', 'updated_at'])
+    _log_stalled(job, 'republished')
+    return 'published'
+
+
+def _fail_stalled(job: EngineJob):
+    """Readable final state; only a version without a persisted analysis fails."""
+    try:
+        version = _job_version(job)
+        unanalyzed = _read_progress(job, version) is None
+    except _RecoveryBlocked:
+        version, unanalyzed = None, False
+    _fail(job, version, STALLED_ERROR, fail_version=unanalyzed)
+    _log_stalled(job, 'failed')
+
+
+def _log_stalled(job: EngineJob, action: str):
+    # Public job id and delivery count only: never the file key or document data.
+    logger.warning(
+        'Stalled analysis recovery: phase=stalled_recovery action=%s job=%s attempts=%s',
+        action, job.public_id, job.attempts,
+        extra={'phase': 'stalled_recovery', 'action': action, 'attempts': job.attempts},
+    )
+
+
 @shared_task(
     name='engine.tasks.recover_pending_analysis',
     soft_time_limit=30, time_limit=40, ignore_result=True,
 )
 def recover_pending_analysis() -> int:
-    """Retry unpublished intentions; acknowledged or started jobs never qualify."""
-    cutoff = timezone.now() - timezone.timedelta(seconds=DISPATCH_MIN_AGE_SECONDS)
-    candidates = EngineJob.objects.filter(
+    """Republish unacknowledged intentions, then deliveries that stopped progressing."""
+    now = timezone.now()
+    cutoff = now - timezone.timedelta(seconds=DISPATCH_MIN_AGE_SECONDS)
+    stalled_cutoff = now - timezone.timedelta(seconds=STALLED_AFTER_SECONDS)
+    unpublished = list(EngineJob.objects.filter(
         job_type=EngineJob.Type.ANALYSIS, status=EngineJob.Status.PENDING,
         celery_task_id='', updated_at__lte=cutoff,
         document_version__deleted_at__isnull=True,
         document_version__document__deleted_at__isnull=True,
         document_version__document__project__deleted_at__isnull=True,
         document_version__analysis_status=DocumentVersion.AnalysisStatus.PENDING,
-    ).order_by('updated_at', 'pk').values_list('pk', flat=True)[:DISPATCH_BATCH_SIZE]
+    ).order_by('updated_at', 'pk').values_list('pk', flat=True)[:DISPATCH_BATCH_SIZE])
+    stalled = list(EngineJob.objects.filter(
+        STALLED_STATE, job_type=EngineJob.Type.ANALYSIS, updated_at__lte=stalled_cutoff,
+        document_version__deleted_at__isnull=True,
+        document_version__document__deleted_at__isnull=True,
+        document_version__document__project__deleted_at__isnull=True,
+    ).order_by('updated_at', 'pk').values_list('pk', flat=True)[
+        :DISPATCH_BATCH_SIZE - len(unpublished)
+    ])
+    candidates = [(job_id, False) for job_id in unpublished]
+    candidates += [(job_id, True) for job_id in stalled]
     deadline = monotonic() + DISPATCH_BUDGET_SECONDS
     published = 0
-    for job_id in list(candidates):
+    for job_id, is_stalled in candidates:
         if monotonic() >= deadline:
             break
-        outcome = _dispatch_pending_analysis(job_id, skip_locked=True, cutoff=cutoff)
+        if is_stalled:
+            outcome = _resume_stalled_analysis(job_id, cutoff=stalled_cutoff)
+        else:
+            outcome = _dispatch_pending_analysis(job_id, skip_locked=True, cutoff=cutoff)
         if outcome == 'deferred':
             break
         published += outcome == 'published'
