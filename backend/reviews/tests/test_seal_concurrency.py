@@ -52,12 +52,12 @@ def _sealable_version(context, required):
 
 
 def _is_approval_count(sql):
-    """The read that decides approval, not the duplicate-seal probe."""
+    """The read of the seals that decide approval, not the duplicate-seal
+    probe (an EXISTS query: SELECT 1 AS ...)."""
     return (
         sql.startswith('SELECT')
         and 'FROM `reviews_seal`' in sql
         and 'SELECT 1 AS' not in sql
-        and '`reviews_seal`.`reviewer_id` =' not in sql
     )
 
 

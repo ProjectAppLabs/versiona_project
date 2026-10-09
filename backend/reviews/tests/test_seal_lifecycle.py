@@ -746,27 +746,124 @@ def test_d5_replay_announces_the_inherited_approval_once(reexported_v2):
     ).count() == 1
 
 
+def _newer_delivery(context, document):
+    """A newer alive delivery still under analysis: it supersedes (I10)."""
+    from documents.models import DocumentVersion
+
+    document.refresh_from_db()
+    number = document.latest_number + 1
+    version = DocumentVersion.objects.create(
+        document=document, number=number, sha256=f'{number:064d}',
+        file_key=f'test/newer/{document.public_id}/v{number}/original.pdf',
+        analysis_status=DocumentVersion.AnalysisStatus.PENDING,
+        config_version=context.config, author=context.users['editor'],
+    )
+    document.latest_number = number
+    document.save(update_fields=['latest_number'])
+    return version
+
+
+def _make_unavailable(context, version, state):
+    """Leave `version` unapproved and break exactly one approval gate."""
+    from documents.models import DocumentVersion
+    from projects.models import Project
+
+    rows = DocumentVersion.all_objects.filter(pk=version.pk)
+
+    def pending_plan():
+        other = Seal.objects.create(
+            document_version=DocumentVersion.objects.get(document=version.document, number=1),
+            reviewer=context.users['admin'], signed_payload={}, signature='gate', key_id='gate',
+        )
+        SealValidityRecord.objects.create(
+            seal=other, to_document_version=version,
+            decision=SealValidityRecord.Decision.PENDING,
+            decided_mode=SealValidityRecord.Mode.COORDINATOR,
+        )
+
+    breakers = {
+        'processing': lambda: rows.update(
+            analysis_status=DocumentVersion.AnalysisStatus.PROCESSING,
+        ),
+        'trashed': lambda: rows.update(deleted_at=timezone.now()),
+        'superseded': lambda: _newer_delivery(context, version.document),
+        'pending_plan': pending_plan,
+        'archived_project': lambda: Project.objects.filter(pk=context.project.pk).update(
+            status=Project.Status.ARCHIVED,
+        ),
+    }
+    rows.update(is_approved=False, approved_at=None)
+    breakers[state]()
+
+
 @pytest.mark.django_db
-@pytest.mark.parametrize('state', ['processing', 'trashed'])
+@pytest.mark.parametrize(
+    'state', ['processing', 'trashed', 'superseded', 'pending_plan', 'archived_project'],
+)
 def test_d5_recompute_never_approves_an_unavailable_version(reexported_v2, state):
-    """Guard: the post-D5 recompute never approves a version that is not an
-    analyzed live one, whatever seals stay valid."""
+    """Catches: the post-D5 recompute approving where create_seal could not —
+    an unanalyzed, trashed or superseded version (I10), a pending plan
+    (D5-F02) or a read-only project — whatever seals stay valid."""
     from comparisons.models import Comparison
     from documents.models import DocumentVersion
 
-    _, v2 = reexported_v2
-    unavailable = {
-        'processing': {'analysis_status': DocumentVersion.AnalysisStatus.PROCESSING},
-        'trashed': {'deleted_at': timezone.now()},
-    }[state]
-    DocumentVersion.all_objects.filter(pk=v2.pk).update(
-        is_approved=False, approved_at=None, **unavailable,
-    )
+    context, v2 = reexported_v2
+    _make_unavailable(context, v2, state)
     comparison = Comparison.objects.get(to_version_id=v2.pk, trigger=Comparison.Trigger.AUTO)
 
     seal_service.apply_invalidation(comparison)
 
     assert DocumentVersion.all_objects.get(pk=v2.pk).is_approved is False
+
+
+def _reexported_after_seal(context, title):
+    """v1 sealed covers_all by the reviewer, then re-exported as v2 (same text)."""
+    editor = context.users['editor']
+    document = version_service.create_document(context.project, title, editor)
+    v1 = upload(document, 'contrato_v1.pdf', 'v1', editor)
+    seal_service.create_seal(v1, context.users['reviewer'], covers_all=True)
+    return upload_bytes(document, _reexported('contrato_v1.pdf'), 'v2 reexportado', editor)
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D4-F02')
+def test_same_reviewer_counts_once_toward_the_quorum(versiona_context):
+    """Catches: a preserved seal and a new seal of ONE reviewer reaching a
+    quorum of two (approval counts distinct reviewers)."""
+    from projects.services import config_service
+
+    context = versiona_context
+    config_service.update_config(
+        context.project, context.users['admin'], approval_policy={'required': 2},
+    )
+    v2 = _reexported_after_seal(context, 'Quórum de dos')
+
+    seal_service.create_seal(v2, context.users['reviewer'], covers_all=True)
+
+    v2.refresh_from_db()
+    assert v2.is_approved is False
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D4-F02')
+def test_preserved_seal_of_a_reviewer_who_lost_access_does_not_approve(versiona_context):
+    """Catches: approval counting a preserved seal of someone who can no longer
+    seal in the project (I12: current membership, not historical)."""
+    from projects.models import ProjectMembership
+
+    context = versiona_context
+    editor = context.users['editor']
+    document = version_service.create_document(context.project, 'Acceso revocado', editor)
+    v1 = upload(document, 'contrato_v1.pdf', 'v1', editor)
+    seal_service.create_seal(v1, context.users['reviewer'], covers_all=True)
+    ProjectMembership.objects.filter(
+        project=context.project, user=context.users['reviewer'],
+    ).delete()
+
+    v2 = upload_bytes(document, _reexported('contrato_v1.pdf'), 'v2 reexportado', editor)
+
+    v2.refresh_from_db()
+    assert v2.is_approved is False
 
 
 @pytest.mark.django_db
@@ -792,3 +889,19 @@ def test_confirming_the_plan_recomputes_the_approval(coordinator_plan):
 
     v2.refresh_from_db()
     assert v2.is_approved is True
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D5-F02')
+def test_confirming_a_plan_on_a_superseded_version_does_not_approve_it(coordinator_plan):
+    """Catches: the plan confirmation approving a version a newer delivery
+    already superseded (same gates as create_seal, I10)."""
+    context, v2, scoped = coordinator_plan
+    _newer_delivery(context, v2.document)
+
+    seal_service.confirm_seal_plan(
+        v2, context.users['admin'], {str(scoped.public_id): 'invalidated'},
+    )
+
+    v2.refresh_from_db()
+    assert v2.is_approved is False

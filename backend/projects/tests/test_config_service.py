@@ -334,3 +334,64 @@ def test_config_update_resumes_after_unarchive(client_as, versiona_context):
     assert current.d5_mode == 'coordinator'
     assert current.number == versiona_context.config.number + 1
     assert response.data['number'] == current.number
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('B3-F03')
+def test_preserved_seal_of_an_owner_who_lost_access_does_not_cover_the_section(
+    versiona_context,
+):
+    """Catches: all_assigned accepting the preserved seal of an owner who can no
+    longer seal in the project (I12: current membership, not historical)."""
+    from projects.models import ProjectMembership
+
+    context = versiona_context
+    editor = context.users['editor']
+    reviewer = context.users['reviewer']
+    admin = context.users['admin']
+    config_service.update_config(
+        context.project, admin,
+        approval_policy={'required': 'all_assigned'},
+        section_owners={
+            'objeto-del-contrato': [reviewer.pk],
+            'obligaciones-del-contratista': [admin.pk],
+        },
+    )
+    document = version_service.create_document(context.project, 'Dueño sin acceso', editor)
+    v1 = upload(document, 'contrato_v1.pdf', 'v1', editor)
+    seal_service.create_seal(v1, reviewer, section_keys=['objeto-del-contrato'])
+    seal_service.create_seal(v1, admin, section_keys=['obligaciones-del-contratista'])
+    v2 = upload(document, 'contrato_v2.pdf', 'v2 modifica §3', editor)
+    ProjectMembership.objects.filter(project=context.project, user=reviewer).delete()
+
+    seal_service.create_seal(v2, admin, section_keys=['obligaciones-del-contratista'])
+
+    v2.refresh_from_db()
+    assert v2.is_approved is False
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('B3-F03')
+def test_owner_of_two_sections_counts_once_in_the_approval(versiona_context):
+    """Catches: the approval quorum counting covered sections instead of the
+    distinct owners who sealed them."""
+    context = versiona_context
+    editor = context.users['editor']
+    reviewer = context.users['reviewer']
+    config_service.update_config(
+        context.project, context.users['admin'],
+        approval_policy={'required': 'all_assigned'},
+        section_owners={
+            'objeto-del-contrato': [reviewer.pk],
+            'definiciones': [reviewer.pk],
+        },
+    )
+    document = version_service.create_document(context.project, 'Un dueño, dos secciones', editor)
+    version = upload(document, 'contrato_v1.pdf', 'v1', editor)
+
+    seal_service.create_seal(version, reviewer, covers_all=True)
+
+    approval = AuditEvent.objects.get(
+        event_type='version.approved', object_id_ref=str(version.public_id),
+    )
+    assert approval.payload['qualifying'] == 1
