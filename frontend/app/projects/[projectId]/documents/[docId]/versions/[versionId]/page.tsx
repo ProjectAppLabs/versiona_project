@@ -45,6 +45,15 @@ export default function VersionViewerPage() {
   const userEmail = useAuthStore((s) => s.user?.email ?? null);
   const [withdrawing, setWithdrawing] = useState<SealSummary | null>(null);
   const [anchorHighlights, setAnchorHighlights] = useState<NormalizedBBox[]>([]);
+  // One target for every "show me this" action. Clearing it first makes a
+  // repeated request for the same page scroll again: PdfViewer only reacts
+  // when the page it receives changes.
+  const [scrollTarget, setScrollTarget] = useState<number | null>(null);
+
+  const scrollViewerTo = (page: number) => {
+    setScrollTarget(null);
+    window.setTimeout(() => setScrollTarget(page), 0);
+  };
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -56,6 +65,11 @@ export default function VersionViewerPage() {
 
   const canSeal =
     ['reviewer', 'admin'].includes(detail?.effective_role ?? '') && !detail?.is_approved;
+
+  const jumpToSection = (stableKey: string) => {
+    const section = detail?.sections.find((candidate) => candidate.stable_key === stableKey);
+    if (section) scrollViewerTo(section.page_start);
+  };
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-10">
@@ -84,7 +98,7 @@ export default function VersionViewerPage() {
                   file={fileUrl}
                   highlights={anchorHighlights}
                   highlightKind="modified"
-                  scrollToPage={anchorHighlights[0]?.page ?? null}
+                  scrollToPage={scrollTarget}
                 />
               ) : (
                 <Skeleton className="h-[480px] w-full" />
@@ -92,7 +106,7 @@ export default function VersionViewerPage() {
             </div>
             <aside className="flex w-full shrink-0 flex-col gap-6 lg:w-80">
               {['reviewer', 'admin'].includes(detail.effective_role ?? '') ? (
-                <ReviewContextBar versionId={detail.public_id} />
+                <ReviewContextBar versionId={detail.public_id} onJumpToSection={jumpToSection} />
               ) : null}
               {canSeal ? (
                 <SealActionBar
@@ -126,7 +140,10 @@ export default function VersionViewerPage() {
                 canReply={detail.effective_role !== 'viewer'}
                 canResolveAny={detail.effective_role === 'admin'}
                 currentUserEmail={userEmail}
-                onSelectAnchor={(quads) => setAnchorHighlights(quads)}
+                onSelectAnchor={(quads) => {
+                  setAnchorHighlights(quads);
+                  if (quads[0]) scrollViewerTo(quads[0].page);
+                }}
               />
               <div>
                 <h2 className="text-sm font-semibold text-muted-foreground">
