@@ -1,12 +1,24 @@
 """Trash rules (kit 3 — B4/C4, tensions T4/T5). Scenario ids per docs/audit/03."""
 
+from pathlib import Path
+
 import pytest
 from freezegun import freeze_time
 from reviews.models import Seal
 
 from documents.models import Document, DocumentVersion
-from documents.services import trash_service
+from documents.services import storage_service, trash_service, version_service
 from documents.services.version_service import DomainError
+
+TESTDATA = Path(__file__).resolve().parents[4] / 'testdata' / 'pdfs'
+
+
+def upload(document, fixture, message, author):
+    """Upload a PDF fixture through the complete analyzed-version lifecycle."""
+    intent = version_service.create_upload_intent(document, author)
+    storage_service.put_bytes(intent.key, (TESTDATA / fixture).read_bytes(), 'application/pdf')
+    version, _ = version_service.complete_upload(document, intent.upload_id, message, author)
+    return version
 
 
 @pytest.fixture
@@ -58,6 +70,22 @@ def test_non_latest_version_cannot_be_trashed(document_with_versions, versiona_c
         trash_service.trash_version(versions[0], versiona_context.users['editor'])
 
     assert excinfo.value.status_code == 409
+
+
+@pytest.mark.django_db
+def test_correct_upload_after_trashing_a_wrong_file_reaches_ready(versiona_context):
+    """Catches: sections retired by a trashed wrong upload blocking the analysis
+    of the corrected delivery (C4 recovery path)."""
+    editor = versiona_context.users['editor']
+    document = version_service.create_document(versiona_context.project, 'Entrega corregida', editor)
+    upload(document, 'contrato_v1.pdf', 'v1', editor)
+    wrong = upload(document, 'sin_encabezados.pdf', 'archivo equivocado', editor)
+    trash_service.trash_version(wrong, editor)
+
+    corrected = upload(document, 'contrato_v2.pdf', 'entrega correcta', editor)
+
+    corrected.refresh_from_db()
+    assert corrected.analysis_status == DocumentVersion.AnalysisStatus.READY
 
 
 @pytest.mark.django_db

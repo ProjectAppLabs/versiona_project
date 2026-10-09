@@ -209,6 +209,24 @@ def test_third_delivery_does_not_revive_an_invalidated_seal(sealed_v1):
 
 
 @pytest.mark.django_db
+def test_reinstated_section_does_not_revive_its_invalidated_seal(versiona_context):
+    """Catches: reusing a retired Section row resurrecting the seal that D5
+    invalidated when the section was removed (the I11 chain stays cut)."""
+    context = versiona_context
+    editor = context.users['editor']
+    document = version_service.create_document(context.project, 'Plazo restituido', editor)
+    v1 = upload(document, 'contrato_v1.pdf', 'v1', editor)
+    seal = seal_service.create_seal(
+        v1, context.users['reviewer'], section_keys=['plazo-de-ejecucion'],
+    )
+    upload(document, 'contrato_v2.pdf', 'v2 quita el plazo', editor)
+
+    v3 = upload(document, 'contrato_v1.pdf', 'v3 restituye el plazo', editor)
+
+    assert seal_service.seal_is_valid_at(seal, v3) is False
+
+
+@pytest.mark.django_db
 def test_third_delivery_replay_keeps_one_original_seal_record(sealed_v1):
     """Catches: inherited seals duplicating evidence when D5 is replayed."""
     from comparisons.models import Comparison

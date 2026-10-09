@@ -43,6 +43,16 @@ def two_versions(document_with_versions, settings):
     return document, [DocumentVersion.objects.get(pk=v.pk) for v in versions]
 
 
+@pytest.fixture
+def three_versions(document_with_versions, settings):
+    settings.DJANGO_ENV = 'test'
+    document, versions = document_with_versions(n_versions=3)
+    DocumentVersion.all_objects.filter(pk__in=[v.pk for v in versions]).update(
+        analysis_status=DocumentVersion.AnalysisStatus.PROCESSING
+    )
+    return document, [DocumentVersion.objects.get(pk=v.pk) for v in versions]
+
+
 @pytest.mark.django_db
 @pytest.mark.escenario('D5-A01')
 def test_renamed_section_reuses_the_same_identity_row(two_versions):
@@ -115,3 +125,65 @@ def test_thumbnail_failure_does_not_break_the_analysis(two_versions, monkeypatch
     assert v1.thumb_status == DocumentVersion.ThumbStatus.FAILED
     assert v1.analysis_status == DocumentVersion.AnalysisStatus.READY
     assert SectionVersion.objects.filter(document_version=v1).count() == 1
+
+
+@pytest.mark.django_db
+def test_reinstated_heading_reuses_its_retired_identity_row(three_versions):
+    """Catches: a heading removed in v2 and restored in v3 colliding with its
+    retired row (unique document + stable_key) and failing the analysis."""
+    document, (v1, v2, v3) = three_versions
+    persist_analysis(
+        v1, analysis([payload('uno', '1. UNO', 'aaa'), payload('dos', '2. DOS', 'bbb', 1)])
+    )
+    original = Section.objects.get(document=document, stable_key='dos')
+    persist_analysis(v2, analysis([payload('uno', '1. UNO', 'aaa')]))
+
+    persist_analysis(
+        v3, analysis([payload('uno', '1. UNO', 'aaa'), payload('dos', '2. DOS', 'bbb', 1)])
+    )
+
+    reinstated = Section.objects.get(document=document, stable_key='dos')
+    assert reinstated.pk == original.pk
+    assert reinstated.retired_in_version_id is None
+    assert SectionVersion.objects.get(
+        document_version=v3, section__stable_key='dos'
+    ).section_id == original.pk
+
+
+@pytest.mark.django_db
+def test_reinstated_heading_is_recorded_as_an_added_section(three_versions):
+    """The reinstatement is new relative to v2: `added` lineage and counter."""
+    document, (v1, v2, v3) = three_versions
+    persist_analysis(
+        v1, analysis([payload('uno', '1. UNO', 'aaa'), payload('dos', '2. DOS', 'bbb', 1)])
+    )
+    original = Section.objects.get(document=document, stable_key='dos')
+    persist_analysis(v2, analysis([payload('uno', '1. UNO', 'aaa')]))
+
+    result = persist_analysis(
+        v3, analysis([payload('uno', '1. UNO', 'aaa'), payload('dos', '2. DOS', 'bbb', 1)])
+    )
+
+    lineage = SectionLineage.objects.get(document_version=v3)
+    assert lineage.relation == SectionLineage.Relation.ADDED
+    assert lineage.to_section_id == original.pk
+    assert result['sections']['added'] == 1
+
+
+@pytest.mark.django_db
+def test_heading_reused_after_its_body_moved_gets_a_new_identity(two_versions):
+    """Catches: the old heading resolving to the row just renamed in the same
+    version, which would snapshot one Section twice (IntegrityError)."""
+    document, (v1, v2) = two_versions
+    persist_analysis(v1, analysis([payload('confidencialidad', 'CONFIDENCIALIDAD', 'aaa')]))
+    original = Section.objects.get(document=document, stable_key='confidencialidad')
+
+    persist_analysis(v2, analysis([
+        payload('reserva', 'RESERVA', 'aaa'),
+        payload('confidencialidad', 'CONFIDENCIALIDAD', 'bbb', 1),
+    ]))
+
+    assert Section.objects.get(pk=original.pk).stable_key == 'reserva'
+    assert Section.objects.get(
+        document=document, stable_key='confidencialidad'
+    ).pk != original.pk
