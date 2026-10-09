@@ -49,14 +49,14 @@ export function TypeToConfirmDialog({
         </span>
         <input
           data-testid="type-to-confirm-input"
-          className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+          className="mt-1 min-h-11 w-full rounded-lg border border-border bg-background px-3 py-2 text-base sm:text-sm"
           value={typed}
           onChange={(event) => setTyped(event.target.value)}
         />
       </label>
       <div className="mt-6 flex justify-end gap-2">
         <button
-          className="rounded-full border border-border px-4 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
+          className="min-h-11 rounded-full border border-border px-4 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
           onClick={close}
           type="button"
         >
@@ -64,7 +64,7 @@ export function TypeToConfirmDialog({
         </button>
         <button
           data-testid="type-to-confirm-submit"
-          className="rounded-full bg-destructive px-4 py-2 text-sm text-white disabled:cursor-not-allowed disabled:opacity-50"
+          className="min-h-11 rounded-full bg-destructive px-4 py-2 text-sm text-white disabled:cursor-not-allowed disabled:opacity-50"
           disabled={!matches || isPending}
           onClick={() => onConfirm(typed.trim())}
           type="button"
