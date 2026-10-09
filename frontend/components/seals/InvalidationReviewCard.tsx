@@ -65,7 +65,7 @@ export function InvalidationReviewCard({ versionId, pending }: InvalidationRevie
             </p>
             <div className="mt-2 flex gap-4 text-sm">
               {(['preserved', 'invalidated'] as const).map((option) => (
-                <label key={option} className="flex items-center gap-1.5">
+                <label key={option} className="flex min-h-11 cursor-pointer items-center gap-1.5">
                   <input
                     data-testid={`plan-${option}-${record.seal.public_id}`}
                     type="radio"
@@ -87,7 +87,7 @@ export function InvalidationReviewCard({ versionId, pending }: InvalidationRevie
       </ul>
       <button
         data-testid="confirm-plan"
-        className="mt-3 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
+        className="mt-3 min-h-11 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
         disabled={isSubmitting}
         onClick={() => void submit()}
         type="button"

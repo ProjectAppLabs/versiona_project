@@ -284,7 +284,7 @@
         "admin"
       ],
       "priority": "P1",
-      "description": "Reviewer or admin creates an anchored thread; editor replies; the author or an admin resolves it, and the author reopens it under I14. The version viewer loads thread summaries in 25-item pages, then loads replies, anchor history, long text and anchor coordinates only when the person explicitly requests each part. A history link keeps a selected thread reachable beyond the first page. Reading failures provide retry controls and stale responses are discarded when version or status filter changes.",
+      "description": "Reviewer or admin creates an anchored thread; editor replies; the author or an admin resolves it, and the author reopens it under I14. The version viewer loads thread summaries in 25-item pages, then loads replies, anchor history, long text and anchor coordinates only when the person explicitly requests each part. A history link keeps a selected thread reachable beyond the first page. Reading failures provide retry controls and stale responses are discarded when version or status filter changes. At 412x915 the reviewer opens the observation form from a 44 px button and fills a 16 px section select and body (no iOS zoom); the editor answers from a 16 px, 44 px reply field with a 44 px send action and the thread shows 'Respondida'.",
       "expectedSpecs": 1,
       "outcomes": [
         "success",
@@ -300,7 +300,7 @@
         "reviewer"
       ],
       "priority": "P1",
-      "description": "Reviewer seals in one click; with all required seals the version freezes as approved (docs/plan/01 D4)",
+      "description": "Reviewer seals in one click; with all required seals the version freezes as approved (docs/plan/01 D4). At 835x1194 the reviewer opens the section picker, taps the 44 px row of '3. OBLIGACIONES DEL CONTRATISTA' and seals it; the seal reads '1 secciones: obligaciones-del-contratista' and its withdraw action is a 44 px target.",
       "expectedSpecs": 1,
       "outcomes": [
         "success",
@@ -316,7 +316,7 @@
         "admin"
       ],
       "priority": "P1",
-      "description": "Re-delivery preserves inherited seals across three versions, invalidates changed coverage, and requires coordinator confirmation for verified degraded analysis; reviewers are notified only after final invalidation.",
+      "description": "Re-delivery preserves inherited seals across three versions, invalidates changed coverage, and requires coordinator confirmation for verified degraded analysis; reviewers are notified only after final invalidation. At 835x1194 the coordinator switches each pending seal between the 44 px 'Conservar' and 'Invalidar' options and confirms through a 44 px 'Confirmar plan'; choosing 'Invalidar' persists the 'invalidated' decision.",
       "expectedSpecs": 2,
       "outcomes": [
         "success",

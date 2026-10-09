@@ -45,7 +45,7 @@ export function SealActionBar({ versionId, sections, onSealed }: SealActionBarPr
     <div data-testid="seal-action-bar" className="flex flex-wrap items-center gap-2">
       <button
         data-testid="seal-all"
-        className="rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
+        className="min-h-11 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
         disabled={isSubmitting}
         onClick={() => void seal(true)}
         type="button"
@@ -54,7 +54,7 @@ export function SealActionBar({ versionId, sections, onSealed }: SealActionBarPr
       </button>
       <button
         data-testid="seal-sections-open"
-        className="rounded-full border border-border px-4 py-2 text-sm hover:bg-accent"
+        className="min-h-11 rounded-full border border-border px-4 py-2 text-sm hover:bg-accent"
         onClick={() => setPickerOpen(true)}
         type="button"
       >
@@ -62,11 +62,11 @@ export function SealActionBar({ versionId, sections, onSealed }: SealActionBarPr
       </button>
 
       <Modal open={pickerOpen} onClose={() => setPickerOpen(false)} title={t.pickSections}>
-        <div className="flex max-h-[50vh] flex-col gap-1 overflow-y-auto">
+        <div className="flex max-h-[50vh] flex-col gap-2 overflow-y-auto">
           {sections.map((section) => (
             <label
               key={section.stable_key}
-              className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-accent"
+              className="flex min-h-11 cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-accent"
             >
               <input
                 data-testid={`pick-${section.stable_key}`}
@@ -86,7 +86,7 @@ export function SealActionBar({ versionId, sections, onSealed }: SealActionBarPr
         </div>
         <div className="mt-4 flex justify-end gap-2">
           <button
-            className="rounded-full border border-border px-4 py-2 text-sm"
+            className="min-h-11 rounded-full border border-border px-4 py-2 text-sm"
             onClick={() => setPickerOpen(false)}
             type="button"
           >
@@ -94,7 +94,7 @@ export function SealActionBar({ versionId, sections, onSealed }: SealActionBarPr
           </button>
           <button
             data-testid="seal-picked"
-            className="rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
+            className="min-h-11 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
             disabled={picked.length === 0 || isSubmitting}
             onClick={() => void seal(false)}
             type="button"

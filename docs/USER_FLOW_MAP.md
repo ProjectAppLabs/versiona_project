@@ -429,3 +429,11 @@ complementa cada interacción y no cuenta como cobertura propia.
 | 412×915 | C3 | Leer la línea de tiempo | display | Cada mensaje se ajusta completo y las acciones Ver documento/Descargar/Eliminar ocupan su propia fila táctil | Ejercido dentro de C2-R01/C2-R02, sin prueba propia de C3 |
 | 412×915 | E1 | Comparar v1 con v2 y tocar la pestaña «Resumen» | display | Conteos 2 modificadas, 1 eliminada, 1 agregada; guardar, siguiente cambio y pestañas pasan bajo el título sin desplazamiento horizontal | `e1-compare-versions.spec.ts` — E1-R01 |
 | Cinco anchos | E1 | Elegir «3. OBLIGACIONES DEL CONTRATISTA» en la lista de cambios | display | El nombre completo se lee sin recorte, también en la columna lateral de 260 px desde 1195×835; el documento no se desplaza en horizontal | `e1-compare-versions.spec.ts` — bucle `E1 PDF @viewport:*` |
+| 412×915 | D3 | El revisor crea una observación desde el formulario y el editor la responde desde el hilo | success | El hilo pasa a «Respondida»; select, texto y respuesta usan 16 px y las acciones miden 44 px | `d3-anchored-observations.spec.ts` — D3-R01 |
+| 835×1194 | D4 | Abrir el selector, tocar la fila de una sección y sellarla | success | El sello muestra «1 secciones: obligaciones-del-contratista»; filas, botones y «Retirar mi sello» miden 44 px | `d4-seal-approve.spec.ts` — D4-R01 |
+| 835×1194 | D5 | El coordinador alterna Conservar/Invalidar en el plan pendiente y confirma | success | La decisión persistida es `invalidated`; opciones y «Confirmar plan» miden 44 px | `d5-coordinator-confirmation.spec.ts` — D5-R01 |
+
+Las pruebas nuevas no se ejecutaron en vivo durante la autoría (no había app ni
+navegador); su validación es la del CI del PR. Las acciones de D1 (solicitud de
+revisión) y E4 (constancias) y los componentes compartidos (Modal, avisos,
+confirmación por texto) quedan fuera de esta ronda.

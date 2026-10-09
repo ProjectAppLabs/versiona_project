@@ -1,6 +1,23 @@
+import type { Locator } from '@playwright/test';
+
 import { expect, test } from '../../test-with-coverage';
 import { D4_SEAL_APPROVE } from '../../helpers/flow-tags';
-import { openSeededProject, uniqueName, uploadPdf } from '../../helpers/versiona';
+import { viewportUse } from '../../helpers/viewports';
+import { AUTH, openSeededProject, uniqueName, uploadPdf } from '../../helpers/versiona';
+
+/** Expected geometry of every touch control (RESPONSIVE_STANDARDS FORM-2). */
+const TOUCH_TARGET_OK = { tallEnough: true, wideEnough: true, insideViewport: true };
+
+async function touchTarget(control: Locator) {
+  return control.evaluate((element) => {
+    const box = element.getBoundingClientRect();
+    return {
+      tallEnough: box.height >= 44,
+      wideEnough: box.width >= 44,
+      insideViewport: box.left >= 0 && box.right <= window.innerWidth,
+    };
+  });
+}
 
 test.describe('D4 — Aprobar con sello', () => {
   test.slow(); // real upload + analysis before sealing
@@ -114,4 +131,53 @@ test.describe('D4 — Aprobar con sello', () => {
       await reviewerContext.close();
     }
   );
+
+  test.describe('sellado @ 835 (tableta vertical)', () => {
+    test.use(viewportUse('portrait'));
+
+    test(
+      'D4-R01 — a 835 px el revisor sella una sección desde el selector táctil',
+      { tag: [...D4_SEAL_APPROVE, '@scenario:d4-r01', '@outcome:success', '@viewport:portrait'] },
+      async ({ browser }) => {
+        // quality: allow-duplicate (per-viewport contract: d4-seal-approve @ 835)
+        // Bug que atrapa (R-review-01): en tableta vertical las filas del selector medían
+        // 32 px, los botones de sellado 36–38 px y «Retirar mi sello» 16 px.
+        const editorContext = await browser.newContext({ storageState: AUTH.editor });
+        const reviewerContext = await browser.newContext({ storageState: AUTH.reviewer });
+        try {
+          const editorPage = await editorContext.newPage();
+          await openSeededProject(editorPage);
+          const title = uniqueName('Contrato D4 tableta');
+          await uploadPdf(editorPage, 'contrato_v1.pdf', { title, message: 'v1' });
+          await expect(
+            editorPage.getByTestId('documents-list').getByRole('link', { name: title })
+          ).toBeVisible({ timeout: 90_000 });
+
+          const reviewerPage = await reviewerContext.newPage();
+          await openSeededProject(reviewerPage);
+          await reviewerPage.getByTestId('documents-list').getByRole('link', { name: title }).tap();
+          await expect(reviewerPage.getByTestId('version-item-1')).toBeVisible({ timeout: 20_000 });
+          await reviewerPage.getByTestId('version-item-1').getByRole('link', { name: 'Ver documento' }).tap();
+          await reviewerPage.waitForURL(/versions\//);
+
+          const openPicker = reviewerPage.getByTestId('seal-sections-open');
+          await expect(openPicker).toBeVisible({ timeout: 20_000 });
+          expect(await touchTarget(openPicker)).toEqual(TOUCH_TARGET_OK);
+          await openPicker.tap();
+          const sectionRow = reviewerPage.getByTestId('pick-obligaciones-del-contratista').locator('..');
+          expect(await touchTarget(sectionRow)).toEqual(TOUCH_TARGET_OK);
+          await sectionRow.tap();
+          const sealPicked = reviewerPage.getByTestId('seal-picked');
+          expect(await touchTarget(sealPicked)).toEqual(TOUCH_TARGET_OK);
+          await sealPicked.tap();
+
+          const seal = reviewerPage.getByTestId('seal-reviewer@versiona.test');
+          await expect(seal).toContainText('1 secciones: obligaciones-del-contratista', { timeout: 20_000 });
+          expect(await touchTarget(seal.getByTestId('withdraw-seal'))).toEqual(TOUCH_TARGET_OK);
+        } finally {
+          await Promise.all([editorContext.close(), reviewerContext.close()]);
+        }
+      }
+    );
+  });
 });

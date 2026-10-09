@@ -91,7 +91,7 @@ export function ObservationsPanel({
     <section data-testid="observations-panel" className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold text-muted-foreground">{t.title}</h2>
-        <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <label className="flex min-h-11 cursor-pointer items-center gap-1.5 text-xs text-muted-foreground">
           <input
             data-testid="show-resolved"
             type="checkbox"
@@ -105,7 +105,7 @@ export function ObservationsPanel({
       {canCreate ? (
         <button
           data-testid="add-observation"
-          className="self-start rounded-full border border-border px-4 py-1.5 text-sm hover:bg-accent disabled:opacity-50"
+          className="min-h-11 self-start rounded-full border border-border px-4 py-1.5 text-sm hover:bg-accent disabled:opacity-50"
           disabled={!scopeMatches || isLoading}
           onClick={() => setModalOpen(true)}
           type="button"
@@ -120,7 +120,7 @@ export function ObservationsPanel({
           <p role="alert">{error}</p>
           <button
             data-testid="observations-retry"
-            className="mt-1 text-primary hover:underline disabled:opacity-50"
+            className="mt-1 inline-flex min-h-11 items-center text-primary hover:underline disabled:opacity-50"
             disabled={isLoading}
             onClick={() => void retryLoad()}
             type="button"
@@ -153,7 +153,7 @@ export function ObservationsPanel({
       {scopeMatches && nextCursor ? (
         <button
           data-testid="observations-more"
-          className="self-start rounded-full border border-border px-4 py-1.5 text-sm hover:bg-accent disabled:opacity-50"
+          className="min-h-11 self-start rounded-full border border-border px-4 py-1.5 text-sm hover:bg-accent disabled:opacity-50"
           disabled={isLoading}
           onClick={() => void loadMore()}
           type="button"
@@ -167,7 +167,7 @@ export function ObservationsPanel({
           <span className="text-muted-foreground">{t.section}</span>
           <select
             data-testid="observation-section"
-            className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+            className="mt-1 min-h-11 w-full rounded-lg border border-border bg-background px-3 py-2 text-base sm:text-sm"
             value={sectionKey}
             onChange={(event) => setSectionKey(event.target.value)}
           >
@@ -183,7 +183,7 @@ export function ObservationsPanel({
           <span className="text-muted-foreground">{t.body}</span>
           <textarea
             data-testid="observation-body"
-            className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+            className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-base sm:text-sm"
             rows={3}
             value={body}
             onChange={(event) => setBody(event.target.value)}
@@ -191,7 +191,7 @@ export function ObservationsPanel({
         </label>
         <div className="mt-4 flex justify-end gap-2">
           <button
-            className="rounded-full border border-border px-4 py-2 text-sm"
+            className="min-h-11 rounded-full border border-border px-4 py-2 text-sm"
             onClick={() => setModalOpen(false)}
             type="button"
           >
@@ -199,7 +199,7 @@ export function ObservationsPanel({
           </button>
           <button
             data-testid="observation-submit"
-            className="rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
+            className="min-h-11 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
             disabled={!body.trim() || isSubmitting}
             onClick={() =>
               void act(create(versionId, { body: body.trim(), sectionKey })).then((ok) => {
