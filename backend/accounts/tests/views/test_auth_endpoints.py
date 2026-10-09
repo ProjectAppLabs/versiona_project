@@ -1,5 +1,6 @@
 """Authentication endpoint behavior and Google/TOTP admission tests."""
 
+import secrets
 from datetime import timedelta
 from unittest.mock import Mock, patch
 
@@ -763,6 +764,91 @@ def test_verify_passcode_keeps_valid_code_after_password_policy_rejection(
     password_code.refresh_from_db()
     user.refresh_from_db()
     assert password_code.used is True
+    assert user.check_password('NewPass!2026') is True
+
+
+def _reset_with(api_client, email, code, new_password='NewPass!2026'):
+    return api_client.post(
+        reverse('verify_passcode_reset'),
+        {'email': email, 'code': code, 'new_password': new_password},
+        format='json',
+    )
+
+
+@pytest.mark.django_db
+def test_verify_passcode_wrong_code_invalidates_the_pending_code(api_client):
+    """Fails if a wrong guess leaves the account's pending code usable."""
+    User = get_user_model()
+    user = User.objects.create_user(email='guess@example.com', password='Violet-River!83')
+    pending = PasswordCode.objects.create(user=user, code='555555')
+
+    response = _reset_with(api_client, user.email, '000000')
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.json()['error'] == 'Invalid or expired code'
+    pending.refresh_from_db()
+    assert pending.used is True
+
+
+@pytest.mark.django_db
+def test_verify_passcode_rejects_the_right_code_after_a_wrong_guess(api_client):
+    """Fails if an account tolerates more than one wrong guess per issued code."""
+    User = get_user_model()
+    user = User.objects.create_user(email='guess-twice@example.com', password='Violet-River!83')
+    PasswordCode.objects.create(user=user, code='555555')
+    _reset_with(api_client, user.email, '000000')
+
+    response = _reset_with(api_client, user.email, '555555')
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    user.refresh_from_db()
+    assert user.check_password('Violet-River!83') is True
+
+
+@pytest.mark.django_db
+def test_verify_passcode_wrong_code_keeps_other_accounts_codes(api_client):
+    """Fails if a wrong guess burns codes beyond the targeted account."""
+    User = get_user_model()
+    target = User.objects.create_user(email='target@example.com', password='Violet-River!83')
+    bystander = User.objects.create_user(email='bystander@example.com', password='Amber-Cloud!74')
+    PasswordCode.objects.create(user=target, code='555555')
+    bystander_code = PasswordCode.objects.create(user=bystander, code='666666')
+
+    _reset_with(api_client, target.email, '000000')
+
+    bystander_code.refresh_from_db()
+    assert bystander_code.used is False
+
+
+@pytest.mark.django_db
+def test_verify_passcode_rejects_a_superseded_code(api_client, monkeypatch):
+    """Fails if an earlier code still resets the password after a reissue."""
+    User = get_user_model()
+    user = User.objects.create_user(email='superseded@example.com', password='Violet-River!83')
+    issued = iter([111111, 222222])
+    monkeypatch.setattr(secrets, 'randbelow', lambda _bound: next(issued))
+    first = PasswordCode.generate_code(user)
+    PasswordCode.generate_code(user)
+
+    response = _reset_with(api_client, user.email, first.code)
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    user.refresh_from_db()
+    assert user.check_password('Violet-River!83') is True
+
+
+@pytest.mark.django_db
+def test_verify_passcode_accepts_the_latest_code_after_a_reissue(api_client):
+    """Fails if superseding earlier codes also disables the newly issued one."""
+    User = get_user_model()
+    user = User.objects.create_user(email='latest@example.com', password='Violet-River!83')
+    PasswordCode.generate_code(user)
+    latest = PasswordCode.generate_code(user)
+
+    response = _reset_with(api_client, user.email, latest.code)
+
+    assert response.status_code == status.HTTP_200_OK
+    user.refresh_from_db()
     assert user.check_password('NewPass!2026') is True
 
 

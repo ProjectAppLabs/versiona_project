@@ -407,12 +407,24 @@ def verify_passcode_and_reset_password(request):
                 code=code,
                 used=False,
             ).first()
-            if not password_code or not password_code.is_valid():
-                return Response(
-                    {'error': 'Invalid or expired code'},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+            if password_code and not password_code.is_valid():
+                password_code = None
         except Exception:
+            return Response(
+                {'error': 'Invalid or expired code'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if password_code is None:
+            # A wrong or expired code burns every pending code of this account,
+            # under the user lock: each issued code admits one failed guess.
+            # The bound lives in the database, so it holds whatever IP or
+            # worker process the attempts come from.
+            # Accepted trade-off: anyone who knows the email can also burn the
+            # owner's pending code and delay recovery until a new one is sent.
+            # An N-attempt counter would not avoid it; the future fix is a
+            # reset-session token bound to whoever requested the code.
+            user.password_codes.filter(used=False).update(used=True)
             return Response(
                 {'error': 'Invalid or expired code'},
                 status=status.HTTP_400_BAD_REQUEST,

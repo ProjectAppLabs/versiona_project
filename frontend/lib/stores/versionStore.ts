@@ -49,6 +49,7 @@ export const useVersionStore = create<VersionState>((set) => ({
       set({ fileUrl: data.url });
       return data.url as string;
     } catch (err) {
+      maybeShowUpgradeDialog(err); // DP-04 history lock → upgrade path
       set({ error: extractError(err) });
       return null;
     }

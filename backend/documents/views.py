@@ -216,7 +216,15 @@ def version_download(request, ver):
 def version_file(request, ver):
     """Inline presigned URL for the in-app viewer (react-pdf)."""
     version: DocumentVersion = request.resolved_object
+    from billing.services import check_history_access
+
     from .services import storage_service
+
+    # DP-04: the inline view serves the same bytes as the download.
+    try:
+        check_history_access(version)
+    except DomainError as exc:
+        return Response({'error': str(exc), 'upgrade': True}, status=exc.status_code)
     url = storage_service.presign_view(version.file_key, 'application/pdf')
     return Response({'url': url})
 
