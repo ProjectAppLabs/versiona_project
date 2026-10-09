@@ -51,12 +51,16 @@ commit `07a62349`, fuera de toda rama.
 - Documentos, comparación y revisión cumplen 44 px y 16 px en celular y tableta,
   sin desborde horizontal; lo mismo para los controles de aviso, modal y
   confirmación.
-- Next.js pasó a 16.3.8, y `npm audit` de producción queda en 0. La 16.4.0 se
-  descartó: rompe el E2E de cierre de sesión desde el menú compacto
-  (`authenticated-navigation.spec.ts:182`).
+- Next.js sigue en 16.2.6. Se probaron 16.4.0 y 16.3.8, y con las dos el E2E
+  de cierre de sesión desde el menú compacto (`authenticated-navigation.spec.ts:182`)
+  falla o queda flaky; con 16.2.6 pasa al primer intento. La subida queda
+  diferida hasta encontrar la causa.
 - Los chips de «Lo que cambió» llevan el visor a la sección.
 
 **Pendientes registrados**
+- Subir Next.js: hay 8 alertas de producción sobre 16.2.6, la mayoría
+  inalcanzables en esta app. Antes hay que encontrar la causa de la regresión
+  del cierre de sesión con E2E sobre una app levantada.
 - Bloqueo malicioso de la recuperación: riesgo aceptado. La mitigación es un
   token de sesión de reset.
 - Papelera y archivado sin el lock del Document frente a sellos.
