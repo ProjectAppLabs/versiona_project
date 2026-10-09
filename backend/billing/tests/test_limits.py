@@ -122,11 +122,11 @@ def test_old_history_is_locked_not_deleted_on_free(versiona_context, document_wi
 def test_latest_version_is_always_accessible_regardless_of_age_on_free(
     versiona_context, document_with_versions
 ):
-    """The latest-version short-circuit skips the age check entirely, on free.
+    """The current-version short-circuit skips the age check entirely, on free.
 
-    Catches a regression that removes or breaks the `version.number ==
-    version.document.latest_number` short-circuit (billing/services.py:137-138)
-    — without it, an old-but-latest version would wrongly get locked out.
+    Catches a regression that removes or breaks the current-version
+    short-circuit of check_history_access — without it, an old-but-current
+    version would wrongly get locked out.
     """
     document, versions = document_with_versions(n_versions=2)
     from documents.models import DocumentVersion
@@ -137,6 +137,30 @@ def test_latest_version_is_always_accessible_regardless_of_age_on_free(
             created_at=frozen_now - timedelta(days=45)
         )
         result = check_history_access(DocumentVersion.objects.get(pk=versions[1].pk))
+
+    assert result is None
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('C3-L02')
+@pytest.mark.escenario('F1-L03')
+def test_current_version_stays_accessible_after_trashing_a_newer_draft(
+    versiona_context, document_with_versions
+):
+    """Catches: the free-plan exemption following the allocation counter, so
+    trashing the newest draft locked the document's current version (DP-04)."""
+    from documents.models import DocumentVersion
+    from documents.services import trash_service
+
+    document, versions = document_with_versions(n_versions=2)
+    trash_service.trash_version(versions[1], versiona_context.users['editor'])
+
+    frozen_now = timezone.now()
+    with freeze_time(frozen_now):
+        DocumentVersion.all_objects.filter(pk=versions[0].pk).update(
+            created_at=frozen_now - timedelta(days=45)
+        )
+        result = check_history_access(DocumentVersion.objects.get(pk=versions[0].pk))
 
     assert result is None
 

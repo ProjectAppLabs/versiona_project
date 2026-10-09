@@ -31,7 +31,7 @@ def test_sign_then_verify_roundtrip():
     assert signing.verify(data, signature) is True
 
 
-@pytest.mark.escenario('D4-E01')
+@pytest.mark.escenario('D4-E03')
 def test_tampered_payload_fails_verification():
     data = payload()
     signature = signing.sign(data)

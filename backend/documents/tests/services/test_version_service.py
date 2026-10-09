@@ -85,6 +85,38 @@ def test_second_version_matches_identity_and_retires_removed(document, versiona_
 
 
 @pytest.mark.django_db
+def test_version_reinstating_a_removed_section_reaches_ready(document, versiona_context):
+    """Catches: a clause removed in v2 and restored in v3 failing v3's analysis."""
+    editor = versiona_context.users['editor']
+    upload(document, editor)
+    upload(document, editor, 'contrato_v2.pdf', 'quita el plazo de ejecución')
+
+    v3, job = upload(document, editor, 'contrato_v1.pdf', 'restituye el plazo')
+
+    v3.refresh_from_db()
+    assert v3.analysis_status == DocumentVersion.AnalysisStatus.READY
+    assert job.status == 'done'
+
+
+@pytest.mark.django_db
+def test_reinstated_section_keeps_its_original_identity(document, versiona_context):
+    """Catches: a restored clause getting a new identity instead of its own."""
+    editor = versiona_context.users['editor']
+    v1, _ = upload(document, editor)
+    upload(document, editor, 'contrato_v2.pdf', 'quita el plazo de ejecución')
+
+    v3, _ = upload(document, editor, 'contrato_v1.pdf', 'restituye el plazo')
+
+    original = SectionVersion.objects.get(
+        document_version=v1, section__stable_key='plazo-de-ejecucion'
+    )
+    restored = SectionVersion.objects.get(
+        document_version=v3, section__stable_key='plazo-de-ejecucion'
+    )
+    assert restored.section_id == original.section_id
+
+
+@pytest.mark.django_db
 @pytest.mark.escenario('C2-E01')
 def test_identical_binary_is_rejected(document, versiona_context):
     """Reject another upload of the document's current binary."""
@@ -95,6 +127,27 @@ def test_identical_binary_is_rejected(document, versiona_context):
         upload(document, editor, 'contrato_v1.pdf', 'reintento')
 
     assert excinfo.value.status_code == 409
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('C2-E01')
+def test_binary_of_the_current_version_is_rejected_after_trashing_a_newer_draft(
+    document, versiona_context,
+):
+    """Catches: F6 comparing against the trashed draft's number instead of the
+    document's current version."""
+    from documents.services import trash_service
+
+    editor = versiona_context.users['editor']
+    upload(document, editor)
+    draft, _ = upload(document, editor, 'contrato_v2.pdf', 'borrador descartado')
+    trash_service.trash_version(draft, editor)
+
+    with pytest.raises(version_service.DomainError) as excinfo:
+        upload(document, editor, 'contrato_v1.pdf', 'reintento de v1')
+
+    assert excinfo.value.status_code == 409
+    assert str(excinfo.value) == 'El archivo es idéntico a la versión v1.'
 
 
 @pytest.mark.django_db

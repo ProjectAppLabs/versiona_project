@@ -13,7 +13,9 @@ from django.utils import timezone
 
 from audit import services as audit
 from comparisons.models import Comparison
-from documents.models import DocumentVersion, SectionVersion
+from core.permissions import resolve_effective_role
+from documents.models import Document, DocumentVersion, SectionVersion
+from documents.queries import newer_alive_versions
 from documents.services.version_service import DomainError, ensure_writable
 from notifications.services import notify
 
@@ -25,6 +27,9 @@ from .invalidation import (
     resolve_seal_invalidation,
 )
 
+# Effective project roles that may seal (D4; the seal endpoint's own check).
+SEALING_ROLES = ('reviewer', 'admin')
+
 
 def _section_snapshots(version: DocumentVersion) -> dict:
     """{stable_key: (section_id, body_hash)} for the version's live sections."""
@@ -35,18 +40,61 @@ def _section_snapshots(version: DocumentVersion) -> dict:
     }
 
 
+def _lock_document(version: DocumentVersion):
+    """Serialize seals, withdrawals and uploads of one document (I10, D4-C01)
+    on the row `_create_locked_version` locks to allocate a version number.
+    Everything the guards read is re-loaded under the lock — analysis and
+    trash state, approval, and the project's read-only state: the caller's
+    copy predates the lock and a concurrent change may have committed since."""
+    Document.all_objects.select_for_update().only('pk').get(pk=version.document_id)
+    version.refresh_from_db(
+        fields=['analysis_status', 'deleted_at', 'is_approved', 'approved_at'],
+    )
+    version.document = Document.all_objects.select_related('project__organization').get(
+        pk=version.document_id,
+    )
+
+
+def _version_gate_error(version: DocumentVersion) -> DomainError | None:
+    """Why `version` can be neither sealed nor approved now, or None.
+
+    One definition for create_seal and for every approval recompute (after
+    D5 and after the coordinator's plan), so the paths cannot diverge: a
+    writable project, an analyzed version out of the trash, the document's
+    current version (I10) and no pending D5 plan (D5-F02).
+    """
+    try:
+        ensure_writable(version.document.project)
+    except DomainError as error:
+        return error
+    if version.analysis_status != DocumentVersion.AnalysisStatus.READY:
+        return DomainError('Solo se puede sellar una versión ya analizada.', 409)
+    if version.is_trashed:
+        return DomainError('La versión está en la papelera.', 409)
+    if newer_alive_versions(version.document_id, version.number).exists():
+        return DomainError('Solo se puede sellar la versión vigente del documento.', 409)
+    if SealValidityRecord.objects.filter(
+        to_document_version=version, decision=SealValidityRecord.Decision.PENDING,
+    ).exists():
+        return DomainError(
+            'La versión tiene un plan de invalidación pendiente: '
+            'el coordinador debe confirmarlo antes de sellar.',
+            409,
+        )
+    return None
+
+
 @transaction.atomic
 def create_seal(
     version: DocumentVersion, reviewer, *, covers_all: bool = False,
     section_keys: list[str] | None = None, request=None,
 ) -> Seal:
     """D4: sign the exact content the reviewer approves (I6)."""
+    _lock_document(version)
     document = version.document
-    ensure_writable(document.project)
-    if version.analysis_status != DocumentVersion.AnalysisStatus.READY:
-        raise DomainError('Solo se puede sellar una versión ya analizada.', 409)
-    if version.is_trashed:
-        raise DomainError('La versión está en la papelera.', 409)
+    gate_error = _version_gate_error(version)
+    if gate_error is not None:
+        raise gate_error
     if Seal.objects.filter(
         document_version=version, reviewer=reviewer, revoked_at__isnull=True
     ).exists():
@@ -129,7 +177,9 @@ def revoke_seal(seal: Seal, actor, request=None) -> Seal:
     version = seal.document_version
     if seal.reviewer != actor:
         raise DomainError('Solo el autor del sello puede retirarlo.', 403)
+    _lock_document(version)
     ensure_writable(version.document.project)
+    seal.refresh_from_db(fields=['revoked_at'])
     if seal.revoked_at is not None:
         raise DomainError('Este sello ya fue retirado.', 409)
     if version.is_approved:
@@ -146,9 +196,12 @@ def revoke_seal(seal: Seal, actor, request=None) -> Seal:
     return seal
 
 
-def _owner_based_approved(version: DocumentVersion, owners: dict) -> tuple[bool, int]:
+def _owner_based_approved(
+    version: DocumentVersion, owners: dict, seals: list,
+) -> tuple[bool, int]:
     """'all_assigned' (B3): every OWNED section present in this version must be
-    covered by an ACTIVE seal from one of its owners."""
+    covered by a counted seal (valid per I11, current sealer) from one of its
+    owners. Each owner counts once, however many sections they cover."""
     present_keys = set(
         SectionVersion.objects.filter(document_version=version)
         .values_list('section__stable_key', flat=True)
@@ -156,11 +209,8 @@ def _owner_based_approved(version: DocumentVersion, owners: dict) -> tuple[bool,
     owned = {key: ids for key, ids in owners.items() if key in present_keys and ids}
     if not owned:
         return False, 0
-    seals = list(
-        Seal.objects.filter(document_version=version, revoked_at__isnull=True)
-        .prefetch_related('covered_sections__section')
-    )
     satisfied = 0
+    owners_counted = set()
     for key, owner_ids in owned.items():
         for seal in seals:
             if seal.reviewer_id not in owner_ids:
@@ -169,37 +219,66 @@ def _owner_based_approved(version: DocumentVersion, owners: dict) -> tuple[bool,
                 cover.section.stable_key == key for cover in seal.covered_sections.all()
             ):
                 satisfied += 1
+                owners_counted.add(seal.reviewer_id)
                 break
-    return satisfied == len(owned), satisfied
+    return satisfied == len(owned), len(owners_counted)
+
+
+def _counted_seals(version: DocumentVersion) -> list:
+    """The seals that may approve `version`: VALID at it per I11 (placed on
+    it or preserved by D5) and signed by someone who can still seal in the
+    project — the same current-membership criterion as the permissions (I12).
+    A preserved seal of a reviewer who lost access approves nothing."""
+    valid = list(
+        valid_seals_at_number(
+            Seal.objects.filter(document_version__document_id=version.document_id),
+            Value(version.number),
+        )
+        .select_related('reviewer')
+        .prefetch_related('covered_sections__section')
+    )
+    project = version.document.project
+    reviewers = {seal.reviewer_id: seal.reviewer for seal in valid}
+    sealers = {
+        reviewer_id for reviewer_id, reviewer in reviewers.items()
+        if resolve_effective_role(reviewer, project) in SEALING_ROLES
+    }
+    return [seal for seal in valid if seal.reviewer_id in sealers]
 
 
 def _refresh_approval(version: DocumentVersion, request=None):
-    """I10: approval derives from the PINNED config's approval_policy (I8).
-    Integer `required` counts full-coverage seals; 'all_assigned' (B3, It5)
-    demands every owned section sealed by one of its owners."""
+    """I10: approval derives from the PINNED config's approval_policy (I8)
+    over the counted seals (see _counted_seals), under the very gates that
+    allow sealing (_version_gate_error) — the same decision for create_seal,
+    the post-D5 recompute and the coordinator's plan. Integer `required`
+    counts DISTINCT reviewers with a full-coverage seal; 'all_assigned' (B3,
+    It5) demands every owned section sealed by one of its owners."""
+    if version.is_approved or _version_gate_error(version) is not None:
+        return
     config = version.config_version
     policy = config.approval_policy or {}
     required = policy.get('required', 1)
+    seals = _counted_seals(version)
 
     if required == 'all_assigned' and config.section_owners:
-        approved, qualifying = _owner_based_approved(version, config.section_owners)
+        approved, qualifying = _owner_based_approved(version, config.section_owners, seals)
         required_display = f'all_assigned ({len(config.section_owners)} secciones)'
-        if approved and not version.is_approved:
+        if approved:
             _mark_approved(version, qualifying, required_display, request)
         return
 
     if not isinstance(required, int):
         required = 1  # 'all_assigned' without owners falls back to one full seal
-    active = Seal.objects.filter(document_version=version, revoked_at__isnull=True)
     total_sections = SectionVersion.objects.filter(document_version=version).count()
 
-    qualifying = 0
-    for seal in active.prefetch_related('covered_sections'):
+    reviewers_counted = set()
+    for seal in seals:
         covered = total_sections if seal.covers_all else seal.covered_sections.count()
         if covered >= total_sections and total_sections > 0:
-            qualifying += 1
+            reviewers_counted.add(seal.reviewer_id)
+    qualifying = len(reviewers_counted)
 
-    if qualifying >= required and not version.is_approved:
+    if qualifying >= required:
         _mark_approved(version, qualifying, required, request)
 
 
@@ -350,6 +429,9 @@ def apply_invalidation(
 
     if any(r.decision == SealValidityRecord.Decision.PENDING for r in records):
         _notify_coordinators_plan_pending(project, document, to_version)
+    else:
+        # Auto mode: approval recomputes at once over the seals now valid (05 §6e).
+        _refresh_approval(to_version)
 
     return records
 
@@ -429,15 +511,23 @@ def confirm_seal_plan(
                 link=f'/projects/{project.public_id}/documents/{to_version.document.public_id}',
                 payload={'seal': str(record.seal.public_id)},
             )
+    # The plan no longer blocks: approval recomputes over the decided chain.
+    _refresh_approval(to_version, request=request)
     return resolved
 
 
 def valid_seals_at_number(queryset, number):
     """I11 as a SQL predicate, for a target-number expression on each seal.
 
-    Only actual live intermediate versions need a preserved link: numbers
-    remain consumed after trash/purge (I1), so subtracting version numbers
-    would incorrectly invalidate chains with a gap. A missing, pending,
+    Validity is only granted ON an analyzed live version: a failed, pending,
+    processing or trashed target is never valid, whatever links it carries,
+    and the target needs its own preserved link. Up to it, only actual live
+    intermediate versions need a preserved link: numbers remain consumed
+    after trash/purge (I1), so subtracting version numbers would incorrectly
+    invalidate chains with a gap. A FAILED intermediate never participates
+    either (F5): D5 compares the next delivery against the last ready one, so
+    it never receives a link. Pending or processing intermediates still need
+    theirs (F4: an undetermined chain is not valid). A missing, pending,
     invalidated or superseded link fails the same predicate.
     """
     preserved_link = SealValidityRecord.objects.filter(
@@ -445,17 +535,27 @@ def valid_seals_at_number(queryset, number):
         to_document_version_id=OuterRef('pk'),
         decision=SealValidityRecord.Decision.PRESERVED,
     )
+    analyzed_target = DocumentVersion.objects.filter(
+        document_id=OuterRef('document_version__document_id'),
+        number=OuterRef('_validity_target_number'),
+        analysis_status=DocumentVersion.AnalysisStatus.READY,
+    )
     missing_link = DocumentVersion.objects.filter(
         document_id=OuterRef('document_version__document_id'),
         number__gt=OuterRef('document_version__number'),
         number__lte=OuterRef('_validity_target_number'),
+    ).exclude(
+        analysis_status=DocumentVersion.AnalysisStatus.FAILED,
+        number__lt=OuterRef('_validity_target_number'),
     ).filter(~Exists(preserved_link))
     return queryset.alias(
         _validity_target_number=number,
+        _validity_target_analyzed=Exists(analyzed_target),
         _validity_has_missing_link=Exists(missing_link),
     ).filter(
         revoked_at__isnull=True,
         document_version__number__lte=F('_validity_target_number'),
+        _validity_target_analyzed=True,
         _validity_has_missing_link=False,
     )
 
