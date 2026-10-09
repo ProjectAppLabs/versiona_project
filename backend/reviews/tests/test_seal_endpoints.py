@@ -85,6 +85,25 @@ def test_double_active_seal_by_the_same_reviewer_is_rejected(client_as, analyzed
 
 
 @pytest.mark.django_db
+@pytest.mark.escenario('D4-E01')
+def test_sealing_a_superseded_version_via_api_is_rejected(client_as, analyzed_v1):
+    """Catches: the viewer's seal action approving a version that a newer
+    upload superseded (I10)."""
+    context, document, v1 = analyzed_v1
+    editor = context.users['editor']
+    intent = version_service.create_upload_intent(document, editor)
+    storage_service.put_bytes(
+        intent.key, (TESTDATA / 'contrato_v2.pdf').read_bytes(), 'application/pdf'
+    )
+    version_service.complete_upload(document, intent.upload_id, 'v2', editor)
+
+    response = client_as('reviewer').post(seals_url(v1), {'covers_all': True}, format='json')
+
+    assert response.status_code == 409
+    assert response.data['error'] == 'Solo se puede sellar la versión vigente del documento.'
+
+
+@pytest.mark.django_db
 @pytest.mark.escenario('D4-F03')
 def test_verify_endpoint_returns_offline_verification_material(client_as, analyzed_v1):
     """Verification exposes the material needed to validate a seal offline."""

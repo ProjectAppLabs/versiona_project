@@ -47,14 +47,44 @@ def _add_validity_records(seal, versions, decisions):
             )
 
 
-def _arrange_i11_case(seal, versions, decisions, revoked, trash_intermediate):
+def _version_state(name):
+    from documents.models import DocumentVersion
+
+    return {
+        'ready': {'analysis_status': DocumentVersion.AnalysisStatus.READY},
+        'trashed': {'deleted_at': timezone.now()},
+        'failed': {'analysis_status': DocumentVersion.AnalysisStatus.FAILED},
+        'pending': {'analysis_status': DocumentVersion.AnalysisStatus.PENDING},
+        'processing': {'analysis_status': DocumentVersion.AnalysisStatus.PROCESSING},
+    }[name]
+
+
+def _arrange_i11_case(seal, versions, decisions, revoked, intermediate, target):
+    from documents.models import DocumentVersion
+
     _add_validity_records(seal, versions[1:], decisions)
     if revoked:
         Seal.objects.filter(pk=seal.pk).update(revoked_at=timezone.now())
         seal.refresh_from_db()
-    if trash_intermediate:
-        from documents.models import DocumentVersion
-        DocumentVersion.all_objects.filter(pk=versions[1].pk).update(deleted_at=timezone.now())
+    DocumentVersion.all_objects.filter(pk=versions[1].pk).update(**_version_state(intermediate))
+    DocumentVersion.all_objects.filter(pk=versions[2].pk).update(**_version_state(target))
+
+
+def _failed_delivery(context, document):
+    """A delivery whose analysis failed for good: never compared nor sealable (F5)."""
+    from documents.models import DocumentVersion
+
+    document.refresh_from_db()
+    number = document.latest_number + 1
+    version = DocumentVersion.objects.create(
+        document=document, number=number, sha256=f'{number:064d}',
+        file_key=f'test/failed/{document.public_id}/v{number}/original.pdf',
+        analysis_status=DocumentVersion.AnalysisStatus.FAILED,
+        config_version=context.config, author=context.users['editor'],
+    )
+    document.latest_number = number
+    document.save(update_fields=['latest_number'])
+    return version
 
 
 def _target_at_number(versions, target_number):
@@ -209,6 +239,53 @@ def test_third_delivery_does_not_revive_an_invalidated_seal(sealed_v1):
 
 
 @pytest.mark.django_db
+def test_reinstated_section_does_not_revive_its_invalidated_seal(versiona_context):
+    """Catches: reusing a retired Section row resurrecting the seal that D5
+    invalidated when the section was removed (the I11 chain stays cut)."""
+    context = versiona_context
+    editor = context.users['editor']
+    document = version_service.create_document(context.project, 'Plazo restituido', editor)
+    v1 = upload(document, 'contrato_v1.pdf', 'v1', editor)
+    seal = seal_service.create_seal(
+        v1, context.users['reviewer'], section_keys=['plazo-de-ejecucion'],
+    )
+    upload(document, 'contrato_v2.pdf', 'v2 quita el plazo', editor)
+
+    v3 = upload(document, 'contrato_v1.pdf', 'v3 restituye el plazo', editor)
+
+    assert seal_service.seal_is_valid_at(seal, v3) is False
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D5-F06')
+def test_seal_preserved_across_a_failed_delivery_stays_valid(sealed_v1):
+    """Catches: a FAILED version (never compared, F5) cutting the I11 chain of
+    a seal that D5 preserved against the last ready version."""
+    context, document, _, seal_a, _ = sealed_v1
+    _failed_delivery(context, document)
+
+    v3 = upload(document, 'contrato_v2.pdf', 'v3 tras el fallo', context.users['editor'])
+
+    assert seal_service.seal_is_valid_at(seal_a, v3) is True
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D5-F06')
+def test_delivery_after_a_failed_one_keeps_tracking_the_preserved_seal(sealed_v1):
+    """Catches: D5 dropping, without record or notice, a seal whose chain
+    crossed a FAILED version."""
+    context, document, _, seal_a, _ = sealed_v1
+    _failed_delivery(context, document)
+    upload(document, 'contrato_v2.pdf', 'v3 tras el fallo', context.users['editor'])
+
+    v4 = upload(document, 'contrato_v3.pdf', 'v4', context.users['editor'])
+
+    assert list(
+        seal_a.validity_records.filter(to_document_version=v4).values_list('decision', flat=True)
+    ) == ['preserved']
+
+
+@pytest.mark.django_db
 def test_third_delivery_replay_keeps_one_original_seal_record(sealed_v1):
     """Catches: inherited seals duplicating evidence when D5 is replayed."""
     from comparisons.models import Comparison
@@ -304,35 +381,46 @@ def test_d5_excludes_a_valid_seal_from_another_document(versiona_context, docume
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    ('case', 'records', 'revoked', 'target_number', 'trash_intermediate', 'expected'),
+    ('case', 'records', 'revoked', 'target_number', 'intermediate', 'target', 'expected'),
     [
-        ('own_version', (), False, 1, False, True),
-        ('preserved_chain', ('preserved', 'preserved'), False, 3, False, True),
-        ('missing_link', (None, 'preserved'), False, 3, False, False),
-        ('pending_link', ('pending_confirmation', 'preserved'), False, 3, False, False),
-        ('invalidated_link', ('invalidated', 'preserved'), False, 3, False, False),
-        ('superseded_link', ('superseded', 'preserved'), False, 3, False, False),
-        ('revoked_seal', ('preserved', 'preserved'), True, 3, False, False),
-        ('target_before_seal', (), False, 0, False, False),
-        ('trashed_intermediate', (None, 'preserved'), False, 3, True, True),
+        ('own_version', (), False, 1, 'ready', 'ready', True),
+        ('preserved_chain', ('preserved', 'preserved'), False, 3, 'ready', 'ready', True),
+        ('missing_link', (None, 'preserved'), False, 3, 'ready', 'ready', False),
+        ('pending_link', ('pending_confirmation', 'preserved'), False, 3, 'ready', 'ready', False),
+        ('invalidated_link', ('invalidated', 'preserved'), False, 3, 'ready', 'ready', False),
+        ('superseded_link', ('superseded', 'preserved'), False, 3, 'ready', 'ready', False),
+        ('revoked_seal', ('preserved', 'preserved'), True, 3, 'ready', 'ready', False),
+        ('target_before_seal', (), False, 0, 'ready', 'ready', False),
+        ('trashed_intermediate', (None, 'preserved'), False, 3, 'trashed', 'ready', True),
+        ('failed_intermediate', (None, 'preserved'), False, 3, 'failed', 'ready', True),
+        ('failed_intermediate_unlinked_target', (None, None), False, 3, 'failed', 'ready', False),
+        ('pending_intermediate', (None, 'preserved'), False, 3, 'pending', 'ready', False),
+        ('processing_intermediate', (None, 'preserved'), False, 3, 'processing', 'ready', False),
+        ('target_failed', ('preserved', None), False, 3, 'ready', 'failed', False),
+        ('target_pending', ('preserved', None), False, 3, 'ready', 'pending', False),
+        ('target_failed_with_link', ('preserved', 'preserved'), False, 3, 'ready', 'failed', False),
+        ('target_pending_with_link', ('preserved', 'preserved'), False, 3, 'ready', 'pending', False),
+        ('target_trashed_with_link', ('preserved', 'preserved'), False, 3, 'ready', 'trashed', False),
     ],
 )
 def test_i11_validity_requires_each_live_preserved_link(
     document_with_versions, versiona_context, case, records, revoked, target_number,
-    trash_intermediate, expected,
+    intermediate, target, expected,
 ):
-    """Catches: I11 accepting a missing or non-preserved live chain link."""
+    """Catches: I11 accepting a missing or non-preserved live chain link,
+    demanding one from a FAILED intermediate that D5 never compares (F5), or
+    granting validity ON a version that is not an analyzed live one."""
     document, versions = document_with_versions(n_versions=3, document_slug=f'i11-{case}')
     seal = Seal.objects.create(
         document_version=versions[0], reviewer=versiona_context.users['reviewer'],
         signed_payload={}, signature=f'signature-{case}', key_id=f'key-{case}',
     )
-    _arrange_i11_case(seal, versions, records, revoked, trash_intermediate)
-    target = _target_at_number(versions, target_number)
+    _arrange_i11_case(seal, versions, records, revoked, intermediate, target)
+    target_version = _target_at_number(versions, target_number)
 
-    scalar = seal_service.seal_is_valid_at(seal, target)
+    scalar = seal_service.seal_is_valid_at(seal, target_version)
     bulk = seal_service.valid_seals_at_number(
-        Seal.objects.filter(pk=seal.pk), Value(target.number),
+        Seal.objects.filter(pk=seal.pk), Value(target_version.number),
     ).exists()
 
     assert scalar is expected
@@ -483,3 +571,337 @@ def test_sealed_version_is_not_trash_eligible(sealed_v1):
 
     with pytest.raises(version_service.DomainError):
         trash_service.trash_version(v1, context.users['editor'])
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D4-E01')
+def test_sealing_a_superseded_version_is_rejected(versiona_context, document_with_versions):
+    """Catches: approving a version a newer delivery already superseded (I10)."""
+    _, versions = document_with_versions(n_versions=2)
+
+    with pytest.raises(version_service.DomainError) as rejection:
+        seal_service.create_seal(versions[0], versiona_context.users['reviewer'], covers_all=True)
+
+    assert rejection.value.status_code == 409
+    assert not Seal.objects.filter(document_version=versions[0]).exists()
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D4-E01')
+@pytest.mark.parametrize('newer_status', ['pending', 'processing', 'failed'])
+def test_newer_version_in_any_analysis_state_blocks_sealing(
+    versiona_context, document_with_versions, newer_status,
+):
+    """I10 is literal: the current version is the newest alive one, analyzed or not."""
+    from documents.models import DocumentVersion
+
+    _, versions = document_with_versions(n_versions=2)
+    DocumentVersion.all_objects.filter(pk=versions[1].pk).update(analysis_status=newer_status)
+
+    with pytest.raises(version_service.DomainError) as rejection:
+        seal_service.create_seal(versions[0], versiona_context.users['reviewer'], covers_all=True)
+
+    assert rejection.value.status_code == 409
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('C4-F01')
+def test_trashing_the_newer_draft_makes_the_previous_version_sealable(
+    versiona_context, document_with_versions,
+):
+    """Catches: I10 reading the allocation counter, which still counts the trashed draft."""
+    from documents.services import trash_service
+
+    _, versions = document_with_versions(n_versions=2)
+    trash_service.trash_version(versions[1], versiona_context.users['editor'])
+
+    seal = seal_service.create_seal(versions[0], versiona_context.users['reviewer'], covers_all=True)
+
+    assert seal.document_version_id == versions[0].pk
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D4-L01')
+def test_sealing_an_unanalyzed_version_is_rejected(versiona_context, document_with_versions):
+    """I10's other half: only an analyzed (ready) version can be sealed."""
+    from documents.models import DocumentVersion
+
+    _, versions = document_with_versions(n_versions=1)
+    DocumentVersion.all_objects.filter(pk=versions[0].pk).update(
+        analysis_status=DocumentVersion.AnalysisStatus.PROCESSING,
+    )
+    version = DocumentVersion.objects.get(pk=versions[0].pk)
+
+    with pytest.raises(version_service.DomainError) as rejection:
+        seal_service.create_seal(version, versiona_context.users['reviewer'], covers_all=True)
+
+    assert rejection.value.status_code == 409
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D5-F02')
+def test_pending_coordinator_plan_rejects_a_new_seal(versiona_context, document_with_versions):
+    """Catches: sealing, and so approving, a version whose D5 plan still waits for the coordinator."""
+    _, versions = document_with_versions(n_versions=2)
+    inherited = Seal.objects.create(
+        document_version=versions[0], reviewer=versiona_context.users['reviewer'],
+        signed_payload={}, signature='pending-plan', key_id='pending-plan',
+    )
+    SealValidityRecord.objects.create(
+        seal=inherited, to_document_version=versions[1],
+        decision=SealValidityRecord.Decision.PENDING,
+        proposed_decision=SealValidityRecord.Decision.INVALIDATED,
+        decided_mode=SealValidityRecord.Mode.COORDINATOR,
+    )
+
+    with pytest.raises(version_service.DomainError) as rejection:
+        seal_service.create_seal(versions[1], versiona_context.users['admin'], covers_all=True)
+
+    assert rejection.value.status_code == 409
+    assert not Seal.objects.filter(document_version=versions[1]).exists()
+
+
+# ── Approval over the seals valid at the version (QA-2) ─────────────────────
+
+
+def _reexported(fixture):
+    """The same PDF saved again with other metadata: new bytes, same text."""
+    import fitz
+
+    pdf = fitz.open(stream=(TESTDATA / fixture).read_bytes(), filetype='pdf')
+    pdf.set_metadata({'title': 'Reexportado'})
+    data = pdf.tobytes(garbage=4, deflate=True)
+    pdf.close()
+    return data
+
+
+def upload_bytes(document, data, message, author):
+    """Upload raw PDF bytes through the complete analyzed-version lifecycle."""
+    intent = version_service.create_upload_intent(document, author)
+    storage_service.put_bytes(intent.key, data, 'application/pdf')
+    version, _ = version_service.complete_upload(document, intent.upload_id, message, author)
+    return version
+
+
+@pytest.fixture
+def reexported_v2(versiona_context):
+    """v1 approved by one covers_all seal; v2 re-exports it with the same text."""
+    context = versiona_context
+    editor = context.users['editor']
+    document = version_service.create_document(context.project, 'Reexportado', editor)
+    v1 = upload(document, 'contrato_v1.pdf', 'v1', editor)
+    seal_service.create_seal(v1, context.users['reviewer'], covers_all=True)
+    v2 = upload_bytes(document, _reexported('contrato_v1.pdf'), 'v2 reexportado', editor)
+    return context, v2
+
+
+@pytest.fixture
+def coordinator_plan(versiona_context):
+    """all_assigned over §1 (owner: reviewer); the admin's §3 seal falls under
+    a coordinator plan when v2 modifies §3."""
+    from projects.services import config_service
+
+    context = versiona_context
+    editor = context.users['editor']
+    config_service.update_config(
+        context.project, context.users['admin'],
+        d5_mode='coordinator',
+        approval_policy={'required': 'all_assigned'},
+        section_owners={'objeto-del-contrato': [context.users['reviewer'].pk]},
+    )
+    document = version_service.create_document(context.project, 'Plan del coordinador', editor)
+    v1 = upload(document, 'contrato_v1.pdf', 'v1', editor)
+    scoped = seal_service.create_seal(
+        v1, context.users['admin'], section_keys=['obligaciones-del-contratista'],
+    )
+    seal_service.create_seal(v1, context.users['reviewer'], section_keys=['objeto-del-contrato'])
+    v2 = upload(document, 'contrato_v2.pdf', 'v2 modifica §3', editor)
+    return context, v2, scoped
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D4-F02')
+def test_preserved_seal_approves_the_reexported_delivery(reexported_v2):
+    """Catches: approval counting only seals placed on the version, so a seal
+    D5 preserved by hash equality never approves the new delivery (05 §6e)."""
+    _, v2 = reexported_v2
+
+    v2.refresh_from_db()
+    assert v2.is_approved is True
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D5-A05')
+def test_d5_replay_announces_the_inherited_approval_once(reexported_v2):
+    """Catches: the post-D5 recompute approving again on an idempotent replay (I15)."""
+    from comparisons.models import Comparison
+
+    _, v2 = reexported_v2
+    comparison = Comparison.objects.get(to_version=v2, trigger=Comparison.Trigger.AUTO)
+
+    seal_service.apply_invalidation(comparison)
+
+    assert AuditEvent.objects.filter(
+        event_type='version.approved', object_id_ref=str(v2.public_id),
+    ).count() == 1
+
+
+def _newer_delivery(context, document):
+    """A newer alive delivery still under analysis: it supersedes (I10)."""
+    from documents.models import DocumentVersion
+
+    document.refresh_from_db()
+    number = document.latest_number + 1
+    version = DocumentVersion.objects.create(
+        document=document, number=number, sha256=f'{number:064d}',
+        file_key=f'test/newer/{document.public_id}/v{number}/original.pdf',
+        analysis_status=DocumentVersion.AnalysisStatus.PENDING,
+        config_version=context.config, author=context.users['editor'],
+    )
+    document.latest_number = number
+    document.save(update_fields=['latest_number'])
+    return version
+
+
+def _make_unavailable(context, version, state):
+    """Leave `version` unapproved and break exactly one approval gate."""
+    from documents.models import DocumentVersion
+    from projects.models import Project
+
+    rows = DocumentVersion.all_objects.filter(pk=version.pk)
+
+    def pending_plan():
+        other = Seal.objects.create(
+            document_version=DocumentVersion.objects.get(document=version.document, number=1),
+            reviewer=context.users['admin'], signed_payload={}, signature='gate', key_id='gate',
+        )
+        SealValidityRecord.objects.create(
+            seal=other, to_document_version=version,
+            decision=SealValidityRecord.Decision.PENDING,
+            decided_mode=SealValidityRecord.Mode.COORDINATOR,
+        )
+
+    breakers = {
+        'processing': lambda: rows.update(
+            analysis_status=DocumentVersion.AnalysisStatus.PROCESSING,
+        ),
+        'trashed': lambda: rows.update(deleted_at=timezone.now()),
+        'superseded': lambda: _newer_delivery(context, version.document),
+        'pending_plan': pending_plan,
+        'archived_project': lambda: Project.objects.filter(pk=context.project.pk).update(
+            status=Project.Status.ARCHIVED,
+        ),
+    }
+    rows.update(is_approved=False, approved_at=None)
+    breakers[state]()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'state', ['processing', 'trashed', 'superseded', 'pending_plan', 'archived_project'],
+)
+def test_d5_recompute_never_approves_an_unavailable_version(reexported_v2, state):
+    """Catches: the post-D5 recompute approving where create_seal could not —
+    an unanalyzed, trashed or superseded version (I10), a pending plan
+    (D5-F02) or a read-only project — whatever seals stay valid."""
+    from comparisons.models import Comparison
+    from documents.models import DocumentVersion
+
+    context, v2 = reexported_v2
+    _make_unavailable(context, v2, state)
+    comparison = Comparison.objects.get(to_version_id=v2.pk, trigger=Comparison.Trigger.AUTO)
+
+    seal_service.apply_invalidation(comparison)
+
+    assert DocumentVersion.all_objects.get(pk=v2.pk).is_approved is False
+
+
+def _reexported_after_seal(context, title):
+    """v1 sealed covers_all by the reviewer, then re-exported as v2 (same text)."""
+    editor = context.users['editor']
+    document = version_service.create_document(context.project, title, editor)
+    v1 = upload(document, 'contrato_v1.pdf', 'v1', editor)
+    seal_service.create_seal(v1, context.users['reviewer'], covers_all=True)
+    return upload_bytes(document, _reexported('contrato_v1.pdf'), 'v2 reexportado', editor)
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D4-F02')
+def test_same_reviewer_counts_once_toward_the_quorum(versiona_context):
+    """Catches: a preserved seal and a new seal of ONE reviewer reaching a
+    quorum of two (approval counts distinct reviewers)."""
+    from projects.services import config_service
+
+    context = versiona_context
+    config_service.update_config(
+        context.project, context.users['admin'], approval_policy={'required': 2},
+    )
+    v2 = _reexported_after_seal(context, 'Quórum de dos')
+
+    seal_service.create_seal(v2, context.users['reviewer'], covers_all=True)
+
+    v2.refresh_from_db()
+    assert v2.is_approved is False
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D4-F02')
+def test_preserved_seal_of_a_reviewer_who_lost_access_does_not_approve(versiona_context):
+    """Catches: approval counting a preserved seal of someone who can no longer
+    seal in the project (I12: current membership, not historical)."""
+    from projects.models import ProjectMembership
+
+    context = versiona_context
+    editor = context.users['editor']
+    document = version_service.create_document(context.project, 'Acceso revocado', editor)
+    v1 = upload(document, 'contrato_v1.pdf', 'v1', editor)
+    seal_service.create_seal(v1, context.users['reviewer'], covers_all=True)
+    ProjectMembership.objects.filter(
+        project=context.project, user=context.users['reviewer'],
+    ).delete()
+
+    v2 = upload_bytes(document, _reexported('contrato_v1.pdf'), 'v2 reexportado', editor)
+
+    v2.refresh_from_db()
+    assert v2.is_approved is False
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D5-F02')
+def test_pending_plan_keeps_the_new_version_unapproved(coordinator_plan):
+    """Guard: the owner's preserved seal would satisfy the policy, but a
+    pending plan blocks approval until the coordinator decides."""
+    _, v2, _ = coordinator_plan
+
+    v2.refresh_from_db()
+    assert v2.is_approved is False
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D5-F02')
+def test_confirming_the_plan_recomputes_the_approval(coordinator_plan):
+    """Catches: approval never recomputed after the coordinator resolves the plan."""
+    context, v2, scoped = coordinator_plan
+
+    seal_service.confirm_seal_plan(
+        v2, context.users['admin'], {str(scoped.public_id): 'invalidated'},
+    )
+
+    v2.refresh_from_db()
+    assert v2.is_approved is True
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D5-F02')
+def test_confirming_a_plan_on_a_superseded_version_does_not_approve_it(coordinator_plan):
+    """Catches: the plan confirmation approving a version a newer delivery
+    already superseded (same gates as create_seal, I10)."""
+    context, v2, scoped = coordinator_plan
+    _newer_delivery(context, v2.document)
+
+    seal_service.confirm_seal_plan(
+        v2, context.users['admin'], {str(scoped.public_id): 'invalidated'},
+    )
+
+    v2.refresh_from_db()
+    assert v2.is_approved is False

@@ -134,9 +134,10 @@ def test_the_degraded_plan_records_coordinator_mode(total_section_loss):
 
 
 @pytest.mark.django_db
-@pytest.mark.xfail(strict=True, reason='Pending product contract: structural loss must reject a new seal')
+@pytest.mark.escenario('D5-F02')
 def test_structural_scope_loss_rejects_a_new_seal(total_section_loss):
-    """Known product gap; excluded from required D5-L01 conformance evidence."""
+    """Structural loss forces the coordinator: its pending plan rejects a new
+    seal until confirmed (D5-F02); the structural guard of D5-L01 stays open."""
     context, _, _, v2, _, _ = total_section_loss
 
     with pytest.raises(version_service.DomainError) as exc:

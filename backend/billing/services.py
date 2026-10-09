@@ -5,6 +5,7 @@ from datetime import timedelta
 from django.conf import settings
 from django.utils import timezone
 
+from documents.queries import is_current_version
 from documents.services.version_service import DomainError
 
 from .models import TRIAL_PLAN_KEY, WARNING_THRESHOLD, Subscription, plan_limits
@@ -128,13 +129,13 @@ def check_member_limit(org):
 
 def check_history_access(version):
     """DP-04 / C3-L02: on the free plan, versions older than the window are
-    LOCKED (never deleted) — except each document's latest version."""
+    LOCKED (never deleted) — except each document's current version."""
     org = version.document.project.organization
     limits = plan_limits(effective_plan(org))
     window = limits['history_days']
     if window is None:
         return
-    if version.number == version.document.latest_number:
+    if is_current_version(version):
         return
     age = timezone.now() - version.created_at
     if age.days >= window:

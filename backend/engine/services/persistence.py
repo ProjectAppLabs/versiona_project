@@ -1,7 +1,9 @@
 """
 Persistence of an analysis result: Section identity matching (steps 1–2 of
-docs/plan/05 §4), SectionVersion snapshots, lineage evidence, thumbnail and
-version fields. Runs inside one transaction; deterministic upserts (I15).
+docs/plan/05 §4 — step 1 over every Section of the document, so a reinstated
+heading keeps its identity), SectionVersion snapshots, lineage evidence,
+thumbnail and version fields. Runs inside one transaction; deterministic
+upserts (I15).
 """
 
 from django.db import transaction
@@ -14,38 +16,49 @@ from documents.services import storage_service
 @transaction.atomic
 def persist_analysis(version: DocumentVersion, analysis: dict) -> dict:
     document: Document = version.document
-    alive_sections = {
-        section.stable_key: section
-        for section in document.sections.filter(retired_in_version__isnull=True)
-    }
+    # Step 1 looks up EVERY Section of the document, retired rows included:
+    # unique(document, stable_key) spans them all, so a reinstated heading
+    # reuses its own row. Renames made while matching keep the map in step.
+    by_key = {section.stable_key: section for section in document.sections.all()}
+    alive_sections = [
+        section for section in by_key.values() if section.retired_in_version_id is None
+    ]
     by_body_hash: dict[str, Section] = {}
     if alive_sections:
+        by_pk = {section.pk: section for section in alive_sections}
         previous = (
             SectionVersion.objects.filter(
-                section__in=alive_sections.values(),
+                section__in=alive_sections,
                 document_version__number__lt=version.number,
             )
             .order_by('section_id', '-document_version__number')
-            .select_related('section')
         )
         seen = set()
         for snapshot in previous:
             if snapshot.section_id in seen:
                 continue
             seen.add(snapshot.section_id)
-            by_body_hash.setdefault(snapshot.body_hash, snapshot.section)
+            by_body_hash.setdefault(snapshot.body_hash, by_pk[snapshot.section_id])
 
     matched_ids = set()
     counters = {'same': 0, 'renamed': 0, 'added': 0, 'removed': 0}
 
     for payload in analysis['sections']:
-        section = alive_sections.get(payload['stable_key'])
+        section = by_key.get(payload['stable_key'])
         relation = SectionLineage.Relation.SAME
-        if section is None:
+        if section is not None and section.retired_in_version_id is not None:
+            # A heading retired by an earlier version is back: same identity,
+            # new relative to the previous version.
+            section.retired_in_version = None
+            section.title_current = payload['heading']
+            section.save(update_fields=['retired_in_version', 'title_current', 'updated_at'])
+            relation = SectionLineage.Relation.ADDED
+        elif section is None:
             candidate = by_body_hash.get(payload['body_hash'])
             if candidate is not None and candidate.pk not in matched_ids:
                 # Step 2: exact-content match ⇒ rename re-assigns the SAME row
                 section = candidate
+                del by_key[section.stable_key]
                 section.stable_key = payload['stable_key']
                 section.title_current = payload['heading']
                 section.save(update_fields=['stable_key', 'title_current', 'updated_at'])
@@ -59,6 +72,7 @@ def persist_analysis(version: DocumentVersion, analysis: dict) -> dict:
                     created_in_version=version,
                 )
                 relation = SectionLineage.Relation.ADDED
+            by_key[section.stable_key] = section
         else:
             if section.title_current != payload['heading']:
                 section.title_current = payload['heading']
@@ -94,7 +108,7 @@ def persist_analysis(version: DocumentVersion, analysis: dict) -> dict:
                 relation=relation,
             )
 
-    for stale in alive_sections.values():
+    for stale in alive_sections:
         if stale.pk not in matched_ids:
             stale.retired_in_version = version
             stale.save(update_fields=['retired_in_version', 'updated_at'])
