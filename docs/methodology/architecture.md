@@ -177,8 +177,8 @@ y sus resaltados comparten ancho efectivo de contenedor.
 - `version_file` y las vistas de comparación aplican `check_history_access`.
 - El visor usa un único destino de scroll compartido por «Lo que cambió» y las
   observaciones ancladas.
-- Next.js 16.3.8. La 16.4.0 se descartó porque rompe el cierre de sesión desde
-  el menú compacto. No hay migraciones nuevas.
+- Next.js sigue en 16.2.6: la subida a 16.3.8 o 16.4.0 se difirió porque rompe
+  el cierre de sesión desde el menú compacto. No hay migraciones nuevas.
 
 **Next**: operator-gated go-public items — deployment (DP-21), domain+SMTP (DP-22),
 Ed25519 key rotation/custody (DP-24), Wompi checkout keys (F1 payment leg), optional
