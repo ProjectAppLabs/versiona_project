@@ -28,7 +28,7 @@ export function ProgressiveObservationText({ summary, testId }: ProgressiveObser
       {hasMore ? (
         <button
           data-testid={`${testId}-more`}
-          className="mt-1 text-xs text-primary underline-offset-2 hover:underline disabled:opacity-50"
+          className="mt-1 inline-flex min-h-11 items-center text-xs text-primary underline-offset-2 hover:underline disabled:opacity-50"
           disabled={content?.isLoading}
           onClick={() => void loadContent(summary.body_content_url)}
           type="button"

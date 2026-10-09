@@ -64,7 +64,7 @@ export default function DocumentTimelinePage() {
           </span>
           <button
             data-testid="compare-selected"
-            className="rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground disabled:cursor-not-allowed disabled:opacity-40"
+            className="min-h-11 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground disabled:cursor-not-allowed disabled:opacity-40"
             disabled={selected.length !== 2}
             onClick={compareSelected}
             type="button"
@@ -97,7 +97,7 @@ export default function DocumentTimelinePage() {
           {list.hasNext || list.hasPrevious ? (
             <div className="flex items-center justify-between text-sm text-muted-foreground">
               <button
-                className="rounded-full border border-border px-4 py-1.5 disabled:opacity-40"
+                className="min-h-11 rounded-full border border-border px-4 py-1.5 disabled:opacity-40"
                 disabled={!list.hasPrevious}
                 onClick={list.previousPage}
                 type="button"
@@ -108,7 +108,7 @@ export default function DocumentTimelinePage() {
                 {common.page} {list.page}
               </span>
               <button
-                className="rounded-full border border-border px-4 py-1.5 disabled:opacity-40"
+                className="min-h-11 rounded-full border border-border px-4 py-1.5 disabled:opacity-40"
                 disabled={!list.hasNext}
                 onClick={list.nextPage}
                 type="button"

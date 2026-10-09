@@ -4,11 +4,11 @@
 
 Use this document to understand each flow's steps, branching conditions, role restrictions,
 and API contracts before writing or reviewing E2E tests. Flow ids map 1:1 to
-`frontend/e2e/flow-definitions.json` (v2.4.1) and to the founding-artifact flow ids
+`frontend/e2e/flow-definitions.json` (v2.4.2) and to the founding-artifact flow ids
 (A1…F1) planned in `docs/plan/01-alcance-mvp.md`.
 
-**Version:** 2.4.1
-**Last Updated:** 2026-10-08
+**Version:** 2.4.2
+**Last Updated:** 2026-10-09
 
 > Maintenance rule (docs/plan/09 DoD #4): each vertical iteration rewrites the sheets of the
 > flows it ships and flips them from *Planned* to *Implemented*. Acceptance criteria live in
@@ -34,7 +34,7 @@ and API contracts before writing or reviewing E2E tests. Flow ids map 1:1 to
 ## Module Index
 
 > **Status governance (updated 2026-10-08)**: the authoritative registry is
-> `frontend/e2e/flow-definitions.json` (v2.4.1, 40 flows). Implementation, authored
+> `frontend/e2e/flow-definitions.json` (v2.4.2, 40 flows). Implementation, authored
 > specs and executed coverage are separate: qualifying tests and their live/CI
 > artifacts determine coverage. A row in this map never grants it by itself.
 
@@ -415,3 +415,25 @@ Los dos specs D5 ejecutados llevan `@outcome:success`; no conceden crédito
 cualificado a display ni failure. El registro declara ambos comportamientos
 existentes para conservar visibles esas brechas, sin inventar pruebas ni ampliar
 la implementación del producto.
+
+## R3 — responsividad de documentos, comparación y revisión (2026-10-09)
+
+Contratos por ancho declarados en los flows dueños (`RESPONSIVE_STANDARDS.md` §6).
+La geometría (objetivos de 44 px, campos de 16 px, sin desplazamiento horizontal)
+complementa cada interacción y no cuenta como cobertura propia.
+
+| Ancho | Flujo | Interacción | Clase | Resultado observable | Prueba |
+|---|---|---|---|---|---|
+| 412×915 | C2 | Subir v2 con un mensaje largo, tocar «Editar mensaje», corregirlo y guardar | success | La línea de tiempo muestra el mensaje corregido completo; el control de edición ya no queda recortado por una línea truncada | `c2-upload-new-version.spec.ts` — C2-R01 |
+| 412×915 | C2 | Subir la re-entrega desde el modal, marcar v1 y v2 y tocar «Comparar seleccionadas» | success | Se abre la comparación con «2 modificadas, 1 eliminada, 1 agregada»; campos de 16 px y casillas y botones de 44 px | `c2-upload-new-version.spec.ts` — C2-R02 |
+| 412×915 | C3 | Leer la línea de tiempo | display | Cada mensaje se ajusta completo y las acciones Ver documento/Descargar/Eliminar ocupan su propia fila táctil | Ejercido dentro de C2-R01/C2-R02, sin prueba propia de C3 |
+| 412×915 | E1 | Comparar v1 con v2 y tocar la pestaña «Resumen» | display | Conteos 2 modificadas, 1 eliminada, 1 agregada; guardar, siguiente cambio y pestañas pasan bajo el título sin desplazamiento horizontal | `e1-compare-versions.spec.ts` — E1-R01 |
+| Cinco anchos | E1 | Elegir «3. OBLIGACIONES DEL CONTRATISTA» en la lista de cambios | display | El nombre completo se lee sin recorte, también en la columna lateral de 260 px desde 1195×835; el documento no se desplaza en horizontal | `e1-compare-versions.spec.ts` — bucle `E1 PDF @viewport:*` |
+| 412×915 | D3 | El revisor crea una observación desde el formulario y el editor la responde desde el hilo | success | El hilo pasa a «Respondida»; select, texto y respuesta usan 16 px y las acciones miden 44 px | `d3-anchored-observations.spec.ts` — D3-R01 |
+| 835×1194 | D4 | Abrir el selector, tocar la fila de una sección y sellarla | success | El sello muestra «1 secciones: obligaciones-del-contratista»; filas, botones y «Retirar mi sello» miden 44 px | `d4-seal-approve.spec.ts` — D4-R01 |
+| 835×1194 | D5 | El coordinador alterna Conservar/Invalidar en el plan pendiente y confirma | success | La decisión persistida es `invalidated`; opciones y «Confirmar plan» miden 44 px | `d5-coordinator-confirmation.spec.ts` — D5-R01 |
+
+Las pruebas nuevas no se ejecutaron en vivo durante la autoría (no había app ni
+navegador); su validación es la del CI del PR. Las acciones de D1 (solicitud de
+revisión) y E4 (constancias) y los componentes compartidos (Modal, avisos,
+confirmación por texto) quedan fuera de esta ronda.

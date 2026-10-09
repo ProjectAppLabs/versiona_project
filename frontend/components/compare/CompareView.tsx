@@ -105,11 +105,14 @@ export function CompareView({
             </p>
           ) : null}
         </div>
-        <div className="flex items-center gap-2">
+        {/* Wraps below the title on narrow screens: at 412 px the three
+            controls plus the tabs need ~442 px and used to push the page
+            sideways (LAY-1). */}
+        <div className="flex flex-wrap items-center gap-2">
           {comparison ? (
             <button
               data-testid="save-comparison"
-              className="rounded-full border border-border px-3 py-1.5 text-sm hover:bg-accent"
+              className="min-h-11 rounded-full border border-border px-3 py-1.5 text-sm hover:bg-accent"
               onClick={() => {
                 const name = window.prompt(saved.name);
                 if (!name?.trim()) return;
@@ -128,7 +131,7 @@ export function CompareView({
           {comparison?.has_changes ? (
             <button
               data-testid="next-change"
-              className="rounded-full border border-border px-3 py-1.5 text-sm hover:bg-accent"
+              className="min-h-11 rounded-full border border-border px-3 py-1.5 text-sm hover:bg-accent"
               onClick={() => {
                 const next = nextChanged(comparison.section_changes, activeSection);
                 if (next) void selectSection(next.stable_key);

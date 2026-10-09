@@ -114,7 +114,7 @@ export function SealsPanel({ versionId, canConfirmPlan, currentUserEmail, onWith
           <div className="mt-2 flex gap-3 text-xs">
             <button
               data-testid={`verify-${seal.public_id}`}
-              className="text-primary underline-offset-2 hover:underline"
+              className="inline-flex min-h-11 items-center text-primary underline-offset-2 hover:underline"
               onClick={() => void verify(seal)}
               type="button"
             >
@@ -123,7 +123,7 @@ export function SealsPanel({ versionId, canConfirmPlan, currentUserEmail, onWith
             {onWithdraw && seal.is_active && seal.reviewer_email === currentUserEmail ? (
               <button
                 data-testid="withdraw-seal"
-                className="text-destructive underline-offset-2 hover:underline"
+                className="inline-flex min-h-11 items-center text-destructive underline-offset-2 hover:underline"
                 onClick={() => onWithdraw(seal)}
                 type="button"
               >
