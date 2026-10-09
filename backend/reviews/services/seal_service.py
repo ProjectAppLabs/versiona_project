@@ -437,8 +437,11 @@ def valid_seals_at_number(queryset, number):
 
     Only actual live intermediate versions need a preserved link: numbers
     remain consumed after trash/purge (I1), so subtracting version numbers
-    would incorrectly invalidate chains with a gap. A missing, pending,
-    invalidated or superseded link fails the same predicate.
+    would incorrectly invalidate chains with a gap. A FAILED version never
+    participates either (F5): D5 compares the next delivery against the last
+    ready one, so it never receives a link. Pending or processing versions
+    still need theirs (F4: an undetermined chain is not valid). A missing,
+    pending, invalidated or superseded link fails the same predicate.
     """
     preserved_link = SealValidityRecord.objects.filter(
         seal_id=OuterRef(OuterRef('pk')),
@@ -449,6 +452,8 @@ def valid_seals_at_number(queryset, number):
         document_id=OuterRef('document_version__document_id'),
         number__gt=OuterRef('document_version__number'),
         number__lte=OuterRef('_validity_target_number'),
+    ).exclude(
+        analysis_status=DocumentVersion.AnalysisStatus.FAILED,
     ).filter(~Exists(preserved_link))
     return queryset.alias(
         _validity_target_number=number,

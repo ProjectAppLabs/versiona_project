@@ -47,14 +47,38 @@ def _add_validity_records(seal, versions, decisions):
             )
 
 
-def _arrange_i11_case(seal, versions, decisions, revoked, trash_intermediate):
+def _arrange_i11_case(seal, versions, decisions, revoked, intermediate):
+    from documents.models import DocumentVersion
+
     _add_validity_records(seal, versions[1:], decisions)
     if revoked:
         Seal.objects.filter(pk=seal.pk).update(revoked_at=timezone.now())
         seal.refresh_from_db()
-    if trash_intermediate:
-        from documents.models import DocumentVersion
-        DocumentVersion.all_objects.filter(pk=versions[1].pk).update(deleted_at=timezone.now())
+    intermediate_state = {
+        'ready': {'analysis_status': DocumentVersion.AnalysisStatus.READY},
+        'trashed': {'deleted_at': timezone.now()},
+        'failed': {'analysis_status': DocumentVersion.AnalysisStatus.FAILED},
+        'pending': {'analysis_status': DocumentVersion.AnalysisStatus.PENDING},
+        'processing': {'analysis_status': DocumentVersion.AnalysisStatus.PROCESSING},
+    }[intermediate]
+    DocumentVersion.all_objects.filter(pk=versions[1].pk).update(**intermediate_state)
+
+
+def _failed_delivery(context, document):
+    """A delivery whose analysis failed for good: never compared nor sealable (F5)."""
+    from documents.models import DocumentVersion
+
+    document.refresh_from_db()
+    number = document.latest_number + 1
+    version = DocumentVersion.objects.create(
+        document=document, number=number, sha256=f'{number:064d}',
+        file_key=f'test/failed/{document.public_id}/v{number}/original.pdf',
+        analysis_status=DocumentVersion.AnalysisStatus.FAILED,
+        config_version=context.config, author=context.users['editor'],
+    )
+    document.latest_number = number
+    document.save(update_fields=['latest_number'])
+    return version
 
 
 def _target_at_number(versions, target_number):
@@ -227,6 +251,35 @@ def test_reinstated_section_does_not_revive_its_invalidated_seal(versiona_contex
 
 
 @pytest.mark.django_db
+@pytest.mark.escenario('D5-F06')
+def test_seal_preserved_across_a_failed_delivery_stays_valid(sealed_v1):
+    """Catches: a FAILED version (never compared, F5) cutting the I11 chain of
+    a seal that D5 preserved against the last ready version."""
+    context, document, _, seal_a, _ = sealed_v1
+    _failed_delivery(context, document)
+
+    v3 = upload(document, 'contrato_v2.pdf', 'v3 tras el fallo', context.users['editor'])
+
+    assert seal_service.seal_is_valid_at(seal_a, v3) is True
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D5-F06')
+def test_delivery_after_a_failed_one_keeps_tracking_the_preserved_seal(sealed_v1):
+    """Catches: D5 dropping, without record or notice, a seal whose chain
+    crossed a FAILED version."""
+    context, document, _, seal_a, _ = sealed_v1
+    _failed_delivery(context, document)
+    upload(document, 'contrato_v2.pdf', 'v3 tras el fallo', context.users['editor'])
+
+    v4 = upload(document, 'contrato_v3.pdf', 'v4', context.users['editor'])
+
+    assert list(
+        seal_a.validity_records.filter(to_document_version=v4).values_list('decision', flat=True)
+    ) == ['preserved']
+
+
+@pytest.mark.django_db
 def test_third_delivery_replay_keeps_one_original_seal_record(sealed_v1):
     """Catches: inherited seals duplicating evidence when D5 is replayed."""
     from comparisons.models import Comparison
@@ -322,30 +375,35 @@ def test_d5_excludes_a_valid_seal_from_another_document(versiona_context, docume
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    ('case', 'records', 'revoked', 'target_number', 'trash_intermediate', 'expected'),
+    ('case', 'records', 'revoked', 'target_number', 'intermediate', 'expected'),
     [
-        ('own_version', (), False, 1, False, True),
-        ('preserved_chain', ('preserved', 'preserved'), False, 3, False, True),
-        ('missing_link', (None, 'preserved'), False, 3, False, False),
-        ('pending_link', ('pending_confirmation', 'preserved'), False, 3, False, False),
-        ('invalidated_link', ('invalidated', 'preserved'), False, 3, False, False),
-        ('superseded_link', ('superseded', 'preserved'), False, 3, False, False),
-        ('revoked_seal', ('preserved', 'preserved'), True, 3, False, False),
-        ('target_before_seal', (), False, 0, False, False),
-        ('trashed_intermediate', (None, 'preserved'), False, 3, True, True),
+        ('own_version', (), False, 1, 'ready', True),
+        ('preserved_chain', ('preserved', 'preserved'), False, 3, 'ready', True),
+        ('missing_link', (None, 'preserved'), False, 3, 'ready', False),
+        ('pending_link', ('pending_confirmation', 'preserved'), False, 3, 'ready', False),
+        ('invalidated_link', ('invalidated', 'preserved'), False, 3, 'ready', False),
+        ('superseded_link', ('superseded', 'preserved'), False, 3, 'ready', False),
+        ('revoked_seal', ('preserved', 'preserved'), True, 3, 'ready', False),
+        ('target_before_seal', (), False, 0, 'ready', False),
+        ('trashed_intermediate', (None, 'preserved'), False, 3, 'trashed', True),
+        ('failed_intermediate', (None, 'preserved'), False, 3, 'failed', True),
+        ('failed_intermediate_unlinked_target', (None, None), False, 3, 'failed', False),
+        ('pending_intermediate', (None, 'preserved'), False, 3, 'pending', False),
+        ('processing_intermediate', (None, 'preserved'), False, 3, 'processing', False),
     ],
 )
 def test_i11_validity_requires_each_live_preserved_link(
     document_with_versions, versiona_context, case, records, revoked, target_number,
-    trash_intermediate, expected,
+    intermediate, expected,
 ):
-    """Catches: I11 accepting a missing or non-preserved live chain link."""
+    """Catches: I11 accepting a missing or non-preserved live chain link, or
+    demanding one from a FAILED version that D5 never compares (F5)."""
     document, versions = document_with_versions(n_versions=3, document_slug=f'i11-{case}')
     seal = Seal.objects.create(
         document_version=versions[0], reviewer=versiona_context.users['reviewer'],
         signed_payload={}, signature=f'signature-{case}', key_id=f'key-{case}',
     )
-    _arrange_i11_case(seal, versions, records, revoked, trash_intermediate)
+    _arrange_i11_case(seal, versions, records, revoked, intermediate)
     target = _target_at_number(versions, target_number)
 
     scalar = seal_service.seal_is_valid_at(seal, target)
