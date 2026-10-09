@@ -68,6 +68,12 @@ class Seal(PublicIdModel, TimestampedModel):
     def covered_keys(self) -> list[str]:
         if self.covers_all:
             return ['*']
+        # values_list() always queries, ignoring a prefetch: list readers that
+        # prefetch `covered_sections__section` get their keys in memory instead.
+        # SealSection rows are append-only, so the prefetched set cannot drift.
+        prefetched = getattr(self, '_prefetched_objects_cache', {}).get('covered_sections')
+        if prefetched is not None:
+            return sorted(cover.section.stable_key for cover in prefetched)
         return sorted(
             self.covered_sections.values_list('section__stable_key', flat=True)
         )

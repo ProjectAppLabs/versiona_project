@@ -47,8 +47,10 @@ def version_reviews(request, ver):
     version = request.resolved_object
 
     if request.method == 'GET':
-        queryset = ReviewRequest.objects.filter(document_version=version).prefetch_related(
-            'assignments__reviewer'
+        queryset = (
+            ReviewRequest.objects.filter(document_version=version)
+            .select_related('requested_by', 'document_version')
+            .prefetch_related('assignments__reviewer')
         )
         return Response({'results': ReviewRequestSerializer(queryset, many=True).data})
 
