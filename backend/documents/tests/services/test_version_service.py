@@ -130,6 +130,27 @@ def test_identical_binary_is_rejected(document, versiona_context):
 
 
 @pytest.mark.django_db
+@pytest.mark.escenario('C2-E01')
+def test_binary_of_the_current_version_is_rejected_after_trashing_a_newer_draft(
+    document, versiona_context,
+):
+    """Catches: F6 comparing against the trashed draft's number instead of the
+    document's current version."""
+    from documents.services import trash_service
+
+    editor = versiona_context.users['editor']
+    upload(document, editor)
+    draft, _ = upload(document, editor, 'contrato_v2.pdf', 'borrador descartado')
+    trash_service.trash_version(draft, editor)
+
+    with pytest.raises(version_service.DomainError) as excinfo:
+        upload(document, editor, 'contrato_v1.pdf', 'reintento de v1')
+
+    assert excinfo.value.status_code == 409
+    assert str(excinfo.value) == 'El archivo es idéntico a la versión v1.'
+
+
+@pytest.mark.django_db
 @pytest.mark.escenario('C1-E01')
 def test_protected_pdf_is_rejected_with_actionable_message(document, versiona_context):
     """Reject password-protected PDFs with a password-specific explanation."""

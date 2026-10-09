@@ -160,14 +160,17 @@ def _create_locked_version(document, data, sha256, size, message, user, request)
     document-row lock, so two concurrent uploads cannot claim the same number."""
     with transaction.atomic():
         locked = Document.objects.select_for_update().get(pk=document.pk)
-        latest = (
-            DocumentVersion.objects.filter(document=locked, number=locked.latest_number)
-            .only('sha256')
+        # F6 compares with the CURRENT version: the alive one no alive version
+        # supersedes (documents.queries), not the allocation counter.
+        current = (
+            DocumentVersion.objects.filter(document=locked)
+            .order_by('-number')
+            .only('number', 'sha256')
             .first()
         )
-        if latest and latest.sha256 == sha256:
+        if current and current.sha256 == sha256:
             raise DomainError(
-                f'El archivo es idéntico a la versión v{locked.latest_number}.', 409
+                f'El archivo es idéntico a la versión v{current.number}.', 409
             )
         number = locked.latest_number + 1
         final_key = storage_service.version_key(locked, number)

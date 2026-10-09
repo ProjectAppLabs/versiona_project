@@ -8,6 +8,24 @@ from documents.models import DocumentVersion
 from reviews.models import ReviewRequest, Seal
 
 
+def newer_alive_versions(document_id, number):
+    """Alive versions of the document that supersede version `number`.
+
+    The one rule for a document's current version (I10, DP-04, B2, F6):
+    trashed or purged numbers stay consumed (I1) yet supersede nothing, so the
+    allocation counter `Document.latest_number` is not the current version.
+    Accepts plain values or OuterRef expressions.
+    """
+    return DocumentVersion.objects.filter(document_id=document_id, number__gt=number)
+
+
+def is_current_version(version: DocumentVersion) -> bool:
+    """Alive and not superseded by another alive version of its document."""
+    return not version.is_trashed and not newer_alive_versions(
+        version.document_id, version.number,
+    ).exists()
+
+
 def with_document_list_data(queryset):
     """Identify each document's latest alive version without loading its history."""
     latest = DocumentVersion.objects.filter(document_id=OuterRef('pk')).order_by('-number')

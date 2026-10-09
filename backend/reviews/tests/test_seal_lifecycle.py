@@ -559,3 +559,91 @@ def test_sealed_version_is_not_trash_eligible(sealed_v1):
 
     with pytest.raises(version_service.DomainError):
         trash_service.trash_version(v1, context.users['editor'])
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D4-E01')
+def test_sealing_a_superseded_version_is_rejected(versiona_context, document_with_versions):
+    """Catches: approving a version a newer delivery already superseded (I10)."""
+    _, versions = document_with_versions(n_versions=2)
+
+    with pytest.raises(version_service.DomainError) as rejection:
+        seal_service.create_seal(versions[0], versiona_context.users['reviewer'], covers_all=True)
+
+    assert rejection.value.status_code == 409
+    assert not Seal.objects.filter(document_version=versions[0]).exists()
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D4-E01')
+@pytest.mark.parametrize('newer_status', ['pending', 'processing', 'failed'])
+def test_newer_version_in_any_analysis_state_blocks_sealing(
+    versiona_context, document_with_versions, newer_status,
+):
+    """I10 is literal: the current version is the newest alive one, analyzed or not."""
+    from documents.models import DocumentVersion
+
+    _, versions = document_with_versions(n_versions=2)
+    DocumentVersion.all_objects.filter(pk=versions[1].pk).update(analysis_status=newer_status)
+
+    with pytest.raises(version_service.DomainError) as rejection:
+        seal_service.create_seal(versions[0], versiona_context.users['reviewer'], covers_all=True)
+
+    assert rejection.value.status_code == 409
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('C4-F01')
+def test_trashing_the_newer_draft_makes_the_previous_version_sealable(
+    versiona_context, document_with_versions,
+):
+    """Catches: I10 reading the allocation counter, which still counts the trashed draft."""
+    from documents.services import trash_service
+
+    _, versions = document_with_versions(n_versions=2)
+    trash_service.trash_version(versions[1], versiona_context.users['editor'])
+
+    seal = seal_service.create_seal(versions[0], versiona_context.users['reviewer'], covers_all=True)
+
+    assert seal.document_version_id == versions[0].pk
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D4-L01')
+def test_sealing_an_unanalyzed_version_is_rejected(versiona_context, document_with_versions):
+    """I10's other half: only an analyzed (ready) version can be sealed."""
+    from documents.models import DocumentVersion
+
+    _, versions = document_with_versions(n_versions=1)
+    DocumentVersion.all_objects.filter(pk=versions[0].pk).update(
+        analysis_status=DocumentVersion.AnalysisStatus.PROCESSING,
+    )
+    version = DocumentVersion.objects.get(pk=versions[0].pk)
+
+    with pytest.raises(version_service.DomainError) as rejection:
+        seal_service.create_seal(version, versiona_context.users['reviewer'], covers_all=True)
+
+    assert rejection.value.status_code == 409
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D5-F02')
+def test_pending_coordinator_plan_rejects_a_new_seal(versiona_context, document_with_versions):
+    """Catches: sealing, and so approving, a version whose D5 plan still waits for the coordinator."""
+    _, versions = document_with_versions(n_versions=2)
+    inherited = Seal.objects.create(
+        document_version=versions[0], reviewer=versiona_context.users['reviewer'],
+        signed_payload={}, signature='pending-plan', key_id='pending-plan',
+    )
+    SealValidityRecord.objects.create(
+        seal=inherited, to_document_version=versions[1],
+        decision=SealValidityRecord.Decision.PENDING,
+        proposed_decision=SealValidityRecord.Decision.INVALIDATED,
+        decided_mode=SealValidityRecord.Mode.COORDINATOR,
+    )
+
+    with pytest.raises(version_service.DomainError) as rejection:
+        seal_service.create_seal(versions[1], versiona_context.users['admin'], covers_all=True)
+
+    assert rejection.value.status_code == 409
+    assert not Seal.objects.filter(document_version=versions[1]).exists()

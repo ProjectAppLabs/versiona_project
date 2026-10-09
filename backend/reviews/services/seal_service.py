@@ -13,7 +13,8 @@ from django.utils import timezone
 
 from audit import services as audit
 from comparisons.models import Comparison
-from documents.models import DocumentVersion, SectionVersion
+from documents.models import Document, DocumentVersion, SectionVersion
+from documents.queries import newer_alive_versions
 from documents.services.version_service import DomainError, ensure_writable
 from notifications.services import notify
 
@@ -35,18 +36,39 @@ def _section_snapshots(version: DocumentVersion) -> dict:
     }
 
 
+def _lock_document(version: DocumentVersion):
+    """Serialize seals, withdrawals and uploads of one document (I10, D4-C01)
+    on the row `_create_locked_version` locks to allocate a version number.
+    The approval state is re-read under the lock: a concurrent seal may have
+    approved the version after this request loaded it."""
+    Document.all_objects.select_for_update().only('pk').get(pk=version.document_id)
+    version.refresh_from_db(fields=['is_approved', 'approved_at'])
+
+
 @transaction.atomic
 def create_seal(
     version: DocumentVersion, reviewer, *, covers_all: bool = False,
     section_keys: list[str] | None = None, request=None,
 ) -> Seal:
     """D4: sign the exact content the reviewer approves (I6)."""
+    _lock_document(version)
     document = version.document
     ensure_writable(document.project)
     if version.analysis_status != DocumentVersion.AnalysisStatus.READY:
         raise DomainError('Solo se puede sellar una versión ya analizada.', 409)
     if version.is_trashed:
         raise DomainError('La versión está en la papelera.', 409)
+    if newer_alive_versions(version.document_id, version.number).exists():
+        raise DomainError('Solo se puede sellar la versión vigente del documento.', 409)
+    if SealValidityRecord.objects.filter(
+        to_document_version=version, decision=SealValidityRecord.Decision.PENDING,
+    ).exists():
+        # D5-F02: a pending coordinator plan blocks approval and new seals.
+        raise DomainError(
+            'La versión tiene un plan de invalidación pendiente: '
+            'el coordinador debe confirmarlo antes de sellar.',
+            409,
+        )
     if Seal.objects.filter(
         document_version=version, reviewer=reviewer, revoked_at__isnull=True
     ).exists():
@@ -130,6 +152,8 @@ def revoke_seal(seal: Seal, actor, request=None) -> Seal:
     if seal.reviewer != actor:
         raise DomainError('Solo el autor del sello puede retirarlo.', 403)
     ensure_writable(version.document.project)
+    _lock_document(version)
+    seal.refresh_from_db(fields=['revoked_at'])
     if seal.revoked_at is not None:
         raise DomainError('Este sello ya fue retirado.', 409)
     if version.is_approved:

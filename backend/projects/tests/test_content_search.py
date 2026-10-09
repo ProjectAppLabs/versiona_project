@@ -35,6 +35,24 @@ def board_with_content(versiona_context):
     return versiona_context
 
 
+@pytest.fixture
+def board_with_trashed_draft(board_with_content):
+    """The indexed v1 stays current once its newer draft v2 goes to the trash."""
+    from documents.models import Document
+    from documents.services import trash_service
+
+    context = board_with_content
+    editor = context.users['editor']
+    document = Document.objects.get(project=context.project, title='Contrato indexado')
+    intent = version_service.create_upload_intent(document, editor)
+    storage_service.put_bytes(
+        intent.key, (TESTDATA / 'contrato_v2.pdf').read_bytes(), 'application/pdf'
+    )
+    draft, _ = version_service.complete_upload(document, intent.upload_id, 'borrador', editor)
+    trash_service.trash_version(draft, editor)
+    return context
+
+
 def board_url(context, **params):
     query = '&'.join(f'{k}={v}' for k, v in params.items())
     return f'/api/orgs/{context.org.public_id}/projects/?{query}'
@@ -72,6 +90,31 @@ def test_search_misses_return_the_guided_empty_list(client_as, board_with_conten
     response = client_as('editor').get(board_url(context, q='blockchain'))
 
     assert response.data['results'] == []
+
+
+@pytest.mark.django_db(transaction=True, reset_sequences=True)
+@pytest.mark.escenario('B2-A03')
+def test_content_search_ignores_the_text_of_a_trashed_draft(client_as, board_with_trashed_draft):
+    """Catches: B2 reading the trashed draft because it holds the highest number.
+    'rectificar' stems to a token only the trashed v2 contains."""
+    context = board_with_trashed_draft
+
+    response = client_as('editor').get(board_url(context, q='rectificar'))
+
+    assert response.data['results'] == []
+
+
+@pytest.mark.django_db(transaction=True, reset_sequences=True)
+@pytest.mark.escenario('B2-A03')
+def test_content_search_finds_the_current_version_after_trashing_a_draft(
+    client_as, board_with_trashed_draft,
+):
+    """Catches: B2 losing the current version's text once a newer draft is trashed."""
+    context = board_with_trashed_draft
+
+    response = client_as('editor').get(board_url(context, q='prorroga'))
+
+    assert [row['name'] for row in response.data['results']] == ['Torre Central']
 
 
 @pytest.mark.django_db
