@@ -34,7 +34,7 @@ export function SectionChangeList({
 
   return (
     <div>
-      <label className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
+      <label className="mb-2 flex min-h-11 cursor-pointer items-center gap-2 text-xs text-muted-foreground">
         <input
           data-testid="hide-unchanged"
           type="checkbox"
@@ -43,14 +43,14 @@ export function SectionChangeList({
         />
         {t.hideUnchanged}
       </label>
-      <ol data-testid="section-change-list" className="flex flex-col gap-1">
+      <ol data-testid="section-change-list" className="flex flex-col gap-2">
         {visible.map((change) => (
           <li key={change.stable_key}>
             <button
               data-testid={`section-${change.stable_key}`}
               data-change={change.change_type}
               aria-current={activeKey === change.stable_key}
-              className={`flex w-full items-center justify-between gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
+              className={`flex min-h-11 w-full items-center justify-between gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
                 activeKey === change.stable_key
                   ? 'border-primary bg-primary/5'
                   : 'border-border bg-card hover:bg-accent'
@@ -58,10 +58,14 @@ export function SectionChangeList({
               onClick={() => onSelect(change.stable_key)}
               type="button"
             >
-              <span className="truncate">{displayHeading(change)}</span>
-              <StatusBadge variant={VARIANT[change.change_type]}>
-                {t.change[change.change_type]}
-              </StatusBadge>
+              {/* The heading wraps: in the 260 px side column a `truncate`
+                  cut every changed section of the reference contract (TIP-2). */}
+              <span className="min-w-0 [overflow-wrap:anywhere]">{displayHeading(change)}</span>
+              <span className="flex shrink-0">
+                <StatusBadge variant={VARIANT[change.change_type]}>
+                  {t.change[change.change_type]}
+                </StatusBadge>
+              </span>
             </button>
           </li>
         ))}

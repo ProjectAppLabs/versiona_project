@@ -2,7 +2,7 @@
 
 export function Tabs({ items, active, onChange }: TabsProps) {
   return (
-    <div role="tablist" className="flex items-center gap-1 border-b border-border">
+    <div role="tablist" className="flex items-center gap-2 border-b border-border">
       {items.map((item) => {
         const isActive = item.id === active;
         return (
@@ -10,7 +10,7 @@ export function Tabs({ items, active, onChange }: TabsProps) {
             key={item.id}
             role="tab"
             aria-selected={isActive}
-            className={`-mb-px border-b-2 px-3 py-2 text-sm transition-colors ${
+            className={`-mb-px min-h-11 border-b-2 px-3 py-2 text-sm transition-colors ${
               isActive
                 ? 'border-primary font-medium text-foreground'
                 : 'border-transparent text-muted-foreground hover:text-foreground'

@@ -99,16 +99,20 @@ export function VersionTimeline({
               v{version.number} — {t.deletedVersion}
             </p>
           ) : (
-            <div className="flex items-start gap-4">
+            <div className="flex flex-wrap items-start gap-4 sm:flex-nowrap">
               {onToggleSelect && version.analysis_status === 'ready' ? (
-                <input
-                  data-testid={`select-version-${version.number}`}
-                  type="checkbox"
-                  aria-label={`Seleccionar v${version.number} para comparar`}
-                  className="mt-8"
-                  checked={selected.includes(version.public_id)}
-                  onChange={() => onToggleSelect(version.public_id)}
-                />
+                // The label is the 44x44 touch target around the native checkbox,
+                // centred on the 80 px thumbnail like the bare checkbox was.
+                <label className="mt-[18px] inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center">
+                  <input
+                    data-testid={`select-version-${version.number}`}
+                    type="checkbox"
+                    aria-label={`Seleccionar v${version.number} para comparar`}
+                    className="h-5 w-5"
+                    checked={selected.includes(version.public_id)}
+                    onChange={() => onToggleSelect(version.public_id)}
+                  />
+                </label>
               ) : null}
               {version.thumb_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -165,22 +169,22 @@ export function VersionTimeline({
                   ) : null}
                 </div>
                 {editing === version.public_id ? (
-                  <div className="mt-2 flex gap-2">
+                  <div className="mt-2 flex flex-wrap gap-2">
                     <input
                       data-testid="edit-message-input"
-                      className="w-full rounded-lg border border-border bg-background px-3 py-1.5 text-sm"
+                      className="min-h-11 w-full min-w-0 rounded-lg border border-border bg-background px-3 py-1.5 text-base sm:w-auto sm:flex-1 sm:text-sm"
                       value={draftMessage}
                       onChange={(event) => setDraftMessage(event.target.value)}
                     />
                     <button
-                      className="rounded-full bg-primary px-3 py-1.5 text-xs text-primary-foreground"
+                      className="min-h-11 rounded-full bg-primary px-3 py-1.5 text-xs text-primary-foreground"
                       onClick={() => void saveMessage(version)}
                       type="button"
                     >
                       {common.save}
                     </button>
                     <button
-                      className="rounded-full border border-border px-3 py-1.5 text-xs"
+                      className="min-h-11 rounded-full border border-border px-3 py-1.5 text-xs"
                       onClick={() => setEditing(null)}
                       type="button"
                     >
@@ -188,12 +192,17 @@ export function VersionTimeline({
                     </button>
                   </div>
                 ) : (
-                  <p className="mt-1 truncate text-sm text-muted-foreground">
-                    {version.message || '—'}
+                  // The message wraps instead of truncating, and the edit control
+                  // sits beside it rather than inside the clipped line: at 412 px a
+                  // `truncate` paragraph used to hide "Editar mensaje" entirely.
+                  <div className="mt-1 flex flex-wrap items-center gap-x-2">
+                    <p className="min-w-0 text-sm text-muted-foreground [overflow-wrap:anywhere]">
+                      {version.message || '—'}
+                    </p>
                     {canEdit && version.is_draft && !version.is_trashed ? (
                       <button
                         data-testid={`edit-message-${version.number}`}
-                        className="ml-2 text-xs text-primary underline-offset-2 hover:underline"
+                        className="inline-flex min-h-11 items-center text-xs text-primary underline-offset-2 hover:underline"
                         onClick={() => {
                           setEditing(version.public_id);
                           setDraftMessage(version.message);
@@ -204,7 +213,7 @@ export function VersionTimeline({
                         {t.editMessage}
                       </button>
                     ) : null}
-                  </p>
+                  </div>
                 )}
                 <p className="mt-1 text-xs text-muted-foreground">
                   {version.author_email ?? '—'} · {formatDate(version.created_at)}
@@ -215,15 +224,18 @@ export function VersionTimeline({
                   </p>
                 ) : null}
               </div>
-              <div className="flex shrink-0 flex-col items-end gap-1">
+              {/* Below sm the actions take their own row under the card text,
+                  so the text column keeps its width; from sm on they stay the
+                  right-hand column. Same items, same order. */}
+              <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto sm:shrink-0 sm:flex-col sm:items-end">
                 <Link
-                  className="text-xs text-primary underline-offset-2 hover:underline"
+                  className="inline-flex min-h-11 items-center px-2 text-xs text-primary underline-offset-2 hover:underline"
                   href={`/projects/${projectId}/documents/${documentId}/versions/${version.public_id}`}
                 >
                   {t.viewer}
                 </Link>
                 <button
-                  className="text-xs text-primary underline-offset-2 hover:underline"
+                  className="inline-flex min-h-11 items-center px-2 text-xs text-primary underline-offset-2 hover:underline"
                   onClick={() => void download(version)}
                   type="button"
                 >
@@ -232,7 +244,7 @@ export function VersionTimeline({
                 {canEdit && version.is_draft && !version.is_trashed ? (
                   <button
                     data-testid={`trash-version-${version.number}`}
-                    className="text-xs text-destructive underline-offset-2 hover:underline"
+                    className="inline-flex min-h-11 items-center px-2 text-xs text-destructive underline-offset-2 hover:underline"
                     onClick={() => setConfirmTrash(version)}
                     type="button"
                   >

@@ -16,7 +16,7 @@ const STATUS_VARIANT: Record<ObservationRow['status'], StatusBadgeVariant> = {
   open: 'in_review', answered: 'draft', resolved: 'approved',
 };
 
-const ACTION_CLASS = 'rounded-full border border-border px-3 py-1.5 text-xs hover:bg-accent disabled:opacity-50';
+const ACTION_CLASS = 'min-h-11 rounded-full border border-border px-3 py-1.5 text-xs hover:bg-accent disabled:opacity-50';
 
 function isQuads(value: unknown): value is NormalizedBBox[] {
   return Array.isArray(value) && value.every((quad) => quad &&
@@ -95,7 +95,7 @@ export function ObservationThread({
       {item.section_heading ? (
         <button
           data-testid={`observation-anchor-${item.public_id}`}
-          className="mt-1 text-left text-xs text-primary underline-offset-2 hover:underline disabled:opacity-50 [overflow-wrap:anywhere]"
+          className="mt-1 inline-flex min-h-11 items-center text-left text-xs text-primary underline-offset-2 hover:underline disabled:opacity-50 [overflow-wrap:anywhere]"
           disabled={!anchor || anchorContent?.isLoading}
           onClick={() => void selectAnchor()}
           type="button"
@@ -105,7 +105,7 @@ export function ObservationThread({
       ) : anchor ? (
         <button
           data-testid={`observation-anchor-${item.public_id}`}
-          className="mt-1 text-xs text-primary disabled:opacity-50"
+          className="mt-1 inline-flex min-h-11 items-center text-xs text-primary disabled:opacity-50"
           disabled={anchorContent?.isLoading}
           onClick={() => void selectAnchor()}
           type="button"
@@ -116,7 +116,7 @@ export function ObservationThread({
       {anchorRequested && anchorContent && !anchorContent.eof ? (
         <button
           data-testid={`observation-anchor-more-${item.public_id}`}
-          className="mt-1 block text-xs text-primary disabled:opacity-50"
+          className="mt-1 flex min-h-11 items-center text-xs text-primary disabled:opacity-50"
           disabled={anchorContent.isLoading}
           onClick={() => void selectAnchor()}
           type="button"
@@ -176,7 +176,7 @@ export function ObservationThread({
           <>
             <input
               data-testid={`reply-input-${item.public_id}`}
-              className="min-w-0 flex-1 rounded-lg border border-border bg-background px-3 py-1.5 text-sm"
+              className="min-h-11 min-w-0 flex-1 rounded-lg border border-border bg-background px-3 py-1.5 text-base sm:text-sm"
               placeholder={t.replyPlaceholder}
               aria-label={t.replyPlaceholder}
               value={replyDraft}
@@ -199,7 +199,7 @@ export function ObservationThread({
         {item.status === 'answered' && (item.author_email === currentUserEmail || canResolveAny) ? (
           <button
             data-testid={`resolve-${item.public_id}`}
-            className="rounded-full bg-primary px-3 py-1.5 text-xs text-primary-foreground disabled:opacity-50"
+            className="min-h-11 rounded-full bg-primary px-3 py-1.5 text-xs text-primary-foreground disabled:opacity-50"
             disabled={busy}
             onClick={() => void act(setStatus(versionId, item.public_id, 'resolved'))}
             type="button"
@@ -223,7 +223,7 @@ export function ObservationThread({
       <div className="mt-2">
         <button
           data-testid={`observation-history-${item.public_id}`}
-          className="text-xs text-muted-foreground underline-offset-2 hover:underline"
+          className="inline-flex min-h-11 items-center text-xs text-muted-foreground underline-offset-2 hover:underline"
           aria-expanded={showHistory}
           onClick={() => {
             setShowHistory((value) => !value);
@@ -246,7 +246,7 @@ export function ObservationThread({
                   {pathname && !historic.version_is_trashed ? (
                     <Link
                       data-testid={`observation-history-version-${item.public_id}-${historic.version_number}`}
-                      className="text-primary underline-offset-2 hover:underline"
+                      className="inline-flex min-h-11 items-center text-primary underline-offset-2 hover:underline"
                       href={`${pathname.replace(/\/versions\/[^/]+\/?$/, `/versions/${historic.version_public_id}`)}?observation=${item.public_id}#observation-${item.public_id}`}
                     >
                       {interpolate(t.viewHistoryVersion, { version: historic.version_number })}

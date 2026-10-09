@@ -1,8 +1,25 @@
+import type { Locator } from '@playwright/test';
+
 import { expect, test } from '../../test-with-coverage';
 import { D3_ANCHORED_OBSERVATIONS } from '../../helpers/flow-tags';
+import { viewportUse } from '../../helpers/viewports';
 import { openSeededProject, uniqueName, uploadPdf } from '../../helpers/versiona';
 
 const BACKEND_API = `http://127.0.0.1:${process.env.E2E_BACKEND_PORT ?? 8000}`;
+
+/** Expected geometry of every touch control (RESPONSIVE_STANDARDS FORM-2). */
+const TOUCH_TARGET_OK = { tallEnough: true, wideEnough: true, insideViewport: true };
+
+async function touchTarget(control: Locator) {
+  return control.evaluate((element) => {
+    const box = element.getBoundingClientRect();
+    return {
+      tallEnough: box.height >= 44,
+      wideEnough: box.width >= 44,
+      insideViewport: box.left >= 0 && box.right <= window.innerWidth,
+    };
+  });
+}
 
 async function openDocumentVersionFromBoard(
   page: import('@playwright/test').Page,
@@ -414,4 +431,56 @@ test.describe('D3 — Observaciones ancladas', () => {
       await reviewerContext.close();
     }
   );
+
+  test.describe('hilo @ 412 (celular)', () => {
+    test.use(viewportUse('compact'));
+
+    test(
+      'D3-R01 — a 412 px una observación nueva recibe respuesta desde el hilo',
+      { tag: [...D3_ANCHORED_OBSERVATIONS, '@scenario:d3-r01', '@outcome:success', '@viewport:compact'] },
+      async ({ browser }) => {
+        // quality: allow-duplicate (per-viewport contract: d3-anchored-observations @ 412)
+        // Bug que atrapa (R-review-02): campos de 14 px (zoom de iOS) y acciones de
+        // 28–34 px en el formulario de la observación y en el hilo a 412 px.
+        const editorContext = await browser.newContext({ storageState: 'e2e/.auth/editor.json' });
+        const reviewerContext = await browser.newContext({ storageState: 'e2e/.auth/reviewer.json' });
+        try {
+          const editorPage = await editorContext.newPage();
+          await openSeededProject(editorPage);
+          const title = uniqueName('Contrato D3 celular');
+          await uploadPdf(editorPage, 'contrato_v1.pdf', { title, message: 'v1' });
+          await expect(
+            editorPage.getByTestId('documents-list').getByRole('link', { name: title })
+          ).toBeVisible({ timeout: 90_000 });
+
+          const reviewerPage = await reviewerContext.newPage();
+          await openDocumentVersionFromBoard(reviewerPage, title);
+          const addObservation = reviewerPage.getByTestId('add-observation');
+          expect(await touchTarget(addObservation)).toEqual(TOUCH_TARGET_OK);
+          await addObservation.tap();
+          const sectionSelect = reviewerPage.getByTestId('observation-section');
+          const bodyInput = reviewerPage.getByTestId('observation-body');
+          await expect(sectionSelect).toHaveCSS('font-size', '16px');
+          await expect(bodyInput).toHaveCSS('font-size', '16px');
+          await sectionSelect.selectOption({ label: '3. OBLIGACIONES DEL CONTRATISTA' });
+          await bodyInput.fill('La multa del contratista necesita un tope explícito.');
+          await reviewerPage.getByTestId('observation-submit').tap();
+          await expect(reviewerPage.getByText('Abierta')).toBeVisible({ timeout: 20_000 });
+
+          await openDocumentVersionFromBoard(editorPage, title);
+          const replyInput = editorPage.locator('[data-testid^="reply-input-"]');
+          await expect(replyInput).toHaveCSS('font-size', '16px');
+          expect(await touchTarget(replyInput)).toEqual(TOUCH_TARGET_OK);
+          await replyInput.fill('Agregamos un tope del 20 % en la siguiente entrega.');
+          const replySend = editorPage.locator('[data-testid^="reply-send-"]');
+          expect(await touchTarget(replySend)).toEqual(TOUCH_TARGET_OK);
+          await replySend.tap();
+
+          await expect(editorPage.getByText('Respondida')).toBeVisible({ timeout: 20_000 });
+        } finally {
+          await Promise.all([editorContext.close(), reviewerContext.close()]);
+        }
+      }
+    );
+  });
 });

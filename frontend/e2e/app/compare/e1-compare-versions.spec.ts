@@ -111,6 +111,34 @@ async function assertSelectedPdfFits(viewer: Locator, bbox: NormalizedBBox) {
   }, bbox)).toBe(true);
 }
 
+/** Expected geometry of every touch control (RESPONSIVE_STANDARDS FORM-2). */
+const TOUCH_TARGET_OK = { tallEnough: true, wideEnough: true, insideViewport: true };
+
+async function touchTarget(control: Locator) {
+  return control.evaluate((element) => {
+    const box = element.getBoundingClientRect();
+    return {
+      tallEnough: box.height >= 44,
+      wideEnough: box.width >= 44,
+      insideViewport: box.left >= 0 && box.right <= window.innerWidth,
+    };
+  });
+}
+
+/** A section name shown whole, never cut by truncate/ellipsis (TIP-2). */
+const TEXT_UNCLIPPED = { horizontallyClipped: false, hasEllipsis: false, hasNoWrap: false };
+
+async function textClipping(text: Locator) {
+  return text.evaluate((element) => {
+    const style = window.getComputedStyle(element);
+    return {
+      horizontallyClipped: element.scrollWidth > element.clientWidth,
+      hasEllipsis: style.textOverflow === 'ellipsis',
+      hasNoWrap: style.whiteSpace === 'nowrap',
+    };
+  });
+}
+
 const PDF_VIEWPORTS: Array<{ alias: ViewportAlias; resized: ViewportAlias }> = [
   { alias: 'compact', resized: 'portrait' },
   { alias: 'portrait', resized: 'compact' },
@@ -128,6 +156,7 @@ for (const { alias, resized } of PDF_VIEWPORTS) {
       { tag: [...E1_COMPARE, '@outcome:display'] }, async ({ page }) => {
         // quality: allow-duplicate (per-viewport contract: e1-compare-versions PDF fit at the five standard viewports)
         // Bug: el canvas fijo de 420 px desborda su columna o el resaltado usa la escala anterior tras resize (LAY-1/MED-1).
+        // Bug (R-compare-02): en la columna de 260 px el `truncate` cortaba el nombre de la sección elegida (TIP-2).
         const title = uniqueName(`Contrato responsive ${alias}`);
         await openSeededProject(page);
         await uploadPdf(page, 'contrato_v1.pdf', { title, message: 'v1' });
@@ -146,6 +175,12 @@ for (const { alias, resized } of PDF_VIEWPORTS) {
         expect(diff.bboxes_to.length).toBeGreaterThan(0);
         await assertSelectedPdfFits(page.getByTestId('side-before').getByTestId('pdf-viewer'), diff.bboxes_from[0]);
         await assertSelectedPdfFits(page.getByTestId('side-after').getByTestId('pdf-viewer'), diff.bboxes_to[0]);
+        const selectedSection = page.getByTestId('section-obligaciones-del-contratista');
+        expect(await touchTarget(selectedSection)).toEqual(TOUCH_TARGET_OK);
+        expect(await textClipping(selectedSection.getByText('3. OBLIGACIONES DEL CONTRATISTA'))).toEqual(TEXT_UNCLIPPED);
+        await expect
+          .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth))
+          .toBe(true);
 
         await page.setViewportSize(VIEWPORTS[resized]);
 
@@ -156,3 +191,47 @@ for (const { alias, resized } of PDF_VIEWPORTS) {
       });
   });
 }
+
+test.describe('E1 vistas @ 412 (celular)', () => {
+  test.use(viewportUse('compact'));
+  test.slow(); // two real upload+analysis cycles before the comparison
+
+  test(
+    'E1-R01 — a 412 px la vista Resumen muestra los conteos de la re-entrega',
+    { tag: [...E1_COMPARE, '@scenario:e1-r01', '@outcome:display', '@viewport:compact'] },
+    async ({ page }) => {
+      // quality: allow-duplicate (per-viewport contract: e1-compare @ 412)
+      // Bug que atrapa (R-compare-01/03): sin flex-wrap, «Guardar comparación» + «Siguiente
+      // cambio» + pestañas piden ~442 px en 364 px útiles; la página se desplaza en
+      // horizontal, «Resumen» queda fuera del viewport y los controles miden 34–38 px.
+      const title = uniqueName('Contrato resumen compacto');
+      await openSeededProject(page);
+      await uploadPdf(page, 'contrato_v1.pdf', { title, message: 'v1' });
+      await page.getByTestId('documents-list').getByRole('link', { name: new RegExp(title) }).click();
+      await expect(page.getByTestId('version-item-1')).toBeVisible({ timeout: 20_000 });
+      await uploadPdf(page, 'contrato_v2.pdf', { message: 'v2' });
+      await expect(page.getByTestId('version-item-2')).toBeVisible({ timeout: 90_000 });
+      await page.getByTestId('select-version-1').check();
+      await page.getByTestId('select-version-2').check();
+      await page.getByTestId('compare-selected').click();
+      await expect(page.getByText('2 modificadas, 1 eliminada, 1 agregada')).toBeVisible({ timeout: 30_000 });
+
+      const summaryTab = page.getByRole('tab', { name: 'Resumen' });
+      const compareControls = await Promise.all([
+        page.getByTestId('save-comparison'),
+        page.getByTestId('next-change'),
+        summaryTab,
+        page.getByTestId('hide-unchanged').locator('..'),
+      ].map((control) => touchTarget(control)));
+      expect(compareControls).toEqual([TOUCH_TARGET_OK, TOUCH_TARGET_OK, TOUCH_TARGET_OK, TOUCH_TARGET_OK]);
+      await summaryTab.tap();
+
+      await expect(page.getByTestId('count-modified')).toHaveText('2');
+      await expect(page.getByTestId('count-removed')).toHaveText('1');
+      await expect(page.getByTestId('count-added')).toHaveText('1');
+      await expect
+        .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth))
+        .toBe(true);
+    }
+  );
+});
