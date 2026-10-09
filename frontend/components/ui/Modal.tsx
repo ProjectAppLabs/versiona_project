@@ -33,7 +33,7 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
           <h2 className="text-lg font-semibold text-foreground">{title}</h2>
           <button
             aria-label="Cerrar diálogo"
-            className="rounded p-1 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+            className="-m-2 inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             onClick={onClose}
             type="button"
           >

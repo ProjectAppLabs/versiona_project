@@ -144,6 +144,42 @@ migraciones ni dependencias. La preparación de metadatos documentales y
 secciones conserva los helpers de autorización y los payloads; la página PDF
 y sus resaltados comparten ancho efectivo de contenedor.
 
+**R3 — 2026-10-09:**
+- `documents/queries.py` define la versión vigente como viva y sin otra versión
+  viva posterior (`newer_alive_versions`, `is_current_version`). La usan
+  `check_history_access` (DP-04, misma firma y mismo 402), la búsqueda B2 y el
+  rechazo de duplicados F6. `latest_number` sigue siendo sólo el contador de
+  asignación (I1).
+- `create_seal` y `revoke_seal` toman el lock del Document, el mismo que usa
+  `_create_locked_version`, y vuelven a leer bajo él el análisis, la papelera,
+  la aprobación y el proyecto.
+- `_version_gate_error` agrupa las compuertas compartidas por sellar y por los
+  recálculos de aprobación al final de `apply_invalidation` y
+  `confirm_seal_plan`: proyecto escribible, versión READY y viva, vigente (I10)
+  y sin plan pendiente (D5-F02).
+- La aprobación cuenta revisores distintos con rol vigente
+  (`resolve_effective_role`) entre los sellos válidos por I11.
+  `valid_seals_at_number` ignora las versiones FAILED intermedias (F5) y exige
+  un destino READY y vivo con su propio eslabón `preserved`.
+- `persist_analysis` reactiva la fila retirada de una sección que vuelve, en vez
+  de chocar con `uniq_section_key`.
+- `issue_certificate` bloquea la organización antes de calcular el serial y
+  guarda cada PDF en `certificates/{serial}-{public_id}.pdf`. Las rutas previas
+  no cambian.
+- `recover_pending_analysis` también republica los trabajos de análisis
+  RUNNING o publicados sin progreso por `STALLED_AFTER_SECONDS` (20 min), con
+  el mismo UUID. Al llegar a `MAX_ANALYSIS_DELIVERIES` (5) el trabajo falla con
+  un mensaje legible.
+- Los fallos de correo registran `phase=*_email error_class=<Clase>` sin datos
+  personales.
+- El código de reset vive en `PasswordCode`: uno por cuenta, con `secrets`, y
+  se quema al primer intento fallido bajo el lock del usuario.
+- `version_file` y las vistas de comparación aplican `check_history_access`.
+- El visor usa un único destino de scroll compartido por «Lo que cambió» y las
+  observaciones ancladas.
+- Next.js sigue en 16.2.6: la subida a 16.3.8 o 16.4.0 se difirió porque rompe
+  el cierre de sesión desde el menú compacto. No hay migraciones nuevas.
+
 **Next**: operator-gated go-public items — deployment (DP-21), domain+SMTP (DP-22),
 Ed25519 key rotation/custody (DP-24), Wompi checkout keys (F1 payment leg), optional
 It10: public certificate verification (/verificar + QR).

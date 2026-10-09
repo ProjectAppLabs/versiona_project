@@ -50,7 +50,7 @@ export function Toaster() {
           <span>{toast.message}</span>
           <button
             aria-label="Descartar aviso"
-            className="text-xs text-muted-foreground hover:text-foreground"
+            className="-m-3 inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl text-xs text-muted-foreground hover:text-foreground"
             onClick={() => dismiss(toast.id)}
             type="button"
           >

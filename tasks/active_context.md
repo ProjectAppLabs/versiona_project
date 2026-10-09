@@ -3,7 +3,72 @@
 > Memory Bank core file: current focus, recent changes, next steps. Updated every session
 > that changes project state.
 
-**Last updated**: 2026-10-08
+**Last updated**: 2026-10-09
+
+## Tercera ronda coordinada — R3 (2026-10-09)
+
+Base `master@4989feb`. Hubo seis frentes, con una rama y un PR por frente
+(seguridad, mantenibilidad, rendimiento, responsividad y observabilidad), más
+una rama compartida del orquestador. Los hallazgos de QA los implementó
+mantenibilidad, porque era la única dueña de `seal_service.py`. La integración
+se hizo con merge-queue. El reporte de la ronda está en el toolkit, en
+`docs/audits/2026-10-09-versiona_project_staging-improvement-pass-project-r3.md`.
+El ledger de mejora del toolkit no se actualizó: el registro de R2 quedó en el
+commit `07a62349`, fuera de toda rama.
+
+**Seguridad.**
+- Cada cuenta tiene un solo código de recuperación vivo, generado con `secrets`.
+  Un intento fallido lo quema, y emisión y verificación comparten el lock del
+  usuario.
+- Desarchivar o restaurar un proyecto respeta el límite de proyectos activos.
+- El bloqueo de historial (DP-04) también se aplica al visor y a las
+  comparaciones: responden 402 con el diálogo de mejora de plan.
+
+**Sellos y versiones.**
+- Hay una sola definición de «versión vigente» (`documents/queries.py`), que
+  rige DP-04, la búsqueda por contenido y el rechazo de duplicados.
+- `create_seal` exige la versión vigente (I10) y rechaza la versión si tiene un
+  plan D5 pendiente. Sellos, retiros y subidas se serializan con el lock del
+  Document, y las guardas se vuelven a leer bajo ese lock.
+- La validez I11 ignora las versiones FAILED intermedias y nunca vale sobre un
+  destino no analizado.
+- La aprobación cuenta revisores distintos con rol vigente, entre los sellos
+  válidos (incluidos los que D5 conserva), y se recalcula después de D5. Sellar
+  y los recálculos comparten una única función de compuertas.
+- El análisis ya no falla cuando reaparece un encabezado retirado.
+
+**Observabilidad.**
+- La emisión de constancias bloquea la organización y cada PDF tiene un nombre
+  único.
+- La recuperación que corre cada minuto republica los análisis sin progreso por
+  20 minutos, hasta un tope de 5 entregas, y después falla con un mensaje legible.
+- Los fallos de SMTP dejan un warning saneado, y `email_sent_at` sólo se guarda
+  si el correo se entregó.
+
+**Rendimiento, responsividad y frontend.**
+- Los paneles de sellos, plan y solicitudes hacen un número constante de
+  consultas.
+- Documentos, comparación y revisión cumplen 44 px y 16 px en celular y tableta,
+  sin desborde horizontal; lo mismo para los controles de aviso, modal y
+  confirmación.
+- Next.js sigue en 16.2.6. Se probaron 16.4.0 y 16.3.8, y con las dos el E2E
+  de cierre de sesión desde el menú compacto (`authenticated-navigation.spec.ts:182`)
+  falla o queda flaky; con 16.2.6 pasa al primer intento. La subida queda
+  diferida hasta encontrar la causa.
+- Los chips de «Lo que cambió» llevan el visor a la sección.
+
+**Pendientes registrados**
+- Subir Next.js: hay 8 alertas de producción sobre 16.2.6, la mayoría
+  inalcanzables en esta app. Antes hay que encontrar la causa de la regresión
+  del cierre de sesión con E2E sobre una app levantada.
+- Bloqueo malicioso de la recuperación: riesgo aceptado. La mitigación es un
+  token de sesión de reset.
+- Papelera y archivado sin el lock del Document frente a sellos.
+- Lock del recálculo en `apply_invalidation`.
+- Un sello entre READY y la fase D5, porque no hay serialización F4.
+- La purga deja los PDFs en disco; requiere una decisión de producto.
+- Objetivos táctiles en ReviewRequestPanel y CertificatePanel.
+- Botón de sellar visible en versiones superadas: responde 409.
 
 ## Segunda ronda coordinada — R2 (2026-10-08)
 
