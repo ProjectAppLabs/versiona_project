@@ -459,18 +459,26 @@ def confirm_seal_plan(
 def valid_seals_at_number(queryset, number):
     """I11 as a SQL predicate, for a target-number expression on each seal.
 
-    Only actual live intermediate versions need a preserved link: numbers
-    remain consumed after trash/purge (I1), so subtracting version numbers
-    would incorrectly invalidate chains with a gap. A FAILED version never
-    participates either (F5): D5 compares the next delivery against the last
-    ready one, so it never receives a link. Pending or processing versions
-    still need theirs (F4: an undetermined chain is not valid). A missing,
-    pending, invalidated or superseded link fails the same predicate.
+    Validity is only granted ON an analyzed live version: a failed, pending,
+    processing or trashed target is never valid, whatever links it carries,
+    and the target needs its own preserved link. Up to it, only actual live
+    intermediate versions need a preserved link: numbers remain consumed
+    after trash/purge (I1), so subtracting version numbers would incorrectly
+    invalidate chains with a gap. A FAILED intermediate never participates
+    either (F5): D5 compares the next delivery against the last ready one, so
+    it never receives a link. Pending or processing intermediates still need
+    theirs (F4: an undetermined chain is not valid). A missing, pending,
+    invalidated or superseded link fails the same predicate.
     """
     preserved_link = SealValidityRecord.objects.filter(
         seal_id=OuterRef(OuterRef('pk')),
         to_document_version_id=OuterRef('pk'),
         decision=SealValidityRecord.Decision.PRESERVED,
+    )
+    analyzed_target = DocumentVersion.objects.filter(
+        document_id=OuterRef('document_version__document_id'),
+        number=OuterRef('_validity_target_number'),
+        analysis_status=DocumentVersion.AnalysisStatus.READY,
     )
     missing_link = DocumentVersion.objects.filter(
         document_id=OuterRef('document_version__document_id'),
@@ -478,13 +486,16 @@ def valid_seals_at_number(queryset, number):
         number__lte=OuterRef('_validity_target_number'),
     ).exclude(
         analysis_status=DocumentVersion.AnalysisStatus.FAILED,
+        number__lt=OuterRef('_validity_target_number'),
     ).filter(~Exists(preserved_link))
     return queryset.alias(
         _validity_target_number=number,
+        _validity_target_analyzed=Exists(analyzed_target),
         _validity_has_missing_link=Exists(missing_link),
     ).filter(
         revoked_at__isnull=True,
         document_version__number__lte=F('_validity_target_number'),
+        _validity_target_analyzed=True,
         _validity_has_missing_link=False,
     )
 

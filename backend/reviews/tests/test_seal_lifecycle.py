@@ -47,21 +47,27 @@ def _add_validity_records(seal, versions, decisions):
             )
 
 
-def _arrange_i11_case(seal, versions, decisions, revoked, intermediate):
+def _version_state(name):
+    from documents.models import DocumentVersion
+
+    return {
+        'ready': {'analysis_status': DocumentVersion.AnalysisStatus.READY},
+        'trashed': {'deleted_at': timezone.now()},
+        'failed': {'analysis_status': DocumentVersion.AnalysisStatus.FAILED},
+        'pending': {'analysis_status': DocumentVersion.AnalysisStatus.PENDING},
+        'processing': {'analysis_status': DocumentVersion.AnalysisStatus.PROCESSING},
+    }[name]
+
+
+def _arrange_i11_case(seal, versions, decisions, revoked, intermediate, target):
     from documents.models import DocumentVersion
 
     _add_validity_records(seal, versions[1:], decisions)
     if revoked:
         Seal.objects.filter(pk=seal.pk).update(revoked_at=timezone.now())
         seal.refresh_from_db()
-    intermediate_state = {
-        'ready': {'analysis_status': DocumentVersion.AnalysisStatus.READY},
-        'trashed': {'deleted_at': timezone.now()},
-        'failed': {'analysis_status': DocumentVersion.AnalysisStatus.FAILED},
-        'pending': {'analysis_status': DocumentVersion.AnalysisStatus.PENDING},
-        'processing': {'analysis_status': DocumentVersion.AnalysisStatus.PROCESSING},
-    }[intermediate]
-    DocumentVersion.all_objects.filter(pk=versions[1].pk).update(**intermediate_state)
+    DocumentVersion.all_objects.filter(pk=versions[1].pk).update(**_version_state(intermediate))
+    DocumentVersion.all_objects.filter(pk=versions[2].pk).update(**_version_state(target))
 
 
 def _failed_delivery(context, document):
@@ -375,40 +381,46 @@ def test_d5_excludes_a_valid_seal_from_another_document(versiona_context, docume
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    ('case', 'records', 'revoked', 'target_number', 'intermediate', 'expected'),
+    ('case', 'records', 'revoked', 'target_number', 'intermediate', 'target', 'expected'),
     [
-        ('own_version', (), False, 1, 'ready', True),
-        ('preserved_chain', ('preserved', 'preserved'), False, 3, 'ready', True),
-        ('missing_link', (None, 'preserved'), False, 3, 'ready', False),
-        ('pending_link', ('pending_confirmation', 'preserved'), False, 3, 'ready', False),
-        ('invalidated_link', ('invalidated', 'preserved'), False, 3, 'ready', False),
-        ('superseded_link', ('superseded', 'preserved'), False, 3, 'ready', False),
-        ('revoked_seal', ('preserved', 'preserved'), True, 3, 'ready', False),
-        ('target_before_seal', (), False, 0, 'ready', False),
-        ('trashed_intermediate', (None, 'preserved'), False, 3, 'trashed', True),
-        ('failed_intermediate', (None, 'preserved'), False, 3, 'failed', True),
-        ('failed_intermediate_unlinked_target', (None, None), False, 3, 'failed', False),
-        ('pending_intermediate', (None, 'preserved'), False, 3, 'pending', False),
-        ('processing_intermediate', (None, 'preserved'), False, 3, 'processing', False),
+        ('own_version', (), False, 1, 'ready', 'ready', True),
+        ('preserved_chain', ('preserved', 'preserved'), False, 3, 'ready', 'ready', True),
+        ('missing_link', (None, 'preserved'), False, 3, 'ready', 'ready', False),
+        ('pending_link', ('pending_confirmation', 'preserved'), False, 3, 'ready', 'ready', False),
+        ('invalidated_link', ('invalidated', 'preserved'), False, 3, 'ready', 'ready', False),
+        ('superseded_link', ('superseded', 'preserved'), False, 3, 'ready', 'ready', False),
+        ('revoked_seal', ('preserved', 'preserved'), True, 3, 'ready', 'ready', False),
+        ('target_before_seal', (), False, 0, 'ready', 'ready', False),
+        ('trashed_intermediate', (None, 'preserved'), False, 3, 'trashed', 'ready', True),
+        ('failed_intermediate', (None, 'preserved'), False, 3, 'failed', 'ready', True),
+        ('failed_intermediate_unlinked_target', (None, None), False, 3, 'failed', 'ready', False),
+        ('pending_intermediate', (None, 'preserved'), False, 3, 'pending', 'ready', False),
+        ('processing_intermediate', (None, 'preserved'), False, 3, 'processing', 'ready', False),
+        ('target_failed', ('preserved', None), False, 3, 'ready', 'failed', False),
+        ('target_pending', ('preserved', None), False, 3, 'ready', 'pending', False),
+        ('target_failed_with_link', ('preserved', 'preserved'), False, 3, 'ready', 'failed', False),
+        ('target_pending_with_link', ('preserved', 'preserved'), False, 3, 'ready', 'pending', False),
+        ('target_trashed_with_link', ('preserved', 'preserved'), False, 3, 'ready', 'trashed', False),
     ],
 )
 def test_i11_validity_requires_each_live_preserved_link(
     document_with_versions, versiona_context, case, records, revoked, target_number,
-    intermediate, expected,
+    intermediate, target, expected,
 ):
-    """Catches: I11 accepting a missing or non-preserved live chain link, or
-    demanding one from a FAILED version that D5 never compares (F5)."""
+    """Catches: I11 accepting a missing or non-preserved live chain link,
+    demanding one from a FAILED intermediate that D5 never compares (F5), or
+    granting validity ON a version that is not an analyzed live one."""
     document, versions = document_with_versions(n_versions=3, document_slug=f'i11-{case}')
     seal = Seal.objects.create(
         document_version=versions[0], reviewer=versiona_context.users['reviewer'],
         signed_payload={}, signature=f'signature-{case}', key_id=f'key-{case}',
     )
-    _arrange_i11_case(seal, versions, records, revoked, intermediate)
-    target = _target_at_number(versions, target_number)
+    _arrange_i11_case(seal, versions, records, revoked, intermediate, target)
+    target_version = _target_at_number(versions, target_number)
 
-    scalar = seal_service.seal_is_valid_at(seal, target)
+    scalar = seal_service.seal_is_valid_at(seal, target_version)
     bulk = seal_service.valid_seals_at_number(
-        Seal.objects.filter(pk=seal.pk), Value(target.number),
+        Seal.objects.filter(pk=seal.pk), Value(target_version.number),
     ).exists()
 
     assert scalar is expected
