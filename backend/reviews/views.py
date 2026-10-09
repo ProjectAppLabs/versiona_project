@@ -28,12 +28,15 @@ def version_seals(request, ver):
     if request.method == 'GET':
         seals = (
             Seal.objects.filter(document_version=version)
-            .select_related('reviewer')
+            .select_related('reviewer', 'document_version')
             .prefetch_related('covered_sections__section')
         )
         incoming = (
             SealValidityRecord.objects.filter(to_document_version=version)
-            .select_related('seal__reviewer', 'seal__document_version', 'decided_by')
+            .select_related(
+                'seal__reviewer', 'seal__document_version', 'decided_by',
+                'to_document_version',
+            )
             .prefetch_related('seal__covered_sections__section')
         )
         return Response({
@@ -106,7 +109,7 @@ def version_seal_plan(request, ver):
                 to_document_version=version,
                 decision=SealValidityRecord.Decision.PENDING,
             )
-            .select_related('seal__reviewer', 'seal__document_version')
+            .select_related('seal__reviewer', 'seal__document_version', 'to_document_version')
             .prefetch_related('seal__covered_sections__section')
         )
         return Response(
