@@ -152,7 +152,7 @@ export function UploadDropzone({ documentId, projectId, compact = false, onUploa
                 <span className="text-muted-foreground">{t.documentTitle}</span>
                 <input
                   data-testid="upload-title"
-                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                  className="mt-1 min-h-11 w-full rounded-lg border border-border bg-background px-3 py-2 text-base sm:text-sm"
                   value={title}
                   onChange={(event) => setTitle(event.target.value)}
                 />
@@ -162,7 +162,7 @@ export function UploadDropzone({ documentId, projectId, compact = false, onUploa
               <span className="text-muted-foreground">{t.versionMessage}</span>
               <input
                 data-testid="upload-message"
-                className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                className="mt-1 min-h-11 w-full rounded-lg border border-border bg-background px-3 py-2 text-base sm:text-sm"
                 placeholder='p. ej. "corrige observaciones del revisor 2"'
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
@@ -195,7 +195,7 @@ export function UploadDropzone({ documentId, projectId, compact = false, onUploa
 
             <div className="flex justify-end gap-2">
               <button
-                className="rounded-full border border-border px-4 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
+                className="min-h-11 rounded-full border border-border px-4 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
                 onClick={closePreview}
                 type="button"
               >
@@ -203,7 +203,7 @@ export function UploadDropzone({ documentId, projectId, compact = false, onUploa
               </button>
               <button
                 data-testid="upload-confirm"
-                className="rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                className="min-h-11 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
                 disabled={busy || upload.phase === 'analyzing' || (!documentId && !title.trim())}
                 onClick={() => void confirm()}
                 type="button"

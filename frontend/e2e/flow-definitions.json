@@ -1,6 +1,6 @@
 {
-  "version": "2.4.1",
-  "lastUpdated": "2026-10-08",
+  "version": "2.4.2",
+  "lastUpdated": "2026-10-09",
   "flows": {
     "home-loads": {
       "name": "Landing page loads",
@@ -225,7 +225,7 @@
         "editor"
       ],
       "priority": "P1",
-      "description": "Editor uploads a re-delivery with a message; within seconds sees what changed, check deltas and affected seals (docs/plan/01 C2) The per-user upload-intent quota is 20/hour: when it is exhausted, the request shows a retryable 429 without issuing another signed URL; an intent issued before exhaustion can still be completed.",
+      "description": "Editor uploads a re-delivery with a message; within seconds sees what changed, check deltas and affected seals (docs/plan/01 C2) The per-user upload-intent quota is 20/hour: when it is exhausted, the request shows a retryable 429 without issuing another signed URL; an intent issued before exhaustion can still be completed. At 412x915 the editor taps 'Editar mensaje' beside a long draft message (no longer clipped by a truncated line), saves the corrected text and sees it in the timeline; the upload modal fields are 16 px and its buttons, the version checkboxes and 'Comparar seleccionadas' are 44 px touch targets that open the comparison with '2 modificadas, 1 eliminada, 1 agregada', without horizontal page scroll.",
       "expectedSpecs": 1,
       "outcomes": [
         "success",
@@ -240,7 +240,7 @@
         "viewer"
       ],
       "priority": "P2",
-      "description": "Timeline shows author/date/message per version, downloads via signed URL and jumps to comparison (docs/plan/01 C3)",
+      "description": "Timeline shows author/date/message per version, downloads via signed URL and jumps to comparison (docs/plan/01 C3). At 412x915 each version message wraps in full instead of being truncated, and the view/download/delete actions take their own row as 44 px touch targets; the 412 px timeline contract is exercised by the C2 spec (C2-R01, C2-R02).",
       "expectedSpecs": 1,
       "outcomes": [
         "display"
