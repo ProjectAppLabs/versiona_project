@@ -39,10 +39,16 @@ def _section_snapshots(version: DocumentVersion) -> dict:
 def _lock_document(version: DocumentVersion):
     """Serialize seals, withdrawals and uploads of one document (I10, D4-C01)
     on the row `_create_locked_version` locks to allocate a version number.
-    The approval state is re-read under the lock: a concurrent seal may have
-    approved the version after this request loaded it."""
+    Everything the guards read is re-loaded under the lock — analysis and
+    trash state, approval, and the project's read-only state: the caller's
+    copy predates the lock and a concurrent change may have committed since."""
     Document.all_objects.select_for_update().only('pk').get(pk=version.document_id)
-    version.refresh_from_db(fields=['is_approved', 'approved_at'])
+    version.refresh_from_db(
+        fields=['analysis_status', 'deleted_at', 'is_approved', 'approved_at'],
+    )
+    version.document = Document.all_objects.select_related('project__organization').get(
+        pk=version.document_id,
+    )
 
 
 @transaction.atomic
@@ -151,8 +157,8 @@ def revoke_seal(seal: Seal, actor, request=None) -> Seal:
     version = seal.document_version
     if seal.reviewer != actor:
         raise DomainError('Solo el autor del sello puede retirarlo.', 403)
-    ensure_writable(version.document.project)
     _lock_document(version)
+    ensure_writable(version.document.project)
     seal.refresh_from_db(fields=['revoked_at'])
     if seal.revoked_at is not None:
         raise DomainError('Este sello ya fue retirado.', 409)

@@ -245,3 +245,63 @@ def test_withdrawal_after_a_concurrent_approval_is_rejected(versiona_context):
         seal_service.revoke_seal(stale_seal, context.users['reviewer'])
 
     assert rejection.value.status_code == 409
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D4-C01')
+def test_seal_on_a_version_trashed_after_loading_it_is_rejected(
+    versiona_context, document_with_versions,
+):
+    """Catches: create_seal judging trash from the copy the view loaded before
+    the document lock (a concurrent trash commits in between)."""
+    from django.utils import timezone
+
+    _, versions = document_with_versions(n_versions=1)
+    stale = DocumentVersion.objects.get(pk=versions[0].pk)
+    DocumentVersion.all_objects.filter(pk=versions[0].pk).update(deleted_at=timezone.now())
+
+    with pytest.raises(DomainError) as rejection:
+        seal_service.create_seal(stale, versiona_context.users['reviewer'], covers_all=True)
+
+    assert rejection.value.status_code == 409
+    assert not Seal.objects.filter(document_version_id=versions[0].pk).exists()
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D4-C01')
+def test_seal_after_the_project_was_archived_is_rejected(
+    versiona_context, document_with_versions,
+):
+    """Catches: create_seal checking read-only on the project cached with the
+    version before the document lock."""
+    from projects.models import Project
+
+    _, versions = document_with_versions(n_versions=1)
+    stale = DocumentVersion.objects.select_related('document__project').get(pk=versions[0].pk)
+    Project.objects.filter(pk=versiona_context.project.pk).update(status=Project.Status.ARCHIVED)
+
+    with pytest.raises(DomainError) as rejection:
+        seal_service.create_seal(stale, versiona_context.users['reviewer'], covers_all=True)
+
+    assert rejection.value.status_code == 409
+    assert not Seal.objects.filter(document_version_id=versions[0].pk).exists()
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D4-C01')
+def test_withdrawal_after_the_project_was_archived_is_rejected(versiona_context):
+    """Catches: revoke_seal checking read-only on the project cached with the
+    seal before the document lock."""
+    from projects.models import Project
+
+    context = versiona_context
+    version = _sealable_version(context, required=2)
+    sealed = seal_service.create_seal(version, context.users['reviewer'], covers_all=True)
+    stale_seal = Seal.objects.select_related('document_version__document__project').get(pk=sealed.pk)
+    Project.objects.filter(pk=context.project.pk).update(status=Project.Status.ARCHIVED)
+
+    with pytest.raises(DomainError) as rejection:
+        seal_service.revoke_seal(stale_seal, context.users['reviewer'])
+
+    assert rejection.value.status_code == 409
+    assert Seal.objects.get(pk=sealed.pk).revoked_at is None
