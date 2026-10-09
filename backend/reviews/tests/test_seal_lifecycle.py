@@ -659,3 +659,136 @@ def test_pending_coordinator_plan_rejects_a_new_seal(versiona_context, document_
 
     assert rejection.value.status_code == 409
     assert not Seal.objects.filter(document_version=versions[1]).exists()
+
+
+# ── Approval over the seals valid at the version (QA-2) ─────────────────────
+
+
+def _reexported(fixture):
+    """The same PDF saved again with other metadata: new bytes, same text."""
+    import fitz
+
+    pdf = fitz.open(stream=(TESTDATA / fixture).read_bytes(), filetype='pdf')
+    pdf.set_metadata({'title': 'Reexportado'})
+    data = pdf.tobytes(garbage=4, deflate=True)
+    pdf.close()
+    return data
+
+
+def upload_bytes(document, data, message, author):
+    """Upload raw PDF bytes through the complete analyzed-version lifecycle."""
+    intent = version_service.create_upload_intent(document, author)
+    storage_service.put_bytes(intent.key, data, 'application/pdf')
+    version, _ = version_service.complete_upload(document, intent.upload_id, message, author)
+    return version
+
+
+@pytest.fixture
+def reexported_v2(versiona_context):
+    """v1 approved by one covers_all seal; v2 re-exports it with the same text."""
+    context = versiona_context
+    editor = context.users['editor']
+    document = version_service.create_document(context.project, 'Reexportado', editor)
+    v1 = upload(document, 'contrato_v1.pdf', 'v1', editor)
+    seal_service.create_seal(v1, context.users['reviewer'], covers_all=True)
+    v2 = upload_bytes(document, _reexported('contrato_v1.pdf'), 'v2 reexportado', editor)
+    return context, v2
+
+
+@pytest.fixture
+def coordinator_plan(versiona_context):
+    """all_assigned over §1 (owner: reviewer); the admin's §3 seal falls under
+    a coordinator plan when v2 modifies §3."""
+    from projects.services import config_service
+
+    context = versiona_context
+    editor = context.users['editor']
+    config_service.update_config(
+        context.project, context.users['admin'],
+        d5_mode='coordinator',
+        approval_policy={'required': 'all_assigned'},
+        section_owners={'objeto-del-contrato': [context.users['reviewer'].pk]},
+    )
+    document = version_service.create_document(context.project, 'Plan del coordinador', editor)
+    v1 = upload(document, 'contrato_v1.pdf', 'v1', editor)
+    scoped = seal_service.create_seal(
+        v1, context.users['admin'], section_keys=['obligaciones-del-contratista'],
+    )
+    seal_service.create_seal(v1, context.users['reviewer'], section_keys=['objeto-del-contrato'])
+    v2 = upload(document, 'contrato_v2.pdf', 'v2 modifica §3', editor)
+    return context, v2, scoped
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D4-F02')
+def test_preserved_seal_approves_the_reexported_delivery(reexported_v2):
+    """Catches: approval counting only seals placed on the version, so a seal
+    D5 preserved by hash equality never approves the new delivery (05 §6e)."""
+    _, v2 = reexported_v2
+
+    v2.refresh_from_db()
+    assert v2.is_approved is True
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D5-A05')
+def test_d5_replay_announces_the_inherited_approval_once(reexported_v2):
+    """Catches: the post-D5 recompute approving again on an idempotent replay (I15)."""
+    from comparisons.models import Comparison
+
+    _, v2 = reexported_v2
+    comparison = Comparison.objects.get(to_version=v2, trigger=Comparison.Trigger.AUTO)
+
+    seal_service.apply_invalidation(comparison)
+
+    assert AuditEvent.objects.filter(
+        event_type='version.approved', object_id_ref=str(v2.public_id),
+    ).count() == 1
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('state', ['processing', 'trashed'])
+def test_d5_recompute_never_approves_an_unavailable_version(reexported_v2, state):
+    """Guard: the post-D5 recompute never approves a version that is not an
+    analyzed live one, whatever seals stay valid."""
+    from comparisons.models import Comparison
+    from documents.models import DocumentVersion
+
+    _, v2 = reexported_v2
+    unavailable = {
+        'processing': {'analysis_status': DocumentVersion.AnalysisStatus.PROCESSING},
+        'trashed': {'deleted_at': timezone.now()},
+    }[state]
+    DocumentVersion.all_objects.filter(pk=v2.pk).update(
+        is_approved=False, approved_at=None, **unavailable,
+    )
+    comparison = Comparison.objects.get(to_version_id=v2.pk, trigger=Comparison.Trigger.AUTO)
+
+    seal_service.apply_invalidation(comparison)
+
+    assert DocumentVersion.all_objects.get(pk=v2.pk).is_approved is False
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D5-F02')
+def test_pending_plan_keeps_the_new_version_unapproved(coordinator_plan):
+    """Guard: the owner's preserved seal would satisfy the policy, but a
+    pending plan blocks approval until the coordinator decides."""
+    _, v2, _ = coordinator_plan
+
+    v2.refresh_from_db()
+    assert v2.is_approved is False
+
+
+@pytest.mark.django_db
+@pytest.mark.escenario('D5-F02')
+def test_confirming_the_plan_recomputes_the_approval(coordinator_plan):
+    """Catches: approval never recomputed after the coordinator resolves the plan."""
+    context, v2, scoped = coordinator_plan
+
+    seal_service.confirm_seal_plan(
+        v2, context.users['admin'], {str(scoped.public_id): 'invalidated'},
+    )
+
+    v2.refresh_from_db()
+    assert v2.is_approved is True

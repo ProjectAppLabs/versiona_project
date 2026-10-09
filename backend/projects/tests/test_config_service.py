@@ -152,6 +152,35 @@ def test_owner_seal_by_a_non_owner_does_not_approve(versiona_context):
 
 
 @pytest.mark.django_db
+@pytest.mark.escenario('B3-F03')
+def test_preserved_owner_seal_counts_toward_owner_approval(versiona_context):
+    """Catches: all_assigned ignoring an owner's seal that D5 preserved, so the
+    re-seal of the invalidated owner alone cannot approve the new version."""
+    context = versiona_context
+    editor = context.users['editor']
+    reviewer = context.users['reviewer']
+    admin = context.users['admin']
+    config_service.update_config(
+        context.project, admin,
+        approval_policy={'required': 'all_assigned'},
+        section_owners={
+            'objeto-del-contrato': [reviewer.pk],
+            'obligaciones-del-contratista': [admin.pk],
+        },
+    )
+    document = version_service.create_document(context.project, 'Dueños en v2', editor)
+    v1 = upload(document, 'contrato_v1.pdf', 'v1', editor)
+    seal_service.create_seal(v1, reviewer, section_keys=['objeto-del-contrato'])
+    seal_service.create_seal(v1, admin, section_keys=['obligaciones-del-contratista'])
+    v2 = upload(document, 'contrato_v2.pdf', 'v2 modifica §3', editor)
+
+    seal_service.create_seal(v2, admin, section_keys=['obligaciones-del-contratista'])
+
+    v2.refresh_from_db()
+    assert v2.is_approved is True
+
+
+@pytest.mark.django_db
 @pytest.mark.escenario('B3-A01')
 def test_template_copy_on_apply_is_a_snapshot(versiona_context):
     """Kit 2: applying a template copies its items; editing it later never touches the project config.

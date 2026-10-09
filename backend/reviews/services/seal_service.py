@@ -176,9 +176,11 @@ def revoke_seal(seal: Seal, actor, request=None) -> Seal:
     return seal
 
 
-def _owner_based_approved(version: DocumentVersion, owners: dict) -> tuple[bool, int]:
+def _owner_based_approved(
+    version: DocumentVersion, owners: dict, valid_seals,
+) -> tuple[bool, int]:
     """'all_assigned' (B3): every OWNED section present in this version must be
-    covered by an ACTIVE seal from one of its owners."""
+    covered by a seal VALID at it (I11) from one of its owners."""
     present_keys = set(
         SectionVersion.objects.filter(document_version=version)
         .values_list('section__stable_key', flat=True)
@@ -186,10 +188,7 @@ def _owner_based_approved(version: DocumentVersion, owners: dict) -> tuple[bool,
     owned = {key: ids for key, ids in owners.items() if key in present_keys and ids}
     if not owned:
         return False, 0
-    seals = list(
-        Seal.objects.filter(document_version=version, revoked_at__isnull=True)
-        .prefetch_related('covered_sections__section')
-    )
+    seals = list(valid_seals.prefetch_related('covered_sections__section'))
     satisfied = 0
     for key, owner_ids in owned.items():
         for seal in seals:
@@ -204,32 +203,47 @@ def _owner_based_approved(version: DocumentVersion, owners: dict) -> tuple[bool,
 
 
 def _refresh_approval(version: DocumentVersion, request=None):
-    """I10: approval derives from the PINNED config's approval_policy (I8).
-    Integer `required` counts full-coverage seals; 'all_assigned' (B3, It5)
-    demands every owned section sealed by one of its owners."""
+    """I10: approval derives from the PINNED config's approval_policy (I8) and
+    counts the seals VALID at the version per I11 — placed on it or preserved
+    by D5 from an earlier one. Only an analyzed live version is approved, and
+    a pending D5 plan blocks approval (D5-F02). Integer `required` counts
+    full-coverage seals; 'all_assigned' (B3, It5) demands every owned section
+    sealed by one of its owners."""
+    if (
+        version.is_approved
+        or version.is_trashed
+        or version.analysis_status != DocumentVersion.AnalysisStatus.READY
+        or SealValidityRecord.objects.filter(
+            to_document_version=version, decision=SealValidityRecord.Decision.PENDING,
+        ).exists()
+    ):
+        return
     config = version.config_version
     policy = config.approval_policy or {}
     required = policy.get('required', 1)
+    valid = valid_seals_at_number(
+        Seal.objects.filter(document_version__document_id=version.document_id),
+        Value(version.number),
+    )
 
     if required == 'all_assigned' and config.section_owners:
-        approved, qualifying = _owner_based_approved(version, config.section_owners)
+        approved, qualifying = _owner_based_approved(version, config.section_owners, valid)
         required_display = f'all_assigned ({len(config.section_owners)} secciones)'
-        if approved and not version.is_approved:
+        if approved:
             _mark_approved(version, qualifying, required_display, request)
         return
 
     if not isinstance(required, int):
         required = 1  # 'all_assigned' without owners falls back to one full seal
-    active = Seal.objects.filter(document_version=version, revoked_at__isnull=True)
     total_sections = SectionVersion.objects.filter(document_version=version).count()
 
     qualifying = 0
-    for seal in active.prefetch_related('covered_sections'):
+    for seal in valid.prefetch_related('covered_sections'):
         covered = total_sections if seal.covers_all else seal.covered_sections.count()
         if covered >= total_sections and total_sections > 0:
             qualifying += 1
 
-    if qualifying >= required and not version.is_approved:
+    if qualifying >= required:
         _mark_approved(version, qualifying, required, request)
 
 
@@ -380,6 +394,9 @@ def apply_invalidation(
 
     if any(r.decision == SealValidityRecord.Decision.PENDING for r in records):
         _notify_coordinators_plan_pending(project, document, to_version)
+    else:
+        # Auto mode: approval recomputes at once over the seals now valid (05 §6e).
+        _refresh_approval(to_version)
 
     return records
 
@@ -459,6 +476,8 @@ def confirm_seal_plan(
                 link=f'/projects/{project.public_id}/documents/{to_version.document.public_id}',
                 payload={'seal': str(record.seal.public_id)},
             )
+    # The plan no longer blocks: approval recomputes over the decided chain.
+    _refresh_approval(to_version, request=request)
     return resolved
 
 
