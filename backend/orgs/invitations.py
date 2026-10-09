@@ -1,5 +1,6 @@
 """A2 invitation services: create + email, accept with email match, revoke."""
 
+import logging
 import secrets
 from datetime import timedelta
 
@@ -11,6 +12,8 @@ from documents.services.version_service import DomainError
 from notifications.services import notify
 
 from .models import Invitation, OrganizationMembership
+
+logger = logging.getLogger(__name__)
 
 INVITATION_TTL_DAYS = 14
 PROJECT_ROLES = {'admin', 'editor', 'reviewer', 'viewer'}
@@ -65,18 +68,27 @@ def _send_invitation_email(invitation: Invitation):
 
     link = f'{settings.FRONTEND_URL}/invite/{invitation.token}'
     project_name = invitation.project.name if invitation.project else invitation.organization.name
-    send_mail(
-        subject=f'{invitation.invited_by.email} te invitó a "{project_name}" en Versiona',
-        message=(
-            f'Te invitaron como {invitation.role} al proyecto "{project_name}".\n\n'
-            f'Acepta la invitación aquí: {link}\n\n'
-            f'El enlace vence en {INVITATION_TTL_DAYS} días. '
-            'Si no esperabas este correo, ignóralo.'
-        ),
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[invitation.email],
-        fail_silently=True,
-    )
+    try:
+        send_mail(
+            subject=f'{invitation.invited_by.email} te invitó a "{project_name}" en Versiona',
+            message=(
+                f'Te invitaron como {invitation.role} al proyecto "{project_name}".\n\n'
+                f'Acepta la invitación aquí: {link}\n\n'
+                f'El enlace vence en {INVITATION_TTL_DAYS} días. '
+                'Si no esperabas este correo, ignóralo.'
+            ),
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[invitation.email],
+            fail_silently=False,
+        )
+    except Exception as exc:
+        # The invitation stays pending and revocable. The warning carries the
+        # error class only: never the invitee address, the token or the link.
+        logger.warning(
+            'Invitation email not delivered: phase=invitation_email error_class=%s',
+            type(exc).__name__,
+            extra={'phase': 'invitation_email', 'error_class': type(exc).__name__},
+        )
 
 
 def invitation_public_state(token: str) -> dict:

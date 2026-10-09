@@ -85,3 +85,55 @@ def test_smtp_timeout_preserves_the_in_app_notification(versiona_context, settin
 
     assert Notification.objects.filter(pk=notification.pk, event_key='seal.invalidated').exists()
     smtp.assert_called_once()
+
+
+@pytest.fixture
+def stalled_smtp(settings, monkeypatch):
+    """SMTP boundary whose connection times out, like an unreachable relay."""
+    settings.EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    settings.EMAIL_TIMEOUT = 5
+    settings.EMAIL_USE_TLS = False
+    settings.EMAIL_USE_SSL = False
+    monkeypatch.setattr(
+        'django.core.mail.backends.smtp.smtplib.SMTP',
+        MagicMock(side_effect=TimeoutError('smtp stalled')),
+    )
+
+
+def _invalidation_notice(context):
+    return notify(
+        user=context.users['reviewer'], event_key='seal.invalidated', org=context.org,
+        title='Volver a revisar', body='Cambió una sección.', link='/projects/demo',
+    )
+
+
+@pytest.mark.django_db
+def test_undelivered_email_leaves_the_send_time_empty(versiona_context, stalled_smtp):
+    """Catches: recording an email as sent when the SMTP relay never accepted it."""
+    notification = _invalidation_notice(versiona_context)
+
+    notification.refresh_from_db()
+    assert notification.email_sent_at is None
+
+
+@pytest.mark.django_db
+def test_undelivered_email_logs_a_sanitized_warning(versiona_context, stalled_smtp, caplog):
+    """Catches: an SMTP outage that leaves no trace, or a trace with the recipient or link."""
+    _invalidation_notice(versiona_context)
+
+    assert [
+        record.getMessage() for record in caplog.records
+        if record.name == 'notifications.services'
+    ] == [
+        'Notification email not delivered: phase=notification_email '
+        'event=seal.invalidated error_class=TimeoutError'
+    ]
+
+
+@pytest.mark.django_db
+def test_delivered_email_records_its_send_time(versiona_context, mailoutbox):
+    """Catches: never recording the send time once the relay accepted the email."""
+    notification = _invalidation_notice(versiona_context)
+
+    notification.refresh_from_db()
+    assert notification.email_sent_at is not None

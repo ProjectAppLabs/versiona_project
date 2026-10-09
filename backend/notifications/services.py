@@ -1,12 +1,16 @@
 """Notification delivery (kit 5): in-app always + email per preference,
 rendered per-recipient language through the bilingual template registry."""
 
+import logging
+
 from django.conf import settings
 from django.core.mail import send_mail
 from django.utils import timezone
 
 from .models import NOTIFICATION_CATALOG, Notification, NotificationPreference
 from .templates import render
+
+logger = logging.getLogger(__name__)
 
 
 def _wants(user, event_key: str, channel: str) -> bool:
@@ -50,19 +54,34 @@ def notify(*, user, event_key: str, org, project=None, context: dict | None = No
             payload=payload or {},
         )
 
-    if wants_email:
-        try:
-            send_mail(
-                subject=title,
-                message=f'{body}\n\n{settings.FRONTEND_URL}{link}' if link else body,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user.email],
-                fail_silently=True,
-            )
-            if notification:
-                notification.email_sent_at = timezone.now()
-                notification.save(update_fields=['email_sent_at', 'updated_at'])
-        except Exception:  # email must never break the domain transaction
-            pass
+    if wants_email and _send_email(user, event_key, title, body, link) and notification:
+        notification.email_sent_at = timezone.now()
+        notification.save(update_fields=['email_sent_at', 'updated_at'])
 
     return notification
+
+
+def _send_email(user, event_key: str, title: str, body: str, link: str) -> bool:
+    """True only when the backend accepted the message. Email must never break
+    the domain transaction, yet a refused or unreachable relay stays visible."""
+    try:
+        delivered = send_mail(
+            subject=title,
+            message=f'{body}\n\n{settings.FRONTEND_URL}{link}' if link else body,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            fail_silently=False,
+        )
+    except Exception as exc:
+        # Event and error class only: never the recipient, the copy or the link.
+        logger.warning(
+            'Notification email not delivered: phase=notification_email '
+            'event=%s error_class=%s',
+            event_key, type(exc).__name__,
+            extra={
+                'phase': 'notification_email', 'event_key': event_key,
+                'error_class': type(exc).__name__,
+            },
+        )
+        return False
+    return bool(delivered)
