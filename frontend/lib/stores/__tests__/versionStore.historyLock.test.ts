@@ -140,4 +140,52 @@ describe('versionStore viewer URL under the DP-04 history lock', () => {
       detail: { public_id: 'v2' }, fileVersionId: 'v2', fileUrl: 'https://files.test/v2.pdf',
     });
   });
+
+  it('returns a replaced consumer URL without changing the current PDF', async () => {
+    const previousFile = pendingResponse();
+    let current = true;
+    mockGet.mockReturnValueOnce(previousFile.promise)
+      .mockResolvedValueOnce({ data: { url: 'https://files.test/current.pdf' } });
+    const previousRequest = useVersionStore.getState().fetchFileUrl('v1', () => current);
+    await useVersionStore.getState().fetchFileUrl('v2');
+    current = false;
+
+    previousFile.resolve({ data: { url: 'https://files.test/previous.pdf' } });
+    const previousUrl = await previousRequest;
+
+    expect(previousUrl).toBe('https://files.test/previous.pdf');
+    expect(useVersionStore.getState()).toMatchObject({ fileVersionId: 'v2', fileUrl: 'https://files.test/current.pdf' });
+  });
+
+  it('ignores a history lock from a replaced comparison consumer', async () => {
+    const previousFile = pendingResponse();
+    let current = true;
+    mockGet.mockReturnValueOnce(previousFile.promise)
+      .mockResolvedValueOnce({ data: { url: 'https://files.test/current.pdf' } });
+    const previousRequest = useVersionStore.getState().fetchFileUrl('v1', () => current);
+    await useVersionStore.getState().fetchFileUrl('v2');
+    current = false;
+
+    previousFile.reject(historyLockError);
+    const previousUrl = await previousRequest;
+
+    expect(previousUrl).toBeNull();
+    expect(useUpgradeDialogStore.getState().isOpen).toBe(false);
+    expect(useVersionStore.getState().fileUrl).toBe('https://files.test/current.pdf');
+  });
+
+  it('reports a current comparison consumer history lock independently', async () => {
+    const before = pendingResponse();
+    mockGet.mockReturnValueOnce(before.promise)
+      .mockResolvedValueOnce({ data: { url: 'https://files.test/v2.pdf' } });
+    const beforeRequest = useVersionStore.getState().fetchFileUrl('v1', () => true);
+    const afterUrl = await useVersionStore.getState().fetchFileUrl('v2', () => true);
+
+    before.reject(historyLockError);
+    const beforeUrl = await beforeRequest;
+
+    expect(beforeUrl).toBeNull();
+    expect(afterUrl).toBe('https://files.test/v2.pdf');
+    expect(useUpgradeDialogStore.getState()).toMatchObject({ isOpen: true, detail: historyLockError.response.data.error });
+  });
 });

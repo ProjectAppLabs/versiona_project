@@ -6,7 +6,7 @@
  */
 
 import dynamic from 'next/dynamic';
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { SectionChangeList } from '@/components/compare/SectionChangeList';
 import { AsyncBoundary } from '@/components/ui/AsyncBoundary';
@@ -46,28 +46,58 @@ export function CompareView({
   const saved = useDict('savedComparisons');
   const common = useDict('common');
   const { toast } = useToast();
-  const comparison = useCompareStore((s) => s.comparison);
-  const isLoading = useCompareStore((s) => s.isLoading);
-  const error = useCompareStore((s) => s.error);
+  const pairKey = JSON.stringify([documentId, fromVersionId, toVersionId]);
+  const requestKey = useCompareStore((s) => s.requestKey);
+  const storedComparison = useCompareStore((s) => s.comparison);
+  const storedIsLoading = useCompareStore((s) => s.isLoading);
+  const storedError = useCompareStore((s) => s.error);
+  const comparison = requestKey === pairKey ? storedComparison : null;
+  const isLoading = requestKey !== pairKey || storedIsLoading;
+  const error = requestKey === pairKey ? storedError : null;
   const activeSection = useCompareStore((s) => s.activeSection);
   const compare = useCompareStore((s) => s.compare);
+  const reset = useCompareStore((s) => s.reset);
   const fetchSectionDiff = useCompareStore((s) => s.fetchSectionDiff);
   const setActiveSection = useCompareStore((s) => s.setActiveSection);
   const diffs = useCompareStore((s) => s.diffs);
   const fetchFileUrl = useVersionStore((s) => s.fetchFileUrl);
 
-  const [fromUrl, setFromUrl] = useState<string | null>(null);
-  const [toUrl, setToUrl] = useState<string | null>(null);
+  const [files, setFiles] = useState<{
+    pairKey: string; fromUrl: string | null; toUrl: string | null;
+  } | null>(null);
+  const fromUrl = files?.pairKey === pairKey ? files.fromUrl : null;
+  const toUrl = files?.pairKey === pairKey ? files.toUrl : null;
+  const consumerGeneration = useRef(0);
   const [hideUnchanged, setHideUnchanged] = useState(true);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    // Invalidate ownership during commit, before late promises can affect the new pair.
+    consumerGeneration.current += 1;
     void compare(documentId, fromVersionId, toVersionId);
-  }, [compare, documentId, fromVersionId, toVersionId]);
+    return () => {
+      consumerGeneration.current += 1;
+      reset();
+    };
+  }, [compare, reset, documentId, fromVersionId, toVersionId]);
 
   useEffect(() => {
-    void fetchFileUrl(fromVersionId).then(setFromUrl);
-    void fetchFileUrl(toVersionId).then(setToUrl);
-  }, [fetchFileUrl, fromVersionId, toVersionId]);
+    const generation = consumerGeneration.current;
+    let active = true;
+    const isCurrent = () => active && generation === consumerGeneration.current;
+    void fetchFileUrl(fromVersionId, isCurrent).then((url) => {
+      if (!isCurrent()) return;
+      setFiles((previous) => ({
+        pairKey, fromUrl: url, toUrl: previous?.pairKey === pairKey ? previous.toUrl : null,
+      }));
+    });
+    void fetchFileUrl(toVersionId, isCurrent).then((url) => {
+      if (!isCurrent()) return;
+      setFiles((previous) => ({
+        pairKey, toUrl: url, fromUrl: previous?.pairKey === pairKey ? previous.fromUrl : null,
+      }));
+    });
+    return () => { active = false; };
+  }, [fetchFileUrl, fromVersionId, toVersionId, pairKey]);
 
   // Deep link (#sec-<key>) selects the section on arrival.
   useEffect(() => {
@@ -81,8 +111,10 @@ export function CompareView({
   }, [comparison, setActiveSection, fetchSectionDiff]);
 
   const selectSection = async (key: string) => {
+    const generation = consumerGeneration.current;
     setActiveSection(key);
     await fetchSectionDiff(key);
+    if (generation !== consumerGeneration.current) return;
     if (typeof window !== 'undefined') {
       window.history.replaceState(null, '', `#sec-${key}`);
     }
