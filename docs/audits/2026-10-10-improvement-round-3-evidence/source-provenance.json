@@ -1,0 +1,84 @@
+{
+  "base": "2604b8dd44090b26e251ffa78a29b63822ef0c02",
+  "head": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+  "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+  "owners": {
+    "shared": {
+      "head": "1fc16f8b7988761170ead8edffae1924dde55730",
+      "allowed": [
+        "backend/versiona_project/settings_prod.py",
+        "frontend/e2e/flow-definitions.json",
+        "docs/USER_FLOW_MAP.md",
+        "docs/audits/2026-10-10-versiona-improvement-round-3.md"
+      ],
+      "actual": [
+        "backend/versiona_project/settings_prod.py",
+        "docs/USER_FLOW_MAP.md",
+        "docs/audits/2026-10-10-versiona-improvement-round-3.md",
+        "frontend/e2e/flow-definitions.json"
+      ]
+    },
+    "security": {
+      "head": "7160cc631941ca0a3128919e945101eb0bd84f0a",
+      "allowed": [
+        "backend/accounts/tests/views/test_auth_throttles.py",
+        "backend/public_tools/tests/test_public_comparison_endpoints.py"
+      ],
+      "actual": [
+        "backend/accounts/tests/views/test_auth_throttles.py",
+        "backend/public_tools/tests/test_public_comparison_endpoints.py"
+      ]
+    },
+    "maintainability": {
+      "head": "1baa0a549b91f6294d7a16a1774dfe84a9a65d08",
+      "allowed": [
+        "frontend/lib/stores/compareStore.ts",
+        "frontend/components/compare/CompareView.tsx",
+        "frontend/lib/stores/versionStore.ts",
+        "frontend/lib/stores/__tests__/compareStore.test.ts",
+        "frontend/components/compare/__tests__/CompareView.test.tsx",
+        "frontend/lib/stores/__tests__/versionStore.historyLock.test.ts",
+        "frontend/e2e/app/compare/e1-compare-versions.spec.ts"
+      ],
+      "actual": [
+        "frontend/components/compare/CompareView.tsx",
+        "frontend/components/compare/__tests__/CompareView.test.tsx",
+        "frontend/e2e/app/compare/e1-compare-versions.spec.ts",
+        "frontend/lib/stores/__tests__/compareStore.test.ts",
+        "frontend/lib/stores/__tests__/versionStore.historyLock.test.ts",
+        "frontend/lib/stores/compareStore.ts",
+        "frontend/lib/stores/versionStore.ts"
+      ]
+    },
+    "observability": {
+      "head": "f9dd2dd1c64787f575d4dbece44af24213ec9b47",
+      "allowed": [
+        "frontend/lib/stores/jobStore.ts",
+        "frontend/lib/stores/__tests__/jobStore.test.ts"
+      ],
+      "actual": [
+        "frontend/lib/stores/__tests__/jobStore.test.ts",
+        "frontend/lib/stores/jobStore.ts"
+      ]
+    }
+  },
+  "actual": [
+    "backend/accounts/tests/views/test_auth_throttles.py",
+    "backend/public_tools/tests/test_public_comparison_endpoints.py",
+    "backend/versiona_project/settings_prod.py",
+    "docs/USER_FLOW_MAP.md",
+    "docs/audits/2026-10-10-versiona-improvement-round-3.md",
+    "frontend/components/compare/CompareView.tsx",
+    "frontend/components/compare/__tests__/CompareView.test.tsx",
+    "frontend/e2e/app/compare/e1-compare-versions.spec.ts",
+    "frontend/e2e/flow-definitions.json",
+    "frontend/lib/stores/__tests__/compareStore.test.ts",
+    "frontend/lib/stores/__tests__/jobStore.test.ts",
+    "frontend/lib/stores/__tests__/versionStore.historyLock.test.ts",
+    "frontend/lib/stores/compareStore.ts",
+    "frontend/lib/stores/jobStore.ts",
+    "frontend/lib/stores/versionStore.ts"
+  ],
+  "exclusive_ownership": true,
+  "scope_passed": true
+}

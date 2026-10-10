@@ -1,0 +1,48 @@
+{
+  "round_id": "versiona-20261010-ronda3",
+  "current_frozen_commit": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+  "historical_attempts": [
+    {
+      "commit": "c494ba8bc4fff33fdeb9fe0e661ebd7f346ea245",
+      "verdict": "REJECTED",
+      "reason": "New component tests mocked stores; owner replaced them with real stores."
+    },
+    {
+      "commit": "4c82bd2def1fe3d5962f8f923372149d8dddf400",
+      "verdict": "REJECTED",
+      "reason": "TS2783 source duplication; 12 legacy D103 errors; E1 absent from official gate scope; process exit evidence incomplete."
+    },
+    {
+      "commit": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+      "verdict": "REJECTED",
+      "reason": "C2-R02 timeout: no v2 upload request. Generated validator corruption was a separately preserved preparation failure; no causal attribution."
+    }
+  ],
+  "preparation_failures_preserved": [
+    "Runner path exit127",
+    "Warmup selector mismatch and cold compilation",
+    "Unit invocation from root exit254",
+    "Official gate missing Ruff PATH",
+    "Generated validator corruption TS1128",
+    "Partial cache recovery /projects404",
+    "Canonical validate without stdin exit2; corrected invocation with original manifest exit0"
+  ],
+  "retained_advisories": [
+    "Legacy timezone.now quality warning",
+    "Legacy window.prompt test stub: unchanged and no invalidating reproduction, below value threshold"
+  ],
+  "current_runtime_recovery": "Full private Next cache preserved and regenerated; six routes, PDF canvas and TypeScript validated with unchanged tracked source.",
+  "final_validation": {
+    "verdict": "APPROVED",
+    "commit": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+    "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+    "passed_tests": 123,
+    "skips": 0,
+    "flaky": 0,
+    "retries": 0,
+    "canonical_record_exit_code": 0,
+    "canonical_validate_exit_code": 0,
+    "original_rejection_unchanged": true,
+    "c2_historical_cause": "unknown; no product/test/config causal fix"
+  }
+}
