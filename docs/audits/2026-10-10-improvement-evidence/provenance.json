@@ -1,0 +1,147 @@
+{
+  "qa_commit": "bdd1994e938f7f0e3138f21b699bdd8aad4de8d8",
+  "original_manifest_sha256": "2237b6090b1e10ac657ceaa7b2c9e90ed513ece3ccd7289a11bedb2e6d35c5f7",
+  "policy": "JUnit omits properties and system streams; Playwright omits output, attachments and environment-bearing config; gates keep findings and counts. No test outcome is changed.",
+  "artifacts": [
+    {
+      "source": "test-results/improvement/2026-10-10-final/backend-google-link.xml",
+      "source_sha256": "0d292ff7c65a82355397128a32c3575a087ab0ed65a1004d89d7d6420205503a",
+      "export": "docs/audits/2026-10-10-improvement-evidence/backend-google-link.xml",
+      "export_sha256": "c8d0d595404d3ae277f13735491faa55e5cd11bee4663f91531ed587c6c777ed",
+      "format": "junit"
+    },
+    {
+      "source": "test-results/improvement/2026-10-10-final/backend-jwt-onboarding.xml",
+      "source_sha256": "71ab3395acd88846bbc8db356bf7b7dbf02b3bade09d9f86c4e36367376e0265",
+      "export": "docs/audits/2026-10-10-improvement-evidence/backend-jwt-onboarding.xml",
+      "export_sha256": "dd2dcb2ef4f2c8a4dfac6ccd1012605550c63136abcd858a1fb2d6f2537b7873",
+      "format": "junit"
+    },
+    {
+      "source": "test-results/improvement/2026-10-10-final/backend-reanchor.xml",
+      "source_sha256": "a5835c9b50bb7ad5db8eb27a70bb8d026a23e52a0a89443ce0d6e0eb1e529652",
+      "export": "docs/audits/2026-10-10-improvement-evidence/backend-reanchor.xml",
+      "export_sha256": "564e5b5f585467ed44e5859d75a95f64b2ac09416af17b7a780b35841c93c9c5",
+      "format": "junit"
+    },
+    {
+      "source": "test-results/improvement/2026-10-10-final/unit-security-panel-ticket.xml",
+      "source_sha256": "df8e115a985582692952585ca1115087cf5d30239c8f9b22659315898c9ba8ad",
+      "export": "docs/audits/2026-10-10-improvement-evidence/unit-security-panel-ticket.xml",
+      "export_sha256": "838bf2387707a77765b9e1e0e48a470fe29b75e1a4dfc2e7f72fabf8248ce649",
+      "format": "junit"
+    },
+    {
+      "source": "test-results/improvement/2026-10-10-final/unit-forgot-password.xml",
+      "source_sha256": "9b9b6416841f025d44c3b2bbca2de8a0115c9ac5feabeaff2194b07987e22028",
+      "export": "docs/audits/2026-10-10-improvement-evidence/unit-forgot-password.xml",
+      "export_sha256": "78d6c65f8bfdbc2ff843a67a10933cee787f87dc2c336f7b6d3fadb853c18120",
+      "format": "junit"
+    },
+    {
+      "source": "test-results/improvement/2026-10-10-final/unit-sign-in.xml",
+      "source_sha256": "001d5d552107c207423ce9db7d1dff7d46604266b4e47030a1e6a0721d55e3d9",
+      "export": "docs/audits/2026-10-10-improvement-evidence/unit-sign-in.xml",
+      "export_sha256": "e7ab379faea781825b9f0144ae542d52c1a94ea4abd8dc76f86ec37ded35a7f6",
+      "format": "junit"
+    },
+    {
+      "source": "test-results/improvement/2026-10-10-final/unit-sign-up.xml",
+      "source_sha256": "196123333dfa471e6a58fe0eeb2bbdd56d30c9e2ed3cc66cb20f55a1da4bf8f3",
+      "export": "docs/audits/2026-10-10-improvement-evidence/unit-sign-up.xml",
+      "export_sha256": "6077841d8e37bfc56953cdac7544ab001e166cdaf6b832ce741e7bed965723b8",
+      "format": "junit"
+    },
+    {
+      "source": "test-results/improvement/2026-10-10-final/unit-http.xml",
+      "source_sha256": "cf211af6d9953006e9832db91e536615c86e8fdeeef430b83f1391b44150e0a6",
+      "export": "docs/audits/2026-10-10-improvement-evidence/unit-http.xml",
+      "export_sha256": "41d3e835be7b30005d40c69baaba82c32d3b46a1a7b3ecccb4a3128cb4b8d405",
+      "format": "junit"
+    },
+    {
+      "source": "test-results/improvement/2026-10-10-final/unit-mailpit.xml",
+      "source_sha256": "4510c828c9374f6d7255714c8bdd607aa9a9bb464dbc651d5c1e8c9b05d29248",
+      "export": "docs/audits/2026-10-10-improvement-evidence/unit-mailpit.xml",
+      "export_sha256": "1ba4e92170071a22864eb4c6af16cf77964bd7361eba35e808b6557dee071eb1",
+      "format": "junit"
+    },
+    {
+      "source": "test-results/improvement/2026-10-10-final/gate-backend.json",
+      "source_sha256": "13384c34193131ed5d584ddca9600c0dd43f9a148a926494a986639506d45a01",
+      "export": "docs/audits/2026-10-10-improvement-evidence/gate-backend.json",
+      "export_sha256": "13384c34193131ed5d584ddca9600c0dd43f9a148a926494a986639506d45a01",
+      "format": "gate-json"
+    },
+    {
+      "source": "test-results/improvement/2026-10-10-final/gate-frontend-unit.json",
+      "source_sha256": "7e54f3b1543bc640bbb5a07c3ef16c6fc3c41f4d34fd7d48cedae6533ffeafdf",
+      "export": "docs/audits/2026-10-10-improvement-evidence/gate-frontend-unit.json",
+      "export_sha256": "7e54f3b1543bc640bbb5a07c3ef16c6fc3c41f4d34fd7d48cedae6533ffeafdf",
+      "format": "gate-json"
+    },
+    {
+      "source": "test-results/improvement/2026-10-10-final/gate-frontend-e2e.json",
+      "source_sha256": "8f7574b664253625993f3071ee6baa544c87cbe9bb7de452d9075bfd6f3ecd3c",
+      "export": "docs/audits/2026-10-10-improvement-evidence/gate-frontend-e2e.json",
+      "export_sha256": "2afa98167e22b2d426c3460803c80d7db9d28d6c944b7456e03563390c08a112",
+      "format": "gate-json"
+    },
+    {
+      "source": "test-results/improvement/2026-10-10-final/e2e.json",
+      "source_sha256": "49f7c8d9c6df70c73519e077cd47cca0021b3eca954903189c45185ed1cef9fa",
+      "export": "docs/audits/2026-10-10-improvement-evidence/e2e.json",
+      "export_sha256": "237dfb0edf1f1fed5e4a07d32608964e0c6959b0ff793503e3870fcf3172feff",
+      "format": "playwright-json"
+    }
+  ],
+  "additional_evidence": [
+    {
+      "source": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-1423/test-results/improvement/2026-10-10-final/flow-audit.json",
+      "source_sha256": "bc9bdd98911a602f07ed27abb69ce9f10ba68a84a06ef0d43f9cd0f8f1e0f424",
+      "export": "flow-audit.json",
+      "export_sha256": "f5d40fc516f598decbfa8e819bc7d2e69c30d2d4171351d3e622a3e16f58c839",
+      "association": "final QA"
+    },
+    {
+      "source": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-1423/test-results/improvement/2026-10-10-final/e2e-runtime.json",
+      "source_sha256": "8a185f3741f710fff616be28d4ce2956798a18e5a76746740f3a3b27cc496b6f",
+      "export": "e2e-runtime.json",
+      "export_sha256": "8a185f3741f710fff616be28d4ce2956798a18e5a76746740f3a3b27cc496b6f",
+      "association": "final QA"
+    },
+    {
+      "source": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-1423/test-results/improvement/2026-10-10-final/git-final.json",
+      "source_sha256": "7263c201cafa9276ef8a291fbea5e9ef10549751bebc5c1f69f6e7beed48d048",
+      "export": "git-final.json",
+      "export_sha256": "7263c201cafa9276ef8a291fbea5e9ef10549751bebc5c1f69f6e7beed48d048",
+      "association": "final QA"
+    },
+    {
+      "source": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-1423/test-results/improvement/2026-10-10-final/verification.json",
+      "source_sha256": "8c87ce77adf7762410d81e33b8822762565418f82ebd4f6297b561e50771e690",
+      "export": "original-verification.json",
+      "export_sha256": "8c87ce77adf7762410d81e33b8822762565418f82ebd4f6297b561e50771e690",
+      "association": "final QA"
+    },
+    {
+      "source": "/home/dev_env/webapps/.wt/versiona_project/improvement-10102026-rendimiento/test-results/improvement/2026-10-10/reanchor-before.xml",
+      "source_sha256": "130246f4d39b39935ba126899621ffa3005f54b1e9f32de6310ace12a7861106",
+      "export": "measurement-before.xml",
+      "export_sha256": "1ebdc20ad75be3ccede9cdd5febbb109e2497a0d7a683977697eaabd524106f6",
+      "association": "initial measured baseline f0c1119 / implementation f49eeae, separate from final QA"
+    },
+    {
+      "source": "/home/dev_env/webapps/.wt/versiona_project/improvement-10102026-rendimiento/test-results/improvement/2026-10-10/reanchor.xml",
+      "source_sha256": "538df3f62dcdac7bad58532b304b5f016d9cd2f5b3e877f2dc1aed568649e53a",
+      "export": "measurement-after.xml",
+      "export_sha256": "1dab94037f27e03000c6f6a9df6140bc2b02e46f79b2098d2770b4bbac488410",
+      "association": "initial measured baseline f0c1119 / implementation f49eeae, separate from final QA"
+    }
+  ],
+  "report": {
+    "source_sha256": "32943970ec4aa5e2061bb215d08151c1c07b83988879617fc030b5bedebd3936",
+    "export_sha256": "37e9be57a271a392add0ebd4f6dbf14a3d6f3f6ad2202004d6f63ebab3051d8c",
+    "editorial_note": "Export clarifies the one preexisting navigation-only gate exception; runner outcomes unchanged."
+  }
+}

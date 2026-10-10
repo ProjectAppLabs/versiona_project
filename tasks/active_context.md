@@ -5,7 +5,7 @@
 
 **Last updated**: 2026-10-10
 
-## Ronda coordinada (2026-10-10) — en validación
+## Ronda coordinada (2026-10-10) — QA aprobada
 
 Base de diagnóstico y ramas: `origin/master@f0c111980447ab880db4c369eec9f5c29594a94a`.
 Se aprobaron sólo tres causas: vínculo explícito Google con recuperación por
@@ -23,8 +23,12 @@ La recuperación asistida de TOTP instalado por un tercero queda abierta.
 
 El reporte y las decisiones viven en
 `docs/audits/2026-10-10-versiona-improvement-round.md`. El toolkit no se edita ni
-se pushea. La verificación final requiere QA del commit combinado, PRs verdes,
-merge-queue y all-in-base --check-only; hasta entonces la entrega está pendiente.
+se pushea. QA aprobó `bdd1994`: 147 casos candidatos (54 backend, 80 unit,
+13 E2E), sin fallos ni omisiones y tres gates estrictos sin errores. Evidencia
+saneada y manifiesto exacto en `docs/audits/2026-10-10-improvement-evidence/`.
+Los PR son Seguridad #64, Rendimiento #63, QA #61 y Compartido #62. Merge-queue
+valida el tren combinado e integra la entrega; all-in-base --check-only confirma
+el cierre. Los PR conservan el estado efectivo de integración.
 
 ## Tercera ronda coordinada — R3 (2026-10-09)
 

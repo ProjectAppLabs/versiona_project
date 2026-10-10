@@ -1,0 +1,194 @@
+{
+  "summary": {
+    "total_files": 2,
+    "total_tests": 12,
+    "errors": 0,
+    "warnings": 0,
+    "info": 6,
+    "infra_errors": 0,
+    "unmatched_include_files": [],
+    "quality_score": 95,
+    "status": "passed",
+    "issues_by_category": {
+      "too_many_assertions": 1,
+      "data_isolation": 1,
+      "fragile_test_data": 4
+    },
+    "semantic_rules": "strict",
+    "semantic_suppressed_by_mode": {
+      "backend": 0,
+      "frontend_unit": 0,
+      "frontend_e2e": 0
+    },
+    "active_exceptions": {
+      "total": 1,
+      "by_rule": {
+        "no_user_interaction": 1
+      },
+      "by_file": {
+        "frontend/e2e/auth/auth.spec.ts": 1
+      },
+      "details": [
+        {
+          "type": "allow",
+          "file": "frontend/e2e/auth/auth.spec.ts",
+          "line": 78,
+          "rule_id": "no_user_interaction",
+          "reason": "authorization gate fires on navigation itself — redirect guard; no user action exists to drive",
+          "marker": "quality: allow-no-interaction (authorization gate fires on navigation itself — redirect guard; no user action exists to drive)"
+        }
+      ],
+      "invalid": {
+        "total": 0,
+        "details": []
+      }
+    },
+    "external_lint": {
+      "mode": "run",
+      "results": [
+        {
+          "source": "ruff",
+          "status": "ok",
+          "message": null,
+          "findings": 0
+        },
+        {
+          "source": "eslint",
+          "status": "ok",
+          "message": null,
+          "findings": 0
+        }
+      ]
+    },
+    "timings": {
+      "backend": 0.0,
+      "frontend_unit": 0.0,
+      "frontend_e2e": 3.8262,
+      "external_lint": 11.6826,
+      "total": 15.509
+    }
+  },
+  "backend": {
+    "files": 0,
+    "tests": 0,
+    "errors": 0,
+    "warnings": 0,
+    "info": 0,
+    "issues": [],
+    "suite_findings": {
+      "semantic_issues_suppressed_by_mode": 0,
+      "active_exceptions_count": 0,
+      "error_count": 0,
+      "warning_count": 0
+    },
+    "file_details": []
+  },
+  "frontend": {
+    "unit": {
+      "files": 0,
+      "tests": 0,
+      "errors": 0,
+      "warnings": 0,
+      "info": 0,
+      "issues": [],
+      "suite_findings": {
+        "semantic_issues_suppressed_by_mode": 0,
+        "active_exceptions_count": 0,
+        "error_count": 0,
+        "warning_count": 0
+      },
+      "file_details": []
+    },
+    "e2e": {
+      "files": 2,
+      "tests": 12,
+      "errors": 0,
+      "warnings": 0,
+      "info": 6,
+      "issues": [
+        {
+          "file": "frontend/e2e/app/onboarding/a3-account-security.spec.ts",
+          "message": "Too many assertions (22 > 15)",
+          "severity": "info",
+          "category": "too_many_assertions",
+          "line": 82,
+          "identifier": "email recovery then explicit Google linking revokes preregistration sessions",
+          "suggestion": "Split into smaller focused tests, or add quality: allow-too-many-assertions (reason)",
+          "rule_id": "too_many_assertions"
+        },
+        {
+          "file": "frontend/e2e/app/onboarding/a3-account-security.spec.ts",
+          "message": "E2E test appears to create data without explicit cleanup/reset signal",
+          "severity": "info",
+          "category": "data_isolation",
+          "line": 82,
+          "identifier": "email recovery then explicit Google linking revokes preregistration sessions",
+          "suggestion": "Ensure data lifecycle cleanup/reset or isolated fixture strategy",
+          "rule_id": "data_isolation"
+        },
+        {
+          "file": "frontend/e2e/auth/auth.spec.ts",
+          "message": "Potentially fragile hardcoded test data detected (test@example.com)",
+          "severity": "info",
+          "category": "fragile_test_data",
+          "line": 43,
+          "identifier": "Authentication > should accept input in form fields",
+          "suggestion": "Prefer generated fixtures or scenario builders for stable data",
+          "rule_id": "fragile_test_data"
+        },
+        {
+          "file": "frontend/e2e/auth/auth.spec.ts",
+          "message": "Potentially fragile hardcoded test data detected (invalid@example.com)",
+          "severity": "info",
+          "category": "fragile_test_data",
+          "line": 58,
+          "identifier": "Authentication > should handle invalid credentials gracefully",
+          "suggestion": "Prefer generated fixtures or scenario builders for stable data",
+          "rule_id": "fragile_test_data"
+        },
+        {
+          "file": "frontend/e2e/auth/auth.spec.ts",
+          "message": "Potentially fragile hardcoded test data detected (test@example.com)",
+          "severity": "info",
+          "category": "fragile_test_data",
+          "line": 90,
+          "identifier": "Authentication > should validate password mismatch on sign-up",
+          "suggestion": "Prefer generated fixtures or scenario builders for stable data",
+          "rule_id": "fragile_test_data"
+        },
+        {
+          "file": "frontend/e2e/auth/auth.spec.ts",
+          "message": "Potentially fragile hardcoded test data detected (739152864039)",
+          "severity": "info",
+          "category": "fragile_test_data",
+          "line": 124,
+          "identifier": "Authentication > should preserve the recovery code after rejecting a numeric password",
+          "suggestion": "Prefer generated fixtures or scenario builders for stable data",
+          "rule_id": "fragile_test_data"
+        }
+      ],
+      "suite_findings": {
+        "semantic_issues_suppressed_by_mode": 0,
+        "active_exceptions_count": 1,
+        "error_count": 0,
+        "warning_count": 0
+      },
+      "file_details": [
+        {
+          "file": "frontend/e2e/app/onboarding/a3-account-security.spec.ts",
+          "area": "e2e",
+          "location_ok": true,
+          "tests": 2,
+          "issues": 2
+        },
+        {
+          "file": "frontend/e2e/auth/auth.spec.ts",
+          "area": "e2e",
+          "location_ok": true,
+          "tests": 10,
+          "issues": 4
+        }
+      ]
+    }
+  }
+}

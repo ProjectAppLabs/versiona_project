@@ -1,0 +1,434 @@
+{
+  "summary": {
+    "total_files": 10,
+    "total_tests": 139,
+    "errors": 0,
+    "warnings": 18,
+    "info": 6,
+    "infra_errors": 0,
+    "unmatched_include_files": [],
+    "quality_score": 96,
+    "status": "passed",
+    "issues_by_category": {
+      "global_state_leak": 1,
+      "nondeterministic": 9,
+      "inline_payload": 5,
+      "unverified_mock": 5,
+      "too_many_assertions": 4
+    },
+    "semantic_rules": "strict",
+    "semantic_suppressed_by_mode": {
+      "backend": 0,
+      "frontend_unit": 0,
+      "frontend_e2e": 0
+    },
+    "active_exceptions": {
+      "total": 0,
+      "by_rule": {},
+      "by_file": {},
+      "details": [],
+      "invalid": {
+        "total": 0,
+        "details": []
+      }
+    },
+    "external_lint": {
+      "mode": "run",
+      "results": [
+        {
+          "source": "ruff",
+          "status": "ok",
+          "message": null,
+          "findings": 0
+        },
+        {
+          "source": "eslint",
+          "status": "ok",
+          "message": null,
+          "findings": 0
+        }
+      ]
+    },
+    "timings": {
+      "backend": 0.6866,
+      "frontend_unit": 0.0,
+      "frontend_e2e": 0.0,
+      "external_lint": 0.1883,
+      "total": 0.8756
+    }
+  },
+  "backend": {
+    "files": 10,
+    "tests": 139,
+    "errors": 0,
+    "warnings": 18,
+    "info": 6,
+    "issues": [
+      {
+        "file": "backend/accounts/tests/utils/test_admin.py",
+        "message": "Potential global-state mutation in test: settings.FRONTEND_URL mutation",
+        "severity": "info",
+        "category": "global_state_leak",
+        "line": 57,
+        "identifier": "test_user_admin_login_as_redirects_to_frontend",
+        "suggestion": "Use scoped fixtures/monkeypatch and ensure cleanup to avoid leaking state.",
+        "rule_id": "global_state_mutation"
+      },
+      {
+        "file": "backend/accounts/tests/views/test_auth_endpoints.py",
+        "message": "Non-deterministic source(s) without explicit control: time.time",
+        "severity": "warning",
+        "category": "nondeterministic",
+        "line": 273,
+        "identifier": "test_google_login_creates_user_with_payload",
+        "suggestion": "Use freezegun/monkeypatch/random.seed or equivalent deterministic control.",
+        "rule_id": "nondeterministic"
+      },
+      {
+        "file": "backend/accounts/tests/views/test_auth_endpoints.py",
+        "message": "Large inline payload detected in test",
+        "severity": "info",
+        "category": "inline_payload",
+        "line": 275,
+        "identifier": "test_google_login_creates_user_with_payload",
+        "suggestion": "Prefer factory/data-builder fixtures for complex payload setup.",
+        "rule_id": "inline_payload"
+      },
+      {
+        "file": "backend/accounts/tests/views/test_auth_endpoints.py",
+        "message": "Non-deterministic source(s) without explicit control: time.time",
+        "severity": "warning",
+        "category": "nondeterministic",
+        "line": 310,
+        "identifier": "test_google_login_does_not_mutate_an_unlinked_existing_user",
+        "suggestion": "Use freezegun/monkeypatch/random.seed or equivalent deterministic control.",
+        "rule_id": "nondeterministic"
+      },
+      {
+        "file": "backend/accounts/tests/views/test_auth_endpoints.py",
+        "message": "Large inline payload detected in test",
+        "severity": "info",
+        "category": "inline_payload",
+        "line": 318,
+        "identifier": "test_google_login_does_not_mutate_an_unlinked_existing_user",
+        "suggestion": "Prefer factory/data-builder fixtures for complex payload setup.",
+        "rule_id": "inline_payload"
+      },
+      {
+        "file": "backend/accounts/tests/views/test_auth_endpoints.py",
+        "message": "Mock created but never verified",
+        "severity": "warning",
+        "category": "unverified_mock",
+        "line": 400,
+        "identifier": "test_google_login_rejects_invalid_http_200_claims_without_using_hints",
+        "suggestion": "Add mock.assert_called*() verification.",
+        "rule_id": "unverified_mock"
+      },
+      {
+        "file": "backend/accounts/tests/views/test_auth_endpoints.py",
+        "message": "Large inline payload detected in test",
+        "severity": "info",
+        "category": "inline_payload",
+        "line": 372,
+        "identifier": "test_google_login_rejects_invalid_http_200_claims_without_using_hints",
+        "suggestion": "Prefer factory/data-builder fixtures for complex payload setup.",
+        "rule_id": "inline_payload"
+      },
+      {
+        "file": "backend/accounts/tests/views/test_auth_endpoints.py",
+        "message": "Mock created but never verified",
+        "severity": "warning",
+        "category": "unverified_mock",
+        "line": 450,
+        "identifier": "test_google_login_uses_the_verified_string_claim_identity_instead_of_hints",
+        "suggestion": "Add mock.assert_called*() verification.",
+        "rule_id": "unverified_mock"
+      },
+      {
+        "file": "backend/accounts/tests/views/test_auth_endpoints.py",
+        "message": "Non-deterministic source(s) without explicit control: time.time",
+        "severity": "warning",
+        "category": "nondeterministic",
+        "line": 450,
+        "identifier": "test_google_login_uses_the_verified_string_claim_identity_instead_of_hints",
+        "suggestion": "Use freezegun/monkeypatch/random.seed or equivalent deterministic control.",
+        "rule_id": "nondeterministic"
+      },
+      {
+        "file": "backend/accounts/tests/views/test_auth_endpoints.py",
+        "message": "Large inline payload detected in test",
+        "severity": "info",
+        "category": "inline_payload",
+        "line": 458,
+        "identifier": "test_google_login_uses_the_verified_string_claim_identity_instead_of_hints",
+        "suggestion": "Prefer factory/data-builder fixtures for complex payload setup.",
+        "rule_id": "inline_payload"
+      },
+      {
+        "file": "backend/accounts/tests/views/test_auth_endpoints.py",
+        "message": "Mock created but never verified",
+        "severity": "warning",
+        "category": "unverified_mock",
+        "line": 501,
+        "identifier": "test_google_login_rejects_debug_transport_failure_with_an_email",
+        "suggestion": "Add mock.assert_called*() verification.",
+        "rule_id": "unverified_mock"
+      },
+      {
+        "file": "backend/accounts/tests/views/test_auth_endpoints.py",
+        "message": "Too many assertions (12 > 7)",
+        "severity": "warning",
+        "category": "too_many_assertions",
+        "line": 530,
+        "identifier": "test_password_login_returns_a_second_factor_challenge_before_token_issuance",
+        "suggestion": "Split into multiple focused tests.",
+        "rule_id": "too_many_assertions"
+      },
+      {
+        "file": "backend/accounts/tests/views/test_auth_endpoints.py",
+        "message": "Too many assertions (10 > 7)",
+        "severity": "warning",
+        "category": "too_many_assertions",
+        "line": 566,
+        "identifier": "test_google_login_returns_a_second_factor_challenge_before_token_issuance",
+        "suggestion": "Split into multiple focused tests.",
+        "rule_id": "too_many_assertions"
+      },
+      {
+        "file": "backend/accounts/tests/views/test_auth_endpoints.py",
+        "message": "Mock created but never verified",
+        "severity": "warning",
+        "category": "unverified_mock",
+        "line": 566,
+        "identifier": "test_google_login_returns_a_second_factor_challenge_before_token_issuance",
+        "suggestion": "Add mock.assert_called*() verification.",
+        "rule_id": "unverified_mock"
+      },
+      {
+        "file": "backend/accounts/tests/views/test_auth_endpoints.py",
+        "message": "Non-deterministic source(s) without explicit control: time.time",
+        "severity": "warning",
+        "category": "nondeterministic",
+        "line": 566,
+        "identifier": "test_google_login_returns_a_second_factor_challenge_before_token_issuance",
+        "suggestion": "Use freezegun/monkeypatch/random.seed or equivalent deterministic control.",
+        "rule_id": "nondeterministic"
+      },
+      {
+        "file": "backend/accounts/tests/views/test_auth_endpoints.py",
+        "message": "Large inline payload detected in test",
+        "severity": "info",
+        "category": "inline_payload",
+        "line": 579,
+        "identifier": "test_google_login_returns_a_second_factor_challenge_before_token_issuance",
+        "suggestion": "Prefer factory/data-builder fixtures for complex payload setup.",
+        "rule_id": "inline_payload"
+      },
+      {
+        "file": "backend/accounts/tests/views/test_auth_endpoints.py",
+        "message": "Mock created but never verified",
+        "severity": "warning",
+        "category": "unverified_mock",
+        "line": 1022,
+        "identifier": "test_google_login_rejects_a_different_subject_for_a_linked_email",
+        "suggestion": "Add mock.assert_called*() verification.",
+        "rule_id": "unverified_mock"
+      },
+      {
+        "file": "backend/accounts/tests/views/test_google_link.py",
+        "message": "Too many assertions (8 > 7)",
+        "severity": "warning",
+        "category": "too_many_assertions",
+        "line": 93,
+        "identifier": "test_explicit_link_returns_a_pair_for_the_new_epoch",
+        "suggestion": "Split into multiple focused tests.",
+        "rule_id": "too_many_assertions"
+      },
+      {
+        "file": "backend/accounts/tests/views/test_google_link.py",
+        "message": "Non-deterministic source(s) without explicit control: timezone.now",
+        "severity": "warning",
+        "category": "nondeterministic",
+        "line": 168,
+        "identifier": "test_active_totp_is_preserved_by_link",
+        "suggestion": "Use freezegun/monkeypatch/random.seed or equivalent deterministic control.",
+        "rule_id": "nondeterministic"
+      },
+      {
+        "file": "backend/accounts/tests/views/test_google_link.py",
+        "message": "Non-deterministic source(s) without explicit control: timezone.now",
+        "severity": "warning",
+        "category": "nondeterministic",
+        "line": 188,
+        "identifier": "test_missing_active_totp_keeps_identity_unlinked",
+        "suggestion": "Use freezegun/monkeypatch/random.seed or equivalent deterministic control.",
+        "rule_id": "nondeterministic"
+      },
+      {
+        "file": "backend/accounts/tests/views/test_google_link.py",
+        "message": "Non-deterministic source(s) without explicit control: timezone.now",
+        "severity": "warning",
+        "category": "nondeterministic",
+        "line": 218,
+        "identifier": "test_link_consumes_a_backup_factor",
+        "suggestion": "Use freezegun/monkeypatch/random.seed or equivalent deterministic control.",
+        "rule_id": "nondeterministic"
+      },
+      {
+        "file": "backend/accounts/tests/views/test_single_use_codes.py",
+        "message": "Too many assertions (11 > 7)",
+        "severity": "warning",
+        "category": "too_many_assertions",
+        "line": 72,
+        "identifier": "test_failed_reset_write_preserves_reusable_code",
+        "suggestion": "Split into multiple focused tests.",
+        "rule_id": "too_many_assertions"
+      },
+      {
+        "file": "backend/observations/tests/test_reanchor_query_budget.py",
+        "message": "Non-deterministic source(s) without explicit control: timezone.now",
+        "severity": "warning",
+        "category": "nondeterministic",
+        "line": 145,
+        "identifier": "test_reanchor_keeps_trashed_prior_anchor_evidence",
+        "suggestion": "Use freezegun/monkeypatch/random.seed or equivalent deterministic control.",
+        "rule_id": "nondeterministic"
+      },
+      {
+        "file": "backend/observations/tests/test_reanchor_query_budget.py",
+        "message": "Non-deterministic source(s) without explicit control: timezone.now",
+        "severity": "warning",
+        "category": "nondeterministic",
+        "line": 168,
+        "identifier": "test_reanchor_bulk_insert_populates_timestamps",
+        "suggestion": "Use freezegun/monkeypatch/random.seed or equivalent deterministic control.",
+        "rule_id": "nondeterministic"
+      }
+    ],
+    "suite_findings": {
+      "root_discovery": {
+        "backend/accounts/tests": 23,
+        "backend/billing/tests": 4,
+        "backend/checks/tests": 1,
+        "backend/comparisons/tests": 4,
+        "backend/core/tests": 3,
+        "backend/documents/tests": 21,
+        "backend/engine/tests": 4,
+        "backend/notifications/tests": 3,
+        "backend/observations/tests": 5,
+        "backend/orgs/tests": 5,
+        "backend/projects/tests": 9,
+        "backend/public_tools/tests": 5,
+        "backend/reviews/tests": 15
+      },
+      "semantic_issues_suppressed_by_mode": 0,
+      "active_exceptions_count": 0,
+      "error_count": 0,
+      "warning_count": 18
+    },
+    "file_details": [
+      {
+        "file": "backend/accounts/tests/services/test_twofactor.py",
+        "area": "services",
+        "location_ok": true,
+        "tests": 11,
+        "issues": 0
+      },
+      {
+        "file": "backend/accounts/tests/utils/test_admin.py",
+        "area": "utils",
+        "location_ok": true,
+        "tests": 6,
+        "issues": 1
+      },
+      {
+        "file": "backend/accounts/tests/utils/test_auth_utils.py",
+        "area": "utils",
+        "location_ok": true,
+        "tests": 8,
+        "issues": 0
+      },
+      {
+        "file": "backend/accounts/tests/views/test_auth_endpoints.py",
+        "area": "views",
+        "location_ok": true,
+        "tests": 46,
+        "issues": 16
+      },
+      {
+        "file": "backend/accounts/tests/views/test_google_link.py",
+        "area": "views",
+        "location_ok": true,
+        "tests": 17,
+        "issues": 4
+      },
+      {
+        "file": "backend/accounts/tests/views/test_jwt_endpoints.py",
+        "area": "views",
+        "location_ok": true,
+        "tests": 10,
+        "issues": 0
+      },
+      {
+        "file": "backend/accounts/tests/views/test_security_endpoints.py",
+        "area": "views",
+        "location_ok": true,
+        "tests": 18,
+        "issues": 0
+      },
+      {
+        "file": "backend/accounts/tests/views/test_single_use_codes.py",
+        "area": "views",
+        "location_ok": true,
+        "tests": 2,
+        "issues": 1
+      },
+      {
+        "file": "backend/observations/tests/test_reanchor_query_budget.py",
+        "area": "",
+        "location_ok": true,
+        "tests": 12,
+        "issues": 2
+      },
+      {
+        "file": "backend/orgs/tests/test_onboarding.py",
+        "area": "",
+        "location_ok": true,
+        "tests": 9,
+        "issues": 0
+      }
+    ]
+  },
+  "frontend": {
+    "unit": {
+      "files": 0,
+      "tests": 0,
+      "errors": 0,
+      "warnings": 0,
+      "info": 0,
+      "issues": [],
+      "suite_findings": {
+        "semantic_issues_suppressed_by_mode": 0,
+        "active_exceptions_count": 0,
+        "error_count": 0,
+        "warning_count": 0
+      },
+      "file_details": []
+    },
+    "e2e": {
+      "files": 0,
+      "tests": 0,
+      "errors": 0,
+      "warnings": 0,
+      "info": 0,
+      "issues": [],
+      "suite_findings": {
+        "semantic_issues_suppressed_by_mode": 0,
+        "active_exceptions_count": 0,
+        "error_count": 0,
+        "warning_count": 0
+      },
+      "file_details": []
+    }
+  }
+}

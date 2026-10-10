@@ -1,0 +1,210 @@
+{
+  "schema": 1,
+  "kind": "improvement-qa",
+  "round_id": "improvement-10102026",
+  "codebase": "versiona_project",
+  "commit": "bdd1994e938f7f0e3138f21b699bdd8aad4de8d8",
+  "candidate_ids": [
+    "I-S-3b550c956232",
+    "I-P-108f9bbe38dd",
+    "I-O-f5de8573e07a"
+  ],
+  "report": "docs/audits/2026-10-10-improvement-evidence/QA.md",
+  "executions": [
+    {
+      "commit": "bdd1994e938f7f0e3138f21b699bdd8aad4de8d8",
+      "candidate_ids": [
+        "I-S-3b550c956232"
+      ],
+      "layer": "backend",
+      "command": "source /tmp/versiona-improvement-10102026/env.sh; source /tmp/versiona-improvement-10102026/venv/bin/activate; DJANGO_SETTINGS_MODULE=pytest_settings DJANGO_DB_NAME=versiona_improvement_security PYTHONPATH=/tmp/versiona-improvement-10102026:/home/dev_env/webapps/.wt/versiona_project/queue-10102026-1423/backend pytest --ds=pytest_settings --no-cov --reuse-db --junitxml=test-results/improvement/2026-10-10-final/backend-google-link.xml backend/accounts/tests/views/test_google_link.py",
+      "artifact": "docs/audits/2026-10-10-improvement-evidence/backend-google-link.xml",
+      "log": "test-results/improvement/2026-10-10-final/backend-google-link.log",
+      "format": "junit",
+      "exit_code": 0,
+      "executed": true,
+      "report": "docs/audits/2026-10-10-improvement-evidence/QA.md",
+      "passed_cases": 20
+    },
+    {
+      "commit": "bdd1994e938f7f0e3138f21b699bdd8aad4de8d8",
+      "candidate_ids": [
+        "I-S-3b550c956232"
+      ],
+      "layer": "backend",
+      "command": "source /tmp/versiona-improvement-10102026/env.sh; source /tmp/versiona-improvement-10102026/venv/bin/activate; DJANGO_SETTINGS_MODULE=pytest_settings DJANGO_DB_NAME=versiona_improvement_security PYTHONPATH=/tmp/versiona-improvement-10102026:/home/dev_env/webapps/.wt/versiona_project/queue-10102026-1423/backend pytest --ds=pytest_settings --no-cov --reuse-db --junitxml=test-results/improvement/2026-10-10-final/backend-jwt-onboarding.xml backend/accounts/tests/views/test_jwt_endpoints.py backend/orgs/tests/test_onboarding.py::test_google_signup_provisions_the_personal_org backend/orgs/tests/test_onboarding.py::test_google_signup_leaves_the_onboarding_wizard_pending",
+      "artifact": "docs/audits/2026-10-10-improvement-evidence/backend-jwt-onboarding.xml",
+      "log": "test-results/improvement/2026-10-10-final/backend-jwt-onboarding.log",
+      "format": "junit",
+      "exit_code": 0,
+      "executed": true,
+      "report": "docs/audits/2026-10-10-improvement-evidence/QA.md",
+      "passed_cases": 15
+    },
+    {
+      "commit": "bdd1994e938f7f0e3138f21b699bdd8aad4de8d8",
+      "candidate_ids": [
+        "I-P-108f9bbe38dd"
+      ],
+      "layer": "backend",
+      "command": "source /tmp/versiona-improvement-10102026/env.sh; source /tmp/versiona-improvement-10102026/venv/bin/activate; PYTHONDONTWRITEBYTECODE=1 DJANGO_SETTINGS_MODULE=pytest_settings DJANGO_DB_NAME=versiona_improvement_perf PYTHONPATH=/tmp/versiona-improvement-10102026:/home/dev_env/webapps/.wt/versiona_project/queue-10102026-1423/backend pytest --ds=pytest_settings --no-cov --reuse-db --junitxml=test-results/improvement/2026-10-10-final/backend-reanchor.xml backend/observations/tests/test_reanchor_query_budget.py backend/observations/tests/test_observations.py::test_reanchor_truth_table_v1_to_v2 backend/observations/tests/test_observations.py::test_reanchor_is_idempotent backend/engine/tests/test_dispatch_recovery.py::test_recovery_keeps_one_invalidation_notice_after_d5_committed",
+      "artifact": "docs/audits/2026-10-10-improvement-evidence/backend-reanchor.xml",
+      "log": "test-results/improvement/2026-10-10-final/backend-reanchor.log",
+      "format": "junit",
+      "exit_code": 0,
+      "executed": true,
+      "report": "docs/audits/2026-10-10-improvement-evidence/QA.md",
+      "passed_cases": 19
+    },
+    {
+      "commit": "bdd1994e938f7f0e3138f21b699bdd8aad4de8d8",
+      "candidate_ids": [
+        "I-S-3b550c956232"
+      ],
+      "layer": "frontend-unit",
+      "command": "source /tmp/versiona-improvement-10102026/env.sh; source /tmp/versiona-improvement-10102026/venv/bin/activate; PYTHONDONTWRITEBYTECODE=1 VERSIONA_JUNIT_OUTPUT=test-results/improvement/2026-10-10-final/unit-security-panel-ticket.xml npm test -- frontend/components/security/__tests__/GoogleLinkPanel.test.tsx frontend/lib/services/__tests__/google-link-ticket.test.ts frontend/components/security/__tests__/SecuritySection.test.tsx --runInBand --reporters=default --reporters=/tmp/versiona-improvement-10102026/jest-junit-reporter.cjs",
+      "artifact": "docs/audits/2026-10-10-improvement-evidence/unit-security-panel-ticket.xml",
+      "log": "test-results/improvement/2026-10-10-final/unit-security-panel-ticket.log",
+      "format": "junit",
+      "exit_code": 0,
+      "executed": true,
+      "report": "docs/audits/2026-10-10-improvement-evidence/QA.md",
+      "passed_cases": 18
+    },
+    {
+      "commit": "bdd1994e938f7f0e3138f21b699bdd8aad4de8d8",
+      "candidate_ids": [
+        "I-S-3b550c956232"
+      ],
+      "layer": "frontend-unit",
+      "command": "source /tmp/versiona-improvement-10102026/env.sh; source /tmp/versiona-improvement-10102026/venv/bin/activate; PYTHONDONTWRITEBYTECODE=1 VERSIONA_JUNIT_OUTPUT=test-results/improvement/2026-10-10-final/unit-forgot-password.xml npm test -- frontend/app/forgot-password/__tests__/page.test.tsx --runInBand --reporters=default --reporters=/tmp/versiona-improvement-10102026/jest-junit-reporter.cjs",
+      "artifact": "docs/audits/2026-10-10-improvement-evidence/unit-forgot-password.xml",
+      "log": "test-results/improvement/2026-10-10-final/unit-forgot-password.log",
+      "format": "junit",
+      "exit_code": 0,
+      "executed": true,
+      "report": "docs/audits/2026-10-10-improvement-evidence/QA.md",
+      "passed_cases": 10
+    },
+    {
+      "commit": "bdd1994e938f7f0e3138f21b699bdd8aad4de8d8",
+      "candidate_ids": [
+        "I-S-3b550c956232"
+      ],
+      "layer": "frontend-unit",
+      "command": "source /tmp/versiona-improvement-10102026/env.sh; source /tmp/versiona-improvement-10102026/venv/bin/activate; PYTHONDONTWRITEBYTECODE=1 VERSIONA_JUNIT_OUTPUT=test-results/improvement/2026-10-10-final/unit-sign-in.xml npm test -- frontend/app/sign-in/__tests__/page.test.tsx --runInBand --reporters=default --reporters=/tmp/versiona-improvement-10102026/jest-junit-reporter.cjs",
+      "artifact": "docs/audits/2026-10-10-improvement-evidence/unit-sign-in.xml",
+      "log": "test-results/improvement/2026-10-10-final/unit-sign-in.log",
+      "format": "junit",
+      "exit_code": 0,
+      "executed": true,
+      "report": "docs/audits/2026-10-10-improvement-evidence/QA.md",
+      "passed_cases": 17
+    },
+    {
+      "commit": "bdd1994e938f7f0e3138f21b699bdd8aad4de8d8",
+      "candidate_ids": [
+        "I-S-3b550c956232"
+      ],
+      "layer": "frontend-unit",
+      "command": "source /tmp/versiona-improvement-10102026/env.sh; source /tmp/versiona-improvement-10102026/venv/bin/activate; PYTHONDONTWRITEBYTECODE=1 VERSIONA_JUNIT_OUTPUT=test-results/improvement/2026-10-10-final/unit-sign-up.xml npm test -- frontend/app/sign-up/__tests__/page.test.tsx --runInBand --reporters=default --reporters=/tmp/versiona-improvement-10102026/jest-junit-reporter.cjs",
+      "artifact": "docs/audits/2026-10-10-improvement-evidence/unit-sign-up.xml",
+      "log": "test-results/improvement/2026-10-10-final/unit-sign-up.log",
+      "format": "junit",
+      "exit_code": 0,
+      "executed": true,
+      "report": "docs/audits/2026-10-10-improvement-evidence/QA.md",
+      "passed_cases": 16
+    },
+    {
+      "commit": "bdd1994e938f7f0e3138f21b699bdd8aad4de8d8",
+      "candidate_ids": [
+        "I-S-3b550c956232"
+      ],
+      "layer": "frontend-unit",
+      "command": "source /tmp/versiona-improvement-10102026/env.sh; source /tmp/versiona-improvement-10102026/venv/bin/activate; PYTHONDONTWRITEBYTECODE=1 VERSIONA_JUNIT_OUTPUT=test-results/improvement/2026-10-10-final/unit-http.xml npm test -- frontend/lib/services/__tests__/http.test.ts --runInBand --reporters=default --reporters=/tmp/versiona-improvement-10102026/jest-junit-reporter.cjs",
+      "artifact": "docs/audits/2026-10-10-improvement-evidence/unit-http.xml",
+      "log": "test-results/improvement/2026-10-10-final/unit-http.log",
+      "format": "junit",
+      "exit_code": 0,
+      "executed": true,
+      "report": "docs/audits/2026-10-10-improvement-evidence/QA.md",
+      "passed_cases": 13
+    },
+    {
+      "commit": "bdd1994e938f7f0e3138f21b699bdd8aad4de8d8",
+      "candidate_ids": [
+        "I-O-f5de8573e07a"
+      ],
+      "layer": "frontend-unit",
+      "command": "source /tmp/versiona-improvement-10102026/env.sh; source /tmp/versiona-improvement-10102026/venv/bin/activate; PYTHONDONTWRITEBYTECODE=1 VERSIONA_JUNIT_OUTPUT=test-results/improvement/2026-10-10-final/unit-mailpit.xml npm test -- frontend/__tests__/helpers/mailpit.test.ts --runInBand --reporters=default --reporters=/tmp/versiona-improvement-10102026/jest-junit-reporter.cjs",
+      "artifact": "docs/audits/2026-10-10-improvement-evidence/unit-mailpit.xml",
+      "log": "test-results/improvement/2026-10-10-final/unit-mailpit.log",
+      "format": "junit",
+      "exit_code": 0,
+      "executed": true,
+      "report": "docs/audits/2026-10-10-improvement-evidence/QA.md",
+      "passed_cases": 6
+    },
+    {
+      "commit": "bdd1994e938f7f0e3138f21b699bdd8aad4de8d8",
+      "layer": "gate",
+      "suite": "backend",
+      "command": "source /tmp/versiona-improvement-10102026/env.sh; source /tmp/versiona-improvement-10102026/venv/bin/activate; PYTHONDONTWRITEBYTECODE=1 PATH=/tmp/versiona-improvement-10102026/venv/bin:/home/dev_env/webapps/.wt/versiona_project/queue-10102026-1423/frontend/node_modules/.bin:$PATH python3 /home/dev_env/webapps/vps-ops-toolkit/workflows/testing/test_quality_gate.py --repo-root /home/dev_env/webapps/.wt/versiona_project/queue-10102026-1423 --suite backend --semantic-rules strict --junk-severity=error --external-lint run --json-only --include-file backend/accounts/tests/services/test_twofactor.py --include-file backend/accounts/tests/utils/test_admin.py --include-file backend/accounts/tests/utils/test_auth_utils.py --include-file backend/accounts/tests/views/test_auth_endpoints.py --include-file backend/accounts/tests/views/test_google_link.py --include-file backend/accounts/tests/views/test_jwt_endpoints.py --include-file backend/accounts/tests/views/test_security_endpoints.py --include-file backend/accounts/tests/views/test_single_use_codes.py --include-file backend/observations/tests/test_reanchor_query_budget.py --include-file backend/orgs/tests/test_onboarding.py",
+      "artifact": "docs/audits/2026-10-10-improvement-evidence/gate-backend.json",
+      "format": "gate-json",
+      "exit_code": 0,
+      "executed": true,
+      "report": "docs/audits/2026-10-10-improvement-evidence/QA.md",
+      "candidate_ids": [
+        "I-S-3b550c956232",
+        "I-P-108f9bbe38dd"
+      ]
+    },
+    {
+      "commit": "bdd1994e938f7f0e3138f21b699bdd8aad4de8d8",
+      "layer": "gate",
+      "suite": "frontend-unit",
+      "command": "source /tmp/versiona-improvement-10102026/env.sh; source /tmp/versiona-improvement-10102026/venv/bin/activate; PYTHONDONTWRITEBYTECODE=1 PATH=/tmp/versiona-improvement-10102026/venv/bin:/home/dev_env/webapps/.wt/versiona_project/queue-10102026-1423/frontend/node_modules/.bin:$PATH python3 /home/dev_env/webapps/vps-ops-toolkit/workflows/testing/test_quality_gate.py --repo-root /home/dev_env/webapps/.wt/versiona_project/queue-10102026-1423 --suite frontend-unit --semantic-rules strict --junk-severity=error --external-lint run --json-only --include-file frontend/__tests__/helpers/mailpit.test.ts --include-file frontend/app/forgot-password/__tests__/page.test.tsx --include-file frontend/app/sign-in/__tests__/page.test.tsx --include-file frontend/app/sign-up/__tests__/page.test.tsx --include-file frontend/components/security/__tests__/GoogleLinkPanel.test.tsx --include-file frontend/components/security/__tests__/SecuritySection.test.tsx --include-file frontend/lib/services/__tests__/google-link-ticket.test.ts --include-file frontend/lib/services/__tests__/http.test.ts --include-file frontend/lib/stores/__tests__/authStore.test.ts",
+      "artifact": "docs/audits/2026-10-10-improvement-evidence/gate-frontend-unit.json",
+      "format": "gate-json",
+      "exit_code": 0,
+      "executed": true,
+      "report": "docs/audits/2026-10-10-improvement-evidence/QA.md",
+      "candidate_ids": [
+        "I-S-3b550c956232",
+        "I-O-f5de8573e07a"
+      ]
+    },
+    {
+      "commit": "bdd1994e938f7f0e3138f21b699bdd8aad4de8d8",
+      "layer": "gate",
+      "suite": "frontend-e2e",
+      "command": "source /tmp/versiona-improvement-10102026/env.sh; source /tmp/versiona-improvement-10102026/venv/bin/activate; PYTHONDONTWRITEBYTECODE=1 PATH=/tmp/versiona-improvement-10102026/venv/bin:/home/dev_env/webapps/.wt/versiona_project/queue-10102026-1423/frontend/node_modules/.bin:$PATH python3 /home/dev_env/webapps/vps-ops-toolkit/workflows/testing/test_quality_gate.py --repo-root /home/dev_env/webapps/.wt/versiona_project/queue-10102026-1423 --suite frontend-e2e --semantic-rules strict --junk-severity=error --external-lint run --json-only --include-file frontend/e2e/app/onboarding/a3-account-security.spec.ts --include-file frontend/e2e/auth/auth.spec.ts",
+      "artifact": "docs/audits/2026-10-10-improvement-evidence/gate-frontend-e2e.json",
+      "format": "gate-json",
+      "exit_code": 0,
+      "executed": true,
+      "report": "docs/audits/2026-10-10-improvement-evidence/QA.md",
+      "candidate_ids": [
+        "I-S-3b550c956232"
+      ]
+    },
+    {
+      "commit": "bdd1994e938f7f0e3138f21b699bdd8aad4de8d8",
+      "layer": "e2e",
+      "candidate_ids": [
+        "I-S-3b550c956232"
+      ],
+      "command": "source /tmp/versiona-improvement-10102026/env.sh\nsource /tmp/versiona-improvement-10102026/venv/bin/activate\nexport PYTHONDONTWRITEBYTECODE=1\nexport DJANGO_SETTINGS_MODULE=e2e_settings\nexport DJANGO_DB_NAME=versiona_e2e_improvement_10102026\nexport PYTHONPATH=/tmp/versiona-improvement-10102026:/home/dev_env/webapps/.wt/versiona_project/queue-10102026-1423/backend\nexport E2E_GOOGLE_HARNESS=1\nexport E2E_GOOGLE_HARNESS_DB_NAME=versiona_e2e_improvement_10102026\nexport E2E_GOOGLE_HARNESS_STORAGE_ROOT=/tmp/versiona-improvement-10102026/objects\nexport CI=1\nexport E2E_PYTHON_BIN=/tmp/versiona-improvement-10102026/venv/bin/python\nexport E2E_FRONTEND_PORT=3120\nexport E2E_BACKEND_PORT=8120\nexport PLAYWRIGHT_JSON_OUTPUT_FILE=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-1423/test-results/improvement/2026-10-10-final/e2e.json\nunset E2E_REUSE_SERVER\nnpx playwright test e2e/auth/auth.spec.ts e2e/app/onboarding/a3-account-security.spec.ts --retries=0 --reporter=line,json --output=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-1423/test-results/improvement/2026-10-10-final/playwright-output > /home/dev_env/webapps/.wt/versiona_project/queue-10102026-1423/test-results/improvement/2026-10-10-final/e2e.log 2>&1\nqa_e2e_exit=$?\nprintf '%s\\n' \"$qa_e2e_exit\" > /home/dev_env/webapps/.wt/versiona_project/queue-10102026-1423/test-results/improvement/2026-10-10-final/e2e.exit\ntail -n 45 /home/dev_env/webapps/.wt/versiona_project/queue-10102026-1423/test-results/improvement/2026-10-10-final/e2e.log\nexit \"$qa_e2e_exit\"",
+      "executed": true,
+      "exit_code": 0,
+      "live": true,
+      "executed_live": true,
+      "artifact": "docs/audits/2026-10-10-improvement-evidence/e2e.json",
+      "format": "playwright-json",
+      "log": "test-results/improvement/2026-10-10-final/e2e.log",
+      "report": "docs/audits/2026-10-10-improvement-evidence/QA.md"
+    }
+  ]
+}

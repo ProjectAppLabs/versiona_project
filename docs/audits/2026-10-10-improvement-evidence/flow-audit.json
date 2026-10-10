@@ -1,0 +1,696 @@
+{
+  "summary": {
+    "specs": 34,
+    "tests": 95,
+    "flows": 40,
+    "covered": 38,
+    "partial": 1,
+    "junk_only": 0,
+    "unvalidated": 0,
+    "missing": 0,
+    "exempt": 1,
+    "suspect": 0,
+    "declaring_outcomes": 40
+  },
+  "flows": {
+    "home-loads": {
+      "module": "home",
+      "priority": "P1",
+      "status": "covered",
+      "required_outcomes": [
+        "display"
+      ],
+      "satisfied_outcomes": [
+        "display"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "auth-sign-in-form": {
+      "module": "auth",
+      "priority": "P2",
+      "status": "covered",
+      "required_outcomes": [
+        "display"
+      ],
+      "satisfied_outcomes": [
+        "display"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "auth-sign-up-form": {
+      "module": "auth",
+      "priority": "P1",
+      "status": "covered",
+      "required_outcomes": [
+        "error"
+      ],
+      "satisfied_outcomes": [
+        "error"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "auth-login-invalid": {
+      "module": "auth",
+      "priority": "P1",
+      "status": "covered",
+      "required_outcomes": [
+        "error"
+      ],
+      "satisfied_outcomes": [
+        "error"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "auth-protected-redirect": {
+      "module": "auth",
+      "priority": "P1",
+      "status": "covered",
+      "required_outcomes": [
+        "success"
+      ],
+      "satisfied_outcomes": [
+        "success"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "auth-forgot-password-form": {
+      "module": "auth",
+      "priority": "P2",
+      "status": "covered",
+      "required_outcomes": [
+        "display",
+        "error"
+      ],
+      "satisfied_outcomes": [
+        "display",
+        "error"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "auth-sign-in-success": {
+      "module": "auth",
+      "priority": "P1",
+      "status": "covered",
+      "required_outcomes": [
+        "success"
+      ],
+      "satisfied_outcomes": [
+        "success"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "auth-sign-out": {
+      "module": "auth",
+      "priority": "P2",
+      "status": "covered",
+      "required_outcomes": [
+        "success"
+      ],
+      "satisfied_outcomes": [
+        "success"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "auth-admin-login-handoff": {
+      "module": "auth",
+      "priority": "P3",
+      "status": "exempt",
+      "required_outcomes": [],
+      "satisfied_outcomes": [],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "help-manual-browse": {
+      "module": "home",
+      "priority": "P3",
+      "status": "covered",
+      "required_outcomes": [
+        "display"
+      ],
+      "satisfied_outcomes": [
+        "display"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "a1-onboarding-wow": {
+      "module": "onboarding",
+      "priority": "P1",
+      "status": "covered",
+      "required_outcomes": [
+        "success",
+        "failure"
+      ],
+      "satisfied_outcomes": [
+        "success",
+        "failure"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "a2-invite-team": {
+      "module": "org",
+      "priority": "P1",
+      "status": "covered",
+      "required_outcomes": [
+        "success",
+        "error",
+        "display"
+      ],
+      "satisfied_outcomes": [
+        "success",
+        "error",
+        "display"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "b1-create-project": {
+      "module": "projects",
+      "priority": "P1",
+      "status": "covered",
+      "required_outcomes": [
+        "success",
+        "error"
+      ],
+      "satisfied_outcomes": [
+        "success",
+        "error"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "b2-projects-board": {
+      "module": "projects",
+      "priority": "P2",
+      "status": "covered",
+      "required_outcomes": [
+        "display"
+      ],
+      "satisfied_outcomes": [
+        "display"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "b3-project-settings": {
+      "module": "projects",
+      "priority": "P2",
+      "status": "covered",
+      "required_outcomes": [
+        "success",
+        "failure"
+      ],
+      "satisfied_outcomes": [
+        "success",
+        "failure"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "c1-upload-first": {
+      "module": "documents",
+      "priority": "P1",
+      "status": "covered",
+      "required_outcomes": [
+        "success",
+        "error",
+        "failure"
+      ],
+      "satisfied_outcomes": [
+        "success",
+        "error",
+        "failure"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "c2-upload-version": {
+      "module": "documents",
+      "priority": "P1",
+      "status": "covered",
+      "required_outcomes": [
+        "success",
+        "error",
+        "failure"
+      ],
+      "satisfied_outcomes": [
+        "success",
+        "error",
+        "failure"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "c3-history": {
+      "module": "documents",
+      "priority": "P2",
+      "status": "covered",
+      "required_outcomes": [
+        "display"
+      ],
+      "satisfied_outcomes": [
+        "display"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "d1-request-review": {
+      "module": "review",
+      "priority": "P1",
+      "status": "covered",
+      "required_outcomes": [
+        "success",
+        "error"
+      ],
+      "satisfied_outcomes": [
+        "success",
+        "error"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "d2-assisted-review": {
+      "module": "review",
+      "priority": "P1",
+      "status": "covered",
+      "required_outcomes": [
+        "display"
+      ],
+      "satisfied_outcomes": [
+        "display"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "d3-anchored-observations": {
+      "module": "review",
+      "priority": "P1",
+      "status": "covered",
+      "required_outcomes": [
+        "success",
+        "error",
+        "failure",
+        "display"
+      ],
+      "satisfied_outcomes": [
+        "success",
+        "error",
+        "failure",
+        "display"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "d4-seal-approve": {
+      "module": "review",
+      "priority": "P1",
+      "status": "covered",
+      "required_outcomes": [
+        "success",
+        "error"
+      ],
+      "satisfied_outcomes": [
+        "success",
+        "error"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "d5-selective-invalidation": {
+      "module": "review",
+      "priority": "P1",
+      "status": "partial",
+      "required_outcomes": [
+        "success",
+        "display",
+        "failure"
+      ],
+      "satisfied_outcomes": [
+        "success"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "e1-compare": {
+      "module": "compare",
+      "priority": "P1",
+      "status": "covered",
+      "required_outcomes": [
+        "display"
+      ],
+      "satisfied_outcomes": [
+        "display"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "e3-configurable-checks": {
+      "module": "compare",
+      "priority": "P2",
+      "status": "covered",
+      "required_outcomes": [
+        "success",
+        "failure"
+      ],
+      "satisfied_outcomes": [
+        "success",
+        "failure"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "f1-billing": {
+      "module": "billing",
+      "priority": "P2",
+      "status": "covered",
+      "required_outcomes": [
+        "error"
+      ],
+      "satisfied_outcomes": [
+        "error"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "c4-delete-draft": {
+      "module": "documents",
+      "priority": "P2",
+      "status": "covered",
+      "required_outcomes": [
+        "success",
+        "error"
+      ],
+      "satisfied_outcomes": [
+        "success",
+        "error"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "a3-account-security": {
+      "module": "auth",
+      "priority": "P2",
+      "status": "covered",
+      "required_outcomes": [
+        "success",
+        "error"
+      ],
+      "satisfied_outcomes": [
+        "success",
+        "error"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "e2-saved-comparisons": {
+      "module": "compare",
+      "priority": "P2",
+      "status": "covered",
+      "required_outcomes": [
+        "success",
+        "error"
+      ],
+      "satisfied_outcomes": [
+        "success",
+        "error"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "f2-usage-panel": {
+      "module": "billing",
+      "priority": "P2",
+      "status": "covered",
+      "required_outcomes": [
+        "display"
+      ],
+      "satisfied_outcomes": [
+        "display"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "e4-constancia": {
+      "module": "review",
+      "priority": "P2",
+      "status": "covered",
+      "required_outcomes": [
+        "success"
+      ],
+      "satisfied_outcomes": [
+        "success"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "master-e2e-journey": {
+      "module": "master",
+      "priority": "P1",
+      "status": "covered",
+      "required_outcomes": [
+        "success"
+      ],
+      "satisfied_outcomes": [
+        "success"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "b4-archive-delete": {
+      "module": "projects",
+      "priority": "P2",
+      "status": "covered",
+      "required_outcomes": [
+        "success",
+        "error"
+      ],
+      "satisfied_outcomes": [
+        "success",
+        "error"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "public-pricing": {
+      "module": "billing",
+      "priority": "P1",
+      "status": "covered",
+      "required_outcomes": [
+        "display"
+      ],
+      "satisfied_outcomes": [
+        "display"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "trial-visibility": {
+      "module": "billing",
+      "priority": "P2",
+      "status": "covered",
+      "required_outcomes": [
+        "success"
+      ],
+      "satisfied_outcomes": [
+        "success"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "public-compare": {
+      "module": "public",
+      "priority": "P1",
+      "status": "covered",
+      "required_outcomes": [
+        "success",
+        "error",
+        "failure"
+      ],
+      "satisfied_outcomes": [
+        "success",
+        "error",
+        "failure"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "f3-org-audit": {
+      "module": "org",
+      "priority": "P2",
+      "status": "covered",
+      "required_outcomes": [
+        "display",
+        "failure"
+      ],
+      "satisfied_outcomes": [
+        "display",
+        "failure"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "layout-public-navigation": {
+      "module": "home",
+      "priority": "P1",
+      "status": "covered",
+      "required_outcomes": [
+        "success",
+        "display"
+      ],
+      "satisfied_outcomes": [
+        "success",
+        "display"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "layout-authenticated-navigation": {
+      "module": "org",
+      "priority": "P1",
+      "status": "covered",
+      "required_outcomes": [
+        "success",
+        "display"
+      ],
+      "satisfied_outcomes": [
+        "success",
+        "display"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    },
+    "public-compare-lifecycle": {
+      "module": "public",
+      "priority": "P1",
+      "status": "covered",
+      "required_outcomes": [
+        "success"
+      ],
+      "satisfied_outcomes": [
+        "success"
+      ],
+      "junk_only_outcomes": [],
+      "unvalidated_outcomes": [],
+      "stray_evidence_outcomes": [],
+      "declares_outcomes": true
+    }
+  },
+  "undeclared_flows": [],
+  "untagged_tests": [
+    {
+      "file": "frontend/e2e/auth/auth.spec.ts",
+      "line": 169,
+      "test": "Google on ${route} requires recovery for an existing email"
+    }
+  ],
+  "outcome_gaps": [
+    {
+      "module": "home",
+      "declared": [
+        "display",
+        "success"
+      ],
+      "missing": [
+        "error",
+        "failure"
+      ]
+    },
+    {
+      "module": "master",
+      "declared": [
+        "success"
+      ],
+      "missing": [
+        "error",
+        "failure"
+      ]
+    }
+  ]
+}
