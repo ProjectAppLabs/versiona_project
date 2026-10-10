@@ -1,0 +1,202 @@
+{
+  "kind": "derived-gate-summaries",
+  "source_commit": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+  "gates": {
+    "backend-quality.json": {
+      "total_files": 2,
+      "total_tests": 22,
+      "errors": 0,
+      "warnings": 1,
+      "info": 1,
+      "infra_errors": 0,
+      "unmatched_include_files": [],
+      "quality_score": 99,
+      "status": "passed",
+      "issues_by_category": {
+        "global_state_leak": 1,
+        "nondeterministic": 1
+      },
+      "semantic_rules": "strict",
+      "semantic_suppressed_by_mode": {
+        "backend": 0,
+        "frontend_unit": 0,
+        "frontend_e2e": 0
+      },
+      "active_exceptions": {
+        "total": 0,
+        "by_rule": {},
+        "by_file": {},
+        "details": [],
+        "invalid": {
+          "total": 0,
+          "details": []
+        }
+      },
+      "external_lint": {
+        "mode": "run",
+        "results": [
+          {
+            "source": "ruff",
+            "status": "ok",
+            "message": null,
+            "findings": 0
+          },
+          {
+            "source": "eslint",
+            "status": "ok",
+            "message": null,
+            "findings": 0
+          }
+        ]
+      },
+      "timings": {
+        "backend": 0.0589,
+        "frontend_unit": 0.0,
+        "frontend_e2e": 0.0,
+        "external_lint": 0.0385,
+        "total": 0.0975
+      }
+    },
+    "frontend-unit-quality.json": {
+      "total_files": 5,
+      "total_tests": 62,
+      "errors": 0,
+      "warnings": 0,
+      "info": 0,
+      "infra_errors": 0,
+      "unmatched_include_files": [],
+      "quality_score": 100,
+      "status": "passed",
+      "issues_by_category": {},
+      "semantic_rules": "strict",
+      "semantic_suppressed_by_mode": {
+        "backend": 0,
+        "frontend_unit": 0,
+        "frontend_e2e": 0
+      },
+      "active_exceptions": {
+        "total": 1,
+        "by_rule": {
+          "negation_only_assertion": 1
+        },
+        "by_file": {
+          "frontend/lib/stores/__tests__/compareStore.test.ts": 1
+        },
+        "details": [
+          {
+            "type": "allow",
+            "file": "frontend/lib/stores/__tests__/compareStore.test.ts",
+            "line": 146,
+            "rule_id": "negation_only_assertion",
+            "reason": "early-return guard with no other state mutated on this path — compareStore.ts:69 'if (!comparison",
+            "marker": "quality: allow-negation-only (early-return guard with no other state mutated on this path — compareStore.ts:69 'if (!comparison)"
+          }
+        ],
+        "invalid": {
+          "total": 0,
+          "details": []
+        }
+      },
+      "external_lint": {
+        "mode": "run",
+        "results": [
+          {
+            "source": "ruff",
+            "status": "ok",
+            "message": null,
+            "findings": 0
+          },
+          {
+            "source": "eslint",
+            "status": "ok",
+            "message": null,
+            "findings": 0
+          }
+        ]
+      },
+      "timings": {
+        "backend": 0.0,
+        "frontend_unit": 3.0063,
+        "frontend_e2e": 0.0,
+        "external_lint": 3.3756,
+        "total": 6.3821
+      }
+    },
+    "frontend-e2e-quality.json": {
+      "total_files": 1,
+      "total_tests": 5,
+      "errors": 0,
+      "warnings": 0,
+      "info": 3,
+      "infra_errors": 0,
+      "unmatched_include_files": [],
+      "quality_score": 94,
+      "status": "passed",
+      "issues_by_category": {
+        "too_many_assertions": 2,
+        "test_too_long": 1
+      },
+      "semantic_rules": "strict",
+      "semantic_suppressed_by_mode": {
+        "backend": 0,
+        "frontend_unit": 0,
+        "frontend_e2e": 0
+      },
+      "active_exceptions": {
+        "total": 2,
+        "by_rule": {
+          "duplicate_coverage": 2
+        },
+        "by_file": {
+          "frontend/e2e/app/compare/e1-compare-versions.spec.ts": 2
+        },
+        "details": [
+          {
+            "type": "allow",
+            "file": "frontend/e2e/app/compare/e1-compare-versions.spec.ts",
+            "line": 269,
+            "rule_id": "duplicate_coverage",
+            "reason": "per-viewport contract: e1-compare-versions PDF fit at the five standard viewports",
+            "marker": "quality: allow-duplicate (per-viewport contract: e1-compare-versions PDF fit at the five standard viewports)"
+          },
+          {
+            "type": "allow",
+            "file": "frontend/e2e/app/compare/e1-compare-versions.spec.ts",
+            "line": 315,
+            "rule_id": "duplicate_coverage",
+            "reason": "per-viewport contract: e1-compare @ 412",
+            "marker": "quality: allow-duplicate (per-viewport contract: e1-compare @ 412)"
+          }
+        ],
+        "invalid": {
+          "total": 0,
+          "details": []
+        }
+      },
+      "external_lint": {
+        "mode": "run",
+        "results": [
+          {
+            "source": "ruff",
+            "status": "ok",
+            "message": null,
+            "findings": 0
+          },
+          {
+            "source": "eslint",
+            "status": "ok",
+            "message": null,
+            "findings": 0
+          }
+        ]
+      },
+      "timings": {
+        "backend": 0.0,
+        "frontend_unit": 0.0,
+        "frontend_e2e": 0.2797,
+        "external_lint": 2.8671,
+        "total": 3.1469
+      }
+    }
+  }
+}

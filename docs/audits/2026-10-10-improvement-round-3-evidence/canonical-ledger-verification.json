@@ -1,0 +1,625 @@
+{
+  "kind": "derived-selected-scope-canonical-verification",
+  "record_qa": {
+    "commit": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+    "reason": "exact round, commit, passing test artifacts and live E2E where required are verified",
+    "round_id": "versiona-20261010-ronda3",
+    "verified": true
+  },
+  "record_qa_exit_code": 0,
+  "validate_qa": {
+    "commit": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+    "reason": "exact round, commit, passing test artifacts and live E2E where required are verified",
+    "round_id": "versiona-20261010-ronda3",
+    "verified": true
+  },
+  "validate_qa_exit_code": 0,
+  "local_only": true,
+  "toolkit_writes": false,
+  "candidates": [
+    {
+      "id": "I-S-2652d50c33dc",
+      "status": "verified",
+      "front": "security",
+      "paths": [
+        "backend/accounts/tests/views/test_auth_throttles.py",
+        "backend/public_tools/tests/test_public_comparison_endpoints.py",
+        "backend/versiona_project/settings_prod.py"
+      ],
+      "qa": {
+        "status": "verified",
+        "round_id": "versiona-20261010-ronda3",
+        "commit": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+        "reason": "exact round, commit, passing test artifacts and live E2E where required are verified",
+        "recorded_at": "2026-10-10T22:20:26Z",
+        "executions": [
+          {
+            "layer": "backend",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/backend-auth-throttles.xml",
+            "format": "junit",
+            "live": false,
+            "candidate_ids": [
+              "I-S-2652d50c33dc"
+            ]
+          },
+          {
+            "layer": "backend",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/backend-public-comparison.xml",
+            "format": "junit",
+            "live": false,
+            "candidate_ids": [
+              "I-S-2652d50c33dc"
+            ]
+          },
+          {
+            "layer": "frontend-unit",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/compareStore-canonical.junit.xml",
+            "format": "junit",
+            "live": false,
+            "candidate_ids": [
+              "I-M-a5771227c659"
+            ]
+          },
+          {
+            "layer": "frontend-unit",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/CompareView-canonical.junit.xml",
+            "format": "junit",
+            "live": false,
+            "candidate_ids": [
+              "I-M-a5771227c659"
+            ]
+          },
+          {
+            "layer": "frontend-unit",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/versionStore-historyLock-canonical.junit.xml",
+            "format": "junit",
+            "live": false,
+            "candidate_ids": [
+              "I-M-a5771227c659"
+            ]
+          },
+          {
+            "layer": "frontend-unit",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/jobStore-canonical.junit.xml",
+            "format": "junit",
+            "live": false,
+            "candidate_ids": [
+              "I-O-2e4131e1c3b8"
+            ]
+          },
+          {
+            "layer": "frontend-unit",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/versionStore-canonical.junit.xml",
+            "format": "junit",
+            "live": false,
+            "candidate_ids": [
+              "I-M-a5771227c659"
+            ]
+          },
+          {
+            "layer": "gate",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/backend-quality.json",
+            "format": "gate-json",
+            "live": false,
+            "candidate_ids": [
+              "I-S-2652d50c33dc",
+              "I-M-a5771227c659",
+              "I-O-2e4131e1c3b8"
+            ]
+          },
+          {
+            "layer": "gate",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/frontend-unit-quality.json",
+            "format": "gate-json",
+            "live": false,
+            "candidate_ids": [
+              "I-S-2652d50c33dc",
+              "I-M-a5771227c659",
+              "I-O-2e4131e1c3b8"
+            ]
+          },
+          {
+            "layer": "gate",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/frontend-e2e-quality.json",
+            "format": "gate-json",
+            "live": false,
+            "candidate_ids": [
+              "I-S-2652d50c33dc",
+              "I-M-a5771227c659",
+              "I-O-2e4131e1c3b8"
+            ]
+          },
+          {
+            "layer": "e2e",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/validation-final-runtime/e1-c3.results.json",
+            "format": "playwright-json",
+            "live": true,
+            "candidate_ids": [
+              "I-M-a5771227c659"
+            ]
+          },
+          {
+            "layer": "e2e",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/validation-final-runtime/c1-c2.results.json",
+            "format": "playwright-json",
+            "live": true,
+            "candidate_ids": [
+              "I-O-2e4131e1c3b8"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "I-M-a5771227c659",
+      "status": "verified",
+      "front": "maintainability",
+      "paths": [
+        "frontend/components/compare/CompareView.tsx",
+        "frontend/components/compare/__tests__/CompareView.test.tsx",
+        "frontend/e2e/app/compare/e1-compare-versions.spec.ts",
+        "frontend/lib/stores/__tests__/compareStore.test.ts",
+        "frontend/lib/stores/__tests__/versionStore.historyLock.test.ts",
+        "frontend/lib/stores/compareStore.ts",
+        "frontend/lib/stores/versionStore.ts"
+      ],
+      "qa": {
+        "status": "verified",
+        "round_id": "versiona-20261010-ronda3",
+        "commit": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+        "reason": "exact round, commit, passing test artifacts and live E2E where required are verified",
+        "recorded_at": "2026-10-10T22:20:26Z",
+        "executions": [
+          {
+            "layer": "backend",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/backend-auth-throttles.xml",
+            "format": "junit",
+            "live": false,
+            "candidate_ids": [
+              "I-S-2652d50c33dc"
+            ]
+          },
+          {
+            "layer": "backend",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/backend-public-comparison.xml",
+            "format": "junit",
+            "live": false,
+            "candidate_ids": [
+              "I-S-2652d50c33dc"
+            ]
+          },
+          {
+            "layer": "frontend-unit",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/compareStore-canonical.junit.xml",
+            "format": "junit",
+            "live": false,
+            "candidate_ids": [
+              "I-M-a5771227c659"
+            ]
+          },
+          {
+            "layer": "frontend-unit",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/CompareView-canonical.junit.xml",
+            "format": "junit",
+            "live": false,
+            "candidate_ids": [
+              "I-M-a5771227c659"
+            ]
+          },
+          {
+            "layer": "frontend-unit",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/versionStore-historyLock-canonical.junit.xml",
+            "format": "junit",
+            "live": false,
+            "candidate_ids": [
+              "I-M-a5771227c659"
+            ]
+          },
+          {
+            "layer": "frontend-unit",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/jobStore-canonical.junit.xml",
+            "format": "junit",
+            "live": false,
+            "candidate_ids": [
+              "I-O-2e4131e1c3b8"
+            ]
+          },
+          {
+            "layer": "frontend-unit",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/versionStore-canonical.junit.xml",
+            "format": "junit",
+            "live": false,
+            "candidate_ids": [
+              "I-M-a5771227c659"
+            ]
+          },
+          {
+            "layer": "gate",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/backend-quality.json",
+            "format": "gate-json",
+            "live": false,
+            "candidate_ids": [
+              "I-S-2652d50c33dc",
+              "I-M-a5771227c659",
+              "I-O-2e4131e1c3b8"
+            ]
+          },
+          {
+            "layer": "gate",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/frontend-unit-quality.json",
+            "format": "gate-json",
+            "live": false,
+            "candidate_ids": [
+              "I-S-2652d50c33dc",
+              "I-M-a5771227c659",
+              "I-O-2e4131e1c3b8"
+            ]
+          },
+          {
+            "layer": "gate",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/frontend-e2e-quality.json",
+            "format": "gate-json",
+            "live": false,
+            "candidate_ids": [
+              "I-S-2652d50c33dc",
+              "I-M-a5771227c659",
+              "I-O-2e4131e1c3b8"
+            ]
+          },
+          {
+            "layer": "e2e",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/validation-final-runtime/e1-c3.results.json",
+            "format": "playwright-json",
+            "live": true,
+            "candidate_ids": [
+              "I-M-a5771227c659"
+            ]
+          },
+          {
+            "layer": "e2e",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/validation-final-runtime/c1-c2.results.json",
+            "format": "playwright-json",
+            "live": true,
+            "candidate_ids": [
+              "I-O-2e4131e1c3b8"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "I-O-2e4131e1c3b8",
+      "status": "verified",
+      "front": "observability",
+      "paths": [
+        "frontend/lib/stores/__tests__/jobStore.test.ts",
+        "frontend/lib/stores/jobStore.ts"
+      ],
+      "qa": {
+        "status": "verified",
+        "round_id": "versiona-20261010-ronda3",
+        "commit": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+        "reason": "exact round, commit, passing test artifacts and live E2E where required are verified",
+        "recorded_at": "2026-10-10T22:20:26Z",
+        "executions": [
+          {
+            "layer": "backend",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/backend-auth-throttles.xml",
+            "format": "junit",
+            "live": false,
+            "candidate_ids": [
+              "I-S-2652d50c33dc"
+            ]
+          },
+          {
+            "layer": "backend",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/backend-public-comparison.xml",
+            "format": "junit",
+            "live": false,
+            "candidate_ids": [
+              "I-S-2652d50c33dc"
+            ]
+          },
+          {
+            "layer": "frontend-unit",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/compareStore-canonical.junit.xml",
+            "format": "junit",
+            "live": false,
+            "candidate_ids": [
+              "I-M-a5771227c659"
+            ]
+          },
+          {
+            "layer": "frontend-unit",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/CompareView-canonical.junit.xml",
+            "format": "junit",
+            "live": false,
+            "candidate_ids": [
+              "I-M-a5771227c659"
+            ]
+          },
+          {
+            "layer": "frontend-unit",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/versionStore-historyLock-canonical.junit.xml",
+            "format": "junit",
+            "live": false,
+            "candidate_ids": [
+              "I-M-a5771227c659"
+            ]
+          },
+          {
+            "layer": "frontend-unit",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/jobStore-canonical.junit.xml",
+            "format": "junit",
+            "live": false,
+            "candidate_ids": [
+              "I-O-2e4131e1c3b8"
+            ]
+          },
+          {
+            "layer": "frontend-unit",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/versionStore-canonical.junit.xml",
+            "format": "junit",
+            "live": false,
+            "candidate_ids": [
+              "I-M-a5771227c659"
+            ]
+          },
+          {
+            "layer": "gate",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/backend-quality.json",
+            "format": "gate-json",
+            "live": false,
+            "candidate_ids": [
+              "I-S-2652d50c33dc",
+              "I-M-a5771227c659",
+              "I-O-2e4131e1c3b8"
+            ]
+          },
+          {
+            "layer": "gate",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/frontend-unit-quality.json",
+            "format": "gate-json",
+            "live": false,
+            "candidate_ids": [
+              "I-S-2652d50c33dc",
+              "I-M-a5771227c659",
+              "I-O-2e4131e1c3b8"
+            ]
+          },
+          {
+            "layer": "gate",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/frontend-e2e-quality.json",
+            "format": "gate-json",
+            "live": false,
+            "candidate_ids": [
+              "I-S-2652d50c33dc",
+              "I-M-a5771227c659",
+              "I-O-2e4131e1c3b8"
+            ]
+          },
+          {
+            "layer": "e2e",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/validation-final-runtime/e1-c3.results.json",
+            "format": "playwright-json",
+            "live": true,
+            "candidate_ids": [
+              "I-M-a5771227c659"
+            ]
+          },
+          {
+            "layer": "e2e",
+            "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+            "artifact": "test-results/improvement-ronda3/attempt-a34d14c/validation-final-runtime/c1-c2.results.json",
+            "format": "playwright-json",
+            "live": true,
+            "candidate_ids": [
+              "I-O-2e4131e1c3b8"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "round": {
+    "id": "versiona-20261010-ronda3",
+    "commit": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+    "candidates": [
+      "I-S-2652d50c33dc",
+      "I-M-a5771227c659",
+      "I-O-2e4131e1c3b8"
+    ],
+    "fronts": [
+      "security",
+      "maintainability",
+      "observability"
+    ],
+    "report": "docs/audits/2026-10-10-versiona-improvement-round-3.md",
+    "e2e_required": true,
+    "required_layers": [
+      "backend",
+      "e2e",
+      "frontend-unit",
+      "gate"
+    ],
+    "codebase": "versiona_project",
+    "status": "verified",
+    "created_at": "2026-10-10T21:25:32Z",
+    "updated_at": "2026-10-10T21:48:53Z",
+    "qa": {
+      "status": "verified",
+      "round_id": "versiona-20261010-ronda3",
+      "commit": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+      "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+      "reason": "exact round, commit, passing test artifacts and live E2E where required are verified",
+      "recorded_at": "2026-10-10T22:20:26Z",
+      "executions": [
+        {
+          "layer": "backend",
+          "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+          "artifact": "test-results/improvement-ronda3/attempt-a34d14c/backend-auth-throttles.xml",
+          "format": "junit",
+          "live": false,
+          "candidate_ids": [
+            "I-S-2652d50c33dc"
+          ]
+        },
+        {
+          "layer": "backend",
+          "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+          "artifact": "test-results/improvement-ronda3/attempt-a34d14c/backend-public-comparison.xml",
+          "format": "junit",
+          "live": false,
+          "candidate_ids": [
+            "I-S-2652d50c33dc"
+          ]
+        },
+        {
+          "layer": "frontend-unit",
+          "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+          "artifact": "test-results/improvement-ronda3/attempt-a34d14c/compareStore-canonical.junit.xml",
+          "format": "junit",
+          "live": false,
+          "candidate_ids": [
+            "I-M-a5771227c659"
+          ]
+        },
+        {
+          "layer": "frontend-unit",
+          "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+          "artifact": "test-results/improvement-ronda3/attempt-a34d14c/CompareView-canonical.junit.xml",
+          "format": "junit",
+          "live": false,
+          "candidate_ids": [
+            "I-M-a5771227c659"
+          ]
+        },
+        {
+          "layer": "frontend-unit",
+          "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+          "artifact": "test-results/improvement-ronda3/attempt-a34d14c/versionStore-historyLock-canonical.junit.xml",
+          "format": "junit",
+          "live": false,
+          "candidate_ids": [
+            "I-M-a5771227c659"
+          ]
+        },
+        {
+          "layer": "frontend-unit",
+          "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+          "artifact": "test-results/improvement-ronda3/attempt-a34d14c/jobStore-canonical.junit.xml",
+          "format": "junit",
+          "live": false,
+          "candidate_ids": [
+            "I-O-2e4131e1c3b8"
+          ]
+        },
+        {
+          "layer": "frontend-unit",
+          "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+          "artifact": "test-results/improvement-ronda3/attempt-a34d14c/versionStore-canonical.junit.xml",
+          "format": "junit",
+          "live": false,
+          "candidate_ids": [
+            "I-M-a5771227c659"
+          ]
+        },
+        {
+          "layer": "gate",
+          "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+          "artifact": "test-results/improvement-ronda3/attempt-a34d14c/backend-quality.json",
+          "format": "gate-json",
+          "live": false,
+          "candidate_ids": [
+            "I-S-2652d50c33dc",
+            "I-M-a5771227c659",
+            "I-O-2e4131e1c3b8"
+          ]
+        },
+        {
+          "layer": "gate",
+          "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+          "artifact": "test-results/improvement-ronda3/attempt-a34d14c/frontend-unit-quality.json",
+          "format": "gate-json",
+          "live": false,
+          "candidate_ids": [
+            "I-S-2652d50c33dc",
+            "I-M-a5771227c659",
+            "I-O-2e4131e1c3b8"
+          ]
+        },
+        {
+          "layer": "gate",
+          "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+          "artifact": "test-results/improvement-ronda3/attempt-a34d14c/frontend-e2e-quality.json",
+          "format": "gate-json",
+          "live": false,
+          "candidate_ids": [
+            "I-S-2652d50c33dc",
+            "I-M-a5771227c659",
+            "I-O-2e4131e1c3b8"
+          ]
+        },
+        {
+          "layer": "e2e",
+          "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+          "artifact": "test-results/improvement-ronda3/attempt-a34d14c/validation-final-runtime/e1-c3.results.json",
+          "format": "playwright-json",
+          "live": true,
+          "candidate_ids": [
+            "I-M-a5771227c659"
+          ]
+        },
+        {
+          "layer": "e2e",
+          "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+          "artifact": "test-results/improvement-ronda3/attempt-a34d14c/validation-final-runtime/c1-c2.results.json",
+          "format": "playwright-json",
+          "live": true,
+          "candidate_ids": [
+            "I-O-2e4131e1c3b8"
+          ]
+        }
+      ]
+    }
+  },
+  "note": "Other legacy scopes are unassessed or need evidence; this proof covers the three selected IDs only."
+}
