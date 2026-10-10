@@ -95,8 +95,12 @@ test('email recovery then explicit Google linking revokes preregistration sessio
   await page.getByTestId('google-boundary-button').click();
   await expect(page.getByTestId('google-link-required')).toBeVisible();
   await page.getByTestId('google-link-required').getByRole('link').click();
+  await expect(page).toHaveURL(/\/forgot-password$/);
+  await expect(page.getByRole('heading', { name: 'Reset Password' })).toBeVisible();
   await page.getByPlaceholder('Email').fill(email);
+  await expect(page.getByPlaceholder('Email')).toHaveValue(email);
   await page.getByRole('button', { name: 'Send verification code', exact: true }).click();
+  await expect(page.getByPlaceholder('000000')).toBeVisible();
   const message = await waitForEmail({ to: email, subjectContains: 'Password Reset Code' });
   if (!process.env.MAILPIT_API) throw new Error('Private MAILPIT_API is required.');
   const mailbox = await request.get(`${process.env.MAILPIT_API}/api/v1/message/${message.ID}`);
