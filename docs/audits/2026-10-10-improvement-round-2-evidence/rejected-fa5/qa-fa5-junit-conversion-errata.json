@@ -1,0 +1,32 @@
+{
+  "commit": "fa5a3f7a805022df46dafd5223bbb8a237b529f2",
+  "status": "REJECTED remains unchanged",
+  "defect": "Derived JUnit testsuite tests was NaN because the converter read a nonexistent Jest suite counter; original Jest JSON contains real cases. Frozen artifacts not mutated.",
+  "resolution_current_attempt": "8611077 JUnit recomputed from actual assertionResults; integer counters and every testcase/status validated in attempt-8611077/junit-integrity-verification.json. No tests rerun to fix conversion.",
+  "rows": [
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/unit-versionStore.xml",
+      "sha256": "eb435ae5f3171327460bbb08331c1120c676a9900d540196c60e90a78befcfbf",
+      "testcases": 13,
+      "testsuite_tests": [
+        "NaN"
+      ]
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/unit-historyLock.xml",
+      "sha256": "1a061b0a6326ba216a463b895bfd954609b5ee8a55434f604710e9240158ee0f",
+      "testcases": 7,
+      "testsuite_tests": [
+        "NaN"
+      ]
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/unit-version-page.xml",
+      "sha256": "bb7538eca31626eda50919329f26cf078ac64c02d48c013f1299cfa12a43dde2",
+      "testcases": 6,
+      "testsuite_tests": [
+        "NaN"
+      ]
+    }
+  ]
+}

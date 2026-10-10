@@ -1,0 +1,90 @@
+{
+  "commit": "86110774cf187f7c108131dc90eb1e41889143dc",
+  "rows": [
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/security-edges-1-retry.xml",
+      "command_matches_source": true,
+      "source_type": "exact tool input cmd"
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/security-edges-2.xml",
+      "command_matches_source": true,
+      "source_type": "exact tool input cmd"
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/security-regression.xml",
+      "command_matches_source": true,
+      "source_type": "exact tool input cmd"
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/observability-diagnostics.xml",
+      "command_matches_source": true,
+      "source_type": "exact tool input cmd"
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/observability-regressions.xml",
+      "command_matches_source": true,
+      "source_type": "exact tool input cmd"
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/observability-endpoint.xml",
+      "command_matches_source": true,
+      "source_type": "exact tool input cmd"
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-versionStore.xml",
+      "command_matches_source": true,
+      "source_type": "exact tool input cmd"
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-historyLock.xml",
+      "command_matches_source": true,
+      "source_type": "exact tool input cmd"
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-version-page.xml",
+      "command_matches_source": true,
+      "source_type": "exact actual spawned argv (shell notation only)"
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/quality-backend.json",
+      "command_matches_source": true,
+      "source_type": "exact actual spawned argv (shell notation only)"
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/quality-unit.json",
+      "command_matches_source": true,
+      "source_type": "exact actual spawned argv (shell notation only)"
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/quality-e2e.json",
+      "command_matches_source": true,
+      "source_type": "exact actual spawned argv (shell notation only)"
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-warm-runtime/playwright-results.json",
+      "command_matches_source": true,
+      "source_type": "exact literal tool input cmd; nested argv equals start/finish recorder and effective process argv plus unchanged wrapper flags",
+      "effective_process_pid": 319307,
+      "actual_argv": [
+        "node",
+        "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/node_modules/.bin/playwright",
+        "test",
+        "e2e/app/documents/c3-version-history.spec.ts",
+        "e2e/app/compare/e1-compare-versions.spec.ts",
+        "--output=test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-warm-runtime/playwright",
+        "--forbid-only",
+        "--workers=1",
+        "--retries=0"
+      ],
+      "safe_environment": {
+        "CI": "",
+        "E2E_FRONTEND_PORT": "3121",
+        "E2E_BACKEND_PORT": "8121",
+        "DJANGO_ENV": "test",
+        "DJANGO_DB_NAME": "versiona_ronda2_e2e",
+        "NEXT_PUBLIC_BACKEND_ORIGIN": "http://127.0.0.1:8121"
+      }
+    }
+  ]
+}

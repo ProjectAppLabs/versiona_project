@@ -1,0 +1,92 @@
+{
+  "commit": "86110774cf187f7c108131dc90eb1e41889143dc",
+  "started_at": "2026-10-10T18:06:26.529Z",
+  "runtime": "existing Next16.2.6/Turbopack and Django; no runtime flags changed",
+  "http": [
+    {
+      "label": "board",
+      "status": 200,
+      "elapsed_ms": 2375,
+      "route_sha256": "902ceeb21a5f1f107d4376878adeee4e1171185b2cd221b98591542b6386a931"
+    },
+    {
+      "label": "new-project",
+      "status": 200,
+      "elapsed_ms": 534,
+      "route_sha256": "966ef4c827750f159402477d1be253a3ca7e405d01ede81f122c77358435ef94"
+    },
+    {
+      "label": "project",
+      "status": 200,
+      "elapsed_ms": 2267,
+      "route_sha256": "53d9fb0d660bac8af0742fc73b6329af57dee37550faa0d3ffb3b7599b55997a"
+    },
+    {
+      "label": "document",
+      "status": 200,
+      "elapsed_ms": 2909,
+      "route_sha256": "cb3a9f8e2164e7a5114e76a85880ad8ed08b12c5c1400a13558789289490b373"
+    },
+    {
+      "label": "viewer",
+      "status": 200,
+      "elapsed_ms": 12642,
+      "route_sha256": "782d54f405ef14808e17f877106e94213b12b1c607a6c6780e9a29cb0c7c1931"
+    },
+    {
+      "label": "compare",
+      "status": 200,
+      "elapsed_ms": 6565,
+      "route_sha256": "d78e52061edd52f958047188313725cbc3fe3b0c83c3c218cd5341a09ab28b07"
+    }
+  ],
+  "dom": [
+    {
+      "label": "board",
+      "status": 200,
+      "target_visible": true,
+      "elapsed_ms": 3450,
+      "heading404_count": 0
+    },
+    {
+      "label": "new-project",
+      "status": 200,
+      "target_visible": true,
+      "elapsed_ms": 2904,
+      "heading404_count": 0
+    },
+    {
+      "label": "project",
+      "status": 200,
+      "target_visible": true,
+      "elapsed_ms": 3668,
+      "heading404_count": 0
+    },
+    {
+      "label": "document",
+      "status": 200,
+      "target_visible": true,
+      "elapsed_ms": 6180,
+      "heading404_count": 0
+    },
+    {
+      "label": "viewer",
+      "status": 200,
+      "target_visible": true,
+      "elapsed_ms": 16793,
+      "heading404_count": 0
+    },
+    {
+      "label": "compare",
+      "status": 200,
+      "target_visible": true,
+      "elapsed_ms": 6089,
+      "heading404_count": 0
+    }
+  ],
+  "backend_versions_status": 200,
+  "page_errors": [],
+  "finished_at": "2026-10-10T18:07:35.667Z",
+  "git_status": "",
+  "pass": true
+}

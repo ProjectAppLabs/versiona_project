@@ -1,0 +1,38 @@
+{
+  "captured_at": "2026-10-10T18:08:19.911789+00:00",
+  "commit": "86110774cf187f7c108131dc90eb1e41889143dc",
+  "tree": "1f2ac36cba6f723878d19df71e05f7c06dda4df7",
+  "git_status": "",
+  "port_lines": [
+    "LISTEN 0      10                       127.0.0.1:8121       0.0.0.0:*    users:((\"python\",pid=305391,fd=4))          ",
+    "LISTEN 0      511                              *:3121             *:*    users:((\"next-server (v1\",pid=317245,fd=22))"
+  ],
+  "processes": [
+    {
+      "pid": 305391,
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend"
+    },
+    {
+      "pid": 317245,
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend"
+    }
+  ],
+  "configuration_delta": "Playwright CI empty => reuseExistingServer=true. CLI forbids test.only,workers1,retries0; source config/spec/timeouts unchanged.",
+  "effective_safe_environment": {
+    "CI": "",
+    "E2E_FRONTEND_PORT": "3121",
+    "E2E_BACKEND_PORT": "8121",
+    "PLAYWRIGHT_BASE_URL": "http://localhost:3121",
+    "NEXT_PUBLIC_BACKEND_ORIGIN": "http://127.0.0.1:8121"
+  },
+  "scripts": [
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-warm-runtime/run-e2e-warm.sh",
+      "sha256": "2cc320dcf799d706a95327aa160eccdc4dc2cf828aebb0ea786a4f82548abbc3"
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-warm-runtime/warm-e2e-8611077.cjs",
+      "sha256": "10627c2dac705e229821ac3f2f66e4dd63645371727cc7db301683fa2447402b"
+    }
+  ]
+}

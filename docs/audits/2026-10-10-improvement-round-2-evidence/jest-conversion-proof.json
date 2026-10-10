@@ -1,0 +1,41 @@
+{
+  "commit": "86110774cf187f7c108131dc90eb1e41889143dc",
+  "converter": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/jest-json-to-junit.cjs",
+  "converter_sha256": "431d420ea4ddb3a5fa60396b3796b1badc973b008b5adacad80b01494adfc59d",
+  "total": 26,
+  "rows": [
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-versionStore.json",
+      "source_sha256": "4e7c02901898a291b4c2941e27219c3eeea09b3826928c996bc549d4c255350a",
+      "derived_junit": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-versionStore.xml",
+      "derived_sha256": "8301a616ecfa6a54682702c8b49951a53e326a9fc1eeddfd9ae0466b89d68bd7",
+      "cases": 13,
+      "source_statuses": {
+        "passed": 13
+      },
+      "all_case_names_preserved": true
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-historyLock.json",
+      "source_sha256": "83f9fa900c6a6f0042f4300864b2ac665e83a31f83f785c79bf0fede05b477b3",
+      "derived_junit": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-historyLock.xml",
+      "derived_sha256": "3b744e8a0ae8760806d6dc99b6765ebe3e1b586b88bdf7e5184aa88b9781d762",
+      "cases": 7,
+      "source_statuses": {
+        "passed": 7
+      },
+      "all_case_names_preserved": true
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-version-page.json",
+      "source_sha256": "1bdc625c34f1178dfc694d4a11d82692da46e666a47180813625f68744ea0941",
+      "derived_junit": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-version-page.xml",
+      "derived_sha256": "ec7d9aede5329618d57f6b554d9022d47118c598c6d56d5478ddbcce3e546bd0",
+      "cases": 6,
+      "source_statuses": {
+        "passed": 6
+      },
+      "all_case_names_preserved": true
+    }
+  ]
+}

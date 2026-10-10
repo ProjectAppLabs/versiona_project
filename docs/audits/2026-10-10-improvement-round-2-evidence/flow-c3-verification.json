@@ -1,0 +1,50 @@
+{
+  "commit": "86110774cf187f7c108131dc90eb1e41889143dc",
+  "c3-history": {
+    "module": "documents",
+    "priority": "P2",
+    "status": "covered",
+    "required_outcomes": [
+      "display",
+      "failure",
+      "success"
+    ],
+    "satisfied_outcomes": [
+      "display",
+      "failure",
+      "success"
+    ],
+    "junk_only_outcomes": [],
+    "unvalidated_outcomes": [],
+    "stray_evidence_outcomes": [],
+    "declares_outcomes": true
+  },
+  "d5": {
+    "module": "review",
+    "priority": "P1",
+    "status": "partial",
+    "required_outcomes": [
+      "success",
+      "display",
+      "failure"
+    ],
+    "satisfied_outcomes": [
+      "success"
+    ],
+    "junk_only_outcomes": [],
+    "unvalidated_outcomes": [],
+    "stray_evidence_outcomes": [],
+    "declares_outcomes": true
+  },
+  "admin": {
+    "module": "auth",
+    "priority": "P3",
+    "status": "exempt",
+    "required_outcomes": [],
+    "satisfied_outcomes": [],
+    "junk_only_outcomes": [],
+    "unvalidated_outcomes": [],
+    "stray_evidence_outcomes": [],
+    "declares_outcomes": true
+  }
+}

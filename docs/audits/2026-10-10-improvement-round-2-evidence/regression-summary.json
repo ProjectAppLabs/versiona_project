@@ -1,0 +1,36 @@
+{
+  "application_base": "dac8de2c8959c9b379186543b0f1d4d16a8f1c13",
+  "policy": "Summaries preserve actual selected failures. Red attempts are not part of the final passing manifest.",
+  "cases": [
+    {
+      "candidate": "I-S-0c3b90d936f0",
+      "executed": 1,
+      "failed_cases": [
+        "test_hidden_reviewer_returns_uniform_not_found[foreign]"
+      ],
+      "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/regression-security-red.xml"
+    },
+    {
+      "candidate": "I-O-42a58784c64c",
+      "executed": 8,
+      "failed_cases": [
+        "test_read_failure_identifies_storage_phase[a]",
+        "test_read_failure_identifies_storage_phase[b]",
+        "test_corrupt_pdf_identifies_build_phase",
+        "test_soft_timeout_identifies_interrupted_phase",
+        "test_cleanup_failure_preserves_processing_diagnostic",
+        "test_result_write_failure_identifies_persist_phase"
+      ],
+      "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/regression-observability-red.xml"
+    },
+    {
+      "candidate": "I-M-0c0b8831bfb6",
+      "executed": 1,
+      "failed_cases": [
+        "versionStore viewer URL under the DP-04 history lock removes the previous PDF when the next version is history-locked"
+      ],
+      "excluded_by_name_filter": 6,
+      "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/regression-versionStore-red.json"
+    }
+  ]
+}

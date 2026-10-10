@@ -1,0 +1,477 @@
+{
+  "qa_commit": "86110774cf187f7c108131dc90eb1e41889143dc",
+  "original_manifest_sha256": "573bc32b91005611adb900f10406afd360996128c2e328f4c9d5dd45ad5b5e3d",
+  "policy": "JUnit removes properties and system streams; Playwright removes output, attachments and environment-bearing config. Test outcomes, names, counts and durations are preserved. Gate counts and findings are preserved.",
+  "artifacts": [
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/security-edges-1-retry.xml",
+      "source_sha256": "c9d10ef1e0d55ff9155b135ad5e527f26835f80d41d3954e04aa22f9a3aa3f56",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/security-edges-1-retry.xml",
+      "export_sha256": "586c5a8afdbc0524ef60a0f2314d0e8b391f7fa56b8388172829adb3e6550e52",
+      "format": "junit"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/security-edges-2.xml",
+      "source_sha256": "9dad6b882aad6028536ac6af16f0425a8fd7393eb12e485b37838fbb2a8a1525",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/security-edges-2.xml",
+      "export_sha256": "1bc61861db8c4b060ec1b0baff8bbe542d840d65e971d3eb63b90cdac94e161f",
+      "format": "junit"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/security-regression.xml",
+      "source_sha256": "3f109a7825ff4c4ca93546e97adf804a7078aed397edfc5acdd16a15bde03b97",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/security-regression.xml",
+      "export_sha256": "443aae72747a6794b6e4dbccade62c19db69fee96218f93195ddd450108262be",
+      "format": "junit"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/observability-diagnostics.xml",
+      "source_sha256": "f3b9c6a0cf4f2891bca555cb637e9e4f78b4b1bb0b577d2e5e12bb77c9a2baf1",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/observability-diagnostics.xml",
+      "export_sha256": "4e45995611f086b978d4dcd170b68433f5664431814e50793c9a946e4e220920",
+      "format": "junit"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/observability-regressions.xml",
+      "source_sha256": "8b1234c403e056bdb674bc008e2b872df99b33c110d077786b7a46fb2a7bdadd",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/observability-regressions.xml",
+      "export_sha256": "d34b773d5808053767bf39eea10e5ec893747334da4c92c9de2df4062211bab8",
+      "format": "junit"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/observability-endpoint.xml",
+      "source_sha256": "01b5c5aef89b2b52be4200090dca4dd53c4f76295c7ea4fb39dafa6277530359",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/observability-endpoint.xml",
+      "export_sha256": "490433b69c9b98958e7362f2426bf61490e1a191eda8019cab4fe1e4baf334d7",
+      "format": "junit"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-versionStore.xml",
+      "source_sha256": "8301a616ecfa6a54682702c8b49951a53e326a9fc1eeddfd9ae0466b89d68bd7",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/unit-versionStore.xml",
+      "export_sha256": "f3276ddabdd85d39dc8bfcc8e55ccd0e904d94c741afce8863c0d00d5b4b5f91",
+      "format": "junit"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-historyLock.xml",
+      "source_sha256": "3b744e8a0ae8760806d6dc99b6765ebe3e1b586b88bdf7e5184aa88b9781d762",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/unit-historyLock.xml",
+      "export_sha256": "b98bee73967f17470d296c832d077c2aed8fa91f4b94d01c90f235d2dce482b0",
+      "format": "junit"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-version-page.xml",
+      "source_sha256": "ec7d9aede5329618d57f6b554d9022d47118c598c6d56d5478ddbcce3e546bd0",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/unit-version-page.xml",
+      "export_sha256": "65f5d27af032bb996a7480fdde85ce383306e784eca0347ce67434825d761a16",
+      "format": "junit"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-warm-runtime/playwright-results.json",
+      "source_sha256": "a3bf0e23eb4a4ace7ae2002f9af4c4aa6abe337a1972f0978077046b99552e33",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/playwright-results.json",
+      "export_sha256": "3f50a3a4fa4f6ac05b72df64a2b2ee09bc5b22ca3f9637b48dc8491d6cca8bb5",
+      "format": "playwright-json"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/quality-backend.json",
+      "source_sha256": "026da4b92be9cde78f9cc27d9118f668e3e9c5bddb7a9f6fe8ca3291788fc484",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/quality-backend.json",
+      "export_sha256": "4636477c67525c2c6e2963c8ab85dd6c0870e026bba0a4234b70dd8c775792ad",
+      "format": "gate-json"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/quality-unit.json",
+      "source_sha256": "969036df0059ee8f60ffa086216bc404c3897b5244988005634a3ca7d1b6b46b",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/quality-unit.json",
+      "export_sha256": "c72e95b25fad8a3b8aa14efcddd5e76bec0396aa57296ba3371ecfd342a6c18a",
+      "format": "gate-json"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/quality-e2e.json",
+      "source_sha256": "a97312b220b630f3f0022b46cc35b105726809b40609c7b8d1aacd113bdfb448",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/quality-e2e.json",
+      "export_sha256": "49585168c8fa055a4cd3e108c0f71f23456b4455aef14fd1caf33ff4516213e8",
+      "format": "gate-json"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/flow-c3-verification.json",
+      "source_sha256": "0e533e07425990472caf195dff3265335d9e86785222ffd96f552f9d34ee51a8",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/flow-c3-verification.json",
+      "export_sha256": "0e533e07425990472caf195dff3265335d9e86785222ffd96f552f9d34ee51a8",
+      "format": "auxiliary-json"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-warm-runtime/live-server-proof.json",
+      "source_sha256": "274dc63c5b87ef8717dabbc6681f5ab9bc5ddab0e93dbb41484ed41d5e7bed2c",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/live-server-proof.json",
+      "export_sha256": "7596d2ddf45ce75e17a3ea15dc36b63c12a419e67150764cd4ed186b86df428c",
+      "format": "auxiliary-json"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/jest-conversion-proof.json",
+      "source_sha256": "6a4bf3260034ff8032eb1a285b30c8d1d2ebd2b61151b50732f5e9270c6a2a4c",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/jest-conversion-proof.json",
+      "export_sha256": "6a4bf3260034ff8032eb1a285b30c8d1d2ebd2b61151b50732f5e9270c6a2a4c",
+      "format": "auxiliary-json"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/junit-integrity-verification.json",
+      "source_sha256": "6a05fa98126f0bb50b45141d3232c8bc461089cfe0b2c7e8d9070a375ac72f78",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/junit-integrity-verification.json",
+      "export_sha256": "6a05fa98126f0bb50b45141d3232c8bc461089cfe0b2c7e8d9070a375ac72f78",
+      "format": "auxiliary-json"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/flow-audit.json",
+      "source_sha256": "91c1f188094c8bdc93895211f24289a4d3b716e14508b641e1d0f8a3dca5cf70",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/flow-audit.json",
+      "export_sha256": "4edc73daa51f8f64ac404a3485484688a49fd8eb4b9145395d3cecfb9188167d",
+      "format": "auxiliary-json"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/tool-input-provenance.json",
+      "source_sha256": "1c997cdddfed63b2493f7c3cca7fc1eb216b7dec1173f0f6d8889a6dee51a116",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/tool-input-provenance.json",
+      "export_sha256": "ff21c26365980548edf9657e65b37c263a1833e03ec63b04038d0e4652522047",
+      "format": "auxiliary-json"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/command-provenance-crosscheck.json",
+      "source_sha256": "e02408805bedc35281f9f32d1268731a86de082bb6bbc164a305a6cd2a4a40d9",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/command-provenance-crosscheck.json",
+      "export_sha256": "e02408805bedc35281f9f32d1268731a86de082bb6bbc164a305a6cd2a4a40d9",
+      "format": "auxiliary-json"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/backend-command-junit-crosscheck.json",
+      "source_sha256": "78053e80492370fc250b913d1718abe44786b002075c087cbc15e6590ff81823",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/backend-command-junit-crosscheck.json",
+      "export_sha256": "78053e80492370fc250b913d1718abe44786b002075c087cbc15e6590ff81823",
+      "format": "auxiliary-json"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/gate-integrity-verification.json",
+      "source_sha256": "3f6ef0e28b672fb4e4ff4bf1d3243a372ae19d2ff7a30597ae873eacd3884882",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/gate-integrity-verification.json",
+      "export_sha256": "3f6ef0e28b672fb4e4ff4bf1d3243a372ae19d2ff7a30597ae873eacd3884882",
+      "format": "auxiliary-json"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/frontend-static-command-proof.json",
+      "source_sha256": "272a1548dfb23acdbeacd89b85235c73d810737bd3171e82a7f27bb4fb80be10",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/frontend-static-command-proof.json",
+      "export_sha256": "272a1548dfb23acdbeacd89b85235c73d810737bd3171e82a7f27bb4fb80be10",
+      "format": "auxiliary-json"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/freeze-hashes.json",
+      "source_sha256": "035d89e983d9d359ad5f80f0c84b70bd99bebe0c565197f43df2e61c450694c7",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/final-freeze-hashes.json",
+      "export_sha256": "035d89e983d9d359ad5f80f0c84b70bd99bebe0c565197f43df2e61c450694c7",
+      "format": "frozen-source-hashes"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/record-qa-final.json",
+      "source_sha256": "cd42811d0d544335f0c0547663fffd5ca158371c84f024899de7c7da09fb2287",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/record-qa.json",
+      "export_sha256": "7ce8232d9a8e28b403584922182593c8cc6f3f846865b1102311f912fa8798a9",
+      "format": "canonical-engine-output"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/validate-qa-final.json",
+      "source_sha256": "8928d34f0ce3881eac80f13059465c2f275cce19eccc1951c13c36ab2c81ca5b",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/validate-qa.json",
+      "export_sha256": "edbc28273aabbbc82c5136c680158cbd1d114ed2b7c0b33bd8b01ed4e2d8e695",
+      "format": "canonical-engine-output"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/root-evidence-count-check.json",
+      "source_sha256": "4bc62e955671fc2cf9111c84a7b7a5d944d8199db3d52d14e80f1b4627d5af8b",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/root-evidence-count-check.json",
+      "export_sha256": "4bc62e955671fc2cf9111c84a7b7a5d944d8199db3d52d14e80f1b4627d5af8b",
+      "format": "canonical-engine-output"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/routing-http-diagnostic.json",
+      "source_sha256": "da2df8c11717876ff87abbb642147ef24ac0f6d7c88fc5e4cf966fe6d0d6a842",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/routing-attempt-861/routing-http-diagnostic.json",
+      "export_sha256": "da2df8c11717876ff87abbb642147ef24ac0f6d7c88fc5e4cf966fe6d0d6a842",
+      "format": "diagnostic-json",
+      "qa_commit": "86110774cf187f7c108131dc90eb1e41889143dc"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/next-cache-preservation.json",
+      "source_sha256": "6adbd9c0c3cf577d88232d93b439baac14be1368623a507540c1e7ca4d0869c7",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/routing-attempt-861/next-cache-preservation.json",
+      "export_sha256": "6adbd9c0c3cf577d88232d93b439baac14be1368623a507540c1e7ca4d0869c7",
+      "format": "diagnostic-json",
+      "qa_commit": "86110774cf187f7c108131dc90eb1e41889143dc"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/routing-http-clean-authenticated.json",
+      "source_sha256": "4082ee6b1bc7576c6e7f0e1622d7d26f650300347029206f1eb914002f2dadb1",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/routing-attempt-861/routing-http-clean-authenticated.json",
+      "export_sha256": "8787092ce74c3626fb294257b81ca40f6db32c37630c5aeb7450f0e65187bad5",
+      "format": "diagnostic-json",
+      "qa_commit": "86110774cf187f7c108131dc90eb1e41889143dc"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/routing-dom-clean-proof.json",
+      "source_sha256": "9852e61c3392d0386c2f5352fbe3983494f2d1d0056b4c7edea4aa303084f573",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/routing-attempt-861/routing-dom-clean-proof.json",
+      "export_sha256": "9852e61c3392d0386c2f5352fbe3983494f2d1d0056b4c7edea4aa303084f573",
+      "format": "diagnostic-json",
+      "qa_commit": "86110774cf187f7c108131dc90eb1e41889143dc"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/diagnostic-server-stop.json",
+      "source_sha256": "2aa3e347401835213c0620a8a3de50e1c84c7ea2a0645c5e369f742dfdf53310",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/routing-attempt-861/diagnostic-server-stop.json",
+      "export_sha256": "2aa3e347401835213c0620a8a3de50e1c84c7ea2a0645c5e369f742dfdf53310",
+      "format": "diagnostic-json",
+      "qa_commit": "86110774cf187f7c108131dc90eb1e41889143dc"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-clean-cache-retry/cold-route-latency-diagnostic.json",
+      "source_sha256": "d2531850ccbf4701bdb318d97464a00025bbc10452a0f5092a572ff85fd81da6",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/cold-start-attempt-861/cold-route-latency-diagnostic.json",
+      "export_sha256": "d2531850ccbf4701bdb318d97464a00025bbc10452a0f5092a572ff85fd81da6",
+      "format": "diagnostic-json",
+      "qa_commit": "86110774cf187f7c108131dc90eb1e41889143dc"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-clean-cache-retry/auth-validity-diagnostic.json",
+      "source_sha256": "d1bbc3c7cd1f153568a27ed5013b7de879a108d1b06163e9a3ca1f975851c896",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/cold-start-attempt-861/auth-validity-diagnostic.json",
+      "export_sha256": "d1bbc3c7cd1f153568a27ed5013b7de879a108d1b06163e9a3ca1f975851c896",
+      "format": "diagnostic-json",
+      "qa_commit": "86110774cf187f7c108131dc90eb1e41889143dc"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-clean-cache-retry/project-board-auth-http-diagnostic.json",
+      "source_sha256": "12d6620741395eb671ba7120d00d3ce6303bf96407f1c4fbabfe6403476096fa",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/cold-start-attempt-861/project-board-auth-http-diagnostic.json",
+      "export_sha256": "12d6620741395eb671ba7120d00d3ce6303bf96407f1c4fbabfe6403476096fa",
+      "format": "diagnostic-json",
+      "qa_commit": "86110774cf187f7c108131dc90eb1e41889143dc"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-warm-runtime/warm-precondition-proof.json",
+      "source_sha256": "9e6ec100a8ec7c9198ef7038394296371c7292d3059f944891c67f47ede1ae84",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/warm-precondition-proof.json",
+      "export_sha256": "9e6ec100a8ec7c9198ef7038394296371c7292d3059f944891c67f47ede1ae84",
+      "format": "warm-runtime-json",
+      "qa_commit": "86110774cf187f7c108131dc90eb1e41889143dc"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-warm-runtime/effective-playwright-argv.json",
+      "source_sha256": "32465ae6b6a7e15d8be9307ae70d41e147aa115081a449301c08b2f7a3c93596",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/effective-playwright-argv.json",
+      "export_sha256": "cd9211982bb7b79bb17c47d8737c004ce4f63b2aa7f5034df497476f8c817372",
+      "format": "warm-runtime-json",
+      "qa_commit": "86110774cf187f7c108131dc90eb1e41889143dc"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-versionStore.json",
+      "source_sha256": "4e7c02901898a291b4c2941e27219c3eeea09b3826928c996bc549d4c255350a",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/unit-versionStore.json",
+      "export_sha256": "d15fcb2c1f275474abd05159a4b86f7a7a6a3f590eeabcd953c98873ca561361",
+      "format": "source-jest-json"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-historyLock.json",
+      "source_sha256": "83f9fa900c6a6f0042f4300864b2ac665e83a31f83f785c79bf0fede05b477b3",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/unit-historyLock.json",
+      "export_sha256": "9214ef0869795f97e4d5b536a84423950ee696dc9bc9523e3309c01ef5360244",
+      "format": "source-jest-json"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-version-page.json",
+      "source_sha256": "1bdc625c34f1178dfc694d4a11d82692da46e666a47180813625f68744ea0941",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/unit-version-page.json",
+      "export_sha256": "43f69681d5288f2cdf2c43f6280681e4eb83d3cbdc4df7fc3df1828081f5ef16",
+      "format": "source-jest-json"
+    },
+    {
+      "source": "/tmp/versiona-improvement-10102026-ronda2/logs/security-red.xml",
+      "source_sha256": "33d9a4f1779036994f37d74bea3a0f7ed228ceeaf6dd45205e624be3fee690f4",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/regression-security-red.xml",
+      "export_sha256": "3ea6b2ee1ce66b58556c1de94d62a1db316d7dc2ada635c085e9a4002a3fba3f",
+      "format": "red-junit"
+    },
+    {
+      "source": "/tmp/versiona-improvement-10102026-ronda2/logs/obs-red.xml",
+      "source_sha256": "078c51afcc6443fda01dbd64195f79350b7f94006b03f496baaa3c210b1a8902",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/regression-observability-red.xml",
+      "export_sha256": "ed238736c94c0a32a25d01bdd165ac15ee8437b18be3dddbd17527b25bcacf33",
+      "format": "red-junit"
+    },
+    {
+      "source": "/tmp/versiona-improvement-10102026-ronda2/maint-unit-red.json",
+      "source_sha256": "305573c35257c4e30744edee1bc28027a2f9e13e3b4070142fb07b20bc2c19b1",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/regression-versionStore-red.json",
+      "export_sha256": "2dc0c0d8c5c9a506d53363453a3adda7a4cb6fa9b26e36b9beda79d1de0253f4",
+      "format": "red-jest-summary"
+    },
+    {
+      "source": "/tmp/versiona-improvement-10102026-ronda2/maint-base-memory.log",
+      "source_sha256": "c2c9a6f9987563201078c8c14fe531709df9b10170b0bc776c635551fed72414",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/regression-base-blob-state.json",
+      "export_sha256": "8f71d573d990f860d15782f0f94aa7724722a35acd3928d0d79b4761a666995b",
+      "format": "base-blob-reproduction"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/security-edges-1.xml",
+      "source_sha256": "9ce1a8c185ea6b9756692ef634d32b71d5c47fbd11535db78f418ec2cb831da1",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/security-edges-1.xml",
+      "export_sha256": "969b82c6fd9b12f0ca8308b075d1af4bc6889de7c5550732e93cea873b2f01c8",
+      "format": "junit",
+      "qa_commit": "fa5a3f7a805022df46dafd5223bbb8a237b529f2"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/security-edges-2.xml",
+      "source_sha256": "0a1d35023f72c9504a56deee2677654b2c8e9fa33da84028379fbcba97ee6121",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/security-edges-2.xml",
+      "export_sha256": "3b80f0299fa6084d02cf3c68135490d2ca18aa3e9953eef405769e4bb47d5c09",
+      "format": "junit",
+      "qa_commit": "fa5a3f7a805022df46dafd5223bbb8a237b529f2"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/security-regression.xml",
+      "source_sha256": "425523bf39fcd2a96896db952c289e11dc189106177d5bd04a15845813ccc1c8",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/security-regression.xml",
+      "export_sha256": "2b22e3c61f76fbc106e272e3933ee00cbdfe71a1379f30dae9626df8b4ea4f77",
+      "format": "junit",
+      "qa_commit": "fa5a3f7a805022df46dafd5223bbb8a237b529f2"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/observability-diagnostics.xml",
+      "source_sha256": "05e30f575e26d644470d36df37ed33e6caf2b85288999febb42f82fbd72a72ab",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/observability-diagnostics.xml",
+      "export_sha256": "b2ab4dad41a7991064b7146daeea1716d711d0f983bc9b2865e12db09ca19640",
+      "format": "junit",
+      "qa_commit": "fa5a3f7a805022df46dafd5223bbb8a237b529f2"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/observability-regressions.xml",
+      "source_sha256": "cd9685578d8ba3dc2b7820c2e8042ec889c49ec5970b64da2afb6c3f3f4096c6",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/observability-regressions.xml",
+      "export_sha256": "4b87ba3c82978c6791298fc44b9c18a8e0f86c4f5597540231dfb48b8d087062",
+      "format": "junit",
+      "qa_commit": "fa5a3f7a805022df46dafd5223bbb8a237b529f2"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/observability-endpoint.xml",
+      "source_sha256": "f76cad100de15481f4cf890bf35252be1b17d339207162a9b5f6cc8771bd525d",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/observability-endpoint.xml",
+      "export_sha256": "3bd2721a8c00799519dbe6e7d100ca88e5bc3cb441d7d53fe77789c8376ee216",
+      "format": "junit",
+      "qa_commit": "fa5a3f7a805022df46dafd5223bbb8a237b529f2"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/unit-versionStore.xml",
+      "source_sha256": "eb435ae5f3171327460bbb08331c1120c676a9900d540196c60e90a78befcfbf",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/unit-versionStore.xml",
+      "export_sha256": "2b970973420df4802bb5d37515da8621bbc8b04ee6fb7ac1afee62a4e19aa2d1",
+      "format": "junit",
+      "qa_commit": "fa5a3f7a805022df46dafd5223bbb8a237b529f2"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/unit-historyLock.xml",
+      "source_sha256": "1a061b0a6326ba216a463b895bfd954609b5ee8a55434f604710e9240158ee0f",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/unit-historyLock.xml",
+      "export_sha256": "71778529f7305960999658cce96a59f72b23b351c92866debaa9f036f55d054a",
+      "format": "junit",
+      "qa_commit": "fa5a3f7a805022df46dafd5223bbb8a237b529f2"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/unit-version-page.xml",
+      "source_sha256": "bb7538eca31626eda50919329f26cf078ac64c02d48c013f1299cfa12a43dde2",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/unit-version-page.xml",
+      "export_sha256": "6353016464051f8edb82a555f68d6bf3b7fab52f452cb2c78798f93b5f04899b",
+      "format": "junit",
+      "qa_commit": "fa5a3f7a805022df46dafd5223bbb8a237b529f2"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/playwright-results.json",
+      "source_sha256": "019729ac44a1a5f2394de685028f5ec84a2d15e650728ebf418ff7ea0b61fdb8",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/playwright-results.json",
+      "export_sha256": "70b030db4d8060a827ad1f87d7f690a4871e2549ed3f969394339f014aa945ae",
+      "format": "playwright-json",
+      "qa_commit": "fa5a3f7a805022df46dafd5223bbb8a237b529f2"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/quality-backend-canonical.json",
+      "source_sha256": "2fc0c0f5527d08e8e5a01556c64df4982d0bb47239824dd436118d843dbbdb75",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/quality-backend-canonical.json",
+      "export_sha256": "7c799c08db4b7a8cecce5ec6b462b4ef176314a319c7e25bc6a5242dfb65af93",
+      "format": "gate-json",
+      "qa_commit": "fa5a3f7a805022df46dafd5223bbb8a237b529f2"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/quality-unit-canonical.json",
+      "source_sha256": "43b45303fc6293b882bb9eea6514d4f64419a2de6b6438ff39b2ee27c36cc575",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/quality-unit-canonical.json",
+      "export_sha256": "4b5244d669e0413cef1306b5ea0a3395713780e0b050ae3f6c59ba6ac03799cb",
+      "format": "gate-json",
+      "qa_commit": "fa5a3f7a805022df46dafd5223bbb8a237b529f2"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/quality-e2e-canonical.json",
+      "source_sha256": "cfdd60f05dbce801e5caf0474f4c79381485f4b3b6bc353281c6a59f1909650f",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/quality-e2e-canonical.json",
+      "export_sha256": "3a6d660c6d049dc2fc9cde8925ac774463026a2ae4e9d8b15d6704e0368e5274",
+      "format": "gate-json",
+      "qa_commit": "fa5a3f7a805022df46dafd5223bbb8a237b529f2"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/ruff-base-comparison.json",
+      "source_sha256": "5594e5a93816ff4fb33542feeb91d2121729a51304d16d8f7ddf7f4ad8db948e",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/ruff-base-comparison.json",
+      "export_sha256": "5594e5a93816ff4fb33542feeb91d2121729a51304d16d8f7ddf7f4ad8db948e",
+      "format": "auxiliary-json",
+      "qa_commit": "fa5a3f7a805022df46dafd5223bbb8a237b529f2"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/record-qa-rejected.json",
+      "source_sha256": "2989459ea21c46853e3711d6bcfe0f767a2f0620a392c961127aa261a59eb820",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/record-qa-rejected.json",
+      "export_sha256": "2989459ea21c46853e3711d6bcfe0f767a2f0620a392c961127aa261a59eb820",
+      "format": "auxiliary-json",
+      "qa_commit": "fa5a3f7a805022df46dafd5223bbb8a237b529f2"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/freeze-hashes.json",
+      "source_sha256": "d31203b19576b4e1f9d1d5dd5a3e8bf868974baace244f21ff2571160d91507a",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/freeze-hashes.json",
+      "export_sha256": "d31203b19576b4e1f9d1d5dd5a3e8bf868974baace244f21ff2571160d91507a",
+      "format": "auxiliary-json",
+      "qa_commit": "fa5a3f7a805022df46dafd5223bbb8a237b529f2"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/ci-pr67-parity/test-quality-report.json",
+      "source_sha256": "025751cafcb0ec27ef65c239e0c3f62b6d70eb50d17e7ec65f0c687bd6127c66",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/ci-parity-summary.json",
+      "export_sha256": "9f65df738492eacafc46190a8e007c2600e13787b5d1ccf7b482355350818176",
+      "format": "ci-parity-summary"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/qa-fa5-command-errata.json",
+      "source_sha256": "076d4b32808b6ed7d3189be328dc27f70fae4f8dcea93ffe4e16b170bb2a90e8",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/qa-fa5-command-errata.json",
+      "export_sha256": "076d4b32808b6ed7d3189be328dc27f70fae4f8dcea93ffe4e16b170bb2a90e8",
+      "format": "external-errata",
+      "qa_commit": "fa5a3f7a805022df46dafd5223bbb8a237b529f2"
+    },
+    {
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/qa-fa5-junit-conversion-errata.json",
+      "source_sha256": "61eff65b7cd236620e9820baebceaa9aa1fbd6ffcc8cf8c07ec78d07eb9f8b15",
+      "export": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/qa-fa5-junit-conversion-errata.json",
+      "export_sha256": "61eff65b7cd236620e9820baebceaa9aa1fbd6ffcc8cf8c07ec78d07eb9f8b15",
+      "format": "external-errata",
+      "qa_commit": "fa5a3f7a805022df46dafd5223bbb8a237b529f2"
+    }
+  ],
+  "original_round_sha256": "73f02fa5811503ad1b8f070e68108e9a029ce323d56f510c1f85604ef88ab1fb"
+}

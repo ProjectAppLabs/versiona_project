@@ -1,0 +1,360 @@
+{
+  "commit": "86110774cf187f7c108131dc90eb1e41889143dc",
+  "tree": "1f2ac36cba6f723878d19df71e05f7c06dda4df7",
+  "status": "APPROVED",
+  "regular_files": 70,
+  "test_cases": 106,
+  "executions": 13,
+  "files": [
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/backend-command-junit-crosscheck.json",
+      "sha256": "78053e80492370fc250b913d1718abe44786b002075c087cbc15e6590ff81823",
+      "size": 1643
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/command-provenance-crosscheck.json",
+      "sha256": "e02408805bedc35281f9f32d1268731a86de082bb6bbc164a305a6cd2a4a40d9",
+      "size": 3874
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/command-records.jsonl",
+      "sha256": "291891687cbfb26b2e76fdf6ebcd1fae59bc63c9ae20358a358fa7ce64466faf",
+      "size": 14675
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/diagnostic-server-stop.json",
+      "sha256": "2aa3e347401835213c0620a8a3de50e1c84c7ea2a0645c5e369f742dfdf53310",
+      "size": 696
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-clean-cache-retry/auth-validity-diagnostic.json",
+      "sha256": "d1bbc3c7cd1f153568a27ed5013b7de879a108d1b06163e9a3ca1f975851c896",
+      "size": 673
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-clean-cache-retry/cold-route-latency-diagnostic.json",
+      "sha256": "d2531850ccbf4701bdb318d97464a00025bbc10452a0f5092a572ff85fd81da6",
+      "size": 1815
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-clean-cache-retry/live-server-proof.json",
+      "sha256": "a393cdd38134ddaac94e6e272940d82ecdf31694c3be0bb22e4f28d8509336b4",
+      "size": 951
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-clean-cache-retry/next-trace-private-original.jsonl",
+      "sha256": "2e4cceb4ed3dc5621cf107b7b5510bee9b22eb0557f564cea90115567f3efd9b",
+      "size": 30094
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-clean-cache-retry/playwright/app-compare-e1-compare-ver-1056a-a-no-ofrece-pares-inv\u00e1lidos-Desktop-Chrome/error-context.md",
+      "sha256": "374d13245dd8489461433495e91f513535355453fc9e3513f075d616fbc322d4",
+      "size": 6050
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-clean-cache-retry/playwright/app-compare-e1-compare-ver-7af26-n-la-tabla-de-verdad-exacta-Desktop-Chrome/error-context.md",
+      "sha256": "accbc91ed559d4e7a23ec4541e43753b06250e14c07adb2da92f28f31f175efe",
+      "size": 6433
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-clean-cache-retry/project-board-auth-http-diagnostic.json",
+      "sha256": "12d6620741395eb671ba7120d00d3ce6303bf96407f1c4fbabfe6403476096fa",
+      "size": 4206
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-error-context.md",
+      "sha256": "5660bb39448ee24189881349cbc40239cdfce136c4b4a8a4f8fb9751171abe10",
+      "size": 1296
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-warm-runtime/auth-refresh-proof.json",
+      "sha256": "95096f2e649c9402ed2e4e1193e5804d5d00e81fe489cf1137562f8b762cf88f",
+      "size": 247
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-warm-runtime/effective-playwright-argv.json",
+      "sha256": "32465ae6b6a7e15d8be9307ae70d41e147aa115081a449301c08b2f7a3c93596",
+      "size": 1804
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-warm-runtime/html/index.html",
+      "sha256": "ad3381a6f43fea45480674ce7b1274eaf6e2e2412a0b1f6342ca019517dc0142",
+      "size": 560852
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-warm-runtime/live-server-proof.json",
+      "sha256": "274dc63c5b87ef8717dabbc6681f5ab9bc5ddab0e93dbb41484ed41d5e7bed2c",
+      "size": 1810
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-warm-runtime/next-blocked-state-before-recovery.json",
+      "sha256": "0d349401b9ca64419d5f714e80282c61871023a21b88c2fa4a5fdd0c1be9f3a9",
+      "size": 868
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-warm-runtime/next-trace-before-recovery.jsonl",
+      "sha256": "14a17e9f87e14164e3be78f3454c8bc9e2144ced3e818ce9c4195b593cfde573",
+      "size": 35458
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-warm-runtime/playwright/.last-run.json",
+      "sha256": "91d1c43004802cd49950d78eb11c8fa7d05da8ffffe219a8b13b2f561bc00903",
+      "size": 45
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-warm-runtime/playwright-artifact-proof.json",
+      "sha256": "d7d72cfe2a15ff45c0d8b7f5a6bf64cf44f115aabd04e8d31bb13b4a1a7fdcb9",
+      "size": 4918
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-warm-runtime/playwright-results.json",
+      "sha256": "a3bf0e23eb4a4ace7ae2002f9af4c4aa6abe337a1972f0978077046b99552e33",
+      "size": 30350
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-warm-runtime/run-e2e-warm.sh",
+      "sha256": "2cc320dcf799d706a95327aa160eccdc4dc2cf828aebb0ea786a4f82548abbc3",
+      "size": 353
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-warm-runtime/tool-input-final.json",
+      "sha256": "b8f067f25de4663ea4e03f5840175eaefc131ca619146ef0cdfd42c8266d3e25",
+      "size": 2422
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-warm-runtime/warm-blocker-diagnostic.json",
+      "sha256": "4345ffe31578107ba3d8f3dc1c5903814b04e6a35fcb2e7aa63b6823043e590e",
+      "size": 620
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-warm-runtime/warm-e2e-8611077.cjs",
+      "sha256": "10627c2dac705e229821ac3f2f66e4dd63645371727cc7db301683fa2447402b",
+      "size": 4079
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-warm-runtime/warm-precondition-progress.json",
+      "sha256": "66ecaf598dde515750d549c2da8c5aa72cf570cf02836414b5fe4300339c229a",
+      "size": 2170
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-warm-runtime/warm-precondition-proof.json",
+      "sha256": "9e6ec100a8ec7c9198ef7038394296371c7292d3059f944891c67f47ede1ae84",
+      "size": 2272
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/executions.json",
+      "sha256": "8232d34a48873e28ee5c95dd2a473ee5a1dea6de948313d983c61bd0d2632bc6",
+      "size": 17022
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/final-state-proof.json",
+      "sha256": "253c5bb5951ac0231acbd2a03d70b526ac54f3ecb2dccd33f8f1dab4076591e2",
+      "size": 246
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/flow-audit.json",
+      "sha256": "91c1f188094c8bdc93895211f24289a4d3b716e14508b641e1d0f8a3dca5cf70",
+      "size": 16125
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/flow-audit.log",
+      "sha256": "9609de0c7363862c7be109cc755549b8e67e7a045590eeb0b0eeb59aaca2fb03",
+      "size": 780
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/flow-c3-verification.json",
+      "sha256": "0e533e07425990472caf195dff3265335d9e86785222ffd96f552f9d34ee51a8",
+      "size": 1072
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/frontend-static-command-proof.json",
+      "sha256": "272a1548dfb23acdbeacd89b85235c73d810737bd3171e82a7f27bb4fb80be10",
+      "size": 863
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/gate-integrity-verification.json",
+      "sha256": "3f6ef0e28b672fb4e4ff4bf1d3243a372ae19d2ff7a30597ae873eacd3884882",
+      "size": 2084
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/jest-conversion-proof.json",
+      "sha256": "6a4bf3260034ff8032eb1a285b30c8d1d2ebd2b61151b50732f5e9270c6a2a4c",
+      "size": 1943
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/jest-json-to-junit.cjs",
+      "sha256": "431d420ea4ddb3a5fa60396b3796b1badc973b008b5adacad80b01494adfc59d",
+      "size": 1508
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/junit-integrity-verification.json",
+      "sha256": "6a05fa98126f0bb50b45141d3232c8bc461089cfe0b2c7e8d9070a375ac72f78",
+      "size": 1831
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/live-server-proof.json",
+      "sha256": "5f56283d06b38a9259b689ea272893be68a57e903fe6e4949980679f76dd18e3",
+      "size": 769
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/next-cache-preservation.json",
+      "sha256": "6adbd9c0c3cf577d88232d93b439baac14be1368623a507540c1e7ca4d0869c7",
+      "size": 1175
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/observability-diagnostics.xml",
+      "sha256": "f3b9c6a0cf4f2891bca555cb637e9e4f78b4b1bb0b577d2e5e12bb77c9a2baf1",
+      "size": 1410
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/observability-endpoint.xml",
+      "sha256": "01b5c5aef89b2b52be4200090dca4dd53c4f76295c7ea4fb39dafa6277530359",
+      "size": 396
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/observability-regressions.xml",
+      "sha256": "8b1234c403e056bdb674bc008e2b872df99b33c110d077786b7a46fb2a7bdadd",
+      "size": 2682
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/playwright/app-compare-e1-compare-ver-1056a-a-no-ofrece-pares-inv\u00e1lidos-Desktop-Chrome/error-context.md",
+      "sha256": "7bc737410bb0359bc12af8e1ed9b18c739ec5c9ac4b445805f64a29a3bc3de84",
+      "size": 13734
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/playwright/app-compare-e1-compare-ver-68469-saltado-al-cambiar-el-ancho-Desktop-Chrome/error-context.md",
+      "sha256": "47d0b63d519615dd1ab2a13fa311a838593838c70dbe4a83d43660a4e3055c32",
+      "size": 12698
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/playwright/app-compare-e1-compare-ver-7af26-n-la-tabla-de-verdad-exacta-Desktop-Chrome/error-context.md",
+      "sha256": "99934c6d936e6420d60cc81c42ead210bf84b34be68e75a407ba31424a578a24",
+      "size": 9431
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/playwright/app-compare-e1-compare-ver-c23ed-saltado-al-cambiar-el-ancho-Desktop-Chrome/error-context.md",
+      "sha256": "c1b1fccc47418d59ab10e32ea38a89aabb7da37c2bb2e771e0320631dcc636ad",
+      "size": 12699
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/qa-manifest-8611077.json",
+      "sha256": "573bc32b91005611adb900f10406afd360996128c2e328f4c9d5dd45ad5b5e3d",
+      "size": 14982
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/qa-report-8611077.md",
+      "sha256": "0943a365496cd11433fbee61b1a12755e40bdc8683a911f5cccf57b77462786c",
+      "size": 9045
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/quality-backend.json",
+      "sha256": "026da4b92be9cde78f9cc27d9118f668e3e9c5bddb7a9f6fe8ca3291788fc484",
+      "size": 2890
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/quality-e2e.json",
+      "sha256": "a97312b220b630f3f0022b46cc35b105726809b40609c7b8d1aacd113bdfb448",
+      "size": 2870
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/quality-unit.json",
+      "sha256": "969036df0059ee8f60ffa086216bc404c3897b5244988005634a3ca7d1b6b46b",
+      "size": 2716
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/routing-dom-clean-proof.json",
+      "sha256": "9852e61c3392d0386c2f5352fbe3983494f2d1d0056b4c7edea4aa303084f573",
+      "size": 265
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/routing-http-clean-authenticated.json",
+      "sha256": "4082ee6b1bc7576c6e7f0e1622d7d26f650300347029206f1eb914002f2dadb1",
+      "size": 2774
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/routing-http-diagnostic.json",
+      "sha256": "da2df8c11717876ff87abbb642147ef24ac0f6d7c88fc5e4cf966fe6d0d6a842",
+      "size": 1949
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/run-recorded.cjs",
+      "sha256": "3dd470f65867c53c0e90e7dd250ed31fe409597cda90b670dd17b1916bf14d8e",
+      "size": 1115
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/security-edges-1-retry.xml",
+      "sha256": "c9d10ef1e0d55ff9155b135ad5e527f26835f80d41d3954e04aa22f9a3aa3f56",
+      "size": 2799
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/security-edges-1.xml",
+      "sha256": "e1e8e8658a6fe6e681c81716df2bf74ff9c45898acd180558014af87f3ec70c2",
+      "size": 235
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/security-edges-2.xml",
+      "sha256": "9dad6b882aad6028536ac6af16f0425a8fd7393eb12e485b37838fbb2a8a1525",
+      "size": 2368
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/security-regression.xml",
+      "sha256": "3f109a7825ff4c4ca93546e97adf804a7078aed397edfc5acdd16a15bde03b97",
+      "size": 1425
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/tool-input-provenance.json",
+      "sha256": "1c997cdddfed63b2493f7c3cca7fc1eb216b7dec1173f0f6d8889a6dee51a116",
+      "size": 16965
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-artifact-sha256.txt",
+      "sha256": "7d40c0b907aeb3141d32263b803030e1e19119426fc60ad4b87e0489482ca2c3",
+      "size": 618
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-historyLock-pre-conversion-fix.xml",
+      "sha256": "4c57fc80736fea19bb10fb270835ca92662f40fe909c9edbea97e997e47d3070",
+      "size": 2325
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-historyLock.json",
+      "sha256": "83f9fa900c6a6f0042f4300864b2ac665e83a31f83f785c79bf0fede05b477b3",
+      "size": 4089
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-historyLock.xml",
+      "sha256": "3b744e8a0ae8760806d6dc99b6765ebe3e1b586b88bdf7e5184aa88b9781d762",
+      "size": 2323
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-version-page-pre-conversion-fix.xml",
+      "sha256": "670b4fbb0ad843ff82fd081896c742ac7ee18bf957538155154519cf285a1bf3",
+      "size": 2208
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-version-page.json",
+      "sha256": "1bdc625c34f1178dfc694d4a11d82692da46e666a47180813625f68744ea0941",
+      "size": 3533
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-version-page.xml",
+      "sha256": "ec7d9aede5329618d57f6b554d9022d47118c598c6d56d5478ddbcce3e546bd0",
+      "size": 2206
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-versionStore-pre-conversion-fix.xml",
+      "sha256": "fc6935c6fe319f45d75398ee4b9bf86bbcdc8550d095561586227b23f934dd1f",
+      "size": 3218
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-versionStore.json",
+      "sha256": "4e7c02901898a291b4c2941e27219c3eeea09b3826928c996bc549d4c255350a",
+      "size": 5526
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-versionStore.xml",
+      "sha256": "8301a616ecfa6a54682702c8b49951a53e326a9fc1eeddfd9ae0466b89d68bd7",
+      "size": 3217
+    }
+  ]
+}

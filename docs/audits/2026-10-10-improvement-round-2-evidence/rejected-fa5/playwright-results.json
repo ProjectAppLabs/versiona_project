@@ -1,0 +1,744 @@
+{
+  "config": {
+    "version": "1.60.0",
+    "workers": 1,
+    "forbidOnly": true,
+    "fullyParallel": true
+  },
+  "suites": [
+    {
+      "title": "app/compare/e1-compare-versions.spec.ts",
+      "file": "app/compare/e1-compare-versions.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "E1 — Comparar dos versiones (pantalla estrella)",
+          "file": "app/compare/e1-compare-versions.spec.ts",
+          "line": 10,
+          "column": 6,
+          "specs": [
+            {
+              "title": "E1-F01/F02 — las tres vistas muestran la tabla de verdad exacta",
+              "ok": true,
+              "tags": [
+                "flow:e1-compare",
+                "module:compare",
+                "priority:P1",
+                "scenario:e1-f01",
+                "scenario:e1-f02",
+                "scenario:c3-a01",
+                "outcome:display"
+              ],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/e2e/app/compare/e1-compare-versions.spec.ts",
+                        "line": 11,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 73402,
+                      "errors": [],
+                      "retry": 0,
+                      "startTime": "2026-10-10T17:15:03.776Z",
+                      "annotations": [
+                        {
+                          "type": "slow",
+                          "location": {
+                            "file": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/e2e/app/compare/e1-compare-versions.spec.ts",
+                            "line": 11,
+                            "column": 8
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "4ea00649e473d123a16a-93d3046892ab8526aafb",
+              "file": "app/compare/e1-compare-versions.spec.ts",
+              "line": 13,
+              "column": 7
+            },
+            {
+              "title": "E1-L01 — comparar una versión consigo misma no ofrece pares inválidos",
+              "ok": true,
+              "tags": [
+                "flow:e1-compare",
+                "module:compare",
+                "priority:P1",
+                "scenario:e1-l01",
+                "outcome:display"
+              ],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/e2e/app/compare/e1-compare-versions.spec.ts",
+                        "line": 11,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8881,
+                      "errors": [],
+                      "retry": 0,
+                      "startTime": "2026-10-10T17:16:18.212Z",
+                      "annotations": [
+                        {
+                          "type": "slow",
+                          "location": {
+                            "file": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/e2e/app/compare/e1-compare-versions.spec.ts",
+                            "line": 11,
+                            "column": 8
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "4ea00649e473d123a16a-3c1932199848847ca7dd",
+              "file": "app/compare/e1-compare-versions.spec.ts",
+              "line": 78,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "E1 PDF @viewport:compact",
+          "file": "app/compare/e1-compare-versions.spec.ts",
+          "line": 151,
+          "column": 8,
+          "specs": [
+            {
+              "title": "la sección seleccionada conserva el resaltado al cambiar el ancho",
+              "ok": true,
+              "tags": [
+                "viewport:compact",
+                "flow:e1-compare",
+                "module:compare",
+                "priority:P1",
+                "outcome:display"
+              ],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/e2e/app/compare/e1-compare-versions.spec.ts",
+                        "line": 153,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 46784,
+                      "errors": [],
+                      "retry": 0,
+                      "startTime": "2026-10-10T17:16:27.272Z",
+                      "annotations": [
+                        {
+                          "type": "slow",
+                          "location": {
+                            "file": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/e2e/app/compare/e1-compare-versions.spec.ts",
+                            "line": 153,
+                            "column": 10
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "4ea00649e473d123a16a-199a3defb0a2fc273967",
+              "file": "app/compare/e1-compare-versions.spec.ts",
+              "line": 155,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "E1 PDF @viewport:portrait",
+          "file": "app/compare/e1-compare-versions.spec.ts",
+          "line": 151,
+          "column": 8,
+          "specs": [
+            {
+              "title": "la sección seleccionada conserva el resaltado al cambiar el ancho",
+              "ok": true,
+              "tags": [
+                "viewport:portrait",
+                "flow:e1-compare",
+                "module:compare",
+                "priority:P1",
+                "outcome:display"
+              ],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/e2e/app/compare/e1-compare-versions.spec.ts",
+                        "line": 153,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 15257,
+                      "errors": [],
+                      "retry": 0,
+                      "startTime": "2026-10-10T17:17:14.114Z",
+                      "annotations": [
+                        {
+                          "type": "slow",
+                          "location": {
+                            "file": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/e2e/app/compare/e1-compare-versions.spec.ts",
+                            "line": 153,
+                            "column": 10
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "4ea00649e473d123a16a-6ea8b72fbd3538df23bc",
+              "file": "app/compare/e1-compare-versions.spec.ts",
+              "line": 155,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "E1 PDF @viewport:landscape",
+          "file": "app/compare/e1-compare-versions.spec.ts",
+          "line": 151,
+          "column": 8,
+          "specs": [
+            {
+              "title": "la sección seleccionada conserva el resaltado al cambiar el ancho",
+              "ok": true,
+              "tags": [
+                "viewport:landscape",
+                "flow:e1-compare",
+                "module:compare",
+                "priority:P1",
+                "outcome:display"
+              ],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/e2e/app/compare/e1-compare-versions.spec.ts",
+                        "line": 153,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 21441,
+                      "errors": [],
+                      "retry": 0,
+                      "startTime": "2026-10-10T17:17:29.442Z",
+                      "annotations": [
+                        {
+                          "type": "slow",
+                          "location": {
+                            "file": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/e2e/app/compare/e1-compare-versions.spec.ts",
+                            "line": 153,
+                            "column": 10
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "4ea00649e473d123a16a-0bb466ac0d50d9fbc465",
+              "file": "app/compare/e1-compare-versions.spec.ts",
+              "line": 155,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "E1 PDF @viewport:desktop",
+          "file": "app/compare/e1-compare-versions.spec.ts",
+          "line": 151,
+          "column": 8,
+          "specs": [
+            {
+              "title": "la sección seleccionada conserva el resaltado al cambiar el ancho",
+              "ok": true,
+              "tags": [
+                "viewport:desktop",
+                "flow:e1-compare",
+                "module:compare",
+                "priority:P1",
+                "outcome:display"
+              ],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/e2e/app/compare/e1-compare-versions.spec.ts",
+                        "line": 153,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 14599,
+                      "errors": [],
+                      "retry": 0,
+                      "startTime": "2026-10-10T17:17:50.959Z",
+                      "annotations": [
+                        {
+                          "type": "slow",
+                          "location": {
+                            "file": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/e2e/app/compare/e1-compare-versions.spec.ts",
+                            "line": 153,
+                            "column": 10
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "4ea00649e473d123a16a-8009b68e8c87d847cf6c",
+              "file": "app/compare/e1-compare-versions.spec.ts",
+              "line": 155,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "E1 PDF @viewport:wide",
+          "file": "app/compare/e1-compare-versions.spec.ts",
+          "line": 151,
+          "column": 8,
+          "specs": [
+            {
+              "title": "la sección seleccionada conserva el resaltado al cambiar el ancho",
+              "ok": true,
+              "tags": [
+                "viewport:wide",
+                "flow:e1-compare",
+                "module:compare",
+                "priority:P1",
+                "outcome:display"
+              ],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/e2e/app/compare/e1-compare-versions.spec.ts",
+                        "line": 153,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 15878,
+                      "errors": [],
+                      "retry": 0,
+                      "startTime": "2026-10-10T17:18:05.663Z",
+                      "annotations": [
+                        {
+                          "type": "slow",
+                          "location": {
+                            "file": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/e2e/app/compare/e1-compare-versions.spec.ts",
+                            "line": 153,
+                            "column": 10
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "4ea00649e473d123a16a-461ffee2ebe01984a5bc",
+              "file": "app/compare/e1-compare-versions.spec.ts",
+              "line": 155,
+              "column": 9
+            }
+          ]
+        },
+        {
+          "title": "E1 vistas @ 412 (celular)",
+          "file": "app/compare/e1-compare-versions.spec.ts",
+          "line": 195,
+          "column": 6,
+          "specs": [
+            {
+              "title": "E1-R01 — a 412 px la vista Resumen muestra los conteos de la re-entrega",
+              "ok": true,
+              "tags": [
+                "flow:e1-compare",
+                "module:compare",
+                "priority:P1",
+                "scenario:e1-r01",
+                "outcome:display",
+                "viewport:compact"
+              ],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/e2e/app/compare/e1-compare-versions.spec.ts",
+                        "line": 197,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 15252,
+                      "errors": [],
+                      "retry": 0,
+                      "startTime": "2026-10-10T17:18:21.610Z",
+                      "annotations": [
+                        {
+                          "type": "slow",
+                          "location": {
+                            "file": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/e2e/app/compare/e1-compare-versions.spec.ts",
+                            "line": 197,
+                            "column": 8
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "4ea00649e473d123a16a-afdac55f26accb51ec3b",
+              "file": "app/compare/e1-compare-versions.spec.ts",
+              "line": 199,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "app/documents/c3-version-history.spec.ts",
+      "file": "app/documents/c3-version-history.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "C3 — Navegar el historial",
+          "file": "app/documents/c3-version-history.spec.ts",
+          "line": 8,
+          "column": 6,
+          "specs": [
+            {
+              "title": "C3-F01/F02 — timeline con autor, mensaje y miniatura; descarga por URL firmada",
+              "ok": true,
+              "tags": [
+                "flow:c3-history",
+                "module:documents",
+                "priority:P2",
+                "scenario:c3-f01",
+                "scenario:c3-f02",
+                "outcome:display"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 21361,
+                      "errors": [],
+                      "retry": 0,
+                      "startTime": "2026-10-10T17:18:36.943Z",
+                      "annotations": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "cbd8abd707127532ef0d-7ebb26c6e3ee363bb8e6",
+              "file": "app/documents/c3-version-history.spec.ts",
+              "line": 9,
+              "column": 7
+            },
+            {
+              "title": "C3 — el visor presenta el PDF de la versión elegida desde el historial",
+              "ok": true,
+              "tags": [
+                "flow:c3-history",
+                "module:documents",
+                "priority:P2",
+                "outcome:display"
+              ],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/e2e/app/documents/c3-version-history.spec.ts",
+                        "line": 59,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 30106,
+                      "errors": [],
+                      "retry": 0,
+                      "startTime": "2026-10-10T17:18:58.364Z",
+                      "annotations": [
+                        {
+                          "type": "slow",
+                          "location": {
+                            "file": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/e2e/app/documents/c3-version-history.spec.ts",
+                            "line": 59,
+                            "column": 12
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "cbd8abd707127532ef0d-527a7d993cd2b063fb55",
+              "file": "app/documents/c3-version-history.spec.ts",
+              "line": 55,
+              "column": 7
+            },
+            {
+              "title": "C3 — un archivo no disponible retira el PDF de la versión anterior",
+              "ok": true,
+              "tags": [
+                "flow:c3-history",
+                "module:documents",
+                "priority:P2",
+                "outcome:failure"
+              ],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/e2e/app/documents/c3-version-history.spec.ts",
+                        "line": 77,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 22121,
+                      "errors": [],
+                      "retry": 0,
+                      "startTime": "2026-10-10T17:19:28.514Z",
+                      "annotations": [
+                        {
+                          "type": "slow",
+                          "location": {
+                            "file": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/e2e/app/documents/c3-version-history.spec.ts",
+                            "line": 77,
+                            "column": 12
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "cbd8abd707127532ef0d-931f8b68fd15c69b6886",
+              "file": "app/documents/c3-version-history.spec.ts",
+              "line": 73,
+              "column": 7
+            },
+            {
+              "title": "C3 — reintentar recupera el PDF real de la versión elegida",
+              "ok": true,
+              "tags": [
+                "flow:c3-history",
+                "module:documents",
+                "priority:P2",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/e2e/app/documents/c3-version-history.spec.ts",
+                        "line": 91,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 28334,
+                      "errors": [],
+                      "retry": 0,
+                      "startTime": "2026-10-10T17:19:50.735Z",
+                      "annotations": [
+                        {
+                          "type": "slow",
+                          "location": {
+                            "file": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/e2e/app/documents/c3-version-history.spec.ts",
+                            "line": 91,
+                            "column": 12
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "cbd8abd707127532ef0d-67a10ad2f16cda3db949",
+              "file": "app/documents/c3-version-history.spec.ts",
+              "line": 87,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-10T17:14:19.156Z",
+    "duration": 360772.374,
+    "expected": 12,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

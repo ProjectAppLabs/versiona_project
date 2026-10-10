@@ -1,0 +1,87 @@
+{
+  "commit": "86110774cf187f7c108131dc90eb1e41889143dc",
+  "rows": [
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/quality-backend.json",
+      "errors": 0,
+      "infra_errors": 0,
+      "warnings": 1,
+      "info": 0,
+      "files": 2,
+      "test_definitions": 29,
+      "external_lint": {
+        "mode": "run",
+        "results": [
+          {
+            "source": "ruff",
+            "status": "ok",
+            "message": null,
+            "findings": 0
+          },
+          {
+            "source": "eslint",
+            "status": "ok",
+            "message": null,
+            "findings": 0
+          }
+        ]
+      },
+      "ast_bridge_unavailable": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/quality-unit.json",
+      "errors": 0,
+      "infra_errors": 0,
+      "warnings": 0,
+      "info": 0,
+      "files": 3,
+      "test_definitions": 26,
+      "external_lint": {
+        "mode": "run",
+        "results": [
+          {
+            "source": "ruff",
+            "status": "ok",
+            "message": null,
+            "findings": 0
+          },
+          {
+            "source": "eslint",
+            "status": "ok",
+            "message": null,
+            "findings": 0
+          }
+        ]
+      },
+      "ast_bridge_unavailable": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/quality-e2e.json",
+      "errors": 0,
+      "infra_errors": 0,
+      "warnings": 0,
+      "info": 1,
+      "files": 1,
+      "test_definitions": 4,
+      "external_lint": {
+        "mode": "run",
+        "results": [
+          {
+            "source": "ruff",
+            "status": "ok",
+            "message": null,
+            "findings": 0
+          },
+          {
+            "source": "eslint",
+            "status": "ok",
+            "message": null,
+            "findings": 0
+          }
+        ]
+      },
+      "ast_bridge_unavailable": false
+    }
+  ],
+  "required_test_files": 6
+}
