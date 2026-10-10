@@ -210,6 +210,23 @@ password.
 
 ## Planned Versiona Modules
 
+### C3 — historial y apertura de la versión correcta
+
+Contrato de la ronda `versiona-20261010-ronda2`; la declaración de outcomes no
+acredita por sí sola ejecución ni cobertura.
+
+| Clase | Interacción observable | Evidencia requerida |
+|---|---|---|
+| display | Navegar por el historial, leer autor/fecha/mensaje y abrir una versión. | Recorrido existente de `e2e/app/documents/c3-version-history.spec.ts`. |
+| failure | Abrir una versión cuyo detalle responde correctamente y cuya lectura de archivo falla una vez con 503. | Error de archivo y acción de reintento visibles; ningún PDF de otra versión. |
+| success | Pulsar Reintentar y permitir la lectura real del archivo de esa misma versión. | Metadatos vigentes, página/canvas renderizados y texto distintivo de v2 dentro del visor: «8. PROTECCION DE DATOS PERSONALES». |
+
+Se conservan `c3-history`, su módulo, prioridad y roles. Las respuestas tardías,
+los errores 402 reemplazados y los retornos independientes del comparador se
+verifican con promesas controladas en frontend-unit. La ejecución C3 en vivo y
+la auditoría de sus tres outcomes deben corresponder al mismo SHA combinado;
+no extienden la certificación a los demás flujos ni resuelven D5 parcial.
+
 > **Nota de análisis:** los checkpoints de reintento del engine son privados. El polling sigue exponiendo el mismo contrato público (`status`, `error`, `result`) y `result` permanece `null` hasta `done`; por eso no cambia ninguna interacción ni outcome de C1/C2.
 
 The 16 MVP flows (A1…F1) are specified with Given/When/Then acceptance criteria in
