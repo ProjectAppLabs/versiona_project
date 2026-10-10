@@ -1,30 +1,34 @@
-"""D1 request endpoint edges + service validations over engine-independent
-fixtures (versions arrive analyzed from the shared context)."""
+"""D1 request endpoint edges and service validations.
+
+Engine-independent fixtures arrive analyzed from the shared context.
+"""
 
 from uuid import uuid4
 
 import pytest
 from audit.models import AuditEvent
 from django.urls import Resolver404, resolve
-
 from documents.models import DocumentVersion
 from documents.services.version_service import DomainError
 from notifications.models import Notification
 from orgs.models import OrganizationMembership
 from projects.models import ProjectMembership
 from projects.services import config_service
+
 from reviews.models import ReviewAssignment, ReviewRequest
 from reviews.services import review_service
 
 
 @pytest.fixture
 def ready_version(document_with_versions):
+    """Provide an analyzed version for review endpoint tests."""
     document, versions = document_with_versions(n_versions=1)
     return document, versions[0]
 
 
 @pytest.fixture
 def open_review(ready_version, versiona_context):
+    """Provide a pending review requested by the project's editor."""
     _, version = ready_version
     return review_service.create_review_request(
         version, versiona_context.users['editor'],
@@ -38,6 +42,7 @@ def open_review(ready_version, versiona_context):
 def test_reviews_list_returns_requests_with_assignments(
     client_as, ready_version, versiona_context, open_review
 ):
+    """Expose a version's review request with its selected assignment."""
     _, version = ready_version
 
     response = client_as('viewer').get(f'/api/versions/{version.public_id}/reviews/')
@@ -53,6 +58,7 @@ def test_reviews_list_returns_requests_with_assignments(
 def test_second_open_request_via_api_returns_conflict(
     client_as, ready_version, versiona_context, open_review
 ):
+    """Reject a second open request for a version through the endpoint."""
     _, version = ready_version
 
     response = client_as('editor').post(
@@ -68,6 +74,7 @@ def test_second_open_request_via_api_returns_conflict(
 @pytest.mark.django_db
 @pytest.mark.escenario('D1-A02')
 def test_requester_cancels_open_review_via_api(client_as, ready_version, open_review):
+    """Allow the requester to cancel an open review through the endpoint."""
     _, version = ready_version
 
     response = client_as('editor').post(
@@ -83,6 +90,7 @@ def test_requester_cancels_open_review_via_api(client_as, ready_version, open_re
 @pytest.mark.django_db
 @pytest.mark.escenario('D1-P04')
 def test_cancel_unknown_review_returns_404(client_as, ready_version):
+    """Hide a nonexistent review when cancellation is requested."""
     _, version = ready_version
 
     response = client_as('editor').post(
@@ -97,6 +105,7 @@ def test_cancel_unknown_review_returns_404(client_as, ready_version):
 def test_cancel_already_closed_review_returns_conflict(
     client_as, ready_version, versiona_context, open_review
 ):
+    """Reject cancellation of a review that is already closed."""
     _, version = ready_version
     review_service.cancel_review_request(open_review, versiona_context.users['editor'])
 
@@ -111,6 +120,7 @@ def test_cancel_already_closed_review_returns_conflict(
 @pytest.mark.django_db
 @pytest.mark.escenario('D2-L01')
 def test_review_context_endpoint_returns_empty_payload_without_seal(client_as, ready_version):
+    """Return empty review context when the reviewer has no previous seal."""
     _, version = ready_version
 
     response = client_as('reviewer').get(f'/api/versions/{version.public_id}/review_context/')
@@ -122,6 +132,7 @@ def test_review_context_endpoint_returns_empty_payload_without_seal(client_as, r
 @pytest.mark.django_db
 @pytest.mark.escenario('D1-E01')
 def test_review_request_requires_analyzed_version(ready_version, versiona_context):
+    """Reject review requests for a version whose analysis is still pending."""
     _, version = ready_version
     DocumentVersion.all_objects.filter(pk=version.pk).update(
         analysis_status=DocumentVersion.AnalysisStatus.PENDING
@@ -141,6 +152,7 @@ def test_review_request_requires_analyzed_version(ready_version, versiona_contex
 @pytest.mark.django_db
 @pytest.mark.escenario('D1-E01')
 def test_review_request_on_trashed_version_is_rejected(ready_version, versiona_context):
+    """Reject review requests for a version in the trash."""
     _, version = ready_version
     version.soft_delete(versiona_context.users['editor'])
 
@@ -157,6 +169,7 @@ def test_review_request_on_trashed_version_is_rejected(ready_version, versiona_c
 @pytest.mark.django_db
 @pytest.mark.escenario('D1-E01')
 def test_review_request_without_reviewers_is_rejected(ready_version, versiona_context):
+    """Require an explicit reviewer selection before creating a request."""
     _, version = ready_version
 
     with pytest.raises(DomainError) as excinfo:
@@ -323,6 +336,7 @@ def test_implicit_org_admin_can_receive_review_assignment(
 @pytest.mark.django_db
 @pytest.mark.escenario('D1-A02')
 def test_non_requester_reviewer_cannot_cancel_review(versiona_context, open_review):
+    """Reject cancellation by a reviewer who did not open the request."""
     with pytest.raises(DomainError) as excinfo:
         review_service.cancel_review_request(open_review, versiona_context.users['reviewer'])
 
@@ -333,6 +347,7 @@ def test_non_requester_reviewer_cannot_cancel_review(versiona_context, open_revi
 @pytest.mark.django_db
 @pytest.mark.escenario('D1-A02')
 def test_admin_who_did_not_request_can_cancel_review(versiona_context, open_review):
+    """Allow a project admin to cancel another user's open review request."""
     review = review_service.cancel_review_request(open_review, versiona_context.users['admin'])
 
     assert review.status == ReviewRequest.Status.CANCELLED
@@ -358,8 +373,10 @@ def version_owned_by_sections(versiona_context, document_with_versions):
 def test_section_owners_do_not_make_reviewer_selection_optional(
     client_as, version_owned_by_sections
 ):
-    """Negative verification: auto-suggestion from section owners is absent —
-    the request still demands an explicit manual selection (DP-A7)."""
+    """Require explicit reviewer selection despite configured section owners.
+
+    Auto-suggestion is absent: DP-A7 requires manual reviewer selection.
+    """
     version = version_owned_by_sections
 
     response = client_as('editor').post(
@@ -375,8 +392,10 @@ def test_section_owners_do_not_make_reviewer_selection_optional(
 def test_section_owners_are_not_added_as_reviewers_on_their_own(
     client_as, versiona_context, version_owned_by_sections
 ):
-    """Negative verification: the admin owns 'confidencialidad' yet gets no
-    assignment because only the explicitly chosen reviewer is assigned."""
+    """Assign only the explicitly selected reviewer.
+
+    The admin owns 'confidencialidad' but was not selected for this request.
+    """
     version = version_owned_by_sections
 
     response = client_as('editor').post(
@@ -395,8 +414,10 @@ def test_section_owners_are_not_added_as_reviewers_on_their_own(
 def test_assignment_scope_ignores_the_sections_the_reviewer_owns(
     versiona_context, version_owned_by_sections
 ):
-    """Negative verification: no per-section scope is derived from ownership —
-    every assignment is created covering the whole document."""
+    """Keep assignment scope independent of section ownership.
+
+    A selected reviewer receives whole-document scope.
+    """
     review = review_service.create_review_request(
         version_owned_by_sections,
         versiona_context.users['editor'],
@@ -409,8 +430,10 @@ def test_assignment_scope_ignores_the_sections_the_reviewer_owns(
 @pytest.mark.django_db
 @pytest.mark.escenario('D2-P01')
 def test_review_progress_route_is_not_registered():
-    """Negative verification: `review_requests/{id}/progress/` (docs/audit/03 D2)
-    has no URL entry, so its permission matrix cannot exist yet."""
+    """Keep the unimplemented review progress route unregistered.
+
+    The route described in docs/audit/03 D2 has no URL entry.
+    """
     with pytest.raises(Resolver404):
         resolve(f'/api/review_requests/{uuid4()}/progress/')
 
@@ -418,8 +441,10 @@ def test_review_progress_route_is_not_registered():
 @pytest.mark.django_db
 @pytest.mark.escenario('D2-P01')
 def test_assigned_reviewer_hits_a_missing_progress_endpoint(client_as, open_review):
-    """Negative verification: even the assigned reviewer gets a router 404 —
-    the D2 progress surface is unimplemented, not merely restricted."""
+    """Return a router 404 for the unimplemented progress endpoint.
+
+    Assignment does not make the absent D2 progress surface available.
+    """
     assignment = ReviewAssignment.objects.get(review_request=open_review)
 
     response = client_as('reviewer').get(
@@ -430,7 +455,7 @@ def test_assigned_reviewer_hits_a_missing_progress_endpoint(client_as, open_revi
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize('actor, expected', [
+@pytest.mark.parametrize(('actor', 'expected'), [
     pytest.param('reviewer', 200, id='d2-p01-assigned-reviewer'),
     pytest.param('viewer', 200, id='d2-p02-unassigned-member'),
     pytest.param('anonymous', 401, id='d2-p03-anonymous'),
@@ -438,8 +463,10 @@ def test_assigned_reviewer_hits_a_missing_progress_endpoint(client_as, open_revi
 ])
 @pytest.mark.escenario('D2-P01')
 def test_review_context_permission_matrix(client_as, ready_version, open_review, actor, expected):
-    """The implemented D2 surface is `review_context/`, gated by project role
-    (viewer+), not by assignment: an unassigned member reads it too."""
+    """Enforce project access on the implemented review context endpoint.
+
+    Viewer membership suffices; an assignment is not required.
+    """
     _, version = ready_version
 
     response = client_as(actor).get(f'/api/versions/{version.public_id}/review_context/')
