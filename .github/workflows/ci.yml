@@ -251,9 +251,9 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: versiona-ci
-          MYSQL_DATABASE: versiona
+          MYSQL_DATABASE: versiona_e2e_ci
         ports:
-          - 3306:3306
+          - 3312:3306
         options: >-
           --health-cmd "mysqladmin ping -h 127.0.0.1 -uroot -pversiona-ci"
           --health-interval 5s
@@ -280,12 +280,13 @@ jobs:
           --health-retries 10
 
     env:
+      DJANGO_ENV: development
       DJANGO_DB_ENGINE: django.db.backends.mysql
-      DJANGO_DB_NAME: versiona
+      DJANGO_DB_NAME: versiona_e2e_ci
       DB_USER: root
       DB_PASSWORD: versiona-ci
       DB_HOST: 127.0.0.1
-      DB_PORT: '3306'
+      DB_PORT: '3312'
       # root, deliberately: the mysql image grants MYSQL_USER rights on
       # MYSQL_DATABASE only, so pytest-django could not create test_versiona.
       # Service containers cannot mount an init script, and the container is
@@ -307,6 +308,15 @@ jobs:
       MAILPIT_API: http://127.0.0.1:8025
       # Shared browser-runner IP; quota-specific backend tests enforce 5/min.
       THROTTLE_AUTH: '1000/min'
+      # Only the external Google transport is simulated. The launcher refuses
+      # any database/storage coordinate outside this disposable CI job.
+      E2E_GOOGLE_HARNESS: '1'
+      E2E_GOOGLE_HARNESS_DB_NAME: versiona_e2e_ci
+      OBJECT_STORAGE_ROOT: /tmp/versiona-e2e-ci/objects
+      E2E_GOOGLE_HARNESS_STORAGE_ROOT: /tmp/versiona-e2e-ci/objects
+      OBJECT_STORAGE_SENDFILE_ROOT: ''
+      DJANGO_GOOGLE_CLIENT_ID: versiona-e2e-ci.apps.googleusercontent.com
+      NEXT_PUBLIC_GOOGLE_CLIENT_ID: versiona-e2e-ci.apps.googleusercontent.com
 
     steps:
       - name: Checkout
