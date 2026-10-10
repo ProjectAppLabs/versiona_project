@@ -50,13 +50,14 @@ export const useJobStore = create<JobState>((set, get) => ({
         timers.delete(jobId);
         const current = get().jobs[jobId];
         const timedOut: TrackedJob = {
-          public_id: jobId,
-          job_type: '',
-          attempts: 0,
-          result: null,
-          version_id: null,
-          startedAt,
-          ...current,
+          ...(current ?? {
+            public_id: jobId,
+            job_type: '',
+            attempts: 0,
+            result: null,
+            version_id: null,
+            startedAt,
+          }),
           status: 'failed',
           error: 'timeout',
         };
