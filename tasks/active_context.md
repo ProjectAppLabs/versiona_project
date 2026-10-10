@@ -3,7 +3,28 @@
 > Memory Bank core file: current focus, recent changes, next steps. Updated every session
 > that changes project state.
 
-**Last updated**: 2026-10-09
+**Last updated**: 2026-10-10
+
+## Ronda coordinada (2026-10-10) — en validación
+
+Base de diagnóstico y ramas: `origin/master@f0c111980447ab880db4c369eec9f5c29594a94a`.
+Se aprobaron sólo tres causas: vínculo explícito Google con recuperación por
+correo y revocación inmediata; reanclaje acotado de observaciones; comprobaciones
+de ausencia de correo que fallen ante un error de Mailpit. Hay un dueño por
+archivo y worktrees externos separados para seguridad, rendimiento, QA y
+documentación compartida. El clon principal no se modifica.
+
+El comparador público necesita una señal saneada de fase y clase de fallo;
+supera el umbral, pero queda pendiente por el cupo global, no por bajo retorno.
+Mantenibilidad y responsividad no justificaron cambios nuevos en lo revisado.
+La asimetría de sellos globales con overrides manuales conserva la clasificación
+`needs-evidence`: falta aclarar el contrato, sin cambiar D5 esta ronda.
+La recuperación asistida de TOTP instalado por un tercero queda abierta.
+
+El reporte y las decisiones viven en
+`docs/audits/2026-10-10-versiona-improvement-round.md`. El toolkit no se edita ni
+se pushea. La verificación final requiere QA del commit combinado, PRs verdes,
+merge-queue y all-in-base --check-only; hasta entonces la entrega está pendiente.
 
 ## Tercera ronda coordinada — R3 (2026-10-09)
 

@@ -20,6 +20,26 @@
 
 ## 2. Authorization
 
+### Vinculación de identidad y revocación de sesiones (2026-10-10)
+
+- Google se identifica por el `sub` de claims verificados. Coincidir en correo
+  no permite vincular ni iniciar sesión en una cuenta existente sin vínculo.
+- Todas las cuentas históricas sin `sub` pasan por recuperación por correo;
+  no se presupone que una contraseña utilizable pruebe la titularidad.
+- El vínculo exige una sesión vigente, ticket de esa recuperación, contraseña
+  actual, contraseña nueva distinta y segundo factor cuando corresponda.
+  La comprobación local y la escritura se serializan sobre el usuario. Un
+  `sub` ya asignado no puede transferirse ni sustituirse.
+- Recuperar o cambiar la contraseña y completar el vínculo incrementa
+  `auth_version`. Access, refresh y desafíos TOTP anteriores se rechazan de
+  inmediato; los tokens antiguos sin claim sólo se admiten en versión cero.
+- El ticket de recuperación dura 15 minutos, está ligado a su propósito,
+  usuario y versión, y no es una credencial de sesión. El frontend lo guarda
+  temporalmente en `sessionStorage`, nunca en la URL.
+- TOTP existente se conserva. Si un tercero instaló un segundo factor antes
+  de recuperar la cuenta, su recuperación asistida sigue fuera del alcance
+  de esta ronda; no se desactiva TOTP automáticamente.
+
 ### 2.1 Per endpoint
 
 The full endpoint × minimum-role table lives in `03-backend.md` §3; the model:

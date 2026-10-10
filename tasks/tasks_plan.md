@@ -25,6 +25,17 @@ v2.4.1 (40 flows).
 
 ## Rondas de mantenimiento
 
+- **2026-10-10 — ronda en validación:** tres causas aprobadas por retorno:
+  vínculo Google explícito después de recuperación por correo, revocación
+  inmediata de sesiones anteriores, reanclaje de observaciones por lotes y
+  helper Mailpit que rechaza fallos en verificaciones negativas. La revocación
+  forma parte de la causa de seguridad, no agrega una cuarta mejora.
+  Una rama por frente aprobado y documentación compartida; QA única sobre la
+  combinación. Reporte y registro en Versiona, sin cambios en toolkit:
+  `docs/audits/2026-10-10-versiona-improvement-round.md`.
+  Diagnóstico del comparador público pendiente por cupo; TOTP asistido y contrato
+  de sellos globales con overrides manuales permanecen abiertos.
+
 - **2026-10-08 — R2:** doce causas de valor demostrado, seleccionadas por el
   operador sin cupo global; propiedad exclusiva por archivo y QA conjunta.
   Permisos de bandeja, integridad de PDF, guardas de archivado, continuidad D5,

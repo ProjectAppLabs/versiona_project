@@ -14,6 +14,14 @@ Kept from the template, as-is or minimally adapted:
   `verify_passcode_and_reset_password/`, `update_password/`, reCAPTCHA, admin impersonation
   ("login as" → frontend handoff). `sign_up` is extended: it auto-creates the personal
   Organization and triggers the sample-project job (A1).
+- **Vinculación Google (2026-10-10):** `User.google_subject` identifica la cuenta
+  por el `sub` verificado y único; el correo no autoriza unir cuentas existentes.
+  Una cuenta sin vínculo debe recuperar su contraseña por correo, iniciar sesión
+  y confirmar el vínculo con el ticket de recuperación, la contraseña vigente,
+  una contraseña nueva y TOTP si está habilitado. `User.auth_version` revoca
+  inmediatamente access, refresh y desafíos TOTP anteriores al recuperar,
+  cambiar la contraseña o completar el vínculo. La migración no infiere vínculos
+  históricos por correo ni por la presencia de contraseña.
 - **Conventions**: function-based views with `@api_view` + a `services/` layer holding all
   domain logic; triple serializers (List/Detail/CreateUpdate); explicit `path()` url modules
   composed per app under `/api/` (no versioning); settings split base/dev/prod driven by
@@ -76,6 +84,16 @@ EngineJob.
 | POST | `sign_up/` · `sign_in/` · `google_login/` · `token/refresh/` · `send_passcode/` · `verify_passcode_and_reset_password/` | — | A1 | Throttled (5/min). `sign_up` auto-creates personal org + sample-project job ⚙︎. |
 | GET | `validate_token/` | authenticated | A1 | Session restore for the SPA. |
 | POST | `update_password/` | authenticated | A1 | |
+| GET | `me/security/` | authenticated | A3 | Estado de TOTP, vínculo Google y disponibilidad de contraseña; no expone `sub`. |
+| POST | `me/google/link/` | authenticated | A1/A3 | Vínculo explícito después de recuperación por correo; exige reautenticación, reemplaza la contraseña y revoca las otras sesiones. |
+
+`google_login/` devuelve HTTP 409 con `code=google_link_required` si el correo
+ya pertenece a una cuenta sin vínculo. No crea una sesión ni altera esa cuenta.
+El reset de una cuenta sin vínculo devuelve un ticket firmado de propósito
+exclusivo, ligado al usuario y a su versión de autenticación, con vigencia de
+15 minutos. El ticket no permite acceder a la cuenta y se consume por la
+rotación de versión al completar el vínculo. Todos los accesos siguen sujetos
+al estado vigente de la cuenta y a su segundo factor.
 
 ### Organizations, members, invitations
 
