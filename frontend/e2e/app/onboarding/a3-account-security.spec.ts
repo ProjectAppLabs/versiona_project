@@ -5,6 +5,13 @@ import { googleCredential, installGoogleBoundary } from '../../helpers/google-bo
 import { waitForEmail } from '../../helpers/mailpit';
 import { uniqueEmail } from '../../helpers/versiona';
 
+function requireMailpitApi(): string {
+  const api = process.env.MAILPIT_API;
+  expect(api, 'Private MAILPIT_API is required.').toEqual(expect.any(String));
+  expect(api).not.toBe('');
+  return api as string;
+}
+
 /** A3 — TOTP end to end: enrol from settings, re-login demands the code.
  * Uses a FRESH account so the seeded users keep 2FA off for other specs. */
 
@@ -83,6 +90,7 @@ test('email recovery then explicit Google linking revokes preregistration sessio
   tag: [...A3_ACCOUNT_SECURITY, '@outcome:success', '@outcome:error'],
 }, async ({ page, request }) => {
   test.slow();
+  const mailpitApi = requireMailpitApi();
   const email = uniqueEmail('google-link');
   const originalPassword = 'Attacker-Chosen!51';
   const recoveredPassword = 'Recover-River!82';
@@ -102,9 +110,7 @@ test('email recovery then explicit Google linking revokes preregistration sessio
   await page.getByRole('button', { name: 'Send verification code', exact: true }).click();
   await expect(page.getByPlaceholder('000000')).toBeVisible();
   const message = await waitForEmail({ to: email, subjectContains: 'Password Reset Code' });
-  expect(process.env.MAILPIT_API).toEqual(expect.any(String));
-  expect(process.env.MAILPIT_API).not.toBe('');
-  const mailbox = await request.get(`${process.env.MAILPIT_API}/api/v1/message/${message.ID}`);
+  const mailbox = await request.get(`${mailpitApi}/api/v1/message/${message.ID}`);
   expect(mailbox.status()).toBe(200);
   const code = ((await mailbox.json()).Text as string).match(/\b\d{6}\b/)?.[0];
   expect(code).toMatch(/^\d{6}$/);
