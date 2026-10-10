@@ -51,7 +51,7 @@ def reanchor_data(document_with_versions, versiona_context):
     return make
 
 
-@pytest.mark.parametrize('count,select_count,insert_count', [(1, 6, 1), (50, 6, 1), (201, 14, 3)])
+@pytest.mark.parametrize(('count', 'select_count', 'insert_count'), [(1, 6, 1), (50, 6, 1), (201, 14, 3)])
 def test_reanchor_database_work_grows_every_hundred_threads(reanchor_data, count, select_count, insert_count):
     """Catches: per-thread reads or inserts returning to the reanchor pass."""
     _, versions, _, _ = reanchor_data(count)
@@ -97,7 +97,7 @@ def test_reanchor_leaves_existing_destination_evidence_untouched(reanchor_data):
     assert counters == {'exact': 1, 'reanchored_section': 0, 'orphaned': 0}
 
 
-@pytest.mark.parametrize('kind,expected', [
+@pytest.mark.parametrize(('kind', 'expected'), [
     ('exact', ('exact', 3, NEW_QUADS)),
     ('changed', ('reanchored_section', 3, NEW_QUADS)),
     ('missing', ('orphaned', 1, [])),
