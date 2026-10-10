@@ -1,0 +1,483 @@
+{
+  "schema": 1,
+  "kind": "improvement-qa",
+  "round_id": "versiona-20261010-ronda3",
+  "codebase": "versiona_project",
+  "commit": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+  "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+  "candidate_ids": [
+    "I-S-2652d50c33dc",
+    "I-M-a5771227c659",
+    "I-O-2e4131e1c3b8"
+  ],
+  "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+  "verdict": "APPROVED",
+  "executions": [
+    {
+      "layer": "backend",
+      "command": "bash /tmp/versiona-improvement-10102026-ronda3/run-pytest.sh security accounts/tests/views/test_auth_throttles.py -v --junitxml=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3/test-results/improvement-ronda3/attempt-a34d14c/backend-auth-throttles.xml",
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3",
+      "exit_code": 0,
+      "artifact": "test-results/improvement-ronda3/attempt-a34d14c/backend-auth-throttles.xml",
+      "format": "junit",
+      "candidate_ids": [
+        "I-S-2652d50c33dc"
+      ],
+      "executed": true,
+      "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+      "live": false,
+      "pre": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "post": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "source_unchanged": true,
+      "label": "backend-auth-throttles",
+      "environment": {}
+    },
+    {
+      "layer": "backend",
+      "command": "bash /tmp/versiona-improvement-10102026-ronda3/run-pytest.sh security public_tools/tests/test_public_comparison_endpoints.py -v --junitxml=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3/test-results/improvement-ronda3/attempt-a34d14c/backend-public-comparison.xml",
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3",
+      "exit_code": 0,
+      "artifact": "test-results/improvement-ronda3/attempt-a34d14c/backend-public-comparison.xml",
+      "format": "junit",
+      "candidate_ids": [
+        "I-S-2652d50c33dc"
+      ],
+      "executed": true,
+      "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+      "live": false,
+      "pre": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "post": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "source_unchanged": true,
+      "label": "backend-public-comparison",
+      "environment": {}
+    },
+    {
+      "layer": "frontend-unit",
+      "command": "npm test -- lib/stores/__tests__/compareStore.test.ts --runInBand --json --outputFile=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3/test-results/improvement-ronda3/attempt-a34d14c/compareStore.raw.json",
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3/frontend",
+      "exit_code": 0,
+      "artifact": "test-results/improvement-ronda3/attempt-a34d14c/compareStore-canonical.junit.xml",
+      "format": "junit",
+      "candidate_ids": [
+        "I-M-a5771227c659"
+      ],
+      "executed": true,
+      "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+      "live": false,
+      "pre": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "post": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "source_unchanged": true,
+      "label": "unit-compare-store-correct",
+      "environment": {}
+    },
+    {
+      "layer": "frontend-unit",
+      "command": "npm test -- components/compare/__tests__/CompareView.test.tsx --runInBand --json --outputFile=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3/test-results/improvement-ronda3/attempt-a34d14c/CompareView.raw.json",
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3/frontend",
+      "exit_code": 0,
+      "artifact": "test-results/improvement-ronda3/attempt-a34d14c/CompareView-canonical.junit.xml",
+      "format": "junit",
+      "candidate_ids": [
+        "I-M-a5771227c659"
+      ],
+      "executed": true,
+      "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+      "live": false,
+      "pre": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "post": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "source_unchanged": true,
+      "label": "unit-compare-view",
+      "environment": {}
+    },
+    {
+      "layer": "frontend-unit",
+      "command": "npm test -- lib/stores/__tests__/versionStore.historyLock.test.ts --runInBand --json --outputFile=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3/test-results/improvement-ronda3/attempt-a34d14c/versionStore-historyLock.raw.json",
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3/frontend",
+      "exit_code": 0,
+      "artifact": "test-results/improvement-ronda3/attempt-a34d14c/versionStore-historyLock-canonical.junit.xml",
+      "format": "junit",
+      "candidate_ids": [
+        "I-M-a5771227c659"
+      ],
+      "executed": true,
+      "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+      "live": false,
+      "pre": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "post": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "source_unchanged": true,
+      "label": "unit-history-lock",
+      "environment": {}
+    },
+    {
+      "layer": "frontend-unit",
+      "command": "npm test -- lib/stores/__tests__/jobStore.test.ts --runInBand --json --outputFile=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3/test-results/improvement-ronda3/attempt-a34d14c/jobStore.raw.json",
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3/frontend",
+      "exit_code": 0,
+      "artifact": "test-results/improvement-ronda3/attempt-a34d14c/jobStore-canonical.junit.xml",
+      "format": "junit",
+      "candidate_ids": [
+        "I-O-2e4131e1c3b8"
+      ],
+      "executed": true,
+      "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+      "live": false,
+      "pre": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "post": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "source_unchanged": true,
+      "label": "unit-job-store",
+      "environment": {}
+    },
+    {
+      "layer": "frontend-unit",
+      "command": "npm test -- lib/stores/__tests__/versionStore.test.ts --runInBand --json --outputFile=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3/test-results/improvement-ronda3/attempt-a34d14c/versionStore.raw.json",
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3/frontend",
+      "exit_code": 0,
+      "artifact": "test-results/improvement-ronda3/attempt-a34d14c/versionStore-canonical.junit.xml",
+      "format": "junit",
+      "candidate_ids": [
+        "I-M-a5771227c659"
+      ],
+      "executed": true,
+      "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+      "live": false,
+      "pre": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "post": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "source_unchanged": true,
+      "label": "unit-version-store",
+      "environment": {}
+    },
+    {
+      "layer": "gate",
+      "command": "bash -c 'set -o pipefail; source /tmp/versiona-improvement-10102026/venv/bin/activate; python scripts/test_quality_gate.py --repo-root . --suite backend --semantic-rules strict --junk-severity error --external-lint run --include-file backend/accounts/tests/views/test_auth_throttles.py --include-file backend/public_tools/tests/test_public_comparison_endpoints.py --report-path test-results/improvement-ronda3/attempt-a34d14c/backend-quality.json 2>&1 | tee test-results/improvement-ronda3/attempt-a34d14c/backend-quality.log; exit ${PIPESTATUS[0]}'",
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3",
+      "exit_code": 0,
+      "artifact": "test-results/improvement-ronda3/attempt-a34d14c/backend-quality.json",
+      "format": "gate-json",
+      "candidate_ids": [
+        "I-S-2652d50c33dc",
+        "I-M-a5771227c659",
+        "I-O-2e4131e1c3b8"
+      ],
+      "executed": true,
+      "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+      "live": false,
+      "pre": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "post": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "source_unchanged": true,
+      "label": "gate-backend-strict",
+      "environment": {}
+    },
+    {
+      "layer": "gate",
+      "command": "bash -c 'set -o pipefail; source /tmp/versiona-improvement-10102026/venv/bin/activate; python scripts/test_quality_gate.py --repo-root . --suite frontend-unit --semantic-rules strict --junk-severity error --external-lint run --include-file frontend/lib/stores/__tests__/compareStore.test.ts --include-file frontend/components/compare/__tests__/CompareView.test.tsx --include-file frontend/lib/stores/__tests__/versionStore.historyLock.test.ts --include-file frontend/lib/stores/__tests__/jobStore.test.ts --include-file frontend/lib/stores/__tests__/versionStore.test.ts --report-path test-results/improvement-ronda3/attempt-a34d14c/frontend-unit-quality.json 2>&1 | tee test-results/improvement-ronda3/attempt-a34d14c/frontend-unit-quality.log; exit ${PIPESTATUS[0]}'",
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3",
+      "exit_code": 0,
+      "artifact": "test-results/improvement-ronda3/attempt-a34d14c/frontend-unit-quality.json",
+      "format": "gate-json",
+      "candidate_ids": [
+        "I-S-2652d50c33dc",
+        "I-M-a5771227c659",
+        "I-O-2e4131e1c3b8"
+      ],
+      "executed": true,
+      "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+      "live": false,
+      "pre": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "post": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "source_unchanged": true,
+      "label": "gate-unit-strict",
+      "environment": {}
+    },
+    {
+      "layer": "gate",
+      "command": "bash -c 'set -o pipefail; source /tmp/versiona-improvement-10102026/venv/bin/activate; python scripts/test_quality_gate.py --repo-root . --suite frontend-e2e --semantic-rules strict --junk-severity error --external-lint run --include-file frontend/e2e/app/compare/e1-compare-versions.spec.ts --report-path test-results/improvement-ronda3/attempt-a34d14c/frontend-e2e-quality.json 2>&1 | tee test-results/improvement-ronda3/attempt-a34d14c/frontend-e2e-quality.log; exit ${PIPESTATUS[0]}'",
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3",
+      "exit_code": 0,
+      "artifact": "test-results/improvement-ronda3/attempt-a34d14c/frontend-e2e-quality.json",
+      "format": "gate-json",
+      "candidate_ids": [
+        "I-S-2652d50c33dc",
+        "I-M-a5771227c659",
+        "I-O-2e4131e1c3b8"
+      ],
+      "executed": true,
+      "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+      "live": false,
+      "pre": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "post": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "source_unchanged": true,
+      "label": "gate-e2e-strict",
+      "environment": {}
+    },
+    {
+      "layer": "e2e",
+      "command": "bash /tmp/versiona-improvement-10102026-ronda3/run-e2e-warm.sh e2e/app/compare/e1-compare-versions.spec.ts e2e/app/documents/c3-version-history.spec.ts --trace=on --output=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3/test-results/improvement-ronda3/attempt-a34d14c/validation-final-runtime/e1-c3.playwright-output",
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3/frontend",
+      "environment": {
+        "PLAYWRIGHT_JSON_OUTPUT_FILE": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3/test-results/improvement-ronda3/attempt-a34d14c/validation-final-runtime/e1-c3.results.json",
+        "PLAYWRIGHT_HTML_OUTPUT_DIR": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3/test-results/improvement-ronda3/attempt-a34d14c/validation-final-runtime/e1-c3.html"
+      },
+      "exit_code": 0,
+      "artifact": "test-results/improvement-ronda3/attempt-a34d14c/validation-final-runtime/e1-c3.results.json",
+      "format": "playwright-json",
+      "candidate_ids": [
+        "I-M-a5771227c659"
+      ],
+      "executed": true,
+      "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+      "live": true,
+      "pre": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "post": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "source_unchanged": true,
+      "label": "final-e2e-e1-c3"
+    },
+    {
+      "layer": "e2e",
+      "command": "bash /tmp/versiona-improvement-10102026-ronda3/run-e2e-warm.sh e2e/app/documents/c1-upload-first-document.spec.ts e2e/app/documents/c2-upload-new-version.spec.ts --trace=on --output=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3/test-results/improvement-ronda3/attempt-a34d14c/validation-final-runtime/c1-c2.playwright-output",
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3/frontend",
+      "environment": {
+        "PLAYWRIGHT_JSON_OUTPUT_FILE": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3/test-results/improvement-ronda3/attempt-a34d14c/validation-final-runtime/c1-c2.results.json",
+        "PLAYWRIGHT_HTML_OUTPUT_DIR": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3/test-results/improvement-ronda3/attempt-a34d14c/validation-final-runtime/c1-c2.html"
+      },
+      "exit_code": 0,
+      "artifact": "test-results/improvement-ronda3/attempt-a34d14c/validation-final-runtime/c1-c2.results.json",
+      "format": "playwright-json",
+      "candidate_ids": [
+        "I-O-2e4131e1c3b8"
+      ],
+      "executed": true,
+      "report": "test-results/improvement-ronda3/attempt-a34d14c/qa-report-final-a34d14c.md",
+      "live": true,
+      "pre": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "post": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "source_unchanged": true,
+      "label": "final-e2e-c1-c2"
+    }
+  ],
+  "required_static_checks": [
+    {
+      "pre": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "post": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "expected_sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+      "process_exit_code": 0,
+      "source_unchanged": true,
+      "label": "ruff-scope",
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3",
+      "argv": [
+        "bash",
+        "-c",
+        "set -o pipefail; source /tmp/versiona-improvement-10102026/venv/bin/activate; ruff check --no-cache backend/accounts/tests/views/test_auth_throttles.py backend/public_tools/tests/test_public_comparison_endpoints.py backend/versiona_project/settings_prod.py 2>&1 | tee test-results/improvement-ronda3/attempt-a34d14c/ruff.log; exit ${PIPESTATUS[0]}"
+      ],
+      "environment": {},
+      "exit_code": 0,
+      "signal": null,
+      "finished_at": "2026-10-10T21:58:37.266Z"
+    },
+    {
+      "pre": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "post": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "expected_sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+      "process_exit_code": 0,
+      "source_unchanged": true,
+      "label": "eslint-scope",
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3/frontend",
+      "argv": [
+        "bash",
+        "-c",
+        "set -o pipefail; npx eslint --no-cache components/compare/CompareView.tsx components/compare/__tests__/CompareView.test.tsx e2e/app/compare/e1-compare-versions.spec.ts lib/stores/compareStore.ts lib/stores/__tests__/compareStore.test.ts lib/stores/jobStore.ts lib/stores/__tests__/jobStore.test.ts lib/stores/versionStore.ts lib/stores/__tests__/versionStore.historyLock.test.ts 2>&1 | tee /home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3/test-results/improvement-ronda3/attempt-a34d14c/eslint.log; exit ${PIPESTATUS[0]}"
+      ],
+      "environment": {},
+      "exit_code": 0,
+      "signal": null,
+      "finished_at": "2026-10-10T21:58:47.869Z"
+    },
+    {
+      "pre": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "post": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "expected_sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+      "process_exit_code": 1,
+      "source_unchanged": true,
+      "label": "gate-official-venv",
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3",
+      "argv": [
+        "bash",
+        "-c",
+        "set -o pipefail; source /tmp/versiona-improvement-10102026/venv/bin/activate; export PYTHONDONTWRITEBYTECODE=1; bash /home/dev_env/webapps/vps-ops-toolkit/scripts/qa/qa-agent.sh --verify versiona_project_staging --projdir=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3 --files=backend/accounts/tests/views/test_auth_throttles.py,backend/public_tools/tests/test_public_comparison_endpoints.py,frontend/lib/stores/__tests__/compareStore.test.ts,frontend/components/compare/__tests__/CompareView.test.tsx,frontend/lib/stores/__tests__/versionStore.historyLock.test.ts,frontend/lib/stores/__tests__/jobStore.test.ts,frontend/lib/stores/__tests__/versionStore.test.ts,frontend/e2e/app/compare/e1-compare-versions.spec.ts 2>&1 | tee test-results/improvement-ronda3/attempt-a34d14c/official-qa-gate-venv.log; exit ${PIPESTATUS[0]}"
+      ],
+      "environment": {},
+      "exit_code": 1,
+      "signal": null,
+      "finished_at": "2026-10-10T22:02:27.883Z"
+    },
+    {
+      "pre": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "post": {
+        "sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+        "tree": "187fd6a5d39116deb1cef110ab632363188c7597",
+        "status": ""
+      },
+      "expected_sha": "a34d14c1012387c676da45b9d68ce451dcff78c4",
+      "process_exit_code": 0,
+      "source_unchanged": true,
+      "label": "tsc-runtime-full-cache",
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3/frontend",
+      "argv": [
+        "bash",
+        "-c",
+        "set -o pipefail; npx tsc --noEmit --incremental false 2>&1 | tee /home/dev_env/webapps/.wt/versiona_project/queue-10102026-ronda3/test-results/improvement-ronda3/attempt-a34d14c/tsc-runtime-full-cache.log; exit ${PIPESTATUS[0]}"
+      ],
+      "environment": {},
+      "exit_code": 0,
+      "signal": null,
+      "finished_at": "2026-10-10T22:06:11.956Z"
+    }
+  ],
+  "nonblocking_official_gate": {
+    "label": "gate-official-venv",
+    "exit_code": 1,
+    "warnings": 1,
+    "errors": 0,
+    "meaning": "WARN heredado timezone.now, CI-parity mergeable; Ruff real disponible"
+  },
+  "history_manifest": "test-results/improvement-ronda3/attempt-a34d14c/qa-rejected-manifest.json",
+  "history_manifest_sha256": "68022791f99097ba370bcce4d508ed73bd7a41080c5ece7959aff2520f26b5da",
+  "risk_notes": [
+    "C2-R02 histórico: lote 11/12 agotó 180 s sin petición v2; mecanismo intermitente no acreditado. Diagnósticos y validación final pasaron, sin cambios de producto/test/config y sin atribuirlo a caché. Riesgo abierto.",
+    "window.prompt LOW/preexistente/diferido, sin contaminación reproducida",
+    "Audit heredado 21 paquetes afectados, explotación nueva no demostrada; no equivale a ausencia de riesgo"
+  ],
+  "runtime_provenance": "test-results/improvement-ronda3/attempt-a34d14c/services-live.json",
+  "runtime_pre_post": [
+    "test-results/improvement-ronda3/attempt-a34d14c/validation-final-runtime/pre-e1-c3.txt",
+    "test-results/improvement-ronda3/attempt-a34d14c/validation-final-runtime/post-e1-c3.txt",
+    "test-results/improvement-ronda3/attempt-a34d14c/validation-final-runtime/pre-c1-c2.txt",
+    "test-results/improvement-ronda3/attempt-a34d14c/validation-final-runtime/post-c1-c2.txt"
+  ],
+  "auditor": "test-results/improvement-ronda3/attempt-a34d14c/auditor-ratification.json",
+  "flow_audit": "test-results/improvement-ronda3/attempt-a34d14c/flow-audit.json",
+  "flow_semantic_review": "test-results/improvement-ronda3/attempt-a34d14c/flow-semantic-review.json"
+}
