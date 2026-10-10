@@ -64,6 +64,7 @@ def test_concurrent_password_reset_has_one_success(reset_account):
     assert user.check_password(outcomes[0][1]) is True
     assert user.check_password(outcomes[1][1]) is False
     assert code.used is True
+    assert user.auth_version == 1
 
 
 @pytest.mark.django_db
@@ -72,6 +73,9 @@ def test_failed_reset_write_preserves_reusable_code(api_client, reset_account, f
     """Preserve a reusable reset code when a password reset write fails."""
     user, code = reset_account
     original_password = user.password
+    from accounts.utils.auth_utils import generate_auth_tokens
+    from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
+    original_pair = generate_auth_tokens(user)
     tables = {'password': user._meta.db_table, 'code': code._meta.db_table}
     update_prefix = f'UPDATE {connection.ops.quote_name(tables[failed_row])}'
 
@@ -93,9 +97,16 @@ def test_failed_reset_write_preserves_reusable_code(api_client, reset_account, f
     code.refresh_from_db()
     assert user.password == original_password
     assert code.used is False
+    assert user.auth_version == 0
+    assert BlacklistedToken.objects.filter(token__user=user).count() == 0
+    still_valid = APIClient()
+    still_valid.credentials(HTTP_AUTHORIZATION=f"Bearer {original_pair['access']}")
+    assert still_valid.get(reverse('validate_token')).status_code == 200
     retried = api_client.post(reverse('verify_passcode_reset'), payload, format='json')
     assert retried.status_code == 200
     user.refresh_from_db()
     code.refresh_from_db()
     assert user.check_password('Amber-Cloud!74') is True
     assert code.used is True
+    assert user.auth_version == 1
+    assert still_valid.get(reverse('validate_token')).status_code == 401

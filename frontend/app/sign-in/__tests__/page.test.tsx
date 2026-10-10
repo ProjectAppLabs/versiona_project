@@ -391,4 +391,15 @@ describe('SignInPage', () => {
     expect(signOut).toHaveBeenCalled();
   });
 
+  it('returns a recovered linked Google account to settings', async () => {
+    window.history.pushState({}, '', '/sign-in?next=/settings');
+    const replace = jest.fn();
+    setAuthStoreState({ signIn: jest.fn(), googleLogin: jest.fn().mockResolvedValue({ requires2fa: false }) });
+    mockUseRouter.mockReturnValue({ replace });
+    mockJwtDecode.mockReturnValue({ email: 'google@example.com' });
+    render(<SignInPage />);
+    await user.click(screen.getByRole('button', { name: 'Google Login' }));
+    await waitFor(() => expect(replace).toHaveBeenCalledWith('/settings'));
+  });
+
 });

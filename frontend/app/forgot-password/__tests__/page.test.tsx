@@ -159,7 +159,7 @@ describe('ForgotPasswordPage', () => {
     expect(screen.getByText('Password reset successfully! Redirecting...')).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(replace).toHaveBeenCalledWith('/sign-in');
+      expect(replace).toHaveBeenCalledWith('/sign-in?next=/settings');
     }, { timeout: 3000 });
   });
 

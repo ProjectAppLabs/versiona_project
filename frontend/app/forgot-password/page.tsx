@@ -63,7 +63,7 @@ export default function ForgotPasswordPage() {
     try {
       await resetPassword({ email, code, new_password: newPassword });
       setMessage(getGoogleLinkTicket() ? googleLink.resetContinuation : 'Password reset successfully! Redirecting...');
-      router.replace(getGoogleLinkTicket() ? '/sign-in?next=/settings' : '/sign-in');
+      router.replace('/sign-in?next=/settings');
     } catch (err) {
       setError(apiErrorMessage(err, 'Failed to reset password'));
     } finally {

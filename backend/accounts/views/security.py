@@ -76,6 +76,8 @@ def sessions_revoke_others(request):
 def google_link(request):
     from accounts.services.google_identity_service import GoogleIdentityError, verify_google_identity, link_google
 
+    if not isinstance(request.data, dict):
+        return Response({'error': 'Envía los datos de vinculación como un objeto.'}, status=status.HTTP_400_BAD_REQUEST)
     try:
         # Network I/O happens before the service takes the account row lock.
         identity = verify_google_identity((request.data or {}).get('credential'))

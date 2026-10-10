@@ -69,7 +69,7 @@ and API contracts before writing or reviewing E2E tests. Flow ids map 1:1 to
 | `f2-usage-panel` | F2 Usage panel + warnings + trial line | billing | P2 | member | `/org/usage` (header "Plan y uso") | Implemented (It7/It9) |
 | `c4-delete-draft` | C4 Delete a draft version | documents | P2 | editor | version timeline | Implemented (It1) |
 | `b4-archive-delete` | B4 Archive/delete a project | projects | P2 | admin | project settings + `/org/trash` | Implemented (It1) |
-| `a3-account-security` | A3 TOTP, Google explícito y sesiones | auth | P2 | user | `/settings`, `/sign-in`, `/sign-up` | Implemented (It6) |
+| `a3-account-security` | A3 TOTP, Google explícito y sesiones | auth | P2 | user | `/settings`, `/sign-in`, `/sign-up`, `/forgot-password` | Implemented (It6) |
 | `e2-saved-comparisons` | E2 Saved comparisons | compare | P2 | viewer | compare view + project panel | Implemented (It7) |
 | `e4-constancia` | E4 Exportable certificate | review | P2 | admin | version viewer (Certificates panel — Constancias) | Implemented (It7) |
 | `master-e2e-journey` | Master journey (16 steps, 3 users) | master | P1 | guest/editor/reviewer | end-to-end | Implemented (It8) |

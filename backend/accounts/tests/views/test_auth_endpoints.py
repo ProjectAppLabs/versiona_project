@@ -986,3 +986,44 @@ def test_validate_token_success(api_client):
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json()['valid'] is True
+
+
+@pytest.mark.django_db
+def test_recovery_of_a_linked_google_account_keeps_its_identity(api_client, django_user_model):
+    user = django_user_model.objects.create_user(email='already-linked@example.com', google_subject='persisted-subject')
+    code = PasswordCode.objects.create(user=user, code='123456')
+    response = _reset_with(api_client, user.email, code.code)
+    assert response.status_code == 200
+    assert 'google_link_ticket' not in response.data
+    user.refresh_from_db()
+    assert user.google_subject == 'persisted-subject'
+    assert user.auth_version == 1
+
+
+@pytest.mark.django_db
+def test_recovery_of_a_legacy_google_account_creates_local_admission(api_client, django_user_model):
+    user = django_user_model.objects.create_user(email='legacy-google@example.com')
+    assert user.has_usable_password() is False
+    code = PasswordCode.objects.create(user=user, code='123456')
+    response = _reset_with(api_client, user.email, code.code)
+    assert response.status_code == 200
+    assert response.data['google_link_ticket']
+    assert 'access' not in response.data
+    assert 'user' not in response.data
+    user.refresh_from_db()
+    assert user.check_password('NewPass!2026')
+    assert user.google_subject is None
+
+
+@pytest.mark.django_db
+@override_settings(GOOGLE_OAUTH_CLIENT_ID='client-1')
+def test_google_login_rejects_a_different_subject_for_a_linked_email(api_client, django_user_model, monkeypatch):
+    user = django_user_model.objects.create_user(email='bound@example.com', google_subject='original-subject')
+    transport = DummyResponse(payload={'aud': 'client-1', 'email': user.email, 'email_verified': True, 'sub': 'different-subject'})
+    monkeypatch.setattr(auth_views.requests, 'get', Mock(return_value=transport))
+    response = api_client.post(reverse('google_login'), {'credential': 'token'}, format='json')
+    assert response.status_code == 409
+    assert response.data['code'] == 'google_identity_conflict'
+    assert 'access' not in response.data
+    user.refresh_from_db()
+    assert user.google_subject == 'original-subject'

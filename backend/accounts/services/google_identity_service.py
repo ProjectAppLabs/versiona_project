@@ -83,6 +83,13 @@ def _valid_ticket(ticket, user):
             and type(payload.get('auth_version')) is int and version_matches(payload, user))
 
 
+
+def _email_conflict(existing):
+    if existing is not None and existing.google_subject:
+        return GoogleIdentityError('Este correo ya tiene otra identidad de Google vinculada.', 409, 'google_identity_conflict')
+    return GoogleIdentityError('Recupera tu cuenta por correo y conecta Google en Configuración → Seguridad.', 409, 'google_link_required')
+
+
 def google_account(identity):
     """Never use a matching email to authenticate or modify an existing user."""
     User = get_user_model()
@@ -90,8 +97,9 @@ def google_account(identity):
         user = User.objects.filter(google_subject=identity.subject).first()
         if user is not None:
             return user, False
-        if User.objects.filter(email=identity.email).exists():
-            raise GoogleIdentityError('Recupera tu cuenta por correo y conecta Google en Configuración → Seguridad.', 409, 'google_link_required')
+        existing = User.objects.filter(email=identity.email).only('google_subject').first()
+        if existing is not None:
+            raise _email_conflict(existing)
         try:
             with transaction.atomic():
                 user = User(email=identity.email, google_subject=identity.subject,
@@ -103,7 +111,7 @@ def google_account(identity):
             user = User.objects.filter(google_subject=identity.subject).first()
             if user is not None:
                 return user, False
-            raise GoogleIdentityError('Recupera tu cuenta por correo y conecta Google en Configuración → Seguridad.', 409, 'google_link_required')
+            raise _email_conflict(User.objects.filter(email=identity.email).only('google_subject').first())
         from orgs.services import ensure_personal_org
         ensure_personal_org(user)
         return user, True

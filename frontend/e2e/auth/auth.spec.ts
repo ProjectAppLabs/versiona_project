@@ -162,9 +162,12 @@ test.describe('Authentication', () => {
 });
 
 
-for (const route of ['/sign-in', '/sign-up']) {
+for (const { route, tags } of [
+  { route: '/sign-in', tags: AUTH_SIGN_IN_FORM },
+  { route: '/sign-up', tags: AUTH_SIGN_UP_FORM },
+]) {
   test(`Google on ${route} requires recovery for an existing email`, {
-    tag: [...AUTH_SIGN_IN_FORM, ...AUTH_SIGN_UP_FORM, '@outcome:error'],
+    tag: [...tags, '@outcome:error'],
   }, async ({ page, request }) => {
     const email = await createRecoveryAccount(request);
     await installGoogleBoundary(page, googleCredential(email));

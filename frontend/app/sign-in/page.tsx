@@ -102,7 +102,8 @@ export default function SignInPage() {
         return;
       }
       
-      router.replace('/projects');
+      const next = new URLSearchParams(window.location.search).get('next');
+      router.replace(next === '/settings' ? '/settings' : '/projects');
     } catch (err) {
       const data = (err as { response?: { status?: number; data?: { code?: string } } }).response;
       if (data?.status === 409 && data.data?.code === 'google_link_required') {
