@@ -207,6 +207,9 @@ describe('http service', () => {
   });
 
   it('never replays a Google linking mutation after a 401 response', async () => {
+    mockGetRefreshToken.mockReturnValue('valid-refresh');
+    mockAxios.post.mockResolvedValueOnce({ data: { access: 'new-access', refresh: 'new-refresh' } });
+    apiInstance.mockResolvedValueOnce('replayed-link');
     await import('../http');
     const error = { response: { status: 401 }, config: { url: 'me/google/link/' } };
     await expect(responseErrorInterceptor?.(error)).rejects.toBe(error);

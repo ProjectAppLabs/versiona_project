@@ -73,8 +73,9 @@ def test_failed_reset_write_preserves_reusable_code(api_client, reset_account, f
     """Preserve a reusable reset code when a password reset write fails."""
     user, code = reset_account
     original_password = user.password
-    from accounts.utils.auth_utils import generate_auth_tokens
     from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
+
+    from accounts.utils.auth_utils import generate_auth_tokens
     original_pair = generate_auth_tokens(user)
     tables = {'password': user._meta.db_table, 'code': code._meta.db_table}
     update_prefix = f'UPDATE {connection.ops.quote_name(tables[failed_row])}'

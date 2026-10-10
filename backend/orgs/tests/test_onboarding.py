@@ -1,9 +1,10 @@
 """A1: wizard + sample project seed → the wow link (metric S1)."""
 
+import time
 from unittest.mock import Mock
 
 import pytest
-from accounts.views import auth as auth_views
+from accounts.services import google_identity_service
 from documents.services import storage_service
 from rest_framework.test import APIClient
 
@@ -37,18 +38,27 @@ def google_signup(api_client, monkeypatch, settings):
     settings.GOOGLE_OAUTH_CLIENT_ID = 'client-1'
     tokeninfo = Mock(status_code=200, text='')
     tokeninfo.json = Mock(return_value={
+        'sub': 'onboarding-google-subject',
         'aud': 'client-1',
+        'iss': 'https://accounts.google.com',
+        'exp': int(time.time()) + 3600,
         'email': GOOGLE_EMAIL,
         'email_verified': True,
         'given_name': 'Nueva',
         'family_name': 'Google',
     })
-    monkeypatch.setattr(auth_views.requests, 'get', Mock(return_value=tokeninfo))
+    transport = Mock(return_value=tokeninfo)
+    monkeypatch.setattr(google_identity_service.requests, 'get', transport)
 
     def _signup():
-        return api_client.post(
+        response = api_client.post(
             '/api/google_login/', {'credential': 'token-google'}, format='json'
         )
+        transport.assert_called_once_with(
+            google_identity_service.TOKENINFO_URL,
+            params={'id_token': 'token-google'}, timeout=5,
+        )
+        return response
 
     return _signup
 
@@ -66,7 +76,8 @@ def failing_storage(monkeypatch):
 @pytest.mark.escenario('A1-A01')
 def test_google_signup_provisions_the_personal_org(google_signup, django_user_model):
     """Provision a personal organization owned by the new Google user."""
-    google_signup()
+    response = google_signup()
+    assert response.status_code == 200
 
     user = django_user_model.objects.get(email=GOOGLE_EMAIL)
     membership = OrganizationMembership.objects.get(user=user)
@@ -80,7 +91,8 @@ def test_google_signup_leaves_the_onboarding_wizard_pending(
     google_signup, django_user_model
 ):
     """Leave the onboarding wizard pending after Google account creation."""
-    google_signup()
+    response = google_signup()
+    assert response.status_code == 200
 
     user = django_user_model.objects.get(email=GOOGLE_EMAIL)
     client = APIClient()
