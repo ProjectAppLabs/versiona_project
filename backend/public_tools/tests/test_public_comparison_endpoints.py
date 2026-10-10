@@ -39,11 +39,13 @@ def _clean_throttle_cache():
 
 
 def upload(name: str, content: bytes | None = None) -> SimpleUploadedFile:
+    """Build a PDF upload from fixture bytes or explicit content."""
     data = content if content is not None else (TESTDATA / name).read_bytes()
     return SimpleUploadedFile(name, data, content_type='application/pdf')
 
 
 def post_pair(api_client, file_a, file_b):
+    """Submit both PDF uploads to the public comparison endpoint."""
     return api_client.post(URL, {'file_a': file_a, 'file_b': file_b},
                            format='multipart')
 
@@ -170,6 +172,7 @@ def test_production_public_quota_preserves_an_independent_client_budget(
 @pytest.mark.django_db
 @pytest.mark.escenario('PC-F01')
 def test_post_happy_path_returns_done_result_in_eager_mode(api_client):
+    """Return the completed comparison result after eager processing."""
     response = post_pair(
         api_client, upload('contrato_v1.pdf'), upload('contrato_v2.pdf')
     )
@@ -185,6 +188,7 @@ def test_post_happy_path_returns_done_result_in_eager_mode(api_client):
 @pytest.mark.django_db
 @pytest.mark.escenario('PC-F02')
 def test_post_creates_no_org_project_document_rows(api_client):
+    """Keep public comparisons outside tenant document records."""
     from documents.models import Document, DocumentVersion
     from orgs.models import Organization
     from projects.models import Project
@@ -200,6 +204,7 @@ def test_post_creates_no_org_project_document_rows(api_client):
 @pytest.mark.django_db
 @pytest.mark.escenario('PC-E01')
 def test_post_rejects_oversize_file_with_413(api_client):
+    """Reject a PDF upload that exceeds the size limit."""
     heavy = upload('pesado.pdf', b'%PDF-' + b'0' * (11 * 1024 * 1024))
 
     response = post_pair(api_client, heavy, upload('contrato_v2.pdf'))
@@ -211,6 +216,7 @@ def test_post_rejects_oversize_file_with_413(api_client):
 @pytest.mark.django_db
 @pytest.mark.escenario('PC-E02')
 def test_post_rejects_non_pdf_with_415(api_client):
+    """Reject uploaded bytes that lack a PDF signature."""
     fake = upload('archivo.pdf', b'GIF89a not a pdf at all')
 
     response = post_pair(api_client, fake, upload('contrato_v2.pdf'))
@@ -222,6 +228,7 @@ def test_post_rejects_non_pdf_with_415(api_client):
 @pytest.mark.django_db
 @pytest.mark.escenario('PC-E03')
 def test_post_rejects_encrypted_pdf_with_400(api_client):
+    """Reject a password-protected PDF before comparison."""
     response = post_pair(
         api_client, upload('protegido.pdf'), upload('contrato_v2.pdf')
     )
@@ -233,6 +240,7 @@ def test_post_rejects_encrypted_pdf_with_400(api_client):
 @pytest.mark.django_db
 @pytest.mark.escenario('PC-E04')
 def test_post_rejects_scanned_pdf_with_422_ocr_required(api_client):
+    """Require OCR for a scanned PDF with no extractable text."""
     response = post_pair(
         api_client, upload('escaneado_v1.pdf'), upload('contrato_v2.pdf')
     )
@@ -244,6 +252,7 @@ def test_post_rejects_scanned_pdf_with_422_ocr_required(api_client):
 @pytest.mark.django_db
 @pytest.mark.escenario('PC-E05')
 def test_post_rejects_page_count_over_cap_with_422(api_client, settings):
+    """Reject a PDF exceeding the configured page limit."""
     settings.PUBLIC_COMPARE_MAX_PAGES = 1
 
     response = post_pair(
@@ -257,6 +266,7 @@ def test_post_rejects_page_count_over_cap_with_422(api_client, settings):
 @pytest.mark.django_db
 @pytest.mark.escenario('PC-E06')
 def test_post_throttled_returns_429(api_client, monkeypatch):
+    """Reject a comparison request after the hourly quota is spent."""
     monkeypatch.setattr(PublicCompareThrottle, 'rate', '1/hour', raising=False)
 
     post_pair(api_client, upload('contrato_v1.pdf'), upload('contrato_v2.pdf'))
@@ -270,6 +280,7 @@ def test_post_throttled_returns_429(api_client, monkeypatch):
 @pytest.mark.django_db
 @pytest.mark.escenario('PC-E07')
 def test_get_unknown_id_returns_404(api_client):
+    """Return not found for an unknown public comparison."""
     response = api_client.get(
         f'{URL}0198c9a0-0000-7000-8000-000000000000/'
     )
@@ -280,6 +291,7 @@ def test_get_unknown_id_returns_404(api_client):
 @pytest.mark.django_db
 @pytest.mark.escenario('PC-E08')
 def test_get_expired_row_returns_410_with_expired_code(api_client):
+    """Return expired for a public comparison past its lifetime."""
     comparison = PublicComparison.objects.create(
         status=PublicComparison.Status.DONE,
         result={'counts': {}},
