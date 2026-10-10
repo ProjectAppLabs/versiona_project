@@ -10,6 +10,7 @@ from accounts import twofactor
 
 @pytest.fixture
 def user(django_user_model):
+    """Create a local account for isolated second-factor lifecycle checks."""
     return django_user_model.objects.create_user(
         email='segura@versiona.test', password='secreta123'
     )
@@ -17,6 +18,7 @@ def user(django_user_model):
 
 @pytest.fixture
 def enabled_user(user):
+    """Enroll TOTP and return the active secret with its one-use backup factors."""
     setup = twofactor.setup(user)
     code = pyotp.TOTP(setup['secret']).now()
     backup_codes = twofactor.enable(user, code)
@@ -27,6 +29,7 @@ def enabled_user(user):
 @pytest.mark.django_db
 @pytest.mark.escenario('A3-F01')
 def test_setup_returns_secret_otpauth_and_qr(user):
+    """Persist pending enrollment material without activating the second factor."""
     result = twofactor.setup(user)
 
     assert result['otpauth_url'].startswith('otpauth://totp/Versiona')
@@ -39,6 +42,7 @@ def test_setup_returns_secret_otpauth_and_qr(user):
 @pytest.mark.django_db
 @pytest.mark.escenario('A3-F02')
 def test_enable_verifies_the_code_and_returns_backup_codes_once(enabled_user):
+    """Store hashed backup factors after successful TOTP enrollment."""
     user, secret, backup_codes = enabled_user
 
     assert user.totp_enabled_at is not None
@@ -50,6 +54,7 @@ def test_enable_verifies_the_code_and_returns_backup_codes_once(enabled_user):
 @pytest.mark.django_db
 @pytest.mark.escenario('A3-E01')
 def test_enable_rejects_a_wrong_code(user):
+    """Reject enrollment when the submitted TOTP code is incorrect."""
     twofactor.setup(user)
 
     with pytest.raises(DomainError):
@@ -59,6 +64,7 @@ def test_enable_rejects_a_wrong_code(user):
 @pytest.mark.django_db
 @pytest.mark.escenario('A3-F03')
 def test_login_becomes_a_two_step_challenge(client_as, enabled_user):
+    """Require a second-factor challenge before granting an enrolled account a session."""
     user, secret, _ = enabled_user
     client = APIClient()
 
@@ -82,6 +88,7 @@ def test_login_becomes_a_two_step_challenge(client_as, enabled_user):
 @pytest.mark.django_db
 @pytest.mark.escenario('A3-E02')
 def test_wrong_totp_code_keeps_the_door_closed(enabled_user):
+    """Reject session admission when the challenge receives an invalid TOTP code."""
     user, secret, _ = enabled_user
     client = APIClient()
     challenge = client.post('/api/sign_in/', {
@@ -98,6 +105,7 @@ def test_wrong_totp_code_keeps_the_door_closed(enabled_user):
 @pytest.mark.django_db
 @pytest.mark.escenario('A3-A01')
 def test_backup_code_works_exactly_once(enabled_user):
+    """Admit a backup factor once and reject its subsequent reuse."""
     user, _, backup_codes = enabled_user
 
     assert twofactor.verify_code(user, backup_codes[0]) is True
@@ -108,6 +116,7 @@ def test_backup_code_works_exactly_once(enabled_user):
 @pytest.mark.django_db
 @pytest.mark.escenario('A3-A02')
 def test_disable_requires_a_valid_code(enabled_user):
+    """Require an enrolled factor before removing second-factor protection."""
     user, secret, _ = enabled_user
 
     with pytest.raises(DomainError):
@@ -122,6 +131,7 @@ def test_disable_requires_a_valid_code(enabled_user):
 @pytest.mark.django_db
 @pytest.mark.escenario('A3-F04')
 def test_sessions_list_and_selective_revocation(user):
+    """Keep the current session while blacklisting other outstanding refresh tokens."""
     from rest_framework_simplejwt.tokens import RefreshToken
 
     keep = RefreshToken.for_user(user)
@@ -143,6 +153,7 @@ def test_sessions_list_and_selective_revocation(user):
 @pytest.mark.django_db
 @pytest.mark.escenario('A3-F05')
 def test_security_endpoints_roundtrip(enabled_user):
+    """Expose enrollment and session controls through authenticated security endpoints."""
     user, secret, _ = enabled_user
     client = APIClient()
     client.force_authenticate(user)
@@ -158,6 +169,7 @@ def test_security_endpoints_roundtrip(enabled_user):
 
 @pytest.mark.django_db
 def test_password_rotation_revokes_an_outstanding_totp_challenge(enabled_user):
+    """Reject a TOTP challenge issued before the account epoch rotates."""
     user, _, _ = enabled_user
     challenge = twofactor.issue_challenge(user)
     type(user).objects.filter(pk=user.pk).update(auth_version=1)
@@ -167,6 +179,7 @@ def test_password_rotation_revokes_an_outstanding_totp_challenge(enabled_user):
 
 @pytest.mark.django_db
 def test_email_recovery_revokes_a_totp_challenge(enabled_user):
+    """Reject a TOTP challenge immediately after successful email recovery."""
     from accounts.models import PasswordCode
     user, _, _ = enabled_user
     challenge = twofactor.issue_challenge(user)

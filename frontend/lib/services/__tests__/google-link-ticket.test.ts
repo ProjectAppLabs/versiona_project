@@ -13,6 +13,7 @@ it('keeps recovery proof in this tab without writing authentication cookies', ()
 it('discards an expired recovery proof', () => {
   jest.useFakeTimers();
   saveGoogleLinkTicket('email-proof');
+  expect(getGoogleLinkTicket()).toBe('email-proof');
   jest.advanceTimersByTime(15 * 60 * 1000);
   expect(getGoogleLinkTicket()).toBeNull();
   expect(sessionStorage.getItem('google_link_ticket')).toBeNull();
@@ -25,6 +26,7 @@ it.each(['broken json', JSON.stringify({ ticket: 'proof' }), JSON.stringify({ ti
 
 it('clears the previous recovery proof when the next reset returns no ticket', () => {
   saveGoogleLinkTicket('old-proof');
+  expect(getGoogleLinkTicket()).toBe('old-proof');
   saveGoogleLinkTicket(undefined);
   expect(getGoogleLinkTicket()).toBeNull();
   clearGoogleLinkTicket();

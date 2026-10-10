@@ -990,6 +990,7 @@ def test_validate_token_success(api_client):
 
 @pytest.mark.django_db
 def test_recovery_of_a_linked_google_account_keeps_its_identity(api_client, django_user_model):
+    """Preserve the existing provider identity during email recovery without issuing a link ticket."""
     user = django_user_model.objects.create_user(email='already-linked@example.com', google_subject='persisted-subject')
     code = PasswordCode.objects.create(user=user, code='123456')
     response = _reset_with(api_client, user.email, code.code)
@@ -1002,6 +1003,7 @@ def test_recovery_of_a_linked_google_account_keeps_its_identity(api_client, djan
 
 @pytest.mark.django_db
 def test_recovery_of_a_legacy_google_account_creates_local_admission(api_client, django_user_model):
+    """Give a passwordless legacy account local credentials and explicit linking proof after recovery."""
     user = django_user_model.objects.create_user(email='legacy-google@example.com')
     assert user.has_usable_password() is False
     code = PasswordCode.objects.create(user=user, code='123456')
@@ -1018,6 +1020,7 @@ def test_recovery_of_a_legacy_google_account_creates_local_admission(api_client,
 @pytest.mark.django_db
 @override_settings(GOOGLE_OAUTH_CLIENT_ID='client-1')
 def test_google_login_rejects_a_different_subject_for_a_linked_email(api_client, django_user_model, monkeypatch):
+    """Reject another provider subject without modifying the already linked identity."""
     user = django_user_model.objects.create_user(email='bound@example.com', google_subject='original-subject')
     transport = DummyResponse(payload={'aud': 'client-1', 'email': user.email, 'email_verified': True, 'sub': 'different-subject'})
     monkeypatch.setattr(auth_views.requests, 'get', Mock(return_value=transport))

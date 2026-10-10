@@ -102,7 +102,8 @@ test('email recovery then explicit Google linking revokes preregistration sessio
   await page.getByRole('button', { name: 'Send verification code', exact: true }).click();
   await expect(page.getByPlaceholder('000000')).toBeVisible();
   const message = await waitForEmail({ to: email, subjectContains: 'Password Reset Code' });
-  if (!process.env.MAILPIT_API) throw new Error('Private MAILPIT_API is required.');
+  expect(process.env.MAILPIT_API).toEqual(expect.any(String));
+  expect(process.env.MAILPIT_API).not.toBe('');
   const mailbox = await request.get(`${process.env.MAILPIT_API}/api/v1/message/${message.ID}`);
   expect(mailbox.status()).toBe(200);
   const code = ((await mailbox.json()).Text as string).match(/\b\d{6}\b/)?.[0];
@@ -126,6 +127,10 @@ test('email recovery then explicit Google linking revokes preregistration sessio
   await page.getByTestId('google-link-confirm').fill(linkedPassword);
   const beforeLink = await page.context().cookies();
   const oldAccess = beforeLink.find((cookie) => cookie.name === 'access_token')?.value;
+  expect(oldAccess).toEqual(expect.any(String));
+  expect(oldAccess).not.toBe('');
+  const admitted = await request.get('/api/validate_token/', { headers: { Authorization: `Bearer ${oldAccess}` } });
+  expect(admitted.status()).toBe(200);
   await page.getByTestId('google-boundary-button').click();
   await page.getByTestId('google-link-submit').click();
   await expect(page.getByTestId('google-link-panel').getByRole('status')).toHaveText(
