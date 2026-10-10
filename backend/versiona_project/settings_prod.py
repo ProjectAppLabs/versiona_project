@@ -42,6 +42,10 @@ SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+# The deployed /api/ route goes through one nginx proxy into the Unix socket.
+# Ignore any X-Forwarded-For prefix supplied by the visitor when throttling.
+REST_FRAMEWORK = {**REST_FRAMEWORK, 'NUM_PROXIES': 1}  # noqa: F405
+
 # ---------------------------------------------------------------------------
 # Database — MySQL 8 (production). Same builder as the base settings, so the
 # driver OPTIONS cannot drift between the two files.
