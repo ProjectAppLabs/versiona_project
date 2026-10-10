@@ -3,6 +3,11 @@
 from __future__ import annotations
 
 import copy
+import importlib.util
+import os
+import sys
+import types
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -15,6 +20,10 @@ from accounts.throttles import AuthThrottle
 
 AUTH_IP = '198.51.100.24'
 OTHER_AUTH_IP = '198.51.100.25'
+FORWARDED_PREFIXES = (
+    pytest.param('192.0.2.{}', id='ipv4-prefix'),
+    pytest.param('2001:db8:ffff::{}', id='ipv6-prefix'),
+)
 PUBLIC_AUTH_REQUESTS = (
     pytest.param('/api/token/', {'email': 'quota@example.com', 'password': 'wrongpass'}, id='token-obtain'),
     pytest.param('/api/token/refresh/', {'refresh': 'not-a-refresh-token'}, id='token-refresh'),
@@ -55,6 +64,134 @@ def _post_from_ip(client, url, payload, ip_address=AUTH_IP):
 def _consume_auth_quota(client, url, payload, ip_address=AUTH_IP):
     for _ in range(5):
         _post_from_ip(client, url, payload, ip_address)
+
+
+@pytest.fixture
+def production_proxy_framework(settings, monkeypatch, tmp_path, _use_five_attempt_auth_rate):
+    """Load real production overrides with private modules and filesystem boundaries.
+
+    No project-global settings import, .env read, database connection or logging
+    configuration occurs. The production module supplies NUM_PROXIES unchanged.
+    """
+    settings_dir = Path(__file__).resolve().parents[3] / 'versiona_project'
+    package_name = '_versiona_private_auth_settings'
+    package = types.ModuleType(package_name)
+    package.__path__ = [str(settings_dir)]
+    monkeypatch.setitem(sys.modules, package_name, package)
+    monkeypatch.setattr(sys, 'dont_write_bytecode', True)
+    private_environment = {
+        'DJANGO_SECRET_KEY': 'private-settings-test-only',
+        'DJANGO_ALLOWED_HOSTS': 'testserver',
+        'DJANGO_ENV': 'test',
+        'DJANGO_DB_ENGINE': 'django.db.backends.sqlite3',
+        'DJANGO_DB_NAME': ':memory:',
+    }
+
+    # Both mocked operations are filesystem boundaries; all configuration code
+    # executes normally, including the real production REST_FRAMEWORK override.
+    with patch.dict(os.environ, private_environment, clear=True), \
+            patch('dotenv.load_dotenv', return_value=False), patch('pathlib.Path.mkdir'):
+        for name in ('db', 'settings', 'settings_prod'):
+            spec = importlib.util.spec_from_file_location(
+                f'{package_name}.{name}', settings_dir / f'{name}.py',
+            )
+            module = importlib.util.module_from_spec(spec)
+            module.__file__ = str(tmp_path / 'backend' / 'versiona_project' / f'{name}.py')
+            monkeypatch.setitem(sys.modules, spec.name, module)
+            spec.loader.exec_module(module)
+
+    settings.REST_FRAMEWORK = copy.deepcopy(module.REST_FRAMEWORK)
+    cache.clear()
+    yield
+    cache.clear()
+
+
+def _post_forwarded_auth(client, url, payload, prefix, attempt, client_ip=AUTH_IP):
+    """Model nginx appending its observed client address to an untrusted prefix."""
+    return client.post(
+        url, payload, format='json', REMOTE_ADDR='',
+        HTTP_X_FORWARDED_FOR=f'{prefix.format(attempt)}, {client_ip}',
+    )
+
+
+def _consume_forwarded_auth_quota(client, prefix, client_ip=AUTH_IP):
+    """Send the five preceding requests whose budget the next request must respect."""
+    payload = {'email': 'proxy-quota@example.com', 'password': 'wrongpass'}
+    return [
+        _post_forwarded_auth(
+            client, reverse('token_obtain_pair'), payload, prefix, attempt, client_ip,
+        ).status_code
+        for attempt in range(1, 6)
+    ]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('prefix', FORWARDED_PREFIXES)
+def test_production_auth_quota_rejects_rotating_forwarded_prefix(
+    api_client, production_proxy_framework, prefix,
+):
+    """Fails if caller-controlled XFF prefixes create a new authentication budget."""
+    # Arrange
+    preceding_statuses = _consume_forwarded_auth_quota(api_client, prefix)
+
+    # Act
+    response = _post_forwarded_auth(
+        api_client, reverse('token_obtain_pair'),
+        {'email': 'proxy-quota@example.com', 'password': 'wrongpass'}, prefix, 6,
+    )
+
+    # Assert
+    assert preceding_statuses == [status.HTTP_401_UNAUTHORIZED] * 5
+    assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
+    assert response['Retry-After'] != ''
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('prefix', FORWARDED_PREFIXES)
+def test_production_auth_quota_preserves_an_independent_client_budget(
+    api_client, production_proxy_framework, prefix,
+):
+    """Fails if the proxy socket address merges independent client budgets."""
+    # Arrange
+    exhausted_statuses = _consume_forwarded_auth_quota(api_client, prefix)
+
+    # Act
+    independent_statuses = _consume_forwarded_auth_quota(api_client, prefix, OTHER_AUTH_IP)
+    response = _post_forwarded_auth(
+        api_client, reverse('token_obtain_pair'),
+        {'email': 'proxy-quota@example.com', 'password': 'wrongpass'},
+        prefix, 6, OTHER_AUTH_IP,
+    )
+
+    # Assert
+    assert exhausted_statuses == [status.HTTP_401_UNAUTHORIZED] * 5
+    assert independent_statuses == [status.HTTP_401_UNAUTHORIZED] * 5
+    assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('prefix', FORWARDED_PREFIXES)
+def test_production_forwarded_quota_blocks_password_reset(
+    api_client, django_user_model, production_proxy_framework, prefix,
+):
+    """Fails if a forged prefix permits recovery persistence after quota exhaustion."""
+    # Arrange
+    user = django_user_model.objects.create_user(
+        email='forwarded-reset@example.com', password='pass1234',
+    )
+    preceding_statuses = _consume_forwarded_auth_quota(api_client, prefix)
+
+    # Act
+    with patch('accounts.views.auth.send_password_reset_code', return_value=True) as send_reset:
+        response = _post_forwarded_auth(
+            api_client, reverse('send_passcode'), {'email': user.email}, prefix, 6,
+        )
+
+    # Assert
+    assert preceding_statuses == [status.HTTP_401_UNAUTHORIZED] * 5
+    assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
+    assert PasswordCode.objects.filter(user=user).count() == 0
+    send_reset.assert_not_called()
 
 
 @pytest.mark.django_db
