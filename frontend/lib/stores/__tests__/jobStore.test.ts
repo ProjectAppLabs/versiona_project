@@ -52,6 +52,86 @@ describe('jobStore', () => {
     expect(mockGet).toHaveBeenCalledTimes(1);
   });
 
+  it('records a terminal timeout without a successful response', async () => {
+    mockGet.mockRejectedValue(new Error('Network unavailable'));
+    const startedAt = Date.now();
+    useJobStore.getState().track('no-response-state');
+
+    await act(async () => {
+      await jest.advanceTimersByTimeAsync(310_000);
+    });
+
+    expect(useJobStore.getState().jobs['no-response-state']).toEqual({
+      public_id: 'no-response-state',
+      job_type: '',
+      status: 'failed',
+      attempts: 0,
+      error: 'timeout',
+      result: null,
+      version_id: null,
+      startedAt,
+    });
+  });
+
+  it('notifies timeout once without a successful response', async () => {
+    mockGet.mockRejectedValue(new Error('Network unavailable'));
+    const onFinish = jest.fn();
+    useJobStore.getState().track('no-response-callback', onFinish);
+
+    await act(async () => {
+      await jest.advanceTimersByTimeAsync(370_000);
+    });
+
+    expect(onFinish).toHaveBeenCalledTimes(1);
+    expect(onFinish).toHaveBeenCalledWith(
+      useJobStore.getState().jobs['no-response-callback']
+    );
+  });
+
+  it('stops requests after polling errors exhaust the deadline', async () => {
+    mockGet.mockRejectedValue(new Error('Network unavailable'));
+    useJobStore.getState().track('no-response-requests');
+    await act(async () => {
+      await jest.advanceTimersByTimeAsync(310_000);
+    });
+    const callsAtTimeout = mockGet.mock.calls.length;
+
+    await act(async () => {
+      await jest.advanceTimersByTimeAsync(60_000);
+    });
+
+    expect(mockGet).toHaveBeenCalledTimes(callsAtTimeout);
+    expect(jest.getTimerCount()).toBe(0);
+  });
+
+  it('retains the last successful snapshot on timeout', async () => {
+    const snapshot = {
+      public_id: 'previous-snapshot',
+      job_type: 'analysis',
+      status: 'running',
+      attempts: 2,
+      error: null,
+      result: { checkpoint: 'analysis' },
+      version_id: 'version-1',
+    };
+    mockGet
+      .mockResolvedValueOnce({ data: snapshot })
+      .mockRejectedValue(new Error('Network unavailable'));
+    const startedAt = Date.now();
+    useJobStore.getState().track('previous-snapshot');
+
+    await act(async () => {
+      await jest.advanceTimersByTimeAsync(310_000);
+    });
+
+    expect(useJobStore.getState().jobs['previous-snapshot']).toEqual({
+      ...snapshot,
+      status: 'failed',
+      error: 'timeout',
+      startedAt,
+    });
+  });
+
   it('does not double-track the same job id', async () => {
     mockGet.mockResolvedValue({ data: { public_id: 'j3', status: 'running' } });
 
