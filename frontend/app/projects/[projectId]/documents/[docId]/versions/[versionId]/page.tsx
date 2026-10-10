@@ -35,10 +35,14 @@ export default function VersionViewerPage() {
   const seals = useDict('seals');
   const common = useDict('common');
   const { toast } = useToast();
-  const detail = useVersionStore((s) => s.detail);
-  const fileUrl = useVersionStore((s) => s.fileUrl);
+  const storedDetail = useVersionStore((s) => s.detail);
+  const storedFileUrl = useVersionStore((s) => s.fileUrl);
+  const detailVersionId = useVersionStore((s) => s.detailVersionId);
+  const fileVersionId = useVersionStore((s) => s.fileVersionId);
   const isLoading = useVersionStore((s) => s.isLoading);
-  const error = useVersionStore((s) => s.error);
+  const isFileLoading = useVersionStore((s) => s.isFileLoading);
+  const storedDetailError = useVersionStore((s) => s.detailError);
+  const storedFileError = useVersionStore((s) => s.fileError);
   const fetchDetail = useVersionStore((s) => s.fetchDetail);
   const fetchFileUrl = useVersionStore((s) => s.fetchFileUrl);
   const revokeSeal = useSealStore((s) => s.revokeSeal);
@@ -50,10 +54,24 @@ export default function VersionViewerPage() {
   // when the page it receives changes.
   const [scrollTarget, setScrollTarget] = useState<number | null>(null);
 
+  // Route parameters change before effects run. Never render the previous
+  // resource under the new version's route, even for that first render.
+  const detail = detailVersionId === params.versionId
+    && storedDetail?.public_id === params.versionId ? storedDetail : null;
+  const detailError = detailVersionId === params.versionId ? storedDetailError : null;
+  const fileUrl = fileVersionId === params.versionId && detail ? storedFileUrl : null;
+  const fileError = fileVersionId === params.versionId ? storedFileError : null;
+
   const scrollViewerTo = (page: number) => {
     setScrollTarget(null);
     window.setTimeout(() => setScrollTarget(page), 0);
   };
+
+  useEffect(() => {
+    setWithdrawing(null);
+    setAnchorHighlights([]);
+    setScrollTarget(null);
+  }, [params.versionId]);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -74,9 +92,12 @@ export default function VersionViewerPage() {
   return (
     <main className="mx-auto max-w-7xl px-6 py-10">
       <AsyncBoundary
-        isLoading={isLoading && !detail}
-        error={!detail ? error : null}
-        onRetry={() => void fetchDetail(params.versionId)}
+        isLoading={!detail && (detailVersionId !== params.versionId || isLoading)}
+        error={detailError}
+        onRetry={() => {
+          void fetchDetail(params.versionId);
+          void fetchFileUrl(params.versionId);
+        }}
         retryLabel={common.retry}
       >
         {detail ? (
@@ -93,16 +114,23 @@ export default function VersionViewerPage() {
                 ) : null}
                 <span className="text-sm text-muted-foreground">{detail.message}</span>
               </div>
-              {fileUrl ? (
-                <PdfViewer
-                  file={fileUrl}
-                  highlights={anchorHighlights}
-                  highlightKind="modified"
-                  scrollToPage={scrollTarget}
-                />
-              ) : (
-                <Skeleton className="h-[480px] w-full" />
-              )}
+              <AsyncBoundary
+                isLoading={fileVersionId !== params.versionId || isFileLoading}
+                error={fileError}
+                onRetry={() => void fetchFileUrl(params.versionId)}
+                retryLabel={common.retry}
+                skeleton={<Skeleton className="h-[480px] w-full" />}
+              >
+                {fileUrl ? (
+                  <PdfViewer
+                    key={params.versionId}
+                    file={fileUrl}
+                    highlights={anchorHighlights}
+                    highlightKind="modified"
+                    scrollToPage={scrollTarget}
+                  />
+                ) : null}
+              </AsyncBoundary>
             </div>
             <aside className="flex w-full shrink-0 flex-col gap-6 lg:w-80">
               {['reviewer', 'admin'].includes(detail.effective_role ?? '') ? (
