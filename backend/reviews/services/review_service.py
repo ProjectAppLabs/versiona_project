@@ -38,9 +38,13 @@ def create_review_request(
     User = get_user_model()
     reviewers = list(User.objects.filter(pk__in=reviewer_ids))
     if len(reviewers) != len(set(reviewer_ids)):
-        raise DomainError('Algún revisor no existe.', 400)
-    for reviewer in reviewers:
-        role = resolve_effective_role(reviewer, project)
+        raise DomainError('Revisor no encontrado.', 404)
+    reviewer_roles = [(reviewer, resolve_effective_role(reviewer, project)) for reviewer in reviewers]
+    # Check the complete selection before exposing any visible candidate's
+    # role/self-review error: unavailable IDs must share one privacy response.
+    if any(role is None for _, role in reviewer_roles):
+        raise DomainError('Revisor no encontrado.', 404)
+    for reviewer, role in reviewer_roles:
         if role not in ('reviewer', 'admin'):
             raise DomainError(
                 f'{reviewer.email} no puede revisar en este proyecto (rol: {role or "ninguno"}).',
