@@ -1,8 +1,8 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { runInThisContext } from 'node:vm';
 
-let assertNoEmailFor: typeof import('../mailpit').assertNoEmailFor;
-let purgeMailbox: typeof import('../mailpit').purgeMailbox;
+let assertNoEmailFor: typeof import('../../e2e/helpers/mailpit').assertNoEmailFor;
+let purgeMailbox: typeof import('../../e2e/helpers/mailpit').purgeMailbox;
 
 // Playwright's Node transport requires native Web APIs when imported in jsdom.
 const webApiNames = [
@@ -21,7 +21,7 @@ beforeAll(async () => {
   webApiNames.forEach((name) => {
     Object.defineProperty(globalThis, name, { configurable: true, value: nativeWebApis[name] });
   });
-  ({ assertNoEmailFor, purgeMailbox } = await import('../mailpit'));
+  ({ assertNoEmailFor, purgeMailbox } = await import('../../e2e/helpers/mailpit'));
 });
 
 afterAll(() => {
