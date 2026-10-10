@@ -10,7 +10,7 @@ import json
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
-from rest_framework_simplejwt.tokens import RefreshToken
+from accounts.services.token_service import mint_token_pair
 
 ALIASES = ('owner', 'admin', 'editor', 'reviewer', 'viewer')
 
@@ -27,6 +27,5 @@ class Command(BaseCommand):
                 raise CommandError(
                     f'Usuario e2e "{alias}" no existe: corre create_fake_data --scenario=e2e'
                 )
-            refresh = RefreshToken.for_user(user)
-            tokens[alias] = {'access': str(refresh.access_token), 'refresh': str(refresh)}
+            tokens[alias] = mint_token_pair(user)
         self.stdout.write(json.dumps(tokens))

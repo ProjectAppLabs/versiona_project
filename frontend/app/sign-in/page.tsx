@@ -23,6 +23,8 @@ export default function SignInPage() {
   const router = useRouter();
   const { signIn, signIn2fa, googleLogin } = useAuthStore();
   const t = useDict('auth');
+  const googleLink = useDict('googleLink');
+  const [linkRequired, setLinkRequired] = useState(false);
   const [challenge, setChallenge] = useState<string | null>(null);
   const [totpCode, setTotpCode] = useState('');
 
@@ -74,6 +76,7 @@ export default function SignInPage() {
     try {
       setLoading(true);
       setError('');
+      setLinkRequired(false);
 
       if (!credentialResponse.credential) {
         setError(t.errorGoogle);
@@ -101,7 +104,13 @@ export default function SignInPage() {
       
       router.replace('/projects');
     } catch (err) {
-      setError(apiErrorMessage(err, t.errorGoogle));
+      const data = (err as { response?: { status?: number; data?: { code?: string } } }).response;
+      if (data?.status === 409 && data.data?.code === 'google_link_required') {
+        setLinkRequired(true);
+        setError('');
+      } else {
+        setError(apiErrorMessage(err, t.errorGoogle));
+      }
     } finally {
       setLoading(false);
     }
@@ -210,6 +219,11 @@ export default function SignInPage() {
             {t.forgot}
           </Link>
         </div>
+
+        {linkRequired && <div data-testid="google-link-required" role="status" className="mt-4 space-y-2 text-sm">
+          <p>{googleLink.legacy}</p>
+          <Link href="/forgot-password" className="underline" onClick={() => useAuthStore.getState().signOut()}>{googleLink.recovery}</Link>
+        </div>}
 
         <div className="mt-6">
           <div className="relative">

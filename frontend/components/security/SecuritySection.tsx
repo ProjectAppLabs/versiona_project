@@ -4,6 +4,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
+import { GoogleLinkPanel } from './GoogleLinkPanel';
+
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toast';
 import { useDict } from '@/lib/i18n/dictionaries';
@@ -14,6 +16,8 @@ interface SecurityState {
   totp_enabled: boolean;
   backup_codes_left: number;
   sso: string;
+  google_linked: boolean;
+  has_usable_password: boolean;
 }
 
 interface SessionRow {
@@ -78,6 +82,9 @@ export function SecuritySection() {
   return (
     <section data-testid="security-section" className="mt-10">
       <h2 className="text-lg font-semibold">{t.title}</h2>
+
+      <GoogleLinkPanel linked={state.google_linked} hasUsablePassword={state.has_usable_password}
+        totpEnabled={state.totp_enabled} onLinked={load} />
 
       {/* ── 2FA ── */}
       <div className="mt-4 rounded-2xl border border-border bg-card p-4">

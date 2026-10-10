@@ -69,7 +69,7 @@ and API contracts before writing or reviewing E2E tests. Flow ids map 1:1 to
 | `f2-usage-panel` | F2 Usage panel + warnings + trial line | billing | P2 | member | `/org/usage` (header "Plan y uso") | Implemented (It7/It9) |
 | `c4-delete-draft` | C4 Delete a draft version | documents | P2 | editor | version timeline | Implemented (It1) |
 | `b4-archive-delete` | B4 Archive/delete a project | projects | P2 | admin | project settings + `/org/trash` | Implemented (It1) |
-| `a3-account-security` | A3 TOTP, admisión y sesiones | auth | P2 | user | `/settings`, `/sign-in`, `/sign-up` | Implemented (It6) |
+| `a3-account-security` | A3 TOTP, Google explícito y sesiones | auth | P2 | user | `/settings`, `/sign-in`, `/sign-up` | Implemented (It6) |
 | `e2-saved-comparisons` | E2 Saved comparisons | compare | P2 | viewer | compare view + project panel | Implemented (It7) |
 | `e4-constancia` | E4 Exportable certificate | review | P2 | admin | version viewer (Certificates panel — Constancias) | Implemented (It7) |
 | `master-e2e-journey` | Master journey (16 steps, 3 users) | master | P1 | guest/editor/reviewer | end-to-end | Implemented (It8) |
@@ -116,9 +116,9 @@ Auth pages are inherited from the template and already functional (JWT + Google 
 | **Frontend route** | `/sign-in` |
 | **API endpoints** | `POST /api/sign_in/`, `POST /api/sign_in/2fa/`, `POST /api/google_login/`, `GET /api/google-captcha/site-key/` |
 
-**Pasos:** el formulario muestra email, contraseña y recuperación. Credenciales inválidas o una cuenta inactiva muestran un error inline y no crean sesión. Una cuenta válida sin TOTP recibe tokens y aterriza directamente en `/projects`; una cuenta válida con TOTP pasa al desafío de código y sólo al completarlo recibe tokens. El desafío también puede seguir a una primera autenticación Google validada, pero el intercambio OAuth real sigue excluido de E2E por ser un proveedor externo (`docs/audit/03-mapa-flujos.md:489`).
+**Pasos:** el formulario muestra email, contraseña y recuperación. Credenciales inválidas o una cuenta inactiva muestran un error inline y no crean sesión. Una cuenta válida sin TOTP recibe tokens y aterriza directamente en `/projects`; una cuenta válida con TOTP pasa al desafío de código y sólo al completarlo recibe tokens. El desafío también puede seguir a una primera autenticación Google validada, y los correos existentes sin identidad vinculada reciben recuperación explícita. El proveedor externo se sustituye en su frontera para probar los endpoints reales en E2E.
 
-Los claims de Google se validan en backend antes de buscar o crear una cuenta: audiencia configurada, email y `email_verified`. Un `202` debe traer `requires_2fa: true` y un desafío no vacío; una respuesta malformada conserva al visitante sin sesión y muestra el error de autenticación.
+Los claims de Google se validan en backend antes de buscar o crear una cuenta: audiencia configurada, sujeto `sub`, emisor, vigencia, email y `email_verified`. Un `202` debe traer `requires_2fa: true` y un desafío no vacío; una respuesta malformada conserva al visitante sin sesión y muestra el error de autenticación.
 
 | Clase | Interacción observable | Cobertura |
 |---|---|---|
@@ -140,7 +140,7 @@ Los claims de Google se validan en backend antes de buscar o crear una cuenta: a
 
 **Pasos:** el formulario renderiza y valida localmente la confirmación de contraseña. Un registro con contraseña válido recibe tokens y aterriza en onboarding. Si una cuenta existente que entra por Google ya tiene TOTP activo, el `202` válido reemplaza el formulario por el desafío de código; el código correcto aterriza en `/onboarding` y uno inválido conserva el desafío con su error inline.
 
-La rama Google no recibe crédito E2E: depende de OAuth externo y se cubre en backend y frontend-unit. La rama password sigue cubierta por `e2e/auth/auth.spec.ts`; el desafío de Google se prueba en la capa unitaria, sin presentar un mock del proveedor como E2E real.
+La admisión Google se recorre en `e2e/auth/auth.spec.ts` usando únicamente una sustitución del script externo y del transporte oficial tokeninfo en el proceso privado. Los endpoints, permisos y JWT son reales; no se prueba disponibilidad del proveedor externo. El desafío de Google también tiene cobertura backend y frontend-unit.
 
 La política del servidor también rechaza contraseñas comunes y conserva el
 formulario de registro con su error. El escenario E2E usa una dirección única y
@@ -152,19 +152,21 @@ formulario de registro con su error. El escenario E2E usa una dirección única 
 |-------|-------|
 | **Priority** | P2 |
 | **Roles** | user para enrolamiento y sesiones; shared al completar inicio de sesión |
-| **Frontend routes** | `/settings`, `/sign-in`, `/sign-up` |
-| **API endpoints** | `GET /api/me/security/`, `POST /api/me/2fa/setup/`, `POST /api/me/2fa/enable/`, `POST /api/sign_in/2fa/`, `GET/POST /api/me/sessions/…` |
+| **Frontend routes** | `/settings`, `/sign-in`, `/sign-up`, `/forgot-password` |
+| **API endpoints** | `GET /api/me/security/`, `POST /api/me/2fa/setup/`, `POST /api/me/2fa/enable/`, `POST /api/sign_in/2fa/`, `GET/POST /api/me/sessions/…`, `POST /api/me/google/link/`, `POST /api/google_login/`, recuperación por correo |
 
 **Pasos:** una persona autenticada activa TOTP desde Seguridad, confirma el código y guarda los códigos de respaldo. En un inicio posterior, una cuenta con TOTP activo recibe un desafío breve tras una primera autenticación válida. El código correcto crea la sesión; un código incorrecto o un desafío malformado, vencido, de usuario eliminado/inactivo o con TOTP ya desactivado devuelve 401 y no crea sesión.
 
 | Clase | Interacción observable | Cobertura |
 |---|---|---|
 | success | Activar TOTP, salir, completar contraseña → desafío → código correcto y volver autenticado. | `e2e/app/onboarding/a3-account-security.spec.ts` |
-| error | Código incorrecto muestra alerta y no crea sesión. El ciclo de desafío inválido se cubre en backend. | A3 E2E + pruebas backend |
-| failure | n/a como superficie separada: el cliente presenta las fallas de endpoint en el mismo error del desafío. | frontend-unit/backend |
-| display | Seguridad muestra el estado; login o registro muestran el desafío sólo después del `202` válido. | Selectores `security-section`, `twofa-step`, `twofa-code`, `twofa-verify` |
+| error | Código incorrecto no crea sesión; Google para correo existente pide recuperación; ticket/correo/contraseña/factor inválidos conservan las credenciales. | A3 y auth E2E + pruebas backend |
+| failure | Respuesta perdida al conectar muestra entrada con la contraseña nueva y evita repetir la mutación. | `GoogleLinkPanel.test.tsx`, sin E2E que simule fallo interno |
+| display | Seguridad muestra Google conectado o recuperación pendiente; login/registro muestran desafío sólo tras `202`. | Selectores `security-section`, `google-link-panel`, `twofa-step`, `twofa-code`, `twofa-verify` |
 
-La autenticación Google real permanece exenta de E2E; la ruta password → desafío → código sí es una interacción de navegador real.
+**Google explícito:** correo existente sin identidad vinculada devuelve `409 google_link_required` en inicio/registro sin crear sesión ni modificar la cuenta. Todas las cuentas anteriores recuperan por correo; la recuperación cierra las sesiones anteriores, conserva TOTP y entrega una autorización de vinculación de 15 minutos. Después entran hacia Configuración → Seguridad, eligen Google y reemplazan otra vez la contraseña, presentando el segundo factor si está activo. La vinculación consume la autorización, cierra las demás sesiones y sustituye ambos tokens. Google admite posteriormente el identificador del proveedor aunque cambie su correo.
+
+**Cobertura Google:** `e2e/auth/auth.spec.ts` verifica continuidad desde inicio/registro y alta nueva; `e2e/app/onboarding/a3-account-security.spec.ts` recorre preregistro → recuperación real por correo → entrada → vinculación → revocación → Google. Solo se reemplazan el script externo y el transporte oficial tokeninfo dentro de un proceso privado que rechaza otra base o almacenamiento; los endpoints Django y los cambios de estado son reales. La pérdida de respuesta de vinculación ofrece entrar con la contraseña nueva, sin repetir la mutación. Recuperar un segundo factor ajeno requiere asistencia y queda fuera del alcance.
 
 ### auth-protected-redirect
 
@@ -248,7 +250,7 @@ it (see the Module Index status column for the shipping iteration).
 
 ## Roles and Conventions
 
-Las superficies de admisión TOTP tienen selectores estables: `twofa-step`, `twofa-code`, `twofa-verify` y `security-section`. Permiten probar la rama real password → desafío → código. Un mock del proveedor Google no concede crédito E2E.
+Las superficies de admisión TOTP tienen selectores estables: `twofa-step`, `twofa-code`, `twofa-verify` y `security-section`. Permiten probar la rama real password → desafío → código. Los endpoints internos nunca se sustituyen: Google sólo se reemplaza en las dos fronteras externas documentadas.
 
 Viewer consulta proyectos y documentos; editor también crea proyectos; admin del
 proyecto configura checks y administra invitaciones. Los permisos siguen las

@@ -1,6 +1,7 @@
 """Authentication endpoint behavior and Google/TOTP admission tests."""
 
 import secrets
+import time
 from datetime import timedelta
 from unittest.mock import Mock, patch
 
@@ -29,6 +30,9 @@ class DummyResponse:
         """Store a configurable HTTP status, payload, and JSON failure."""
         self.status_code = status_code
         self._payload = {} if payload is _UNSET else payload
+        if isinstance(self._payload, dict):
+            self._payload = {'sub': 'verified-google-subject', 'iss': 'https://accounts.google.com',
+                             'exp': str(int(time.time()) + 3600), **self._payload}
         self.text = text
         self._json_error = json_error
 
@@ -245,9 +249,9 @@ def test_google_login_aud_mismatch_returns_error(api_client, monkeypatch):
 
 
 @pytest.mark.django_db
-@override_settings(DEBUG=True)
-def test_google_login_requires_email_when_payload_missing(api_client, monkeypatch):
-    """Verifies Google login returns 400 when the Google API call fails and no fallback email is provided."""
+@override_settings(DEBUG=True, GOOGLE_OAUTH_CLIENT_ID='client-1')
+def test_google_login_rejects_missing_provider_payload(api_client, monkeypatch):
+    """Rejects Google credentials when the provider call fails."""
 
     def fake_get(*_args, **_kwargs):
         raise auth_views.requests.RequestException('fail')
@@ -260,8 +264,8 @@ def test_google_login_requires_email_when_payload_missing(api_client, monkeypatc
         format='json',
     )
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert response.json()['error'] == 'Email is required'
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.json()['error'] == 'Invalid Google credential'
 
 
 @pytest.mark.django_db
@@ -269,6 +273,9 @@ def test_google_login_requires_email_when_payload_missing(api_client, monkeypatc
 def test_google_login_creates_user_with_payload(api_client, monkeypatch):
     """Verifies Google login creates a new user when the token payload contains a valid audience and email."""
     payload = {
+        'sub': 'verified-google-subject',
+        'iss': 'https://accounts.google.com',
+        'exp': str(int(time.time()) + 3600),
         'aud': 'client-1',
         'email': 'google@example.com',
         'email_verified': True,
@@ -300,8 +307,8 @@ def test_google_login_creates_user_with_payload(api_client, monkeypatch):
 
 @pytest.mark.django_db
 @override_settings(DEBUG=False, GOOGLE_OAUTH_CLIENT_ID='client-1')
-def test_google_login_updates_existing_user_names(api_client, monkeypatch):
-    """Verifies Google login updates the first and last name of an existing user when the payload provides new values."""
+def test_google_login_does_not_mutate_an_unlinked_existing_user(api_client, monkeypatch):
+    """Rejects implicit linking without altering a preregistered account."""
     User = get_user_model()
     user = User.objects.create_user(email='existing@example.com', password='pass1234')
     user.first_name = ''
@@ -309,6 +316,9 @@ def test_google_login_updates_existing_user_names(api_client, monkeypatch):
     user.save(update_fields=['first_name', 'last_name'])
 
     payload = {
+        'sub': 'verified-google-subject',
+        'iss': 'https://accounts.google.com',
+        'exp': str(int(time.time()) + 3600),
         'aud': 'client-1',
         'email': 'existing@example.com',
         'email_verified': True,
@@ -327,18 +337,18 @@ def test_google_login_updates_existing_user_names(api_client, monkeypatch):
         format='json',
     )
 
-    assert response.status_code == status.HTTP_200_OK
-    assert response.json()['created'] is False
+    assert response.status_code == status.HTTP_409_CONFLICT
+    assert response.json()['code'] == 'google_link_required'
 
     user.refresh_from_db()
-    assert user.first_name == 'Given'
-    assert user.last_name == 'Name'
+    assert user.first_name == ''
+    assert user.last_name == ''
 
 
 @pytest.mark.django_db
-@override_settings(DEBUG=True)
-def test_google_login_allows_debug_without_payload(api_client, monkeypatch):
-    """Verifies Google login succeeds in debug mode using the fallback email when the Google API call fails."""
+@override_settings(DEBUG=True, GOOGLE_OAUTH_CLIENT_ID='client-1')
+def test_google_login_rejects_debug_without_payload(api_client, monkeypatch):
+    """Rejects browser email hints when the Google API call fails, even in DEBUG."""
 
     def fake_get(*_args, **_kwargs):
         return DummyResponse(status_code=500)
@@ -351,8 +361,9 @@ def test_google_login_allows_debug_without_payload(api_client, monkeypatch):
         format='json',
     )
 
-    assert response.status_code == status.HTTP_200_OK
-    assert response.json()['google_validated'] is False
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert 'access' not in response.json()
+    assert 'refresh' not in response.json()
 
 
 @pytest.mark.django_db
@@ -371,12 +382,18 @@ def test_google_login_allows_debug_without_payload(api_client, monkeypatch):
         DummyResponse(payload=[]),
         DummyResponse(payload=None),
         DummyResponse(json_error=ValueError('not json')),
+        DummyResponse(payload={'aud': 'client-1', 'email': 'google@example.com', 'email_verified': True, 'sub': ''}),
+        DummyResponse(payload={'aud': 'client-1', 'email': 'google@example.com', 'email_verified': True, 'exp': '0'}),
+        DummyResponse(payload={'aud': 'client-1', 'email': 'google@example.com', 'email_verified': True, 'iss': 'https://other.example.com'}),
+        DummyResponse(payload={'aud': 'client-1', 'email': 'google@example.com', 'email_verified': 1}),
+        DummyResponse(payload={'aud': [], 'email': 'google@example.com', 'email_verified': True}),
     ],
     ids=[
         'aud-missing', 'aud-mismatch', 'email-blank', 'email-non-string',
         'email-unverified-bool', 'email-unverified-missing', 'email-unverified-string',
         'given-name-non-string', 'family-name-non-string', 'json-list', 'json-null',
-        'json-unparseable',
+        'json-unparseable', 'subject-blank', 'expired', 'issuer-mismatch',
+        'email-verification-numeric', 'aud-non-string',
     ],
 )
 @override_settings(DEBUG=True, GOOGLE_OAUTH_CLIENT_ID='client-1')
@@ -439,6 +456,9 @@ def test_google_login_uses_the_verified_string_claim_identity_instead_of_hints(
         email='hinted@example.com', password='pass1234', first_name='Hint', last_name='User'
     )
     payload = {
+        'sub': 'verified-google-subject',
+        'iss': 'https://accounts.google.com',
+        'exp': str(int(time.time()) + 3600),
         'aud': 'client-1',
         'email': 'claimed@example.com',
         'email_verified': 'true',
@@ -478,8 +498,8 @@ def test_google_login_uses_the_verified_string_claim_identity_instead_of_hints(
     ids=['provider-500', 'transport-error'],
 )
 @override_settings(DEBUG=True, GOOGLE_OAUTH_CLIENT_ID='client-1')
-def test_google_login_uses_debug_transport_fallback_with_an_email(api_client, monkeypatch, tokeninfo):
-    """Fails if DEBUG stops admitting the documented provider-failure fallback."""
+def test_google_login_rejects_debug_transport_failure_with_an_email(api_client, monkeypatch, tokeninfo):
+    """Fails if DEBUG admits browser hints after a provider transport failure."""
     monkeypatch.setattr(auth_views.requests, 'get', tokeninfo)
 
     response = api_client.post(
@@ -488,10 +508,9 @@ def test_google_login_uses_debug_transport_fallback_with_an_email(api_client, mo
         format='json',
     )
 
-    assert response.status_code == status.HTTP_200_OK
-    assert response.json()['google_validated'] is False
-    assert response.json()['access']
-    assert response.json()['refresh']
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert 'access' not in response.json()
+    assert 'refresh' not in response.json()
 
 
 @pytest.fixture
@@ -555,7 +574,12 @@ def test_google_login_returns_a_second_factor_challenge_before_token_issuance(
     outstanding_before = OutstandingToken.objects.count()
     organizations_before = Organization.objects.count()
     memberships_before = OrganizationMembership.objects.count()
+    user.google_subject = 'verified-google-subject'
+    user.save(update_fields=['google_subject'])
     payload = {
+        'sub': 'verified-google-subject',
+        'iss': 'https://accounts.google.com',
+        'exp': str(int(time.time()) + 3600),
         'aud': 'client-1',
         'email': user.email,
         'email_verified': True,

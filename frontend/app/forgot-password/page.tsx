@@ -5,10 +5,13 @@ import Link from 'next/link';
 import { FormEvent, useState } from 'react';
 
 import { useAuthStore } from '@/lib/stores/authStore';
+import { useDict } from '@/lib/i18n/dictionaries';
+import { getGoogleLinkTicket } from '@/lib/services/google-link-ticket';
 import { apiErrorMessage } from '@/lib/services/errors';
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
+  const googleLink = useDict('googleLink');
   const { sendPasswordResetCode, resetPassword } = useAuthStore();
 
   const [step, setStep] = useState<'email' | 'code'>('email');
@@ -59,8 +62,8 @@ export default function ForgotPasswordPage() {
 
     try {
       await resetPassword({ email, code, new_password: newPassword });
-      setMessage('Password reset successfully! Redirecting...');
-      router.replace('/sign-in');
+      setMessage(getGoogleLinkTicket() ? googleLink.resetContinuation : 'Password reset successfully! Redirecting...');
+      router.replace(getGoogleLinkTicket() ? '/sign-in?next=/settings' : '/sign-in');
     } catch (err) {
       setError(apiErrorMessage(err, 'Failed to reset password'));
     } finally {

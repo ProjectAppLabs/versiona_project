@@ -31,6 +31,9 @@ def test_generate_auth_tokens_contains_user_payload():
     assert tokens['user']['id'] == user.id
     assert tokens['refresh']
     assert tokens['access']
+    from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
+    assert AccessToken(tokens['access'])['auth_version'] == 0
+    assert RefreshToken(tokens['refresh'])['auth_version'] == 0
 
 
 @pytest.mark.django_db

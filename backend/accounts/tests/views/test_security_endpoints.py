@@ -278,3 +278,16 @@ def test_sign_in_2fa_rejects_a_user_with_disabled_totp_after_challenge(enabled_u
     assert response.status_code == 401
     assert response.data == {'error': 'Desafío inválido o vencido.'}
     assert OutstandingToken.objects.count() == outstanding_before
+
+
+@pytest.mark.django_db
+def test_security_exposes_google_link_status(auth_client, user):
+    response = auth_client.get('/api/me/security/')
+    assert response.data['google_linked'] is False
+    assert response.data['has_usable_password'] is True
+    user.google_subject = 'linked-subject'
+    user.set_unusable_password()
+    user.save(update_fields=['google_subject', 'password'])
+    response = auth_client.get('/api/me/security/')
+    assert response.data['google_linked'] is True
+    assert response.data['has_usable_password'] is False

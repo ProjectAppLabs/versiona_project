@@ -107,7 +107,7 @@ def disable(user, code: str):
 
 def issue_challenge(user) -> str:
     """Signed, short-lived proof that the first authentication step passed."""
-    return signing.dumps({'user': user.pk}, salt=CHALLENGE_SALT)
+    return signing.dumps({'user': user.pk, 'auth_version': user.auth_version}, salt=CHALLENGE_SALT)
 
 
 def resolve_challenge(challenge: str):
@@ -128,7 +128,9 @@ def resolve_challenge(challenge: str):
         user = user_model.objects.get(pk=payload['user'])
     except (user_model.DoesNotExist, ValueError, TypeError, OverflowError) as exc:
         raise DomainError(invalid_challenge, 401) from exc
-    if not user.is_active or not user.totp_enabled_at:
+    from accounts.services.token_service import version_matches
+
+    if not user.is_active or not user.totp_enabled_at or not version_matches(payload, user):
         raise DomainError(invalid_challenge, 401)
     return user
 

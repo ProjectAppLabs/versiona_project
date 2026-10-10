@@ -7,20 +7,24 @@ from rest_framework.decorators import api_view, permission_classes, throttle_cla
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenObtainSerializer
+from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.settings import api_settings as jwt_settings
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.contrib.auth.models import update_last_login
 from django.contrib.auth.hashers import check_password, make_password
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import transaction
 
 import requests
 
 from accounts.models import PasswordCode
+from accounts.serializers.token_refresh import VersionedTokenRefreshSerializer
+from accounts.services.token_service import mint_token_pair, rotate_credentials, version_matches
+from accounts.services.google_identity_service import (
+    GoogleIdentityError, verify_google_identity, google_account, issue_link_ticket,
+)
 from accounts.throttles import AuthThrottle
 from accounts.utils.auth_utils import (
     generate_auth_tokens, 
@@ -73,14 +77,16 @@ class TokenObtainPairWithAdmissionView(TokenObtainPairView):
             return admission
 
         # Pair validation mints a token, so only use it after admission.
-        refresh = TokenObtainPairSerializer.get_token(user)
+        pair = mint_token_pair(user)
         if jwt_settings.UPDATE_LAST_LOGIN:
             update_last_login(None, user)
-        return Response({'refresh': str(refresh), 'access': str(refresh.access_token)})
+        return Response(pair)
 
 
 class AuthTokenRefreshView(TokenRefreshView):
     """Refresh participates in the same attempt budget as initial admission."""
+
+    serializer_class = VersionedTokenRefreshSerializer
 
     throttle_classes = [AuthThrottle]
 
@@ -209,118 +215,17 @@ def sign_in(request):
 @permission_classes([AllowAny])
 @throttle_classes([AuthThrottle])
 def google_login(request):
-    """
-    Google OAuth login endpoint.
-
-    Expected data: credential (or id_token).
-    Email and name hints are used only by the DEBUG transport fallback.
-    """
-    credential = request.data.get('credential') or request.data.get('id_token')
-
-    if not credential:
-        return Response({'error': 'Google credential is required'}, status=status.HTTP_400_BAD_REQUEST)
-
-    allowed_auds = [
-        value.strip()
-        for value in (settings.GOOGLE_OAUTH_CLIENT_ID or '').split(',')
-        if value.strip()
-    ]
-    if not allowed_auds and not settings.DEBUG:
-        return Response({'error': 'Invalid Google client'}, status=status.HTTP_401_UNAUTHORIZED)
-
-    payload = None
+    """Authenticate only a provider subject, never an email coincidence."""
     try:
-        tokeninfo = requests.get(
-            'https://oauth2.googleapis.com/tokeninfo',
-            params={'id_token': credential},
-            timeout=5,
-        )
-        if tokeninfo.status_code == 200:
-            try:
-                payload = tokeninfo.json()
-            except ValueError:
-                return Response({'error': 'Invalid Google credential'}, status=status.HTTP_401_UNAUTHORIZED)
-
-            if not isinstance(payload, dict):
-                return Response({'error': 'Invalid Google credential'}, status=status.HTTP_401_UNAUTHORIZED)
-
-            aud = payload.get('aud')
-            if not isinstance(aud, str) or not aud.strip() or aud not in allowed_auds:
-                return Response({'error': 'Invalid Google client'}, status=status.HTTP_401_UNAUTHORIZED)
-
-            token_email = payload.get('email')
-            email_verified = payload.get('email_verified')
-            if (
-                not isinstance(token_email, str)
-                or not token_email.strip()
-                or not (email_verified is True or email_verified == 'true')
-            ):
-                return Response({'error': 'Invalid Google credential'}, status=status.HTTP_401_UNAUTHORIZED)
-
-            token_given = payload.get('given_name', '')
-            token_family = payload.get('family_name', '')
-            if not isinstance(token_given, str) or not isinstance(token_family, str):
-                return Response({'error': 'Invalid Google credential'}, status=status.HTTP_401_UNAUTHORIZED)
-
-            email = token_email.strip().lower()
-            given_name = token_given.strip()
-            family_name = token_family.strip()
-        else:
-            logger.warning('Google tokeninfo rejected credential: status=%s', tokeninfo.status_code)
-    except requests.RequestException:
-        logger.warning('Google token validation transport failed')
-
-    if payload is None:
-        if not settings.DEBUG:
-            return Response({'error': 'Invalid Google credential'}, status=status.HTTP_401_UNAUTHORIZED)
-
-        # Invalid claims returned with HTTP 200 never reach this fallback.
-        email = request.data.get('email', '').strip().lower()
-        given_name = request.data.get('given_name', '').strip()
-        family_name = request.data.get('family_name', '').strip()
-    
-    if not email:
-        return Response(
-            {'error': 'Email is required'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    # Get or create user
-    user, created = User.objects.get_or_create(
-        email=email,
-        defaults={
-            'first_name': given_name,
-            'last_name': family_name,
-            'is_active': True,
-        }
-    )
-
+        identity = verify_google_identity(request.data.get('credential') or request.data.get('id_token'))
+        user, created = google_account(identity)
+    except GoogleIdentityError as exc:
+        return Response(exc.detail, status=exc.status_code)
     admission = _login_admission(user)
     if admission is not None:
         return admission
-
-    if created:
-        user.set_unusable_password()
-        user.save(update_fields=['password'])
-    
-    # Update names if user exists but doesn't have them
-    if not created:
-        if not user.first_name and given_name:
-            user.first_name = given_name
-        if not user.last_name and family_name:
-            user.last_name = family_name
-        if user.first_name or user.last_name:
-            user.save()
-
-    # Every user owns a personal organization from day one (A1); idempotent
-    from orgs.services import ensure_personal_org
-    ensure_personal_org(user)
-
-    # Generate tokens
     tokens = generate_auth_tokens(user)
-    tokens['created'] = created
-    tokens['google_validated'] = payload is not None
-
+    tokens.update(created=created, google_validated=True)
     return Response(tokens, status=status.HTTP_200_OK)
 
 
@@ -435,12 +340,16 @@ def verify_passcode_and_reset_password(request):
             return Response({'error': password_error}, status=status.HTTP_400_BAD_REQUEST)
 
         user.password = make_password(new_password)
-        user.save(update_fields=['password'])
+        rotate_credentials(user)
+        user.save(update_fields=['password', 'auth_version'])
         password_code.used = True
         password_code.save(update_fields=['used'])
+        result = {'message': 'Password reset successfully'}
+        if not user.google_subject:
+            result['google_link_ticket'] = issue_link_ticket(user)
     
     return Response(
-        {'message': 'Password reset successfully'},
+        result,
         status=status.HTTP_200_OK
     )
 
@@ -464,21 +373,20 @@ def update_password(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    user = request.user
-    
-    if not check_password(current_password, user.password):
-        return Response(
-            {'error': 'Current password is incorrect'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+    with transaction.atomic():
+        user = User.objects.select_for_update().get(pk=request.user.pk)
+        payload = request.auth or {'auth_version': request.user.auth_version}
+        if not version_matches(payload, user):
+            return Response({'error': 'La sesión ha vencido.'}, status=status.HTTP_401_UNAUTHORIZED)
+        if not check_password(current_password, user.password):
+            return Response({'error': 'Current password is incorrect'}, status=status.HTTP_400_BAD_REQUEST)
+        password_error = _password_validation_error(new_password, user)
+        if password_error:
+            return Response({'error': password_error}, status=status.HTTP_400_BAD_REQUEST)
+        user.password = make_password(new_password)
+        rotate_credentials(user)
+        user.save(update_fields=['password', 'auth_version'])
 
-    password_error = _password_validation_error(new_password, user)
-    if password_error:
-        return Response({'error': password_error}, status=status.HTTP_400_BAD_REQUEST)
-    
-    user.password = make_password(new_password)
-    user.save()
-    
     return Response(
         {'message': 'Password updated successfully'},
         status=status.HTTP_200_OK
