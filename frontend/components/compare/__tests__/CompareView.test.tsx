@@ -2,11 +2,13 @@ import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { CompareView } from '../CompareView';
-import type { ComparisonDetail } from '../../../lib/stores/compareStore';
+import { useCompareStore, type ComparisonDetail } from '../../../lib/stores/compareStore';
 import { api } from '../../../lib/services/http';
 import { useVersionStore } from '../../../lib/stores/versionStore';
 import { useUpgradeDialogStore } from '../../../lib/stores/upgradeDialogStore';
+import { useToastStore } from '../../ui/toast';
 
+// PDF.js is the visual rendering boundary; E1 live tests verify the real PDFs.
 jest.mock('next/dynamic', () => ({
   __esModule: true,
   default: () => {
@@ -15,26 +17,11 @@ jest.mock('next/dynamic', () => ({
   },
 }));
 
-const compare = jest.fn();
-const fetchSectionDiff = jest.fn();
-const setActiveSection = jest.fn();
-const reset = jest.fn();
-let storeState: Record<string, unknown> = {};
-
-jest.mock('../../../lib/stores/compareStore', () => ({
-  useCompareStore: Object.assign(
-    (selector: (s: Record<string, unknown>) => unknown) => selector(storeState),
-    { getState: () => storeState }
-  ),
-}));
 jest.mock('../../../lib/services/http', () => ({
   api: { get: jest.fn(), post: jest.fn().mockResolvedValue({ data: {} }) },
 }));
 const mockGet = api.get as jest.Mock;
-const toast = jest.fn();
-jest.mock('../../../components/ui/toast', () => ({
-  useToast: () => ({ toast }),
-}));
+const mockPost = api.post as jest.Mock;
 
 const comparison: ComparisonDetail = {
   public_id: 'cmp1',
@@ -53,21 +40,13 @@ const comparison: ComparisonDetail = {
   ],
 };
 
-function setState(over: Record<string, unknown> = {}) {
-  storeState = {
-    comparison,
-    requestKey: JSON.stringify(['d1', 'v1', 'v2']),
-    diffs: {},
-    activeSection: null,
-    isLoading: false,
-    error: null,
-    compare,
-    fetchSectionDiff,
-    setActiveSection,
-    reset,
-    ...over,
-  };
-}
+const comparisonsByPair: Record<string, ComparisonDetail> = {
+  'v1:v2': comparison,
+  'v3:v4': {
+    ...comparison, public_id: 'cmp-current', from_version: 'v3', to_version: 'v4',
+    from_number: 3, to_number: 4,
+  },
+};
 
 const baseProps = {
   documentId: 'd1',
@@ -79,20 +58,20 @@ const baseProps = {
 
 describe('CompareView (E1)', () => {
   beforeEach(() => {
-    compare.mockReset();
-    reset.mockReset();
-    fetchSectionDiff.mockResolvedValue(null);
+    useCompareStore.getState().reset();
+    mockPost.mockReset().mockImplementation((_path: string, pair: { from_version: string; to_version: string }) =>
+      Promise.resolve({ data: comparisonsByPair[`${pair.from_version}:${pair.to_version}`] ?? {} }));
+    useToastStore.getState().clear();
     mockGet.mockReset().mockResolvedValue({ data: { url: 'http://minio/f.pdf' } });
     useVersionStore.setState(useVersionStore.getInitialState(), true);
     useUpgradeDialogStore.getState().hide();
     window.history.replaceState(null, '', '/');
-    setState();
   });
 
   it('[E1-F01] the side-by-side view renders both viewers and the summary', async () => {
     await renderCompare(baseProps);
 
-    expect(compare).toHaveBeenCalledWith('d1', 'v1', 'v2');
+    expect(mockPost).toHaveBeenCalledWith('documents/d1/comparisons/', { from_version: 'v1', to_version: 'v2' });
     expect(screen.getByTestId('side-before')).toBeInTheDocument();
     expect(screen.getByTestId('side-after')).toBeInTheDocument();
     expect(screen.getByText(/2 modificadas, 1 eliminada, 1 agregada/)).toBeInTheDocument();
@@ -108,16 +87,19 @@ describe('CompareView (E1)', () => {
   it('[E1-F02] next-change selects the first changed section', async () => {
     await renderCompare(baseProps);
 
+    mockGet.mockResolvedValueOnce({ data: {
+      ...comparison.section_changes[1], word_diff: [], bboxes_from: [], bboxes_to: [],
+    } });
+
     await userEvent.click(screen.getByTestId('next-change'));
 
-    expect(setActiveSection).toHaveBeenCalledWith('multas');
-    expect(fetchSectionDiff).toHaveBeenCalledWith('multas');
+    expect(screen.getByTestId('section-multas')).toHaveAttribute('aria-current', 'true');
+    expect(window.location.hash).toBe('#sec-multas');
+    expect(mockGet).toHaveBeenCalledWith('comparisons/cmp1/sections/multas/diff/');
   });
 
   it('[E1-L01] a comparison without changes shows the explicit empty state', async () => {
-    setState({
-      comparison: { ...comparison, has_changes: false, section_changes: [] },
-    });
+    mockPost.mockResolvedValueOnce({ data: { ...comparison, has_changes: false, section_changes: [] } });
 
     await renderCompare(baseProps);
 
@@ -126,23 +108,23 @@ describe('CompareView (E1)', () => {
   });
 
   it('[E1-E01] a failed comparison offers retry', async () => {
-    setState({ comparison: null, error: 'La versión v2 aún no está analizada' });
+    mockPost.mockRejectedValueOnce({ response: { status: 409, data: { error: 'La versión v2 aún no está analizada' } } });
 
     await renderCompare(baseProps);
 
     expect(screen.getByTestId('async-error')).toHaveTextContent('no está analizada');
     await userEvent.click(screen.getByRole('button', { name: 'Reintentar' }));
-    expect(compare).toHaveBeenCalledTimes(2);
+    expect(mockPost).toHaveBeenCalledTimes(2);
+    expect(screen.getByTestId('side-after')).toHaveTextContent('v2');
   });
 
   it('[E2-F01-ui] the save button posts the chosen name', async () => {
-    const { api } = jest.requireMock('../../../lib/services/http');
     window.prompt = jest.fn().mockReturnValue('Entrega 1 vs 2');
 
     await renderCompare(baseProps);
     await userEvent.click(screen.getByTestId('save-comparison'));
 
-    expect(api.post).toHaveBeenCalledWith('comparisons/cmp1/save/', {
+    expect(mockPost).toHaveBeenCalledWith('comparisons/cmp1/save/', {
       name: 'Entrega 1 vs 2',
     });
   });
@@ -155,7 +137,6 @@ describe('CompareView (E1)', () => {
       .mockResolvedValueOnce({ data: { url: 'v3.pdf' } })
       .mockResolvedValueOnce({ data: { url: 'v4.pdf' } });
     const { rerender } = await renderCompare(baseProps);
-    setCurrentPair();
     await act(async () => { rerender(<CompareView {...baseProps} fromVersionId="v3" toVersionId="v4" />); });
 
     await act(async () => {
@@ -173,9 +154,8 @@ describe('CompareView (E1)', () => {
     const { rerender } = await renderCompare(baseProps);
     expect(await screen.findByText('v1.pdf')).toBeInTheDocument();
     mockGet.mockReturnValue(new Promise(() => {}));
-    setCurrentPair();
 
-    rerender(<CompareView {...baseProps} fromVersionId="v3" toVersionId="v4" />);
+    await act(async () => { rerender(<CompareView {...baseProps} fromVersionId="v3" toVersionId="v4" />); });
 
     expect(screen.getByTestId('side-before')).toHaveTextContent('v3');
     expect(screen.queryAllByTestId('pdf-stub')).toHaveLength(0);
@@ -188,7 +168,6 @@ describe('CompareView (E1)', () => {
       .mockResolvedValueOnce({ data: { url: 'v3.pdf' } })
       .mockResolvedValueOnce({ data: { url: 'v4.pdf' } });
     const { rerender } = await renderCompare(baseProps);
-    setCurrentPair();
     await act(async () => { rerender(<CompareView {...baseProps} fromVersionId="v3" toVersionId="v4" />); });
 
     await act(async () => { old.reject(historyLockError); });
@@ -234,13 +213,6 @@ function pendingResponse() {
 const historyLockError = {
   response: { status: 402, data: { upgrade: true, error: 'El historial anterior está bloqueado.' } },
 };
-
-function setCurrentPair() {
-  setState({
-    requestKey: JSON.stringify(['d1', 'v3', 'v4']),
-    comparison: { ...comparison, public_id: 'cmp-current', from_version: 'v3', to_version: 'v4', from_number: 3, to_number: 4 },
-  });
-}
 
 async function renderCompare(props: Parameters<typeof CompareView>[0]) {
   let result!: ReturnType<typeof render>;
