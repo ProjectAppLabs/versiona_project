@@ -1,0 +1,9 @@
+{
+  "valid": true,
+  "reason": "exact round, commit, passing test artifacts and live E2E where required are verified",
+  "validator": "scripts/improvement/verification.py::validate_verification",
+  "commit": "bdd1994e938f7f0e3138f21b699bdd8aad4de8d8",
+  "manifest": "test-results/improvement/2026-10-10-final/manifest.json",
+  "round_record": "test-results/improvement/2026-10-10-final/round-local.json",
+  "canonical_ledger_written": false
+}

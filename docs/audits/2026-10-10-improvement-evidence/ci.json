@@ -1,0 +1,30 @@
+{
+  "observed_at": "2026-10-10T15:35:40.858726+00:00",
+  "repo": "ProjectAppLabs/versiona_project",
+  "runs": [
+    {
+      "front": "seguridad",
+      "pr": 64,
+      "head": "b62fd881eed15e66df3f4b9662f0a8ef405d1661",
+      "run": 38062765903,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "front": "rendimiento",
+      "pr": 63,
+      "head": "9ca84efb01c0197ff416928f170299442d22a9b7",
+      "run": 38061542178,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "front": "qa",
+      "pr": 61,
+      "head": "3ce16e4adc03307c879ddda149dd959b0dc2529e",
+      "run": 38061753687,
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ]
+}

@@ -1,0 +1,563 @@
+{
+  "config": {
+    "version": "1.60.0",
+    "workers": 1,
+    "forbidOnly": true,
+    "fullyParallel": true
+  },
+  "suites": [
+    {
+      "title": "app/onboarding/a3-account-security.spec.ts",
+      "file": "app/onboarding/a3-account-security.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "email recovery then explicit Google linking revokes preregistration sessions",
+          "ok": true,
+          "tags": [
+            "flow:a3-account-security",
+            "module:auth",
+            "priority:P2",
+            "outcome:success",
+            "outcome:error"
+          ],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "slow",
+                  "location": {
+                    "file": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-1423/frontend/e2e/app/onboarding/a3-account-security.spec.ts",
+                    "line": 85,
+                    "column": 8
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "Desktop Chrome",
+              "projectName": "Desktop Chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 22611,
+                  "errors": [],
+                  "retry": 0,
+                  "startTime": "2026-10-10T15:27:28.169Z",
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-1423/frontend/e2e/app/onboarding/a3-account-security.spec.ts",
+                        "line": 85,
+                        "column": 8
+                      }
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "7ec484a171bb85e448f8-61f97f02803e3d69f5a6",
+          "file": "app/onboarding/a3-account-security.spec.ts",
+          "line": 82,
+          "column": 5
+        }
+      ],
+      "suites": [
+        {
+          "title": "A3 — Seguridad de la cuenta",
+          "file": "app/onboarding/a3-account-security.spec.ts",
+          "line": 11,
+          "column": 6,
+          "specs": [
+            {
+              "title": "A3-F01/F03 — activar 2FA y entrar con el código",
+              "ok": true,
+              "tags": [
+                "flow:a3-account-security",
+                "module:auth",
+                "priority:P2",
+                "scenario:a3-f01",
+                "scenario:a3-f03",
+                "outcome:success",
+                "outcome:error"
+              ],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-1423/frontend/e2e/app/onboarding/a3-account-security.spec.ts",
+                        "line": 12,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 62213,
+                      "errors": [],
+                      "retry": 0,
+                      "startTime": "2026-10-10T15:26:25.331Z",
+                      "annotations": [
+                        {
+                          "type": "slow",
+                          "location": {
+                            "file": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-1423/frontend/e2e/app/onboarding/a3-account-security.spec.ts",
+                            "line": 12,
+                            "column": 8
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7ec484a171bb85e448f8-b76b8696fb78aa13dc29",
+              "file": "app/onboarding/a3-account-security.spec.ts",
+              "line": 14,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "auth/auth.spec.ts",
+      "file": "auth/auth.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Google on /sign-in requires recovery for an existing email",
+          "ok": true,
+          "tags": [
+            "flow:auth-sign-in-form",
+            "module:auth",
+            "priority:P2",
+            "outcome:error"
+          ],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "Desktop Chrome",
+              "projectName": "Desktop Chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5011,
+                  "errors": [],
+                  "retry": 0,
+                  "startTime": "2026-10-10T15:28:17.816Z",
+                  "annotations": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "11ab049aabb515b3eeb7-b10f95b37aac294af3bd",
+          "file": "auth/auth.spec.ts",
+          "line": 169,
+          "column": 7
+        },
+        {
+          "title": "Google on /sign-up requires recovery for an existing email",
+          "ok": true,
+          "tags": [
+            "flow:auth-sign-up-form",
+            "module:auth",
+            "priority:P1",
+            "outcome:error"
+          ],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "Desktop Chrome",
+              "projectName": "Desktop Chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2772,
+                  "errors": [],
+                  "retry": 0,
+                  "startTime": "2026-10-10T15:28:22.911Z",
+                  "annotations": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "11ab049aabb515b3eeb7-dba8d07cbd7cac3d59d9",
+          "file": "auth/auth.spec.ts",
+          "line": 169,
+          "column": 7
+        },
+        {
+          "title": "new Google identity enters onboarding through the real API",
+          "ok": true,
+          "tags": [
+            "flow:auth-sign-up-form",
+            "module:auth",
+            "priority:P1",
+            "outcome:success"
+          ],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "Desktop Chrome",
+              "projectName": "Desktop Chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4722,
+                  "errors": [],
+                  "retry": 0,
+                  "startTime": "2026-10-10T15:28:25.734Z",
+                  "annotations": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "11ab049aabb515b3eeb7-416d075e4420b9d6015c",
+          "file": "auth/auth.spec.ts",
+          "line": 184,
+          "column": 5
+        }
+      ],
+      "suites": [
+        {
+          "title": "Authentication",
+          "file": "auth/auth.spec.ts",
+          "line": 30,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should show validation on empty form submission",
+              "ok": true,
+              "tags": [
+                "flow:auth-sign-in-form",
+                "module:auth",
+                "priority:P2",
+                "outcome:display"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1983,
+                      "errors": [],
+                      "retry": 0,
+                      "startTime": "2026-10-10T15:27:50.975Z",
+                      "annotations": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "11ab049aabb515b3eeb7-66844278780f1125b59a",
+              "file": "auth/auth.spec.ts",
+              "line": 31,
+              "column": 7
+            },
+            {
+              "title": "should accept input in form fields",
+              "ok": true,
+              "tags": [
+                "flow:auth-sign-in-form",
+                "module:auth",
+                "priority:P2",
+                "outcome:display"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2129,
+                      "errors": [],
+                      "retry": 0,
+                      "startTime": "2026-10-10T15:27:52.993Z",
+                      "annotations": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "11ab049aabb515b3eeb7-002194213466a6b8ef65",
+              "file": "auth/auth.spec.ts",
+              "line": 43,
+              "column": 7
+            },
+            {
+              "title": "should handle invalid credentials gracefully",
+              "ok": true,
+              "tags": [
+                "flow:auth-login-invalid",
+                "module:auth",
+                "priority:P1",
+                "outcome:error"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2498,
+                      "errors": [],
+                      "retry": 0,
+                      "startTime": "2026-10-10T15:27:55.184Z",
+                      "annotations": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "11ab049aabb515b3eeb7-66fa0c11f4f05f5f8466",
+              "file": "auth/auth.spec.ts",
+              "line": 58,
+              "column": 7
+            },
+            {
+              "title": "should redirect anonymous users away from the dashboard",
+              "ok": true,
+              "tags": [
+                "flow:auth-protected-redirect",
+                "module:auth",
+                "priority:P1",
+                "outcome:success"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1658,
+                      "errors": [],
+                      "retry": 0,
+                      "startTime": "2026-10-10T15:27:57.808Z",
+                      "annotations": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "11ab049aabb515b3eeb7-12885c46166b5c2e7511",
+              "file": "auth/auth.spec.ts",
+              "line": 77,
+              "column": 7
+            },
+            {
+              "title": "should validate password mismatch on sign-up",
+              "ok": true,
+              "tags": [
+                "flow:auth-sign-up-form",
+                "module:auth",
+                "priority:P1",
+                "outcome:error"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3381,
+                      "errors": [],
+                      "retry": 0,
+                      "startTime": "2026-10-10T15:27:59.622Z",
+                      "annotations": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "11ab049aabb515b3eeb7-11b9b0b2967472c55eb7",
+              "file": "auth/auth.spec.ts",
+              "line": 90,
+              "column": 7
+            },
+            {
+              "title": "should display the server rejection for a common sign-up password",
+              "ok": true,
+              "tags": [
+                "flow:auth-sign-up-form",
+                "module:auth",
+                "priority:P1",
+                "outcome:error"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2493,
+                      "errors": [],
+                      "retry": 0,
+                      "startTime": "2026-10-10T15:28:03.065Z",
+                      "annotations": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "11ab049aabb515b3eeb7-e4a52b4851c223ef063d",
+              "file": "auth/auth.spec.ts",
+              "line": 109,
+              "column": 7
+            },
+            {
+              "title": "should preserve the recovery code after rejecting a numeric password",
+              "ok": true,
+              "tags": [
+                "flow:auth-forgot-password-form",
+                "module:auth",
+                "priority:P2",
+                "outcome:error"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7450,
+                      "errors": [],
+                      "retry": 0,
+                      "startTime": "2026-10-10T15:28:05.640Z",
+                      "annotations": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "11ab049aabb515b3eeb7-641605f13b33393074a4",
+              "file": "auth/auth.spec.ts",
+              "line": 124,
+              "column": 7
+            },
+            {
+              "title": "should navigate from sign-in to forgot password",
+              "ok": true,
+              "tags": [
+                "flow:auth-forgot-password-form",
+                "module:auth",
+                "priority:P2",
+                "outcome:display"
+              ],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Desktop Chrome",
+                  "projectName": "Desktop Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4643,
+                      "errors": [],
+                      "retry": 0,
+                      "startTime": "2026-10-10T15:28:13.125Z",
+                      "annotations": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "11ab049aabb515b3eeb7-d18c39ec40a957ebb4b5",
+              "file": "auth/auth.spec.ts",
+              "line": 149,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-10T15:25:41.514Z",
+    "duration": 169542.249,
+    "expected": 13,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

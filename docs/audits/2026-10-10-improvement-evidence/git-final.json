@@ -1,0 +1,28 @@
+{
+  "commit": "bdd1994e938f7f0e3138f21b699bdd8aad4de8d8",
+  "status_porcelain": "",
+  "clean": true,
+  "artifacts_regular": true,
+  "artifacts_gitignored": true,
+  "artifacts": [
+    "test-results/improvement/2026-10-10-final/qa.md",
+    "test-results/improvement/2026-10-10-final/manifest.json",
+    "test-results/improvement/2026-10-10-final/verification.json",
+    "test-results/improvement/2026-10-10-final/round-local.json",
+    "test-results/improvement/2026-10-10-final/flow-audit.json",
+    "test-results/improvement/2026-10-10-final/e2e-runtime.json",
+    "test-results/improvement/2026-10-10-final/backend-google-link.xml",
+    "test-results/improvement/2026-10-10-final/backend-jwt-onboarding.xml",
+    "test-results/improvement/2026-10-10-final/backend-reanchor.xml",
+    "test-results/improvement/2026-10-10-final/unit-security-panel-ticket.xml",
+    "test-results/improvement/2026-10-10-final/unit-forgot-password.xml",
+    "test-results/improvement/2026-10-10-final/unit-sign-in.xml",
+    "test-results/improvement/2026-10-10-final/unit-sign-up.xml",
+    "test-results/improvement/2026-10-10-final/unit-http.xml",
+    "test-results/improvement/2026-10-10-final/unit-mailpit.xml",
+    "test-results/improvement/2026-10-10-final/gate-backend.json",
+    "test-results/improvement/2026-10-10-final/gate-frontend-unit.json",
+    "test-results/improvement/2026-10-10-final/gate-frontend-e2e.json",
+    "test-results/improvement/2026-10-10-final/e2e.json"
+  ]
+}
