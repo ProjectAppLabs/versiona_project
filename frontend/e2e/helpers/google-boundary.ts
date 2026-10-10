@@ -24,7 +24,7 @@ export async function installGoogleBoundary(page: Page, credential: string): Pro
             button.textContent = 'Continuar con Google';
             button.setAttribute('data-testid', 'google-boundary-button');
             button.addEventListener('click', () => callback({ credential: ${JSON.stringify(credential)} }));
-            container.appendChild(button);
+            container.replaceChildren(button);
           },
           cancel: () => {}, disableAutoSelect: () => {}, prompt: () => {},
         } } };
