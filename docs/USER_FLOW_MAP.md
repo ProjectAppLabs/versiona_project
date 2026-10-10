@@ -63,7 +63,7 @@ and API contracts before writing or reviewing E2E tests. Flow ids map 1:1 to
 | `d3-anchored-observations` | D3 Anchored observations | review | P1 | viewer/reviewer/editor/admin | version viewer | Implemented (It4; progressive reading reviewed 2026-10-02) |
 | `d4-seal-approve` | D4 Approve with a seal | review | P1 | reviewer | version viewer (Seals panel) | Implemented (It3) |
 | `d5-selective-invalidation` | D5 Selective invalidation | review | P1 | editor/reviewer/admin | seals panel + `/inbox` | Implemented (It3) |
-| `e1-compare` | E1 Compare two versions | compare | P1 | viewer | `.../compare/[base]/[target]` | Implemented (It2) |
+| `e1-compare` | E1 Compare two versions | compare | P1 | viewer | `.../compare/[base]/[target]` | Implemented (It2; a newer pair remains visible when delayed responses from an earlier pair arrive) |
 | `e3-configurable-checks` | E3 Configurable checks | compare | P2 | admin | `/projects/[id]/settings` + version viewer (Checks panel) | Implemented (It5) |
 | `f1-billing` | F1 Plan limits + upgrade path (contact) | billing | P2 | owner | 402 sites → UpgradeDialog → `/precios` | Implemented (It7/It9 — no online checkout) |
 | `f2-usage-panel` | F2 Usage panel + warnings + trial line | billing | P2 | member | `/org/usage` (header "Plan y uso") | Implemented (It7/It9) |

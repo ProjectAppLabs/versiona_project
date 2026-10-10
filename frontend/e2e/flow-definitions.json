@@ -1,6 +1,6 @@
 {
   "version": "2.4.2",
-  "lastUpdated": "2026-10-09",
+  "lastUpdated": "2026-10-10",
   "flows": {
     "home-loads": {
       "name": "Landing page loads",
@@ -333,7 +333,7 @@
         "viewer"
       ],
       "priority": "P1",
-      "description": "Side-by-side with highlights, modified-section list matching the fixture truth table, and summary view (docs/plan/01 E1). At 412x915 the save, next-change and view-tab controls wrap below the title as 44 px targets without horizontal page scroll, and tapping 'Resumen' shows 2 modified, 1 removed and 1 added; at every reference width the selected section shows its full name (e.g. '3. OBLIGACIONES DEL CONTRATISTA' in the 260 px side column from 1195x835) instead of a truncated one.",
+      "description": "Side-by-side with highlights, modified-section list matching the fixture truth table, and summary view (docs/plan/01 E1). If the user selects a newer pair while the earlier comparison or its PDFs are still loading, the screen retains only the newer pair and its section diff. At 412x915 the save, next-change and view-tab controls wrap below the title as 44 px targets without horizontal page scroll, and tapping 'Resumen' shows 2 modified, 1 removed and 1 added; at every reference width the selected section shows its full name (e.g. '3. OBLIGACIONES DEL CONTRATISTA' in the 260 px side column from 1195x835) instead of a truncated one.",
       "expectedSpecs": 2,
       "outcomes": [
         "display"
