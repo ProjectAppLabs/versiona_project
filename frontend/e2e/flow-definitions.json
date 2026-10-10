@@ -48,7 +48,7 @@
         "shared"
       ],
       "priority": "P1",
-      "description": "Wrong credentials or an inactive account show an error and do not create a session. Invalid Google claims are rejected server-side; real Google OAuth remains an explicit backend/unit-only exemption.",
+      "description": "Wrong credentials or an inactive account show an error and do not create a session. Invalid Google claims are rejected server-side; existing email without linked subject returns google_link_required without a session. E2E uses only the external Google script and official verification transport boundaries; real Django endpoints remain in process.",
       "expectedSpecs": 1,
       "outcomes": [
         "error"
@@ -380,13 +380,13 @@
       ]
     },
     "a3-account-security": {
-      "name": "A3 - 2FA and active sessions",
+      "name": "A3 - 2FA, Google linking and active sessions",
       "module": "auth",
       "roles": [
         "user"
       ],
       "priority": "P2",
-      "description": "TOTP enrolment, active-session revocation, and completion of a challenge issued after password or validated Google first-factor login. A malformed, expired, disabled, deleted, or inactive-user challenge returns 401 and creates no session. Google OAuth itself remains exempt from real E2E because it depends on the external provider.",
+      "description": "TOTP enrolment, active-session revocation, and completion of a challenge issued after password or validated Google first-factor login. A malformed, expired, disabled, deleted, or inactive-user challenge returns 401 and creates no session. Explicit Google linking requires a single-use email-recovery ticket, current password, distinct new password and active TOTP. Existing emails never auto-link. Recovery and linking revoke old access/refresh immediately. E2E replaces only the external Google script and official tokeninfo transport in the guarded private process; Django endpoints stay real.",
       "expectedSpecs": 1,
       "outcomes": [
         "success",

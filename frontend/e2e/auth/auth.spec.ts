@@ -2,6 +2,7 @@ import { test, expect } from '../test-with-coverage';
 import type { APIRequestContext } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 import { waitForPageLoad } from '../fixtures';
+import { googleCredential, installGoogleBoundary } from '../helpers/google-boundary';
 import { waitForEmail } from '../helpers/mailpit';
 import { AUTH_SIGN_IN_FORM, AUTH_SIGN_UP_FORM, AUTH_LOGIN_INVALID, AUTH_PROTECTED_REDIRECT, AUTH_FORGOT_PASSWORD_FORM } from '../helpers/flow-tags';
 
@@ -138,11 +139,11 @@ test.describe('Authentication', () => {
     await page.getByPlaceholder('New Password', { exact: true }).fill('NewPass!2026');
     await page.getByPlaceholder('Confirm New Password').fill('NewPass!2026');
     await page.getByRole('button', { name: 'Reset password', exact: true }).click();
-    await expect(page).toHaveURL(/\/sign-in$/);
+    await expect(page).toHaveURL(/\/sign-in\?next=\/settings$/);
     await page.getByPlaceholder('Email').fill(email);
     await page.getByPlaceholder('Password', { exact: true }).fill('NewPass!2026');
     await page.getByRole('button', { name: 'Entrar', exact: true }).click();
-    await expect(page).toHaveURL(/\/projects$/);
+    await expect(page).toHaveURL(/\/settings$/);
   });
 
   test('should navigate from sign-in to forgot password', { tag: [...AUTH_FORGOT_PASSWORD_FORM, '@outcome:display'] }, async ({ page }) => {
@@ -158,4 +159,35 @@ test.describe('Authentication', () => {
     await expect(page).toHaveURL(/.*forgot-password/);
     await expect(page.getByRole('heading', { name: 'Reset Password' })).toBeVisible();
   });
+});
+
+
+for (const { route, tags } of [
+  { route: '/sign-in', tags: AUTH_SIGN_IN_FORM },
+  { route: '/sign-up', tags: AUTH_SIGN_UP_FORM },
+]) {
+  test(`Google on ${route} requires recovery for an existing email`, {
+    tag: [...tags, '@outcome:error'],
+  }, async ({ page, request }) => {
+    const email = await createRecoveryAccount(request);
+    await installGoogleBoundary(page, googleCredential(email));
+    await page.goto(route);
+    await page.getByTestId('google-boundary-button').click();
+    await expect(page.getByTestId('google-link-required')).toBeVisible();
+    const cookies = await page.context().cookies();
+    expect(cookies.some((cookie) => cookie.name === 'access_token' && cookie.value)).toBe(false);
+    await page.getByTestId('google-link-required').getByRole('link').click();
+    await expect(page).toHaveURL(/\/forgot-password$/);
+  });
+}
+
+test('new Google identity enters onboarding through the real API', {
+  tag: [...AUTH_SIGN_UP_FORM, '@outcome:success'],
+}, async ({ page }) => {
+  const email = `google-new-${randomUUID()}@versiona.test`;
+  await installGoogleBoundary(page, googleCredential(email));
+  await page.goto('/sign-up');
+  await page.getByTestId('google-boundary-button').click();
+  await expect(page).toHaveURL(/\/onboarding$/);
+  await expect(page.getByRole('button', { name: 'Salir' })).toBeVisible();
 });

@@ -1,6 +1,8 @@
 import { expect, test } from '../../test-with-coverage';
 import { A3_ACCOUNT_SECURITY } from '../../helpers/flow-tags';
 import { totpNow } from '../../helpers/totp';
+import { googleCredential, installGoogleBoundary } from '../../helpers/google-boundary';
+import { waitForEmail } from '../../helpers/mailpit';
 import { uniqueEmail } from '../../helpers/versiona';
 
 /** A3 — TOTP end to end: enrol from settings, re-login demands the code.
@@ -73,4 +75,72 @@ test.describe('A3 — Seguridad de la cuenta', () => {
       await expect(page.getByRole('button', { name: 'Salir' })).toBeVisible();
     }
   );
+});
+
+
+// Fails if an attacker-selected password suffices to join an email owner's Google identity.
+test('email recovery then explicit Google linking revokes preregistration sessions', {
+  tag: [...A3_ACCOUNT_SECURITY, '@outcome:success', '@outcome:error'],
+}, async ({ page, request }) => {
+  test.slow();
+  const email = uniqueEmail('google-link');
+  const originalPassword = 'Attacker-Chosen!51';
+  const recoveredPassword = 'Recover-River!82';
+  const linkedPassword = 'Connect-Mountain!93';
+  const seeded = await request.post('/api/sign_up/', { data: { email, password: originalPassword } });
+  expect(seeded.status()).toBe(201);
+  const stolen = await seeded.json() as { access: string; refresh: string };
+  await installGoogleBoundary(page, googleCredential(email));
+  await page.goto('/sign-in');
+  await page.getByTestId('google-boundary-button').click();
+  await expect(page.getByTestId('google-link-required')).toBeVisible();
+  await page.getByTestId('google-link-required').getByRole('link').click();
+  await expect(page).toHaveURL(/\/forgot-password$/);
+  await expect(page.getByRole('heading', { name: 'Reset Password' })).toBeVisible();
+  await page.getByPlaceholder('Email').fill(email);
+  await expect(page.getByPlaceholder('Email')).toHaveValue(email);
+  await page.getByRole('button', { name: 'Send verification code', exact: true }).click();
+  await expect(page.getByPlaceholder('000000')).toBeVisible();
+  const message = await waitForEmail({ to: email, subjectContains: 'Password Reset Code' });
+  expect(process.env.MAILPIT_API).toEqual(expect.any(String));
+  expect(process.env.MAILPIT_API).not.toBe('');
+  const mailbox = await request.get(`${process.env.MAILPIT_API}/api/v1/message/${message.ID}`);
+  expect(mailbox.status()).toBe(200);
+  const code = ((await mailbox.json()).Text as string).match(/\b\d{6}\b/)?.[0];
+  expect(code).toMatch(/^\d{6}$/);
+  await page.getByPlaceholder('000000').fill(code as string);
+  await page.getByPlaceholder('New Password', { exact: true }).fill(recoveredPassword);
+  await page.getByPlaceholder('Confirm New Password').fill(recoveredPassword);
+  await page.getByRole('button', { name: 'Reset password', exact: true }).click();
+  await expect(page).toHaveURL(/\/sign-in\?next=\/settings$/);
+  const deniedAccess = await request.get('/api/validate_token/', { headers: { Authorization: `Bearer ${stolen.access}` } });
+  expect(deniedAccess.status()).toBe(401);
+  const deniedRefresh = await request.post('/api/token/refresh/', { data: { refresh: stolen.refresh } });
+  expect(deniedRefresh.status()).toBe(401);
+  await page.getByPlaceholder('Email').fill(email);
+  await page.getByPlaceholder('Password', { exact: true }).fill(recoveredPassword);
+  await page.getByRole('button', { name: 'Entrar', exact: true }).click();
+  await expect(page).toHaveURL(/\/settings$/);
+  await expect(page.getByTestId('google-link-form')).toBeVisible();
+  await page.getByTestId('google-link-current').fill(recoveredPassword);
+  await page.getByTestId('google-link-new').fill(linkedPassword);
+  await page.getByTestId('google-link-confirm').fill(linkedPassword);
+  const beforeLink = await page.context().cookies();
+  const oldAccess = beforeLink.find((cookie) => cookie.name === 'access_token')?.value;
+  expect(oldAccess).toEqual(expect.any(String));
+  expect(oldAccess).not.toBe('');
+  const admitted = await request.get('/api/validate_token/', { headers: { Authorization: `Bearer ${oldAccess}` } });
+  expect(admitted.status()).toBe(200);
+  await page.getByTestId('google-boundary-button').click();
+  await page.getByTestId('google-link-submit').click();
+  await expect(page.getByTestId('google-link-panel').getByRole('status')).toHaveText(
+    'Google vinculado. Tu contraseña cambió y las demás sesiones se cerraron.',
+  );
+  const stale = await request.get('/api/validate_token/', { headers: { Authorization: `Bearer ${oldAccess}` } });
+  expect(stale.status()).toBe(401);
+  await page.getByRole('button', { name: 'Salir' }).click();
+  await page.goto('/sign-in');
+  await page.getByTestId('google-boundary-button').click();
+  await expect(page).toHaveURL(/\/projects$/);
+  await expect(page.getByRole('button', { name: 'Salir' })).toBeVisible();
 });

@@ -278,3 +278,26 @@ def test_sign_in_2fa_rejects_a_user_with_disabled_totp_after_challenge(enabled_u
     assert response.status_code == 401
     assert response.data == {'error': 'Desafío inválido o vencido.'}
     assert OutstandingToken.objects.count() == outstanding_before
+
+
+@pytest.mark.django_db
+def test_security_exposes_google_link_status(auth_client, user):
+    """Expose the stored provider linkage and local password availability."""
+    response = auth_client.get('/api/me/security/')
+    assert response.data['google_linked'] is False
+    assert response.data['has_usable_password'] is True
+    user.google_subject = 'linked-subject'
+    user.set_unusable_password()
+    user.save(update_fields=['google_subject', 'password'])
+    response = auth_client.get('/api/me/security/')
+    assert response.data['google_linked'] is True
+    assert response.data['has_usable_password'] is False
+
+
+@pytest.mark.django_db
+def test_google_link_rejects_a_non_object_body(auth_client, user):
+    """Reject a non-object linking payload without persisting a provider identity."""
+    response = auth_client.post('/api/me/google/link/', ['credential'], format='json')
+    assert response.status_code == 400
+    user.refresh_from_db()
+    assert user.google_subject is None

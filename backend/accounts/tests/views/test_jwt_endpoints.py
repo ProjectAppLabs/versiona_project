@@ -131,3 +131,60 @@ def test_jwt_totp_challenge_allows_refresh_after_second_factor(api_client):
     assert second.status_code == status.HTTP_200_OK
     assert refreshed.status_code == status.HTTP_200_OK
     assert refreshed.json()['access'] != ''
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('version', [0, 3])
+def test_jwt_alias_mints_the_authenticated_epoch(api_client, django_user_model, version):
+    """Stamp both JWT aliases with the epoch authenticated by the local password."""
+    from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
+    user = django_user_model.objects.create_user(email='epoch@example.com', password='pass1234', auth_version=version)
+    response = api_client.post(reverse('token_obtain_pair'), {'email': user.email, 'password': 'pass1234'}, format='json')
+    assert response.status_code == 200
+    assert AccessToken(response.data['access'])['auth_version'] == version
+    assert RefreshToken(response.data['refresh'])['auth_version'] == version
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(('version', 'expected'), [(0, 200), (1, 401)])
+def test_legacy_access_only_admits_an_unrotated_account(api_client, django_user_model, version, expected):
+    """Accept a claimless access token only before the account rotates its epoch."""
+    from rest_framework_simplejwt.tokens import RefreshToken
+    user = django_user_model.objects.create_user(email='legacy@example.com', auth_version=version)
+    token = RefreshToken.for_user(user)
+    api_client.credentials(HTTP_AUTHORIZATION=f'Bearer {token.access_token}')
+    assert api_client.get(reverse('validate_token')).status_code == expected
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(('version', 'expected'), [(0, 200), (1, 401)])
+def test_legacy_refresh_only_admits_an_unrotated_account(api_client, django_user_model, version, expected):
+    """Accept a claimless refresh token only before the account rotates its epoch."""
+    from rest_framework_simplejwt.tokens import RefreshToken
+    user = django_user_model.objects.create_user(email='legacy-refresh@example.com', auth_version=version)
+    token = RefreshToken.for_user(user)
+    response = api_client.post(reverse('token_refresh'), {'refresh': str(token)}, format='json')
+    assert response.status_code == expected
+
+
+@pytest.mark.django_db
+def test_minting_does_not_upgrade_a_previously_authenticated_password(api_client, django_user_model):
+    """Keep an authenticated stale instance from minting a token for a newer epoch."""
+    from accounts.utils.auth_utils import generate_auth_tokens
+    user = django_user_model.objects.create_user(email='stale-instance@example.com', password='pass1234')
+    django_user_model.objects.filter(pk=user.pk).update(auth_version=1)
+    pair = generate_auth_tokens(user)
+    api_client.credentials(HTTP_AUTHORIZATION=f"Bearer {pair['access']}")
+    assert api_client.get(reverse('validate_token')).status_code == 401
+
+
+@pytest.mark.django_db
+def test_password_update_revokes_the_current_access(api_client, django_user_model):
+    """Reject the active access token immediately after password replacement."""
+    from accounts.utils.auth_utils import generate_auth_tokens
+    user = django_user_model.objects.create_user(email='update-session@example.com', password='pass1234')
+    pair = generate_auth_tokens(user)
+    api_client.credentials(HTTP_AUTHORIZATION=f"Bearer {pair['access']}")
+    response = api_client.post(reverse('update_password'), {'current_password': 'pass1234', 'new_password': 'Updated-Mountain!91'}, format='json')
+    assert response.status_code == 200
+    assert api_client.get(reverse('validate_token')).status_code == 401

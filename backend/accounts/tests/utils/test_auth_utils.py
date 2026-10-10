@@ -1,3 +1,5 @@
+"""Authentication token epochs and email delivery outcomes."""
+
 import smtplib
 
 import pytest
@@ -22,6 +24,7 @@ def _auth_email_warnings(caplog):
 
 @pytest.mark.django_db
 def test_generate_auth_tokens_contains_user_payload():
+    """Return the account payload with an access and refresh pair carrying its epoch."""
     User = get_user_model()
     user = User.objects.create_user(email='tokens@example.com', password='pass1234')
 
@@ -31,10 +34,14 @@ def test_generate_auth_tokens_contains_user_payload():
     assert tokens['user']['id'] == user.id
     assert tokens['refresh']
     assert tokens['access']
+    from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
+    assert AccessToken(tokens['access'])['auth_version'] == 0
+    assert RefreshToken(tokens['refresh'])['auth_version'] == 0
 
 
 @pytest.mark.django_db
 def test_send_password_reset_code_success(monkeypatch):
+    """Deliver the recovery code to the requested account recipient."""
     User = get_user_model()
     user = User.objects.create_user(email='reset@example.com', password='pass1234', first_name='Reset')
     sent = {}
@@ -52,6 +59,7 @@ def test_send_password_reset_code_success(monkeypatch):
 
 @pytest.mark.django_db
 def test_send_password_reset_code_failure(monkeypatch):
+    """Report failed recovery delivery without raising the SMTP transport exception."""
     User = get_user_model()
     user = User.objects.create_user(email='resetfail@example.com', password='pass1234', first_name='Reset')
 
@@ -65,6 +73,7 @@ def test_send_password_reset_code_failure(monkeypatch):
 
 @pytest.mark.django_db
 def test_send_verification_code_success(monkeypatch):
+    """Deliver the verification code to the requested recipient."""
     sent = {}
 
     def fake_send_mail(subject, message, from_email, recipient_list, fail_silently):
@@ -80,6 +89,7 @@ def test_send_verification_code_success(monkeypatch):
 
 @pytest.mark.django_db
 def test_send_verification_code_failure(monkeypatch):
+    """Report failed verification delivery without raising the transport exception."""
     def fake_send_mail(*_args, **_kwargs):
         raise RuntimeError('send failed')
 

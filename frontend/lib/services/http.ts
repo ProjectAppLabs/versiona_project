@@ -35,7 +35,7 @@ const refreshAccessToken = async (): Promise<string | null> => {
     const response = await axios.post(`${API_BASE_URL}/token/refresh/`, { refresh });
     const access = response.data?.access;
     if (!access) return null;
-    setTokens({ access, refresh });
+    setTokens({ access, refresh: response.data?.refresh || refresh });
     return access;
   } catch (e) {
     clearTokens();
@@ -49,7 +49,9 @@ api.interceptors.response.use(
     const originalRequest = error?.config as (typeof error.config & { _retry?: boolean }) | undefined;
     const status = error?.response?.status;
 
-    if (status !== 401 || !originalRequest || originalRequest._retry) {
+    // Linking rotates credentials: an uncertain response must never replay the mutation.
+    if (status !== 401 || !originalRequest || originalRequest._retry ||
+        originalRequest.url?.replace(/\/$/, '').endsWith('me/google/link')) {
       return Promise.reject(error);
     }
 

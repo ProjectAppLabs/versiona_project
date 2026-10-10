@@ -196,4 +196,25 @@ describe('http service', () => {
     await expect(responseErrorInterceptor?.(error)).rejects.toBe(error);
     expect(mockAxios.post).not.toHaveBeenCalled();
   });
+
+  it('persists the rotated refresh token before retrying an expired access token', async () => {
+    mockGetRefreshToken.mockReturnValue('old-refresh');
+    mockAxios.post.mockResolvedValueOnce({ data: { access: 'new-access', refresh: 'new-refresh' } });
+    apiInstance.mockResolvedValueOnce('retried');
+    await import('../http');
+    await responseErrorInterceptor?.({ response: { status: 401 }, config: {} });
+    expect(mockSetTokens).toHaveBeenCalledWith({ access: 'new-access', refresh: 'new-refresh' });
+  });
+
+  it('never replays a Google linking mutation after a 401 response', async () => {
+    mockGetRefreshToken.mockReturnValue('valid-refresh');
+    mockAxios.post.mockResolvedValueOnce({ data: { access: 'new-access', refresh: 'new-refresh' } });
+    apiInstance.mockResolvedValueOnce('replayed-link');
+    await import('../http');
+    const error = { response: { status: 401 }, config: { url: 'me/google/link/' } };
+    await expect(responseErrorInterceptor?.(error)).rejects.toBe(error);
+    expect(mockAxios.post).not.toHaveBeenCalled();
+    expect(apiInstance).not.toHaveBeenCalled();
+  });
+
 });

@@ -35,6 +35,7 @@ const advanceToCodeStep = async () => {
 describe('ForgotPasswordPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    sessionStorage.clear();
   });
 
   afterEach(() => {
@@ -158,7 +159,7 @@ describe('ForgotPasswordPage', () => {
     expect(screen.getByText('Password reset successfully! Redirecting...')).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(replace).toHaveBeenCalledWith('/sign-in');
+      expect(replace).toHaveBeenCalledWith('/sign-in?next=/settings');
     }, { timeout: 3000 });
   });
 
@@ -213,4 +214,20 @@ describe('ForgotPasswordPage', () => {
 
     expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
   });
+  it('sends a recovered Google account to password sign-in with a fixed settings continuation', async () => {
+    const { saveGoogleLinkTicket } = await import('../../../lib/services/google-link-ticket');
+    const resetPassword = jest.fn().mockImplementation(async () => saveGoogleLinkTicket('proof'));
+    const replace = jest.fn();
+    setAuthStoreState({ sendPasswordResetCode: jest.fn().mockResolvedValue(undefined), resetPassword });
+    mockUseRouter.mockReturnValue({ replace });
+    render(<ForgotPasswordPage />);
+    await advanceToCodeStep();
+    fireEvent.change(screen.getByPlaceholderText('000000'), { target: { value: '123456' } });
+    fireEvent.change(screen.getByPlaceholderText('New Password'), { target: { value: 'password123' } });
+    fireEvent.change(screen.getByPlaceholderText('Confirm New Password'), { target: { value: 'password123' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Reset password' }));
+    await waitFor(() => expect(replace).toHaveBeenCalledWith('/sign-in?next=/settings'));
+    expect(screen.getByText(/La verificación dura 15 minutos/)).toBeInTheDocument();
+  });
+
 });

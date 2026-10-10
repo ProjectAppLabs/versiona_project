@@ -12,6 +12,8 @@ from documents.services.version_service import DomainError
 @api_view(['GET'])
 def my_security(request):
     return Response({
+        'google_linked': bool(request.user.google_subject),
+        'has_usable_password': request.user.has_usable_password(),
         'totp_enabled': bool(request.user.totp_enabled_at),
         'totp_enabled_at': request.user.totp_enabled_at,
         'backup_codes_left': len(request.user.totp_backup_codes or []),
@@ -67,3 +69,20 @@ def sessions_revoke_others(request):
         request.user, (request.data or {}).get('refresh')
     )
     return Response({'revoked': revoked})
+
+
+@api_view(['POST'])
+@throttle_classes([AuthThrottle])
+def google_link(request):
+    from accounts.services.google_identity_service import GoogleIdentityError, verify_google_identity, link_google
+
+    if not isinstance(request.data, dict):
+        return Response({'error': 'Envía los datos de vinculación como un objeto.'}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        # Network I/O happens before the service takes the account row lock.
+        identity = verify_google_identity((request.data or {}).get('credential'))
+        tokens = link_google(request.user, request.auth, request.data, identity)
+    except GoogleIdentityError as exc:
+        # Linking has a uniform input error status; it never authenticates.
+        return Response(exc.detail, status=400 if exc.status_code == 401 else exc.status_code)
+    return Response(tokens, status=status.HTTP_201_CREATED)

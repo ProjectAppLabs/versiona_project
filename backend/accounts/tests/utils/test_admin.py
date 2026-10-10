@@ -1,3 +1,5 @@
+"""Admin recovery-code permissions and authorized impersonation admission."""
+
 import pytest
 from core.admin_site import admin_site
 from django.contrib.messages.storage.fallback import FallbackStorage
@@ -18,6 +20,7 @@ def _request_with_messages(user):
 
 @pytest.mark.django_db
 def test_password_code_admin_disables_add_permission():
+    """Prevent administrators from creating password recovery codes through the admin form."""
     admin = PasswordCodeAdmin(PasswordCode, admin_site)
     request = RequestFactory().get('/admin/')
 
@@ -40,6 +43,7 @@ def test_admin_site_custom_sections():
 
 @pytest.mark.django_db
 def test_user_admin_login_as_link_renders_admin_url():
+    """Render the impersonation link for the target account admin route."""
     user = User.objects.create_user(email='target@example.com', password='pass1234')
     admin = VersionaUserAdmin(User, admin_site)
 
@@ -51,6 +55,7 @@ def test_user_admin_login_as_link_renders_admin_url():
 
 @pytest.mark.django_db
 def test_user_admin_login_as_redirects_to_frontend(settings):
+    """Redirect authorized impersonation with tokens stamped for the target account epoch."""
     factory = RequestFactory()
     admin_user = User.objects.create_superuser(email='admin@example.com', password='pass1234')
     target_user = User.objects.create_user(email='target@example.com', password='pass1234')
@@ -66,10 +71,17 @@ def test_user_admin_login_as_redirects_to_frontend(settings):
     assert 'access=' in response['Location']
     assert 'refresh=' in response['Location']
     assert 'redirect=%2F' in response['Location']
+    from urllib.parse import parse_qs, urlparse
+
+    from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
+    query = parse_qs(urlparse(response['Location']).query)
+    assert AccessToken(query['access'][0])['auth_version'] == target_user.auth_version
+    assert RefreshToken(query['refresh'][0])['auth_version'] == target_user.auth_version
 
 
 @pytest.mark.django_db
 def test_user_admin_login_as_requires_active_superuser():
+    """Deny impersonation to an account without active superuser authority."""
     factory = RequestFactory()
     regular_user = User.objects.create_user(email='user@example.com', password='pass1234')
     target_user = User.objects.create_user(email='target@example.com', password='pass1234')
@@ -98,6 +110,7 @@ def test_user_admin_login_as_requires_active_superuser():
     ),
 ])
 def test_user_admin_login_as_blocks_ineligible_target(build_target):
+    """Deny token issuance for inactive or superuser impersonation targets."""
     admin_user = User.objects.create_superuser(email='admin@example.com', password='pass1234')
     target_user = build_target()
     request = _request_with_messages(admin_user)
