@@ -26,6 +26,7 @@ export interface SectionDiffDetail extends SectionChange {
 }
 
 interface CompareState {
+  requestKey: string | null;
   comparison: ComparisonDetail | null;
   diffs: Record<string, SectionDiffDetail>;
   activeSection: string | null;
@@ -45,43 +46,60 @@ function extractError(err: unknown): string {
   );
 }
 
-export const useCompareStore = create<CompareState>((set, get) => ({
-  comparison: null,
-  diffs: {},
-  activeSection: null,
-  isLoading: false,
-  error: null,
+export const useCompareStore = create<CompareState>((set, get) => {
+  let requestGeneration = 0;
+  return {
+    requestKey: null,
+    comparison: null,
+    diffs: {},
+    activeSection: null,
+    isLoading: false,
+    error: null,
 
-  compare: async (documentId, fromVersion, toVersion) => {
-    set({ isLoading: true, error: null, comparison: null, diffs: {} });
-    try {
-      const { data } = await api.post<ComparisonDetail>(
-        `documents/${documentId}/comparisons/`,
-        { from_version: fromVersion, to_version: toVersion }
-      );
-      set({ comparison: data, isLoading: false });
-    } catch (err) {
-      maybeShowUpgradeDialog(err); // DP-04 history lock → upgrade path
-      set({ isLoading: false, error: extractError(err) });
-    }
-  },
+    compare: async (documentId, fromVersion, toVersion) => {
+      const generation = ++requestGeneration;
+      set({
+        requestKey: JSON.stringify([documentId, fromVersion, toVersion]),
+        isLoading: true, error: null, comparison: null, diffs: {}, activeSection: null,
+      });
+      try {
+        const { data } = await api.post<ComparisonDetail>(
+          `documents/${documentId}/comparisons/`,
+          { from_version: fromVersion, to_version: toVersion }
+        );
+        if (generation !== requestGeneration) return;
+        set({ comparison: data, isLoading: false });
+      } catch (err) {
+        if (generation !== requestGeneration) return;
+        maybeShowUpgradeDialog(err); // DP-04 history lock → upgrade path
+        set({ isLoading: false, error: extractError(err) });
+      }
+    },
 
-  fetchSectionDiff: async (sectionKey) => {
-    const { comparison, diffs } = get();
-    if (!comparison) return null;
-    if (diffs[sectionKey]) return diffs[sectionKey];
-    try {
-      const { data } = await api.get<SectionDiffDetail>(
-        `comparisons/${comparison.public_id}/sections/${sectionKey}/diff/`
-      );
-      set((state) => ({ diffs: { ...state.diffs, [sectionKey]: data } }));
-      return data;
-    } catch (err) {
-      set({ error: extractError(err) });
-      return null;
-    }
-  },
+    fetchSectionDiff: async (sectionKey) => {
+      const { comparison, diffs } = get();
+      if (!comparison) return null;
+      if (diffs[sectionKey]) return diffs[sectionKey];
+      const generation = requestGeneration;
+      const isCurrent = () => generation === requestGeneration
+        && get().comparison?.public_id === comparison.public_id;
+      try {
+        const { data } = await api.get<SectionDiffDetail>(
+          `comparisons/${comparison.public_id}/sections/${sectionKey}/diff/`
+        );
+        if (!isCurrent()) return null;
+        set((state) => ({ diffs: { ...state.diffs, [sectionKey]: data } }));
+        return data;
+      } catch (err) {
+        if (isCurrent()) set({ error: extractError(err) });
+        return null;
+      }
+    },
 
-  setActiveSection: (key) => set({ activeSection: key }),
-  reset: () => set({ comparison: null, diffs: {}, activeSection: null, error: null }),
-}));
+    setActiveSection: (key) => set({ activeSection: key }),
+    reset: () => {
+      requestGeneration += 1;
+      set({ requestKey: null, comparison: null, diffs: {}, activeSection: null, error: null, isLoading: false });
+    },
+  };
+});

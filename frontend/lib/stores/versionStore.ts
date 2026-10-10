@@ -17,7 +17,7 @@ interface VersionState {
   fileError: string | null;
   error: string | null;
   fetchDetail: (versionId: string) => Promise<void>;
-  fetchFileUrl: (versionId: string) => Promise<string | null>;
+  fetchFileUrl: (versionId: string, isConsumerCurrent?: () => boolean) => Promise<string | null>;
   downloadUrl: (versionId: string) => Promise<string | null>;
   editMessage: (versionId: string, message: string) => Promise<boolean>;
   trashVersion: (versionId: string) => Promise<boolean>;
@@ -83,7 +83,9 @@ export const useVersionStore = create<VersionState>((set, get) => {
       }
     },
 
-    fetchFileUrl: async (versionId) => {
+    fetchFileUrl: async (versionId, isConsumerCurrent) => {
+      // A comparison owns a pair, independently of the viewer's active version.
+      // Its optional guard suppresses obsolete effects, never the URL return.
       const generation = ++fileGeneration;
       const navigation = navigationGeneration;
       const attempt = Symbol();
@@ -95,14 +97,15 @@ export const useVersionStore = create<VersionState>((set, get) => {
       try {
         const { data } = await api.get(`versions/${versionId}/file/`);
         if (generation === fileGeneration && navigation === navigationGeneration
-          && latestFileAttemptByVersion.get(versionId) === attempt) {
+          && latestFileAttemptByVersion.get(versionId) === attempt
+          && (isConsumerCurrent?.() ?? true)) {
           set({ fileUrl: data.url, isFileLoading: false });
         }
         // CompareView consumes each promise's URL, not the shared viewer state.
         return data.url as string;
       } catch (err) {
         const currentAttempt = latestFileAttemptByVersion.get(versionId) === attempt
-          && navigation === navigationGeneration;
+          && navigation === navigationGeneration && (isConsumerCurrent?.() ?? true);
         if (currentAttempt && generation === fileGeneration) {
           const message = extractError(err);
           set({ fileUrl: null, fileError: message, isFileLoading: false, error: message });
