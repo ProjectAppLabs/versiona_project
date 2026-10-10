@@ -93,7 +93,119 @@ test.describe('E1 — Comparar dos versiones (pantalla estrella)', () => {
       await expect(page.getByTestId('compare-selected')).toBeDisabled();
     }
   );
+
+  test('E1 — conserva la pareja vigente después de respuestas de la pareja anterior',
+    { tag: [...E1_COMPARE, '@outcome:display'] }, async ({ page }) => {
+      test.setTimeout(360_000); // Three real analyses plus deliberately retained API responses.
+      // Bug: leaving A=v1/v2 for B=v2/v3 lets A replace B's result, diff or PDFs.
+      const title = uniqueName('Comparación vigente');
+      await openSeededProject(page);
+      await uploadPdf(page, 'contrato_v1.pdf', { title, message: 'v1' });
+      await page.getByTestId('documents-list').getByRole('link', { name: title }).click();
+      await expect(page.getByTestId('version-item-1')).toBeVisible({ timeout: 20_000 });
+      await uploadPdf(page, 'contrato_v2.pdf', { message: 'v2' });
+      await expect(page.getByTestId('version-item-2')).toBeVisible({ timeout: 90_000 });
+      await uploadPdf(page, 'contrato_v3.pdf', { message: 'v3' });
+      await expect(page.getByTestId('version-item-3')).toBeVisible({ timeout: 90_000 });
+      const fromId = (await page.getByTestId('version-item-1').getByRole('link').getAttribute('href'))!.split('/versions/')[1];
+      const middleId = (await page.getByTestId('version-item-2').getByRole('link').getAttribute('href'))!.split('/versions/')[1];
+      const toId = (await page.getByTestId('version-item-3').getByRole('link').getAttribute('href'))!.split('/versions/')[1];
+      const projectId = new URL(page.url()).pathname.split('/')[2];
+      const timeOrigin = await page.evaluate(() => performance.timeOrigin);
+      const releaseOlder = deferredSignal();
+      const olderComparisonReady = deferredSignal();
+      const olderFilesReady = deferredSignal();
+      const olderDeliveries: Array<Promise<void>> = [];
+      let enteringCurrent = false;
+      let oldFileCount = 0;
+      let currentId = '';
+      let comparisonEndpoint = '';
+
+      await page.route('**/documents/*/comparisons/', async (route) => {
+        const pair = route.request().postDataJSON() as { from_version: string; to_version: string };
+        const response = await route.fetch(); // Real comparison; only its delivery is delayed.
+        if (pair.from_version === fromId && pair.to_version === middleId) {
+          const delivered = deferredSignal();
+          olderDeliveries.push(delivered.promise);
+          olderComparisonReady.resolve();
+          await releaseOlder.promise;
+          await route.fulfill({ response });
+          delivered.resolve();
+          return;
+        }
+        currentId = (await response.json()).public_id;
+        comparisonEndpoint = route.request().url();
+        await route.fulfill({ response });
+      });
+      await page.route('**/versions/*/file/', async (route) => {
+        const retain = !enteringCurrent;
+        const delivered = deferredSignal();
+        if (retain) olderDeliveries.push(delivered.promise);
+        const response = await route.fetch(); // Signed URL for the real uploaded PDF.
+        if (retain) {
+          oldFileCount += 1;
+          if (oldFileCount === 2) olderFilesReady.resolve();
+          await releaseOlder.promise;
+        }
+        await route.fulfill({ response });
+        delivered.resolve();
+      });
+
+      try {
+        await page.getByTestId('select-version-1').check();
+        await page.getByTestId('select-version-2').check();
+        await page.getByTestId('compare-selected').click();
+        await Promise.all([olderComparisonReady.promise, olderFilesReady.promise]);
+        enteringCurrent = true;
+        await page.goBack(); // Client history: retain the original JS realm and pending A.
+        await expect(page.getByTestId('version-timeline')).toBeVisible();
+        await page.getByTestId('select-version-1').uncheck();
+        await page.getByTestId('select-version-2').check();
+        await page.getByTestId('select-version-3').check();
+        await page.getByTestId('compare-selected').click();
+        await expect(page).toHaveURL(new RegExp(`/compare/${middleId}/${toId}$`));
+        await expect(page.getByTestId('side-before').getByRole('heading')).toHaveText('Antes · v2');
+        await expect(page.getByTestId('side-after').getByRole('heading')).toHaveText('Después · v3');
+        await expect(page.getByTestId('side-before').getByTestId('pdf-viewer')).toContainText(/COP\s*\$120\.000\.000/);
+        await expect(page.getByTestId('side-after').getByTestId('pdf-viewer')).toContainText(/previa\s*notificacion\s*escrita\s*con\s*al\s*menos\s*cinco\s*\(5\)\s*dias\s*habiles\s*de\s*antelacion\./);
+        const currentDiffResponse = page.waitForResponse((response) => response.url().endsWith(`/comparisons/${currentId}/sections/obligaciones-del-contratista/diff/`) && response.status() === 200);
+        await page.getByTestId('section-obligaciones-del-contratista').click();
+        const currentDiff = await (await currentDiffResponse).json();
+        await assertSelectedPdfFits(page.getByTestId('side-before').getByTestId('pdf-viewer'), currentDiff.bboxes_from[0]);
+        await assertSelectedPdfFits(page.getByTestId('side-after').getByTestId('pdf-viewer'), currentDiff.bboxes_to[0]);
+
+        releaseOlder.resolve();
+        await Promise.all(olderDeliveries);
+
+        expect(await page.evaluate(() => performance.timeOrigin)).toBe(timeOrigin);
+        await expect(page.getByTestId('compare-view')).toContainText('v2 → v3');
+        await expect(page.getByTestId('side-before').getByTestId('pdf-viewer')).not.toContainText(/COP\s*\$100\.000\.000/);
+        await expect(page.getByTestId('side-after').getByTestId('pdf-viewer')).toContainText(/previa\s*notificacion\s*escrita\s*con\s*al\s*menos\s*cinco\s*\(5\)\s*dias\s*habiles\s*de\s*antelacion\./);
+        await expect(page.getByTestId('side-after').getByTestId('pdf-page-1').locator('canvas')).toBeVisible();
+        await expect(page.getByTestId('section-obligaciones-del-contratista')).toHaveAttribute('aria-current', 'true');
+        await assertSelectedPdfFits(page.getByTestId('side-after').getByTestId('pdf-viewer'), currentDiff.bboxes_to[0]);
+        const name = uniqueName('Pareja vigente');
+        page.once('dialog', (dialog) => dialog.accept(name));
+        const saved = page.waitForResponse((response) => response.url().endsWith(`/comparisons/${currentId}/save/`) && response.request().method() === 'POST');
+        await page.getByTestId('save-comparison').click();
+        expect((await saved).status()).toBe(201);
+        const access = (await page.context().cookies()).find((cookie) => cookie.name === 'access_token')!.value;
+        const savedEndpoint = comparisonEndpoint.replace(/documents\/[^/]+\/comparisons\/$/, `projects/${projectId}/saved_comparisons/`);
+        const savedRows = await page.request.get(savedEndpoint, { headers: { Authorization: `Bearer ${access}` } });
+        expect(savedRows.status()).toBe(200);
+        const rows = (await savedRows.json()).results as Array<{ name: string; link: string }>;
+        expect(rows.find((row) => row.name === name)?.link).toContain(`/compare/${middleId}/${toId}`);
+      } finally {
+        releaseOlder.resolve();
+      }
+    });
 });
+
+function deferredSignal() {
+  let resolve!: () => void;
+  const promise = new Promise<void>((resolvePromise) => { resolve = resolvePromise; });
+  return { promise, resolve };
+}
 
 async function assertSelectedPdfFits(viewer: Locator, bbox: NormalizedBBox) {
   const pdfPage = viewer.getByTestId(`pdf-page-${bbox.page}`);

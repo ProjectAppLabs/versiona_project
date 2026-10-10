@@ -1,4 +1,5 @@
 import { api } from '../../services/http';
+import { useUpgradeDialogStore } from '../upgradeDialogStore';
 import {
   useCompareStore,
   type ComparisonDetail,
@@ -11,6 +12,16 @@ jest.mock('../../services/http', () => ({
 
 const mockGet = api.get as jest.Mock;
 const mockPost = api.post as jest.Mock;
+
+function pendingResponse() {
+  let resolve!: (response: { data: unknown }) => void;
+  let reject!: (error: unknown) => void;
+  const promise = new Promise<{ data: unknown }>((resolvePromise, rejectPromise) => {
+    resolve = resolvePromise;
+    reject = rejectPromise;
+  });
+  return { promise, resolve, reject };
+}
 
 const createComparison = (overrides: Partial<ComparisonDetail> = {}): ComparisonDetail => ({
   public_id: 'cmp-1',
@@ -49,6 +60,7 @@ describe('compareStore', () => {
       isLoading: false,
       error: null,
     });
+    useUpgradeDialogStore.getState().hide();
   });
 
   it('stores the comparison returned by the API', async () => {
@@ -59,6 +71,23 @@ describe('compareStore', () => {
 
     expect(useCompareStore.getState().comparison).toEqual(comparison);
     expect(useCompareStore.getState().isLoading).toBe(false);
+  });
+
+  it('keeps the current comparison after an older pair responds', async () => {
+    // Bug: navigating to v2/v3 must not let a late v1/v2 response replace it.
+    const older = pendingResponse();
+    const current = pendingResponse();
+    mockPost.mockReturnValueOnce(older.promise).mockReturnValueOnce(current.promise);
+    const olderRequest = useCompareStore.getState().compare('doc-1', 'ver-1', 'ver-2');
+    const currentRequest = useCompareStore.getState().compare('doc-1', 'ver-2', 'ver-3');
+    const expected = createComparison({ public_id: 'current', from_version: 'ver-2', to_version: 'ver-3' });
+    current.resolve({ data: expected });
+    await currentRequest;
+
+    older.resolve({ data: createComparison({ public_id: 'older' }) });
+    await olderRequest;
+
+    expect(useCompareStore.getState().comparison).toEqual(expected);
   });
 
   it('sends the version pair to the document comparisons endpoint', async () => {
@@ -189,5 +218,84 @@ describe('compareStore', () => {
       activeSection: null,
       error: null,
     });
+  });
+
+  it('keeps the current comparison after an older pair fails', async () => {
+    const older = pendingResponse();
+    mockPost.mockReturnValueOnce(older.promise)
+      .mockResolvedValueOnce({ data: createComparison({ public_id: 'current' }) });
+    const olderRequest = useCompareStore.getState().compare('doc-1', 'ver-1', 'ver-2');
+    await useCompareStore.getState().compare('doc-1', 'ver-2', 'ver-3');
+
+    older.reject(new Error('old comparison unavailable'));
+    await olderRequest;
+
+    expect(useCompareStore.getState()).toMatchObject({
+      comparison: { public_id: 'current' }, error: null, isLoading: false,
+    });
+  });
+
+  it('ignores a history lock from an older pair', async () => {
+    const older = pendingResponse();
+    mockPost.mockReturnValueOnce(older.promise)
+      .mockResolvedValueOnce({ data: createComparison({ public_id: 'current' }) });
+    const olderRequest = useCompareStore.getState().compare('doc-1', 'ver-1', 'ver-2');
+    await useCompareStore.getState().compare('doc-1', 'ver-2', 'ver-3');
+
+    older.reject({ response: { status: 402, data: { upgrade: true, error: 'Old history lock' } } });
+    await olderRequest;
+
+    expect(useUpgradeDialogStore.getState().isOpen).toBe(false);
+    expect(useCompareStore.getState()).toMatchObject({ comparison: { public_id: 'current' }, error: null });
+  });
+
+  it('keeps the current section diff after an older comparison diff responds', async () => {
+    useCompareStore.setState({ comparison: createComparison() });
+    const older = pendingResponse();
+    mockGet.mockReturnValueOnce(older.promise).mockResolvedValueOnce({ data: createDiff() });
+    mockPost.mockResolvedValueOnce({ data: createComparison({ public_id: 'current' }) });
+    const oldRequest = useCompareStore.getState().fetchSectionDiff('sec-1');
+    await useCompareStore.getState().compare('doc-1', 'ver-2', 'ver-3');
+    await useCompareStore.getState().fetchSectionDiff('sec-1');
+
+    older.resolve({ data: createDiff({ word_diff: [{ op: 'delete', text: 'old content' }] }) });
+    await oldRequest;
+
+    expect(useCompareStore.getState().diffs['sec-1']).toEqual(createDiff());
+  });
+
+  it('ignores a section error from an older comparison', async () => {
+    useCompareStore.setState({ comparison: createComparison() });
+    const older = pendingResponse();
+    mockGet.mockReturnValueOnce(older.promise);
+    mockPost.mockResolvedValueOnce({ data: createComparison({ public_id: 'current' }) });
+    const oldRequest = useCompareStore.getState().fetchSectionDiff('sec-1');
+    await useCompareStore.getState().compare('doc-1', 'ver-2', 'ver-3');
+
+    older.reject(new Error('old section unavailable'));
+    await oldRequest;
+
+    expect(useCompareStore.getState()).toMatchObject({ comparison: { public_id: 'current' }, error: null });
+  });
+
+  it('keeps the comparison reset after its pending response arrives', async () => {
+    const pending = pendingResponse();
+    mockPost.mockReturnValueOnce(pending.promise);
+    const request = useCompareStore.getState().compare('doc-1', 'ver-1', 'ver-2');
+    useCompareStore.getState().reset();
+
+    pending.resolve({ data: createComparison() });
+    await request;
+
+    expect(useCompareStore.getState()).toMatchObject({ comparison: null, diffs: {}, isLoading: false });
+  });
+
+  it('clears the selected section when a new comparison begins', () => {
+    useCompareStore.setState({ comparison: createComparison(), activeSection: 'sec-1' });
+    mockPost.mockReturnValueOnce(new Promise(() => {}));
+
+    void useCompareStore.getState().compare('doc-1', 'ver-2', 'ver-3');
+
+    expect(useCompareStore.getState()).toMatchObject({ comparison: null, activeSection: null, isLoading: true });
   });
 });
