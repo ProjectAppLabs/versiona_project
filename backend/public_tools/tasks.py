@@ -29,17 +29,26 @@ def run_public_comparison(comparison_pk: int) -> None:
 
     comparison.status = PublicComparison.Status.PROCESSING
     comparison.save(update_fields=['status'])
+    phase = 'read_a'
     try:
         bytes_a = storage_service.get_bytes(storage_key_for(comparison.public_id, 'a'))
+        phase = 'read_b'
         bytes_b = storage_service.get_bytes(storage_key_for(comparison.public_id, 'b'))
+        phase = 'build_result'
         comparison.result = build_result(bytes_a, bytes_b)
         comparison.status = PublicComparison.Status.DONE
+        phase = 'persist_result'
         comparison.save(update_fields=['result', 'status'])
     except OcrRequiredError:
         comparison.status = PublicComparison.Status.FAILED
         comparison.error_code = 'ocr_required'
         comparison.save(update_fields=['status', 'error_code'])
-    except Exception:
+    except Exception as exc:
+        logger.error(
+            'Public comparison processing failed: phase=%s error_class=%s',
+            phase, type(exc).__name__,
+            extra={'phase': phase, 'error_class': type(exc).__name__},
+        )
         comparison.status = PublicComparison.Status.FAILED
         comparison.error_code = 'processing_failed'
         comparison.save(update_fields=['status', 'error_code'])
