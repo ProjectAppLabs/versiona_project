@@ -154,3 +154,26 @@ def test_security_endpoints_roundtrip(enabled_user):
 
     sessions = client.get('/api/me/sessions/')
     assert sessions.status_code == 200
+
+
+@pytest.mark.django_db
+def test_password_rotation_revokes_an_outstanding_totp_challenge(enabled_user):
+    user, _, _ = enabled_user
+    challenge = twofactor.issue_challenge(user)
+    type(user).objects.filter(pk=user.pk).update(auth_version=1)
+    with pytest.raises(DomainError):
+        twofactor.resolve_challenge(challenge)
+
+
+@pytest.mark.django_db
+def test_email_recovery_revokes_a_totp_challenge(enabled_user):
+    from accounts.models import PasswordCode
+    user, _, _ = enabled_user
+    challenge = twofactor.issue_challenge(user)
+    code = PasswordCode.objects.create(user=user, code='123456')
+    response = APIClient().post('/api/verify_passcode_and_reset_password/', {
+        'email': user.email, 'code': code.code, 'new_password': 'Recovered-Valley!82',
+    }, format='json')
+    assert response.status_code == 200
+    with pytest.raises(DomainError):
+        twofactor.resolve_challenge(challenge)

@@ -3,6 +3,7 @@ from accounts.views import auth, security
 
 urlpatterns = [
     path('sign_in/2fa/', auth.sign_in_2fa, name='sign-in-2fa'),
+    path('me/google/link/', security.google_link, name='google-link'),
     path('me/security/', security.my_security, name='my-security'),
     path('me/2fa/setup/', security.twofa_setup, name='twofa-setup'),
     path('me/2fa/enable/', security.twofa_enable, name='twofa-enable'),

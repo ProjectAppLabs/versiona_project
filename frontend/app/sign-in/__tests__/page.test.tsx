@@ -375,4 +375,31 @@ describe('SignInPage', () => {
     });
     expect(replace).toHaveBeenCalledWith('/projects');
   });
+  it('explains explicit Google linking for an existing account without navigating into a session', async () => {
+    const googleLogin = jest.fn().mockRejectedValue({ response: { status: 409, data: { code: 'google_link_required' } } });
+    const replace = jest.fn();
+    const signOut = jest.fn();
+    Object.assign(mockUseAuthStore, { getState: () => ({ signOut }) });
+    setAuthStoreState({ googleLogin, signIn: jest.fn(), signUp: jest.fn() });
+    mockUseRouter.mockReturnValue({ replace });
+    render(<SignInPage />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Google Login' }));
+    expect(await screen.findByTestId('google-link-required')).toHaveTextContent('Tu cuenta y documentos se conservan');
+    expect(screen.getByRole('link', { name: 'Verificar mi correo' })).toHaveAttribute('href', '/forgot-password');
+    expect(replace).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('link', { name: 'Verificar mi correo' }));
+    expect(signOut).toHaveBeenCalled();
+  });
+
+  it('returns a recovered linked Google account to settings', async () => {
+    window.history.pushState({}, '', '/sign-in?next=/settings');
+    const replace = jest.fn();
+    setAuthStoreState({ signIn: jest.fn(), googleLogin: jest.fn().mockResolvedValue({ requires2fa: false }) });
+    mockUseRouter.mockReturnValue({ replace });
+    mockJwtDecode.mockReturnValue({ email: 'google@example.com' });
+    render(<SignInPage />);
+    await user.click(screen.getByRole('button', { name: 'Google Login' }));
+    await waitFor(() => expect(replace).toHaveBeenCalledWith('/settings'));
+  });
+
 });

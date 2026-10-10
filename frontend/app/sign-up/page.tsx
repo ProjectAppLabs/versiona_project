@@ -24,6 +24,8 @@ export default function SignUpPage() {
   const router = useRouter();
   const { signUp, signIn2fa, googleLogin } = useAuthStore();
   const t = useDict('auth');
+  const googleLink = useDict('googleLink');
+  const [linkRequired, setLinkRequired] = useState(false);
   const [challenge, setChallenge] = useState<string | null>(null);
   const [totpCode, setTotpCode] = useState('');
 
@@ -94,6 +96,7 @@ export default function SignUpPage() {
     try {
       setLoading(true);
       setError('');
+      setLinkRequired(false);
 
       if (!credentialResponse.credential) {
         setError('Google registration failed');
@@ -121,7 +124,13 @@ export default function SignUpPage() {
       
       router.replace('/onboarding');
     } catch (err) {
-      setError(apiErrorMessage(err, 'Google registration failed'));
+      const data = (err as { response?: { status?: number; data?: { code?: string } } }).response;
+      if (data?.status === 409 && data.data?.code === 'google_link_required') {
+        setLinkRequired(true);
+        setError('');
+      } else {
+        setError(apiErrorMessage(err, 'Google registration failed'));
+      }
     } finally {
       setLoading(false);
     }
@@ -256,6 +265,11 @@ export default function SignUpPage() {
           {error ? <p className="text-destructive text-sm">{error}</p> : null}
         </form>
         )}
+
+        {linkRequired && <div data-testid="google-link-required" role="status" className="mt-4 space-y-2 text-sm">
+          <p>{googleLink.legacy}</p>
+          <Link href="/forgot-password" className="underline" onClick={() => useAuthStore.getState().signOut()}>{googleLink.recovery}</Link>
+        </div>}
 
         <div className="mt-6">
           <div className="relative">

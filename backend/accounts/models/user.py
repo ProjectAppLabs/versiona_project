@@ -63,6 +63,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     totp_enabled_at = models.DateTimeField(null=True, blank=True)
     totp_backup_codes = models.JSONField(default=list, blank=True)
 
+    # Provider identity is opaque: MySQL must compare subjects exactly.
+    google_subject = models.CharField(
+        max_length=255, null=True, blank=True, unique=True, db_collation='utf8mb4_bin'
+    )
+    auth_version = models.PositiveIntegerField(default=0)
+
     objects = UserManager()
 
     USERNAME_FIELD = 'email'

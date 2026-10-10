@@ -4,6 +4,9 @@ import userEvent from '@testing-library/user-event';
 import { SecuritySection } from '../SecuritySection';
 import { api } from '../../../lib/services/http';
 
+jest.mock('next/navigation', () => ({ useRouter: () => ({ push: jest.fn() }) }));
+jest.mock('../../../lib/stores/authStore', () => ({ useAuthStore: { getState: () => ({ signOut: jest.fn() }) } }));
+
 jest.mock('../../../lib/services/http', () => ({
   api: { get: jest.fn(), post: jest.fn() },
 }));
@@ -26,6 +29,8 @@ function primeState({ enabled = false, sessions = [] as unknown[] } = {}) {
           totp_enabled: enabled,
           backup_codes_left: enabled ? 8 : 0,
           sso: 'DECISIÓN PENDIENTE',
+          google_linked: false,
+          has_usable_password: true,
         },
       });
     }

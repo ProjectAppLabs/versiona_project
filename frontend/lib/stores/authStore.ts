@@ -2,7 +2,8 @@
 
 import { create } from 'zustand';
 
-import { api } from '@/lib/services/http';
+import { api, publicApi } from '@/lib/services/http';
+import { clearGoogleLinkTicket, saveGoogleLinkTicket } from '@/lib/services/google-link-ticket';
 import { clearTokens, getAccessToken, getRefreshToken, setTokens } from '@/lib/services/tokens';
 
 type User = {
@@ -108,14 +109,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     get().syncFromCookies();
   },
 
-  googleLogin: async ({ credential, email, given_name, family_name, picture }) => {
-    const response = await api.post('google_login/', {
-      credential,
-      email,
-      given_name,
-      family_name,
-      picture,
-    });
+  googleLogin: async ({ credential }) => {
+    const response = await publicApi.post('google_login/', { credential });
 
     if (response.status === 202) {
       const challenge = response.data?.challenge;
@@ -141,6 +136,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   signOut: () => {
+    clearGoogleLinkTicket();
     clearTokens();
     localStorage.removeItem('user_data');
     set({ accessToken: null, refreshToken: null, user: null, isAuthenticated: false });
@@ -166,14 +162,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
   
   sendPasswordResetCode: async (email: string) => {
-    await api.post('send_passcode/', { email });
+    await publicApi.post('send_passcode/', { email });
   },
   
   resetPassword: async ({ email, code, new_password }) => {
-    await api.post('verify_passcode_and_reset_password/', { 
+    const response = await publicApi.post('verify_passcode_and_reset_password/', {
       email, 
       code, 
       new_password 
     });
+    get().signOut();
+    saveGoogleLinkTicket(response.data?.google_link_ticket);
   },
 }));

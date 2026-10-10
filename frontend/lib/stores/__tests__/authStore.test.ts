@@ -2,10 +2,11 @@ import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import { act } from '@testing-library/react';
 
 import { useAuthStore } from '../authStore';
-import { api } from '../../services/http';
+import { api, publicApi } from '../../services/http';
 import { clearTokens, getAccessToken, getRefreshToken, setTokens } from '../../services/tokens';
 
 jest.mock('../../services/http', () => ({
+  publicApi: { post: jest.fn() },
   api: {
     post: jest.fn(),
     get: jest.fn(),
@@ -19,6 +20,7 @@ jest.mock('../../services/tokens', () => ({
   clearTokens: jest.fn(),
 }));
 
+const mockPublicApi = publicApi as jest.Mocked<typeof publicApi>;
 const mockApi = api as jest.Mocked<typeof api>;
 const mockGetAccessToken = getAccessToken as jest.Mock;
 const mockGetRefreshToken = getRefreshToken as jest.Mock;
@@ -38,6 +40,7 @@ describe('authStore', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     resetAuthState();
+    sessionStorage.clear();
     mockGetAccessToken.mockReturnValue(null);
     mockGetRefreshToken.mockReturnValue(null);
   });
@@ -136,7 +139,7 @@ describe('authStore', () => {
   it('logs in with google credentials', async () => {
     mockGetAccessToken.mockReturnValue('access');
     mockGetRefreshToken.mockReturnValue('refresh');
-    mockApi.post.mockResolvedValueOnce({
+    mockPublicApi.post.mockResolvedValueOnce({
       data: {
         access: 'access',
         refresh: 'refresh',
@@ -183,7 +186,7 @@ describe('authStore', () => {
   });
 
   it('returns a second-factor challenge from Google login without authenticating', async () => {
-    mockApi.post.mockResolvedValueOnce({
+    mockPublicApi.post.mockResolvedValueOnce({
       status: 202,
       data: {
         requires_2fa: true,
@@ -227,7 +230,7 @@ describe('authStore', () => {
     ['a non-string challenge', { requires_2fa: true, challenge: 123456, access: 'access', refresh: 'refresh', user: { id: 8 } }],
     ['a blank challenge', { requires_2fa: true, challenge: '   ', access: 'access', refresh: 'refresh', user: { id: 8 } }],
   ])('rejects Google login 202 response with %s', async (_label, data) => {
-    mockApi.post.mockResolvedValueOnce({ status: 202, data });
+    mockPublicApi.post.mockResolvedValueOnce({ status: 202, data });
 
     // Fails if token-shaped data lets a malformed Google challenge create a session.
     await expect(useAuthStore.getState().googleLogin({ credential: 'token' })).rejects.toThrow('Invalid challenge response');
@@ -238,12 +241,13 @@ describe('authStore', () => {
   });
 
   it('throws when google login response is missing tokens', async () => {
-    mockApi.post.mockResolvedValueOnce({ data: { access: null, refresh: null } });
+    mockPublicApi.post.mockResolvedValueOnce({ data: { access: null, refresh: null } });
 
     await expect(useAuthStore.getState().googleLogin({ credential: 'token' })).rejects.toThrow('Invalid token response');
   });
 
   it('signs out and clears tokens', () => {
+    sessionStorage.setItem('google_link_ticket', 'old-proof');
     useAuthStore.setState({ isAuthenticated: true, accessToken: 'access', refreshToken: 'refresh' });
 
     act(() => {
@@ -253,20 +257,21 @@ describe('authStore', () => {
     expect(mockClearTokens).toHaveBeenCalledTimes(1);
     expect(useAuthStore.getState().isAuthenticated).toBe(false);
     expect(useAuthStore.getState().accessToken).toBeNull();
+    expect(sessionStorage.getItem('google_link_ticket')).toBeNull();
   });
 
   it('sends a password reset code', async () => {
-    mockApi.post.mockResolvedValueOnce({ data: {} });
+    mockPublicApi.post.mockResolvedValueOnce({ data: {} });
 
     await act(async () => {
       await useAuthStore.getState().sendPasswordResetCode('user@example.com');
     });
 
-    expect(mockApi.post).toHaveBeenCalledWith('send_passcode/', { email: 'user@example.com' });
+    expect(mockPublicApi.post).toHaveBeenCalledWith('send_passcode/', { email: 'user@example.com' });
   });
 
   it('resets password', async () => {
-    mockApi.post.mockResolvedValueOnce({ data: {} });
+    mockPublicApi.post.mockResolvedValueOnce({ data: {} });
 
     await act(async () => {
       await useAuthStore
@@ -274,7 +279,7 @@ describe('authStore', () => {
         .resetPassword({ email: 'user@example.com', code: '123456', new_password: 'password123' });
     });
 
-    expect(mockApi.post).toHaveBeenCalledWith('verify_passcode_and_reset_password/', {
+    expect(mockPublicApi.post).toHaveBeenCalledWith('verify_passcode_and_reset_password/', {
       email: 'user@example.com',
       code: '123456',
       new_password: 'password123',
@@ -323,4 +328,26 @@ describe('authStore', () => {
     expect(useAuthStore.getState().user).toBeNull();
     expect(useAuthStore.getState().isAuthenticated).toBe(false);
   });
+
+  it('keeps authentication unchanged when Google requires explicit linking', async () => {
+    const rejection = { response: { status: 409, data: { code: 'google_link_required' } } };
+    mockPublicApi.post.mockRejectedValueOnce(rejection);
+    await expect(useAuthStore.getState().googleLogin({ credential: 'signed-proof', email: 'untrusted@example.com' })).rejects.toBe(rejection);
+    expect(mockPublicApi.post).toHaveBeenCalledWith('google_login/', { credential: 'signed-proof' });
+    expect(mockSetTokens).not.toHaveBeenCalled();
+    expect(useAuthStore.getState().isAuthenticated).toBe(false);
+  });
+
+  it('clears authentication after email recovery without using its Google ticket as a session', async () => {
+    useAuthStore.setState({ isAuthenticated: true, accessToken: 'old-access', refreshToken: 'old-refresh' });
+    localStorage.setItem('user_data', '{"id":3}');
+    mockPublicApi.post.mockResolvedValueOnce({ data: { google_link_ticket: 'email-proof' } });
+    await useAuthStore.getState().resetPassword({ email: 'user@example.com', code: '123456', new_password: 'new-password' });
+    expect(mockClearTokens).toHaveBeenCalled();
+    expect(localStorage.getItem('user_data')).toBeNull();
+    expect(useAuthStore.getState()).toMatchObject({ accessToken: null, refreshToken: null, user: null, isAuthenticated: false });
+    expect(sessionStorage.getItem('google_link_ticket')).toContain('email-proof');
+    expect(mockSetTokens).not.toHaveBeenCalled();
+  });
+
 });

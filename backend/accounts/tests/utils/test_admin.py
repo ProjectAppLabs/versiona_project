@@ -66,6 +66,11 @@ def test_user_admin_login_as_redirects_to_frontend(settings):
     assert 'access=' in response['Location']
     assert 'refresh=' in response['Location']
     assert 'redirect=%2F' in response['Location']
+    from urllib.parse import parse_qs, urlparse
+    from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
+    query = parse_qs(urlparse(response['Location']).query)
+    assert AccessToken(query['access'][0])['auth_version'] == target_user.auth_version
+    assert RefreshToken(query['refresh'][0])['auth_version'] == target_user.auth_version
 
 
 @pytest.mark.django_db

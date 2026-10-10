@@ -3,7 +3,6 @@ Authentication utility functions.
 """
 import logging
 
-from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.mail import send_mail
 from django.conf import settings
 
@@ -27,11 +26,11 @@ def generate_auth_tokens(user):
     :param user: User instance
     :return: Dictionary with refresh, access tokens and user data
     """
-    refresh = RefreshToken.for_user(user)
-    
+    # services package imports email helpers; defer to avoid admin import cycles.
+    from accounts.services.token_service import mint_token_pair
+
     return {
-        'refresh': str(refresh),
-        'access': str(refresh.access_token),
+        **mint_token_pair(user),
         'user': {
             'id': user.id,
             'email': user.email,
