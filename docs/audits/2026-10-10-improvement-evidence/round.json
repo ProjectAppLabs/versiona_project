@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "improvement-10102026",
+  "codebase": "versiona_project",
+  "commit": "bdd1994e938f7f0e3138f21b699bdd8aad4de8d8",
+  "candidates": [
+    "I-S-3b550c956232",
+    "I-P-108f9bbe38dd",
+    "I-O-f5de8573e07a"
+  ],
+  "required_layers": [
+    "backend",
+    "frontend-unit",
+    "e2e"
+  ],
+  "e2e_required": true,
+  "canonical_ledger_written": false,
+  "scope": "local declaration of the conductor; not canonical verified"
+}

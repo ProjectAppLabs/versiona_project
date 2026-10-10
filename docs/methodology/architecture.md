@@ -35,6 +35,22 @@ flowchart LR
 
 ## Current workflow (updated per iteration)
 
+**Ronda coordinada — 2026-10-10 (implementación validada):** se aprobaron
+tres causas globales. El vínculo Google usa una identidad `sub` única y exige
+recuperación por correo para cualquier cuenta previa sin vínculo. El usuario
+confirma el vínculo desde Seguridad, reemplaza la contraseña y conserva TOTP;
+una versión de autenticación revoca las sesiones y desafíos anteriores.
+El reanclaje de observaciones conserva la transacción y los resultados, pero
+recorre lotes de 100 por PK y escribe anclas en bloque sin cargar los cuerpos
+completos de secciones. El helper de Mailpit rechaza respuestas fallidas o
+inválidas para que una comprobación negativa de correo no pase por accidente.
+La evidencia final y las limitaciones se registran en
+`docs/audits/2026-10-10-versiona-improvement-round.md`, dentro de Versiona;
+esta ronda no modifica el toolkit. QA aprobó el commit combinado `bdd1994`
+con 147 casos candidatos y tres gates estrictos sin errores. La evidencia
+saneada está en `docs/audits/2026-10-10-improvement-evidence/`; los PR #61–#64
+se integran mediante el tren de merge-queue sin modificar el checkout de deploy.
+
 **Ronda coordinada — 2026-10-08:** los códigos de respaldo y recuperación se
 consumen desde filas vigentes bloqueadas; contraseña y código comparten la
 transacción. El polling público tiene identidad de carga y cancelación de

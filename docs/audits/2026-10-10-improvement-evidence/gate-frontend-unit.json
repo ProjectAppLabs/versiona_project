@@ -1,0 +1,230 @@
+{
+  "summary": {
+    "total_files": 9,
+    "total_tests": 96,
+    "errors": 0,
+    "warnings": 5,
+    "info": 1,
+    "infra_errors": 0,
+    "unmatched_include_files": [],
+    "quality_score": 99,
+    "status": "passed",
+    "issues_by_category": {
+      "mock_only_assertion": 4,
+      "too_many_assertions": 1,
+      "network_dependency": 1
+    },
+    "semantic_rules": "strict",
+    "semantic_suppressed_by_mode": {
+      "backend": 0,
+      "frontend_unit": 0,
+      "frontend_e2e": 0
+    },
+    "active_exceptions": {
+      "total": 0,
+      "by_rule": {},
+      "by_file": {},
+      "details": [],
+      "invalid": {
+        "total": 0,
+        "details": []
+      }
+    },
+    "external_lint": {
+      "mode": "run",
+      "results": [
+        {
+          "source": "ruff",
+          "status": "ok",
+          "message": null,
+          "findings": 0
+        },
+        {
+          "source": "eslint",
+          "status": "ok",
+          "message": null,
+          "findings": 0
+        }
+      ]
+    },
+    "timings": {
+      "backend": 0.0,
+      "frontend_unit": 5.4699,
+      "frontend_e2e": 0.0,
+      "external_lint": 10.282,
+      "total": 15.7522
+    }
+  },
+  "backend": {
+    "files": 0,
+    "tests": 0,
+    "errors": 0,
+    "warnings": 0,
+    "info": 0,
+    "issues": [],
+    "suite_findings": {
+      "semantic_issues_suppressed_by_mode": 0,
+      "active_exceptions_count": 0,
+      "error_count": 0,
+      "warning_count": 0
+    },
+    "file_details": []
+  },
+  "frontend": {
+    "unit": {
+      "files": 9,
+      "tests": 96,
+      "errors": 0,
+      "warnings": 5,
+      "info": 1,
+      "issues": [
+        {
+          "file": "frontend/app/forgot-password/__tests__/page.test.tsx",
+          "message": "the only assertion is toHaveBeenCalled() on a spy - it verifies the collaborator was reached, never that the code produced the right result, so it passes on a wrong effect",
+          "severity": "warning",
+          "category": "mock_only_assertion",
+          "line": 96,
+          "identifier": "validates password mismatch",
+          "suggestion": "Assert the resulting value or state, or pin the payload with toHaveBeenCalledWith(...). Justify a genuine exception with `// quality: allow-mock-only (reason)`",
+          "rule_id": "mock_only_assertion"
+        },
+        {
+          "file": "frontend/app/forgot-password/__tests__/page.test.tsx",
+          "message": "the only assertion is toHaveBeenCalled() on a spy - it verifies the collaborator was reached, never that the code produced the right result, so it passes on a wrong effect",
+          "severity": "warning",
+          "category": "mock_only_assertion",
+          "line": 115,
+          "identifier": "validates password length",
+          "suggestion": "Assert the resulting value or state, or pin the payload with toHaveBeenCalledWith(...). Justify a genuine exception with `// quality: allow-mock-only (reason)`",
+          "rule_id": "mock_only_assertion"
+        },
+        {
+          "file": "frontend/app/sign-up/__tests__/page.test.tsx",
+          "message": "the only assertion is toHaveBeenCalled() on a spy - it verifies the collaborator was reached, never that the code produced the right result, so it passes on a wrong effect",
+          "severity": "warning",
+          "category": "mock_only_assertion",
+          "line": 97,
+          "identifier": "shows error when passwords do not match",
+          "suggestion": "Assert the resulting value or state, or pin the payload with toHaveBeenCalledWith(...). Justify a genuine exception with `// quality: allow-mock-only (reason)`",
+          "rule_id": "mock_only_assertion"
+        },
+        {
+          "file": "frontend/app/sign-up/__tests__/page.test.tsx",
+          "message": "the only assertion is toHaveBeenCalled() on a spy - it verifies the collaborator was reached, never that the code produced the right result, so it passes on a wrong effect",
+          "severity": "warning",
+          "category": "mock_only_assertion",
+          "line": 115,
+          "identifier": "shows error when password is too short",
+          "suggestion": "Assert the resulting value or state, or pin the payload with toHaveBeenCalledWith(...). Justify a genuine exception with `// quality: allow-mock-only (reason)`",
+          "rule_id": "mock_only_assertion"
+        },
+        {
+          "file": "frontend/components/security/__tests__/GoogleLinkPanel.test.tsx",
+          "message": "Too many assertions (8 > 7)",
+          "severity": "warning",
+          "category": "too_many_assertions",
+          "line": 59,
+          "identifier": "replaces the complete session after verified linking",
+          "suggestion": "Split into smaller focused tests, or add quality: allow-too-many-assertions (reason)",
+          "rule_id": "too_many_assertions"
+        },
+        {
+          "file": "frontend/lib/services/__tests__/http.test.ts",
+          "message": "HTTP mock assertion without observable outcome (mock(axios))",
+          "severity": "info",
+          "category": "network_dependency",
+          "line": 200,
+          "identifier": "http service > persists the rotated refresh token before retrying an expired access token",
+          "suggestion": "Add assertions for user-visible state/behavior, not only call contract",
+          "rule_id": "network_dependency"
+        }
+      ],
+      "suite_findings": {
+        "semantic_issues_suppressed_by_mode": 0,
+        "active_exceptions_count": 0,
+        "error_count": 0,
+        "warning_count": 5
+      },
+      "file_details": [
+        {
+          "file": "frontend/__tests__/helpers/mailpit.test.ts",
+          "area": "unit",
+          "location_ok": true,
+          "tests": 6,
+          "issues": 0
+        },
+        {
+          "file": "frontend/app/forgot-password/__tests__/page.test.tsx",
+          "area": "unit",
+          "location_ok": true,
+          "tests": 10,
+          "issues": 2
+        },
+        {
+          "file": "frontend/app/sign-in/__tests__/page.test.tsx",
+          "area": "unit",
+          "location_ok": true,
+          "tests": 17,
+          "issues": 0
+        },
+        {
+          "file": "frontend/app/sign-up/__tests__/page.test.tsx",
+          "area": "unit",
+          "location_ok": true,
+          "tests": 16,
+          "issues": 2
+        },
+        {
+          "file": "frontend/components/security/__tests__/GoogleLinkPanel.test.tsx",
+          "area": "unit",
+          "location_ok": true,
+          "tests": 8,
+          "issues": 1
+        },
+        {
+          "file": "frontend/components/security/__tests__/SecuritySection.test.tsx",
+          "area": "unit",
+          "location_ok": true,
+          "tests": 4,
+          "issues": 0
+        },
+        {
+          "file": "frontend/lib/services/__tests__/google-link-ticket.test.ts",
+          "area": "unit",
+          "location_ok": true,
+          "tests": 4,
+          "issues": 0
+        },
+        {
+          "file": "frontend/lib/services/__tests__/http.test.ts",
+          "area": "unit",
+          "location_ok": true,
+          "tests": 13,
+          "issues": 1
+        },
+        {
+          "file": "frontend/lib/stores/__tests__/authStore.test.ts",
+          "area": "unit",
+          "location_ok": true,
+          "tests": 18,
+          "issues": 0
+        }
+      ]
+    },
+    "e2e": {
+      "files": 0,
+      "tests": 0,
+      "errors": 0,
+      "warnings": 0,
+      "info": 0,
+      "issues": [],
+      "suite_findings": {
+        "semantic_issues_suppressed_by_mode": 0,
+        "active_exceptions_count": 0,
+        "error_count": 0,
+        "warning_count": 0
+      },
+      "file_details": []
+    }
+  }
+}
