@@ -4,10 +4,14 @@ fixtures (versions arrive analyzed from the shared context)."""
 from uuid import uuid4
 
 import pytest
+from audit.models import AuditEvent
 from django.urls import Resolver404, resolve
 
 from documents.models import DocumentVersion
 from documents.services.version_service import DomainError
+from notifications.models import Notification
+from orgs.models import OrganizationMembership
+from projects.models import ProjectMembership
 from projects.services import config_service
 from reviews.models import ReviewAssignment, ReviewRequest
 from reviews.services import review_service
@@ -165,6 +169,7 @@ def test_review_request_without_reviewers_is_rejected(ready_version, versiona_co
 @pytest.mark.django_db
 @pytest.mark.escenario('D1-E01')
 def test_review_request_with_unknown_reviewer_is_rejected(ready_version, versiona_context):
+    """Unknown reviewer IDs share the privacy rejection of inaccessible users."""
     _, version = ready_version
 
     with pytest.raises(DomainError) as excinfo:
@@ -172,8 +177,147 @@ def test_review_request_with_unknown_reviewer_is_rejected(ready_version, version
             version, versiona_context.users['editor'], [999999]
         )
 
-    assert excinfo.value.status_code == 400
-    assert str(excinfo.value) == 'Algún revisor no existe.'
+    assert excinfo.value.status_code == 404
+    assert str(excinfo.value) == 'Revisor no encontrado.'
+
+
+def review_selection_state(version):
+    """Capture persistent effects and the version preserved by a rejected selection."""
+    return {
+        'requests': ReviewRequest.objects.count(),
+        'assignments': ReviewAssignment.objects.count(),
+        'notifications': Notification.objects.count(),
+        'audit_events': AuditEvent.objects.count(),
+        'version': DocumentVersion.objects.values(
+            'message', 'sha256', 'analysis_status', 'config_version_id', 'is_approved',
+        ).get(pk=version.pk),
+    }
+
+
+@pytest.fixture(params=['foreign', 'without_project', 'inactive_org', 'unknown'])
+def hidden_reviewer_id(request, versiona_context, django_user_model):
+    """Supply IDs unavailable through the target project's effective access."""
+    if request.param == 'foreign':
+        return versiona_context.users['non_member'].pk
+    if request.param == 'without_project':
+        user = django_user_model.objects.create_user(
+            email='unassigned@versiona.test', password='secreta123',
+        )
+        OrganizationMembership.objects.create(
+            organization=versiona_context.org, user=user,
+            role=OrganizationMembership.Role.MEMBER,
+        )
+        return user.pk
+    if request.param == 'inactive_org':
+        user = versiona_context.users['reviewer']
+        OrganizationMembership.objects.filter(
+            organization=versiona_context.org, user=user,
+        ).update(is_active=False)
+        return user.pk
+    return 999999
+
+
+@pytest.mark.django_db
+def test_hidden_reviewer_returns_uniform_not_found(
+    client_as, ready_version, hidden_reviewer_id,
+):
+    """Unavailable reviewer IDs reveal no identity and leave persistent state intact."""
+    _, version = ready_version
+    before = review_selection_state(version)
+
+    response = client_as('editor').post(
+        f'/api/versions/{version.public_id}/reviews/',
+        {'reviewer_ids': [hidden_reviewer_id]}, format='json',
+    )
+
+    assert response.status_code == 404
+    assert response.data == {'error': 'Revisor no encontrado.'}
+    assert review_selection_state(version) == before
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(('visible_alias', 'hidden_first'), [
+    pytest.param('viewer', False, id='viewer-before-hidden'),
+    pytest.param('viewer', True, id='hidden-before-viewer'),
+    pytest.param('admin', False, id='self-before-hidden'),
+    pytest.param('admin', True, id='hidden-before-self'),
+])
+def test_hidden_reviewer_precedes_visible_selection_errors(
+    client_as, ready_version, versiona_context, visible_alias, hidden_first,
+):
+    """A mixed selection has one privacy response regardless of candidate order."""
+    _, version = ready_version
+    visible_id = versiona_context.users[visible_alias].pk
+    hidden_id = versiona_context.users['non_member'].pk
+    reviewer_ids = {False: [visible_id, hidden_id], True: [hidden_id, visible_id]}[hidden_first]
+    before = review_selection_state(version)
+
+    response = client_as('admin').post(
+        f'/api/versions/{version.public_id}/reviews/',
+        {'reviewer_ids': reviewer_ids}, format='json',
+    )
+
+    assert response.status_code == 404
+    assert response.data == {'error': 'Revisor no encontrado.'}
+    assert review_selection_state(version) == before
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(('visible_alias', 'expected_error'), [
+    pytest.param(
+        'viewer', 'viewer@versiona.test no puede revisar en este proyecto (rol: viewer).',
+        id='visible-viewer',
+    ),
+    pytest.param('admin', 'No puedes asignarte tu propia revisión.', id='visible-self'),
+])
+def test_visible_reviewer_keeps_selection_error(
+    client_as, ready_version, versiona_context, visible_alias, expected_error,
+):
+    """Visible candidates retain their actionable role or self-review rejection."""
+    _, version = ready_version
+    before = review_selection_state(version)
+
+    response = client_as('admin').post(
+        f'/api/versions/{version.public_id}/reviews/',
+        {'reviewer_ids': [versiona_context.users[visible_alias].pk]}, format='json',
+    )
+
+    assert response.status_code == 400
+    assert response.data == {'error': expected_error}
+    assert review_selection_state(version) == before
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('org_role', ['owner', 'admin'])
+def test_implicit_org_admin_can_receive_review_assignment(
+    client_as, ready_version, versiona_context, org_role,
+):
+    """Effective organization admins remain eligible without project membership."""
+    _, version = ready_version
+    reviewer = versiona_context.users['owner']
+    OrganizationMembership.objects.filter(
+        organization=versiona_context.org, user=reviewer,
+    ).update(role=org_role)
+    assert not ProjectMembership.objects.filter(
+        project=versiona_context.project, user=reviewer,
+    ).exists()
+
+    response = client_as('editor').post(
+        f'/api/versions/{version.public_id}/reviews/',
+        {'reviewer_ids': [reviewer.pk]}, format='json',
+    )
+
+    assert response.status_code == 201
+    review = ReviewRequest.objects.get(public_id=response.data['public_id'])
+    assert review.document_version_id == version.pk
+    assert review.requested_by_id == versiona_context.users['editor'].pk
+    assignment = review.assignments.get()
+    assert assignment.reviewer_id == reviewer.pk
+    assert assignment.status == ReviewAssignment.Status.PENDING
+    notification = Notification.objects.get(user=reviewer, event_key='review.requested')
+    assert notification.payload['review'] == str(review.public_id)
+    event = AuditEvent.objects.get(event_type='review.requested', object_id_ref=str(review.public_id))
+    assert event.payload['reviewers'] == [reviewer.email]
 
 
 @pytest.mark.django_db
