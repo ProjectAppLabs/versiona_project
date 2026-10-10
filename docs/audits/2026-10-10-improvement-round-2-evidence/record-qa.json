@@ -1,0 +1,10 @@
+{
+  "codebase": "versiona_project",
+  "qa": {
+    "commit": "86110774cf187f7c108131dc90eb1e41889143dc",
+    "reason": "exact round, commit, passing test artifacts and live E2E where required are verified",
+    "round_id": "versiona-20261010-ronda2",
+    "verified": true
+  },
+  "read_only": false
+}

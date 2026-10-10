@@ -1,0 +1,378 @@
+{
+  "commit": "fa5a3f7a805022df46dafd5223bbb8a237b529f2",
+  "tree": "6c1c9eb996bf1564cd0d673564a73a955ff6a311",
+  "status": "REJECTED",
+  "regular_files": 46,
+  "manifest": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/qa-manifest-fa5a3f7-rejected.json",
+  "report": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/qa-report-fa5a3f7-rejected.md",
+  "files": [
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/ci-pr67-parity/test-quality-report.json",
+      "sha256": "025751cafcb0ec27ef65c239e0c3f62b6d70eb50d17e7ec65f0c687bd6127c66",
+      "bytes": 144879,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/ci-pr67-parity/test-quality-report.json",
+      "source_sha256": "025751cafcb0ec27ef65c239e0c3f62b6d70eb50d17e7ec65f0c687bd6127c66",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/e2e-results-generated/flow-coverage.json",
+      "sha256": "62c6abe4e391fe72ecd2cdef60d6365f8dfa4390511d0ba8300606ce3c49dea1",
+      "bytes": 33834,
+      "source": null,
+      "source_sha256": null,
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/e2e-results-generated/results.json",
+      "sha256": "019729ac44a1a5f2394de685028f5ec84a2d15e650728ebf418ff7ea0b61fdb8",
+      "bytes": 30316,
+      "source": null,
+      "source_sha256": null,
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/executions.json",
+      "sha256": "6cd85fda72e486de38925b876d53b885c13496b752e6d11f794402e557601294",
+      "bytes": 14730,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/executions.json",
+      "source_sha256": "6cd85fda72e486de38925b876d53b885c13496b752e6d11f794402e557601294",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/flow-audit.json",
+      "sha256": "91c1f188094c8bdc93895211f24289a4d3b716e14508b641e1d0f8a3dca5cf70",
+      "bytes": 16125,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/flow-audit.json",
+      "source_sha256": "91c1f188094c8bdc93895211f24289a4d3b716e14508b641e1d0f8a3dca5cf70",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/flow-audit.log",
+      "sha256": "901a734961f7cf663d6f86489f3fef35a8940cae103343cc52d87d67f20c9a9d",
+      "bytes": 764,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/flow-audit.log",
+      "source_sha256": "901a734961f7cf663d6f86489f3fef35a8940cae103343cc52d87d67f20c9a9d",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/flow-c3-verification.json",
+      "sha256": "b74daabcb808d1105047fc8c31daf0df41c7bd77b8a832d502d937e9eb191a5f",
+      "bytes": 1145,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/flow-c3-verification.json",
+      "source_sha256": "b74daabcb808d1105047fc8c31daf0df41c7bd77b8a832d502d937e9eb191a5f",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/jest-conversion-proof.json",
+      "sha256": "c3739afc3d000878b67b4c780560d819e7bede31d7a35dfe53c2a1f0b0559248",
+      "bytes": 1895,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/jest-conversion-proof.json",
+      "source_sha256": "c3739afc3d000878b67b4c780560d819e7bede31d7a35dfe53c2a1f0b0559248",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/jest-json-to-junit.cjs",
+      "sha256": "31c21fcb4897e6e17873824d6870e6c673146d0dcbba2846c4d7199ed2eb77ec",
+      "bytes": 1423,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/jest-json-to-junit.cjs",
+      "source_sha256": "31c21fcb4897e6e17873824d6870e6c673146d0dcbba2846c4d7199ed2eb77ec",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/ledger/versiona_project.yml",
+      "sha256": "68914b2db7b26b80c78f048eae215d8067968a08b8aa22dc79cfd325a4b193e6",
+      "bytes": 4923,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/ledger/versiona_project.yml",
+      "source_sha256": "68914b2db7b26b80c78f048eae215d8067968a08b8aa22dc79cfd325a4b193e6",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/live-server-proof.json",
+      "sha256": "d77785f92e37b5541d1c3cd4c81f56f5aaefcf941569441465216798a4d049ed",
+      "bytes": 715,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/live-server-proof.json",
+      "source_sha256": "d77785f92e37b5541d1c3cd4c81f56f5aaefcf941569441465216798a4d049ed",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/observability-diagnostics.xml",
+      "sha256": "05e30f575e26d644470d36df37ed33e6caf2b85288999febb42f82fbd72a72ab",
+      "bytes": 1410,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/observability-diagnostics.xml",
+      "source_sha256": "05e30f575e26d644470d36df37ed33e6caf2b85288999febb42f82fbd72a72ab",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/observability-endpoint.xml",
+      "sha256": "f76cad100de15481f4cf890bf35252be1b17d339207162a9b5f6cc8771bd525d",
+      "bytes": 396,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/observability-endpoint.xml",
+      "source_sha256": "f76cad100de15481f4cf890bf35252be1b17d339207162a9b5f6cc8771bd525d",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/observability-regressions.xml",
+      "sha256": "cd9685578d8ba3dc2b7820c2e8042ec889c49ec5970b64da2afb6c3f3f4096c6",
+      "bytes": 2682,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/observability-regressions.xml",
+      "source_sha256": "cd9685578d8ba3dc2b7820c2e8042ec889c49ec5970b64da2afb6c3f3f4096c6",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/playwright/.last-run.json",
+      "sha256": "91d1c43004802cd49950d78eb11c8fa7d05da8ffffe219a8b13b2f561bc00903",
+      "bytes": 45,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/playwright/.last-run.json",
+      "source_sha256": "91d1c43004802cd49950d78eb11c8fa7d05da8ffffe219a8b13b2f561bc00903",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/playwright-copy-proof.json",
+      "sha256": "37550ec447a0c43f81a8957463d2974e06657c182567eaa2e22c843b873d9b25",
+      "bytes": 431,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/playwright-copy-proof.json",
+      "source_sha256": "37550ec447a0c43f81a8957463d2974e06657c182567eaa2e22c843b873d9b25",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/playwright-results.json",
+      "sha256": "019729ac44a1a5f2394de685028f5ec84a2d15e650728ebf418ff7ea0b61fdb8",
+      "bytes": 30316,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/playwright-results.json",
+      "source_sha256": "019729ac44a1a5f2394de685028f5ec84a2d15e650728ebf418ff7ea0b61fdb8",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/qa-manifest-fa5a3f7-rejected.json",
+      "sha256": "ba8fd36fe451eb92a26a81216371aba1637e1a3ff869644ccf6b097b5d7ffc22",
+      "bytes": 14370,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/qa-manifest-fa5a3f7-rejected.json",
+      "source_sha256": "e22991ada2f3a8dd2a1808c9eae17d72652d2828abe4cddc83f97a05e7b50280",
+      "manifest_reference_rewrite": true
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/qa-report-fa5a3f7-rejected.md",
+      "sha256": "334e415bc47d11bc57e4ff4e38499e4bc706c4abc254e9cacce509c87dc55bd4",
+      "bytes": 7397,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/qa-report-fa5a3f7-rejected.md",
+      "source_sha256": "334e415bc47d11bc57e4ff4e38499e4bc706c4abc254e9cacce509c87dc55bd4",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/quality-backend-canonical.json",
+      "sha256": "2fc0c0f5527d08e8e5a01556c64df4982d0bb47239824dd436118d843dbbdb75",
+      "bytes": 18465,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/quality-backend-canonical.json",
+      "source_sha256": "2fc0c0f5527d08e8e5a01556c64df4982d0bb47239824dd436118d843dbbdb75",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/quality-backend.json",
+      "sha256": "0045d873d0a121cacc78f4bc31013176c5c9d25f854fba0ef2d7a8391d622dc6",
+      "bytes": 3918,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/quality-backend.json",
+      "source_sha256": "0045d873d0a121cacc78f4bc31013176c5c9d25f854fba0ef2d7a8391d622dc6",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/quality-e2e-canonical.json",
+      "sha256": "cfdd60f05dbce801e5caf0474f4c79381485f4b3b6bc353281c6a59f1909650f",
+      "bytes": 2866,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/quality-e2e-canonical.json",
+      "source_sha256": "cfdd60f05dbce801e5caf0474f4c79381485f4b3b6bc353281c6a59f1909650f",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/quality-e2e.json",
+      "sha256": "780ba6405f40c04c54c2be9b9d2f4ddf9a9275c188b0edd22997c312a2c3deca",
+      "bytes": 2868,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/quality-e2e.json",
+      "source_sha256": "780ba6405f40c04c54c2be9b9d2f4ddf9a9275c188b0edd22997c312a2c3deca",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/quality-unit-canonical.json",
+      "sha256": "43b45303fc6293b882bb9eea6514d4f64419a2de6b6438ff39b2ee27c36cc575",
+      "bytes": 2716,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/quality-unit-canonical.json",
+      "source_sha256": "43b45303fc6293b882bb9eea6514d4f64419a2de6b6438ff39b2ee27c36cc575",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/quality-unit.json",
+      "sha256": "70969906dbc77ca232d0dc5d8b0b49ffe74d379d955bca36fee69114eded1874",
+      "bytes": 2717,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/quality-unit.json",
+      "source_sha256": "70969906dbc77ca232d0dc5d8b0b49ffe74d379d955bca36fee69114eded1874",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/register-I-M-0c0b8831bfb6-applied.json",
+      "sha256": "56d48c78c44909d7eb1804c22b2709016859027dbb71600bb6ff397d305e79ce",
+      "bytes": 7566,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/register-I-M-0c0b8831bfb6-applied.json",
+      "source_sha256": "56d48c78c44909d7eb1804c22b2709016859027dbb71600bb6ff397d305e79ce",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/register-I-M-0c0b8831bfb6-diagnosed.json",
+      "sha256": "24a9c2ca962e701094ae7e679a6b4152239942a5adb91e382940f945a28776ce",
+      "bytes": 7798,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/register-I-M-0c0b8831bfb6-diagnosed.json",
+      "source_sha256": "24a9c2ca962e701094ae7e679a6b4152239942a5adb91e382940f945a28776ce",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/register-I-M-0c0b8831bfb6-note.json",
+      "sha256": "89bda8aba780cd5cf5c24595f5446852307e301842dd031f696c8ab09ea64ba8",
+      "bytes": 7799,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/register-I-M-0c0b8831bfb6-note.json",
+      "source_sha256": "89bda8aba780cd5cf5c24595f5446852307e301842dd031f696c8ab09ea64ba8",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/register-I-O-42a58784c64c-applied.json",
+      "sha256": "112f1ba3a15dc4fca3371ba3c72258e21384c1df558f0358ea480b3994aeb9ee",
+      "bytes": 7585,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/register-I-O-42a58784c64c-applied.json",
+      "source_sha256": "112f1ba3a15dc4fca3371ba3c72258e21384c1df558f0358ea480b3994aeb9ee",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/register-I-O-42a58784c64c-diagnosed.json",
+      "sha256": "d6e542234bfa7855ee90302c304888dc662f6e0add7bd2a5afe1d494add73a2e",
+      "bytes": 7609,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/register-I-O-42a58784c64c-diagnosed.json",
+      "source_sha256": "d6e542234bfa7855ee90302c304888dc662f6e0add7bd2a5afe1d494add73a2e",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/register-I-O-42a58784c64c-note.json",
+      "sha256": "d6e542234bfa7855ee90302c304888dc662f6e0add7bd2a5afe1d494add73a2e",
+      "bytes": 7609,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/register-I-O-42a58784c64c-note.json",
+      "source_sha256": "d6e542234bfa7855ee90302c304888dc662f6e0add7bd2a5afe1d494add73a2e",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/register-I-S-0c3b90d936f0-applied.json",
+      "sha256": "2fcd96c243d9b10ef542de1e659b9c8441d17a743b04121a9d3f914ed4e5b384",
+      "bytes": 7547,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/register-I-S-0c3b90d936f0-applied.json",
+      "source_sha256": "2fcd96c243d9b10ef542de1e659b9c8441d17a743b04121a9d3f914ed4e5b384",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/register-I-S-0c3b90d936f0-diagnosed.json",
+      "sha256": "a81436548e8018683e4ba83f3541634b0e15a53813cbdad8a10ca3f1c7707077",
+      "bytes": 7336,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/register-I-S-0c3b90d936f0-diagnosed.json",
+      "source_sha256": "a81436548e8018683e4ba83f3541634b0e15a53813cbdad8a10ca3f1c7707077",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/register-I-S-0c3b90d936f0-note.json",
+      "sha256": "dc2d2bdb9264d47e3bf2ca2c582f9fcb55a4422a272bd17306555c335a9ac7ed",
+      "bytes": 7337,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/register-I-S-0c3b90d936f0-note.json",
+      "source_sha256": "dc2d2bdb9264d47e3bf2ca2c582f9fcb55a4422a272bd17306555c335a9ac7ed",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/register-round.json",
+      "sha256": "e138f41f296c78bf79df4ccebbdf42d2b803b8b5b16b8a4e0f02c2c8b1a9b2fc",
+      "bytes": 7589,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/register-round.json",
+      "source_sha256": "e138f41f296c78bf79df4ccebbdf42d2b803b8b5b16b8a4e0f02c2c8b1a9b2fc",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/round-record.json",
+      "sha256": "2189e5868e43ddbc2b74b0b20a62ef70e5e2c99fd53a4ea8bde430032af05b7a",
+      "bytes": 529,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/round-record.json",
+      "source_sha256": "2189e5868e43ddbc2b74b0b20a62ef70e5e2c99fd53a4ea8bde430032af05b7a",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/ruff-base-comparison.json",
+      "sha256": "5594e5a93816ff4fb33542feeb91d2121729a51304d16d8f7ddf7f4ad8db948e",
+      "bytes": 13155,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/ruff-base-comparison.json",
+      "source_sha256": "5594e5a93816ff4fb33542feeb91d2121729a51304d16d8f7ddf7f4ad8db948e",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/security-edges-1.xml",
+      "sha256": "9ce1a8c185ea6b9756692ef634d32b71d5c47fbd11535db78f418ec2cb831da1",
+      "bytes": 2799,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/security-edges-1.xml",
+      "source_sha256": "9ce1a8c185ea6b9756692ef634d32b71d5c47fbd11535db78f418ec2cb831da1",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/security-edges-2.xml",
+      "sha256": "0a1d35023f72c9504a56deee2677654b2c8e9fa33da84028379fbcba97ee6121",
+      "bytes": 2367,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/security-edges-2.xml",
+      "source_sha256": "0a1d35023f72c9504a56deee2677654b2c8e9fa33da84028379fbcba97ee6121",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/security-regression.xml",
+      "sha256": "425523bf39fcd2a96896db952c289e11dc189106177d5bd04a15845813ccc1c8",
+      "bytes": 1424,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/security-regression.xml",
+      "source_sha256": "425523bf39fcd2a96896db952c289e11dc189106177d5bd04a15845813ccc1c8",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/unit-historyLock.json",
+      "sha256": "9d3fb3fecbfed23a82f35b0bb73212dbaf6e19a6820a1a945a7be8830eece151",
+      "bytes": 4086,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/unit-historyLock.json",
+      "source_sha256": "9d3fb3fecbfed23a82f35b0bb73212dbaf6e19a6820a1a945a7be8830eece151",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/unit-historyLock.xml",
+      "sha256": "1a061b0a6326ba216a463b895bfd954609b5ee8a55434f604710e9240158ee0f",
+      "bytes": 2326,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/unit-historyLock.xml",
+      "source_sha256": "1a061b0a6326ba216a463b895bfd954609b5ee8a55434f604710e9240158ee0f",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/unit-version-page.json",
+      "sha256": "15e8e03b827140ff0cbcf28ae37690dedbcb54b55050284782a75e30c818f366",
+      "bytes": 3531,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/unit-version-page.json",
+      "source_sha256": "15e8e03b827140ff0cbcf28ae37690dedbcb54b55050284782a75e30c818f366",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/unit-version-page.xml",
+      "sha256": "bb7538eca31626eda50919329f26cf078ac64c02d48c013f1299cfa12a43dde2",
+      "bytes": 2206,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/unit-version-page.xml",
+      "source_sha256": "bb7538eca31626eda50919329f26cf078ac64c02d48c013f1299cfa12a43dde2",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/unit-versionStore.json",
+      "sha256": "802b1b23cc39b0f597adae190d2110542463ee5968ce5382fab9eccad1d8b3be",
+      "bytes": 5525,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/unit-versionStore.json",
+      "source_sha256": "802b1b23cc39b0f597adae190d2110542463ee5968ce5382fab9eccad1d8b3be",
+      "manifest_reference_rewrite": false
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-fa5/unit-versionStore.xml",
+      "sha256": "eb435ae5f3171327460bbb08331c1120c676a9900d540196c60e90a78befcfbf",
+      "bytes": 3219,
+      "source": "frontend/test-results/improvement/versiona-20261010-ronda2/unit-versionStore.xml",
+      "source_sha256": "eb435ae5f3171327460bbb08331c1120c676a9900d540196c60e90a78befcfbf",
+      "manifest_reference_rewrite": false
+    }
+  ]
+}

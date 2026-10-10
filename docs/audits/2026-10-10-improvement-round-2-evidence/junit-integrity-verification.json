@@ -1,0 +1,61 @@
+{
+  "commit": "86110774cf187f7c108131dc90eb1e41889143dc",
+  "total": 94,
+  "all_cases_passed": true,
+  "rows": [
+    {
+      "file": "security-edges-1-retry.xml",
+      "cases": 18,
+      "sha256": "c9d10ef1e0d55ff9155b135ad5e527f26835f80d41d3954e04aa22f9a3aa3f56",
+      "numeric_consistent": true
+    },
+    {
+      "file": "security-edges-2.xml",
+      "cases": 15,
+      "sha256": "9dad6b882aad6028536ac6af16f0425a8fd7393eb12e485b37838fbb2a8a1525",
+      "numeric_consistent": true
+    },
+    {
+      "file": "security-regression.xml",
+      "cases": 9,
+      "sha256": "3f109a7825ff4c4ca93546e97adf804a7078aed397edfc5acdd16a15bde03b97",
+      "numeric_consistent": true
+    },
+    {
+      "file": "observability-diagnostics.xml",
+      "cases": 8,
+      "sha256": "f3b9c6a0cf4f2891bca555cb637e9e4f78b4b1bb0b577d2e5e12bb77c9a2baf1",
+      "numeric_consistent": true
+    },
+    {
+      "file": "observability-regressions.xml",
+      "cases": 17,
+      "sha256": "8b1234c403e056bdb674bc008e2b872df99b33c110d077786b7a46fb2a7bdadd",
+      "numeric_consistent": true
+    },
+    {
+      "file": "observability-endpoint.xml",
+      "cases": 1,
+      "sha256": "01b5c5aef89b2b52be4200090dca4dd53c4f76295c7ea4fb39dafa6277530359",
+      "numeric_consistent": true
+    },
+    {
+      "file": "unit-versionStore.xml",
+      "cases": 13,
+      "sha256": "8301a616ecfa6a54682702c8b49951a53e326a9fc1eeddfd9ae0466b89d68bd7",
+      "numeric_consistent": true
+    },
+    {
+      "file": "unit-historyLock.xml",
+      "cases": 7,
+      "sha256": "3b744e8a0ae8760806d6dc99b6765ebe3e1b586b88bdf7e5184aa88b9781d762",
+      "numeric_consistent": true
+    },
+    {
+      "file": "unit-version-page.xml",
+      "cases": 6,
+      "sha256": "ec7d9aede5329618d57f6b554d9022d47118c598c6d56d5478ddbcce3e546bd0",
+      "numeric_consistent": true
+    }
+  ]
+}

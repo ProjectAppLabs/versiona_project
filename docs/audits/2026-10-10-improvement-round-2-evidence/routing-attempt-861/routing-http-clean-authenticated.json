@@ -1,0 +1,38 @@
+{
+  "observed_at": "2026-10-10T17:46:02.724799+00:00",
+  "commit": "86110774cf187f7c108131dc90eb1e41889143dc",
+  "tree": "1f2ac36cba6f723878d19df71e05f7c06dda4df7",
+  "git_status": "",
+  "requests": [
+    {
+      "label": "frontend_document",
+      "status": 200,
+      "default_404": true,
+      "body_length": 21285,
+      "body_sha256": "a25719b03dbd476069a4856751c843e5a8c02440af00104644933f8d2819ab48"
+    },
+    {
+      "label": "backend_versions",
+      "status": 200,
+      "default_404": false,
+      "body_length": 793,
+      "body_sha256": "93c6d8ce991cf78a3d0e6dd91a4b16b4011f48884ad1a2c7aa081e5317818cf4"
+    }
+  ],
+  "url_sha256": "9c09911358adbd60776dcf605909dbf0c6f60e6640c5590e33e74d4130bfad71",
+  "cache_manifest": {
+    "/projects/[projectId]/documents/[docId]/page": "app/projects/[projectId]/documents/[docId]/page.js",
+    "/sign-in/page": "app/sign-in/page.js"
+  },
+  "server_proof": [
+    {
+      "pid": 297087,
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend"
+    },
+    {
+      "pid": 302010,
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend"
+    }
+  ],
+  "interpretation_note": "The serialized HTML substring default_404 is not a DOM error verdict. The subsequent routing-dom-clean-proof.json observes HTTP 200, the actual version entry and zero Next 404 headings."
+}

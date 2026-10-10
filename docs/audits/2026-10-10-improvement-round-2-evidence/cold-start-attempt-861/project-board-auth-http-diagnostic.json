@@ -1,0 +1,164 @@
+{
+  "kind": "read-only-existing-project-board-diagnostic",
+  "captured_at": "2026-10-10T17:56:47.507Z",
+  "status": 200,
+  "elapsed_ms": 12802,
+  "new_project_link_visible": true,
+  "signin_link_visible": true,
+  "auth_cookie_names": [
+    "access_token",
+    "refresh_token"
+  ],
+  "events": [
+    {
+      "kind": "response",
+      "path": "/projects",
+      "status": 200,
+      "resource": "document"
+    },
+    {
+      "kind": "response",
+      "path": "/_next/static/chunks/app_globals_0jn8.0u.css",
+      "status": 200,
+      "resource": "stylesheet"
+    },
+    {
+      "kind": "response",
+      "path": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_10z625~._.js",
+      "status": 200,
+      "resource": "script"
+    },
+    {
+      "kind": "response",
+      "path": "/_next/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js",
+      "status": 200,
+      "resource": "script"
+    },
+    {
+      "kind": "response",
+      "path": "/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_0p3wegg._.js",
+      "status": 200,
+      "resource": "script"
+    },
+    {
+      "kind": "response",
+      "path": "/_next/static/chunks/node_modules_next_dist_115brz8._.js",
+      "status": 200,
+      "resource": "script"
+    },
+    {
+      "kind": "response",
+      "path": "/_next/static/chunks/_0rqeker._.js",
+      "status": 200,
+      "resource": "script"
+    },
+    {
+      "kind": "response",
+      "path": "/_next/static/chunks/node_modules_%40swc_helpers_cjs_0-4ujiy._.js",
+      "status": 200,
+      "resource": "script"
+    },
+    {
+      "kind": "response",
+      "path": "/_next/static/chunks/turbopack-_0p44nws._.js",
+      "status": 200,
+      "resource": "script"
+    },
+    {
+      "kind": "response",
+      "path": "/_next/static/chunks/app_layout_tsx_004glpo._.js",
+      "status": 200,
+      "resource": "script"
+    },
+    {
+      "kind": "response",
+      "path": "/_next/static/chunks/_0lf_8_m._.js",
+      "status": 200,
+      "resource": "script"
+    },
+    {
+      "kind": "response",
+      "path": "/_next/static/chunks/node_modules_next_dist_client_0fhqo1d._.js",
+      "status": 200,
+      "resource": "script"
+    },
+    {
+      "kind": "response",
+      "path": "/_next/static/chunks/app_projects_page_tsx_0zr70jx._.js",
+      "status": 200,
+      "resource": "script"
+    },
+    {
+      "kind": "response",
+      "path": "/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_0553esy.js",
+      "status": 200,
+      "resource": "script"
+    },
+    {
+      "kind": "response",
+      "path": "/_next/static/chunks/_0r53vj4._.js",
+      "status": 200,
+      "resource": "script"
+    },
+    {
+      "kind": "response",
+      "path": "/_next/static/chunks/node_modules_next_dist_client_components_builtin_global-error_0zr70jx.js",
+      "status": 200,
+      "resource": "script"
+    },
+    {
+      "kind": "response",
+      "path": "/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js",
+      "status": 200,
+      "resource": "script"
+    },
+    {
+      "kind": "response",
+      "path": "/_next/static/chunks/node_modules_0oghzot._.js",
+      "status": 200,
+      "resource": "script"
+    },
+    {
+      "kind": "response",
+      "path": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_10mygs7._.js",
+      "status": 200,
+      "resource": "script"
+    },
+    {
+      "kind": "response",
+      "path": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_0yjw1oe._.js",
+      "status": 200,
+      "resource": "script"
+    },
+    {
+      "kind": "response",
+      "path": "/api/validate_token/",
+      "status": 200,
+      "resource": "xhr"
+    },
+    {
+      "kind": "response",
+      "path": "/api/orgs/",
+      "status": 200,
+      "resource": "xhr"
+    },
+    {
+      "kind": "response",
+      "path": "/api/staging-banner/",
+      "status": 200,
+      "resource": "xhr"
+    },
+    {
+      "kind": "response",
+      "path": "/api/validate_token/",
+      "status": 200,
+      "resource": "xhr"
+    },
+    {
+      "kind": "response",
+      "path": "/api/me/notifications/",
+      "status": 200,
+      "resource": "xhr"
+    }
+  ]
+}

@@ -1,0 +1,375 @@
+{
+  "pr": 67,
+  "run": 38070254601,
+  "source": "GitHub Actions artifact from the original source PR; not QA execution of the combined commit.",
+  "summary": {
+    "total_files": 214,
+    "total_tests": 1477,
+    "errors": 0,
+    "warnings": 61,
+    "info": 114,
+    "infra_errors": 0,
+    "unmatched_include_files": [],
+    "quality_score": 98,
+    "status": "passed",
+    "issues_by_category": {
+      "missing_docstring": 29,
+      "global_state_leak": 42,
+      "unverified_mock": 6,
+      "nondeterministic": 30,
+      "inline_payload": 6,
+      "too_many_assertions": 22,
+      "test_too_short": 7,
+      "test_too_long": 5,
+      "tool_unavailable": 1,
+      "mock_only_assertion": 5,
+      "network_dependency": 1,
+      "fragile_test_data": 17,
+      "deep_link_entry": 1,
+      "fragile_locator": 2,
+      "data_isolation": 1
+    },
+    "semantic_rules": "strict",
+    "semantic_suppressed_by_mode": {
+      "backend": 0,
+      "frontend_unit": 0,
+      "frontend_e2e": 0
+    },
+    "active_exceptions": {
+      "total": 34,
+      "by_rule": {
+        "deep_link_entry": 1,
+        "duplicate_coverage": 20,
+        "negation_only_assertion": 5,
+        "no_user_interaction": 8
+      },
+      "by_file": {
+        "frontend/components/ui/__tests__/ui-kit.test.tsx": 2,
+        "frontend/e2e/app/a11y.spec.ts": 1,
+        "frontend/e2e/app/compare/e1-compare-versions.spec.ts": 2,
+        "frontend/e2e/app/documents/c1-upload-first-document.spec.ts": 1,
+        "frontend/e2e/app/documents/c2-upload-new-version.spec.ts": 2,
+        "frontend/e2e/app/layout/authenticated-navigation.spec.ts": 3,
+        "frontend/e2e/app/onboarding/a2-invite-team.spec.ts": 1,
+        "frontend/e2e/app/org/f3-org-audit.spec.ts": 2,
+        "frontend/e2e/app/projects/b2-board-search.spec.ts": 2,
+        "frontend/e2e/app/projects/b3-e3-governance.spec.ts": 1,
+        "frontend/e2e/app/reviews/d3-anchored-observations.spec.ts": 1,
+        "frontend/e2e/app/seals/d4-seal-approve.spec.ts": 1,
+        "frontend/e2e/app/seals/d5-coordinator-confirmation.spec.ts": 1,
+        "frontend/e2e/auth/admin-login.spec.ts": 1,
+        "frontend/e2e/auth/auth.spec.ts": 1,
+        "frontend/e2e/public/manual.spec.ts": 1,
+        "frontend/e2e/public/pricing.spec.ts": 2,
+        "frontend/e2e/public/public-navigation.spec.ts": 5,
+        "frontend/e2e/public/smoke.spec.ts": 1,
+        "frontend/lib/compare/__tests__/sync.test.ts": 1,
+        "frontend/lib/pdf/__tests__/coords.test.ts": 1,
+        "frontend/lib/stores/__tests__/compareStore.test.ts": 1
+      },
+      "details": [
+        {
+          "type": "allow",
+          "file": "frontend/components/ui/__tests__/ui-kit.test.tsx",
+          "line": 54,
+          "rule_id": "negation_only_assertion",
+          "reason": "Modal.tsx:15 returns null before rendering anything when !open — there is nothing else the component renders in this state",
+          "marker": "quality: allow-negation-only (Modal.tsx:15 returns null before rendering anything when !open — there is nothing else the component renders in this state)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/components/ui/__tests__/ui-kit.test.tsx",
+          "line": 119,
+          "rule_id": "negation_only_assertion",
+          "reason": "toast.tsx:36 returns null when toasts.length === 0 — nothing else renders",
+          "marker": "quality: allow-negation-only (toast.tsx:36 returns null when toasts.length === 0 — nothing else renders)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/app/a11y.spec.ts",
+          "line": 25,
+          "rule_id": "no_user_interaction",
+          "reason": "an axe sweep asserts the accessibility of a screen AS RENDERED; driving the UI first would change what is audited, not strengthen it. The interactions on these screens are covered by the flows that own them.",
+          "marker": "quality: allow-no-interaction (an axe sweep asserts the accessibility of a screen AS RENDERED; driving the UI first would change what is audited, not strengthen it. The interactions on these screens are covered by the flows that own them.)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/app/compare/e1-compare-versions.spec.ts",
+          "line": 157,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: e1-compare-versions PDF fit at the five standard viewports",
+          "marker": "quality: allow-duplicate (per-viewport contract: e1-compare-versions PDF fit at the five standard viewports)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/app/compare/e1-compare-versions.spec.ts",
+          "line": 203,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: e1-compare @ 412",
+          "marker": "quality: allow-duplicate (per-viewport contract: e1-compare @ 412)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/app/documents/c1-upload-first-document.spec.ts",
+          "line": 107,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: c1-upload-first-document PDF fit at the five standard viewports",
+          "marker": "quality: allow-duplicate (per-viewport contract: c1-upload-first-document PDF fit at the five standard viewports)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/app/documents/c2-upload-new-version.spec.ts",
+          "line": 137,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: c2-upload-version @ 412",
+          "marker": "quality: allow-duplicate (per-viewport contract: c2-upload-version @ 412)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/app/documents/c2-upload-new-version.spec.ts",
+          "line": 172,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: c2-upload-version @ 412",
+          "marker": "quality: allow-duplicate (per-viewport contract: c2-upload-version @ 412)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/app/layout/authenticated-navigation.spec.ts",
+          "line": 73,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: layout-authenticated-navigation member at the five standard viewports",
+          "marker": "quality: allow-duplicate (per-viewport contract: layout-authenticated-navigation member at the five standard viewports)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/app/layout/authenticated-navigation.spec.ts",
+          "line": 96,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: layout-authenticated-navigation owner at the five standard viewports",
+          "marker": "quality: allow-duplicate (per-viewport contract: layout-authenticated-navigation owner at the five standard viewports)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/app/layout/authenticated-navigation.spec.ts",
+          "line": 118,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: layout-authenticated-navigation bell at the five standard viewports",
+          "marker": "quality: allow-duplicate (per-viewport contract: layout-authenticated-navigation bell at the five standard viewports)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/app/onboarding/a2-invite-team.spec.ts",
+          "line": 189,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: a2-invite-team @ 835",
+          "marker": "quality: allow-duplicate (per-viewport contract: a2-invite-team @ 835)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/app/org/f3-org-audit.spec.ts",
+          "line": 12,
+          "rule_id": "deep_link_entry",
+          "reason": "verified 2026-08-13: no .tsx in frontend/ links to /org/audit — grep for the literal string returned zero matches outside this spec and flow-definitions.json; there is no button/link to click yet",
+          "marker": "quality: allow-deep-link (verified 2026-08-13: no .tsx in frontend/ links to /org/audit — grep for the literal string returned zero matches outside this spec and flow-definitions.json; there is no button/link to click yet)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/app/org/f3-org-audit.spec.ts",
+          "line": 42,
+          "rule_id": "no_user_interaction",
+          "reason": "permission gate renders on navigation; the restricted-notice IS the outcome",
+          "marker": "quality: allow-no-interaction (permission gate renders on navigation; the restricted-notice IS the outcome)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/app/projects/b2-board-search.spec.ts",
+          "line": 93,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: b2-projects-board @ 412",
+          "marker": "quality: allow-duplicate (per-viewport contract: b2-projects-board @ 412)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/app/projects/b2-board-search.spec.ts",
+          "line": 146,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: b2-projects-board @ 1195",
+          "marker": "quality: allow-duplicate (per-viewport contract: b2-projects-board @ 1195)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/app/projects/b3-e3-governance.spec.ts",
+          "line": 107,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: b3-project-settings @ 835",
+          "marker": "quality: allow-duplicate (per-viewport contract: b3-project-settings @ 835)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/app/reviews/d3-anchored-observations.spec.ts",
+          "line": 442,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: d3-anchored-observations @ 412",
+          "marker": "quality: allow-duplicate (per-viewport contract: d3-anchored-observations @ 412)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/app/seals/d4-seal-approve.spec.ts",
+          "line": 142,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: d4-seal-approve @ 835",
+          "marker": "quality: allow-duplicate (per-viewport contract: d4-seal-approve @ 835)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/app/seals/d5-coordinator-confirmation.spec.ts",
+          "line": 137,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: d5-selective-invalidation @ 835",
+          "marker": "quality: allow-duplicate (per-viewport contract: d5-selective-invalidation @ 835)"
+        },
+        {
+          "type": "disable",
+          "file": "frontend/e2e/auth/admin-login.spec.ts",
+          "line": 23,
+          "rule_id": "no_user_interaction",
+          "reason": "query-param handoff page, no clickable UI by design — the click happens in Django admin, a separate app outside this suite; handoff logic is already unit-tested in app/admin-login/__tests__/page.test.tsx",
+          "marker": "quality: disable no_user_interaction (query-param handoff page, no clickable UI by design — the click happens in Django admin, a separate app outside this suite; handoff logic is already unit-tested in app/admin-login/__tests__/page.test.tsx)",
+          "matched_issues": 2
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/auth/auth.spec.ts",
+          "line": 78,
+          "rule_id": "no_user_interaction",
+          "reason": "authorization gate fires on navigation itself — redirect guard; no user action exists to drive",
+          "marker": "quality: allow-no-interaction (authorization gate fires on navigation itself — redirect guard; no user action exists to drive)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/public/manual.spec.ts",
+          "line": 10,
+          "rule_id": "no_user_interaction",
+          "reason": "display-only sheet — the manual renders from a static array with no network call, so there is nothing to drive. The interactive path of this same flow is MAN-F02 below, which types into the search box.",
+          "marker": "quality: allow-no-interaction (display-only sheet — the manual renders from a static array with no network call, so there is nothing to drive. The interactive path of this same flow is MAN-F02 below, which types into the search box.)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/public/pricing.spec.ts",
+          "line": 11,
+          "rule_id": "no_user_interaction",
+          "reason": "display contract: concrete COP prices/limits asserted; interactive coverage lives in PR-F03",
+          "marker": "quality: allow-no-interaction (display contract: concrete COP prices/limits asserted; interactive coverage lives in PR-F03)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/public/pricing.spec.ts",
+          "line": 31,
+          "rule_id": "no_user_interaction",
+          "reason": "display contract: concrete COP prices/limits asserted; interactive coverage lives in PR-F03",
+          "marker": "quality: allow-no-interaction (display contract: concrete COP prices/limits asserted; interactive coverage lives in PR-F03)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/public/public-navigation.spec.ts",
+          "line": 60,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: layout-public-navigation at the five standard viewports",
+          "marker": "quality: allow-duplicate (per-viewport contract: layout-public-navigation at the five standard viewports)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/public/public-navigation.spec.ts",
+          "line": 78,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: layout-public-navigation theme control at the five standard viewports",
+          "marker": "quality: allow-duplicate (per-viewport contract: layout-public-navigation theme control at the five standard viewports)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/public/public-navigation.spec.ts",
+          "line": 103,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: layout-public-navigation closure at compact and portrait",
+          "marker": "quality: allow-duplicate (per-viewport contract: layout-public-navigation closure at compact and portrait)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/public/public-navigation.spec.ts",
+          "line": 117,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: layout-public-navigation closure at compact and portrait",
+          "marker": "quality: allow-duplicate (per-viewport contract: layout-public-navigation closure at compact and portrait)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/public/public-navigation.spec.ts",
+          "line": 133,
+          "rule_id": "duplicate_coverage",
+          "reason": "per-viewport contract: layout-public-navigation closure at compact and portrait",
+          "marker": "quality: allow-duplicate (per-viewport contract: layout-public-navigation closure at compact and portrait)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/e2e/public/smoke.spec.ts",
+          "line": 21,
+          "rule_id": "no_user_interaction",
+          "reason": "footer hrefs are the contract; nav covered by the pricing test",
+          "marker": "quality: allow-no-interaction (footer hrefs are the contract; nav covered by the pricing test)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/lib/compare/__tests__/sync.test.ts",
+          "line": 51,
+          "rule_id": "negation_only_assertion",
+          "reason": "pure function on a fixed input; a broken \"always null\" implementation is already caught by the adjacent tests in this same file — lines 34-48 — that assert real, non-null returns for other inputs",
+          "marker": "quality: allow-negation-only (pure function on a fixed input; a broken \"always null\" implementation is already caught by the adjacent tests in this same file — lines 34-48 — that assert real, non-null returns for other inputs)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/lib/pdf/__tests__/coords.test.ts",
+          "line": 53,
+          "rule_id": "negation_only_assertion",
+          "reason": "pure function; adjacent test at line 43-50 in the same file proves firstPage returns a real value for non-empty input",
+          "marker": "quality: allow-negation-only (pure function; adjacent test at line 43-50 in the same file proves firstPage returns a real value for non-empty input)"
+        },
+        {
+          "type": "allow",
+          "file": "frontend/lib/stores/__tests__/compareStore.test.ts",
+          "line": 117,
+          "rule_id": "negation_only_assertion",
+          "reason": "early-return guard with no other state mutated on this path — compareStore.ts:69 'if (!comparison",
+          "marker": "quality: allow-negation-only (early-return guard with no other state mutated on this path — compareStore.ts:69 'if (!comparison)"
+        }
+      ],
+      "invalid": {
+        "total": 0,
+        "details": []
+      }
+    },
+    "external_lint": {
+      "mode": "run",
+      "results": [
+        {
+          "source": "ruff",
+          "status": "unavailable",
+          "message": "ruff executable not found in PATH",
+          "findings": 0
+        },
+        {
+          "source": "eslint",
+          "status": "ok",
+          "message": null,
+          "findings": 0
+        }
+      ]
+    },
+    "timings": {
+      "backend": 0.8707,
+      "frontend_unit": 5.0983,
+      "frontend_e2e": 2.2457,
+      "external_lint": 4.0971,
+      "total": 12.3118
+    }
+  }
+}

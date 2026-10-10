@@ -1,0 +1,144 @@
+{
+  "numFailedTestSuites": 0,
+  "numFailedTests": 0,
+  "numPassedTestSuites": 1,
+  "numPassedTests": 6,
+  "numPendingTestSuites": 0,
+  "numPendingTests": 0,
+  "numRuntimeErrorTestSuites": 0,
+  "numTodoTests": 0,
+  "numTotalTestSuites": 1,
+  "numTotalTests": 6,
+  "snapshot": {
+    "added": 0,
+    "didUpdate": false,
+    "failure": false,
+    "filesAdded": 0,
+    "filesRemoved": 0,
+    "filesRemovedList": [],
+    "filesUnmatched": 0,
+    "filesUpdated": 0,
+    "matched": 0,
+    "total": 0,
+    "unchecked": 0,
+    "uncheckedKeysByFile": [],
+    "unmatched": 0,
+    "updated": 0
+  },
+  "startTime": 1791653696768,
+  "success": true,
+  "testResults": [
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "VersionViewerPage review context (D2)"
+          ],
+          "duration": 720,
+          "failing": false,
+          "failureDetails": [],
+          "failureMessages": [],
+          "fullName": "VersionViewerPage review context (D2) [D2] scrolls the viewer to the first page of a changed section picked in the context bar",
+          "invocations": 1,
+          "location": null,
+          "numPassingAsserts": 1,
+          "retryReasons": [],
+          "startAt": 1791653700813,
+          "status": "passed",
+          "title": "[D2] scrolls the viewer to the first page of a changed section picked in the context bar"
+        },
+        {
+          "ancestorTitles": [
+            "VersionViewerPage review context (D2)"
+          ],
+          "duration": 201,
+          "failing": false,
+          "failureDetails": [],
+          "failureMessages": [],
+          "fullName": "VersionViewerPage review context (D2) [D2] scrolls again when the same changed section is picked a second time",
+          "invocations": 1,
+          "location": null,
+          "numPassingAsserts": 2,
+          "retryReasons": [],
+          "startAt": 1791653701535,
+          "status": "passed",
+          "title": "[D2] scrolls again when the same changed section is picked a second time"
+        },
+        {
+          "ancestorTitles": [
+            "VersionViewerPage review context (D2)"
+          ],
+          "duration": 422,
+          "failing": false,
+          "failureDetails": [],
+          "failureMessages": [],
+          "fullName": "VersionViewerPage review context (D2) [C3] removes the previous PDF as soon as the route changes",
+          "invocations": 1,
+          "location": null,
+          "numPassingAsserts": 6,
+          "retryReasons": [],
+          "startAt": 1791653701737,
+          "status": "passed",
+          "title": "[C3] removes the previous PDF as soon as the route changes"
+        },
+        {
+          "ancestorTitles": [
+            "VersionViewerPage review context (D2)"
+          ],
+          "duration": 173,
+          "failing": false,
+          "failureDetails": [],
+          "failureMessages": [],
+          "fullName": "VersionViewerPage review context (D2) [C3] ignores a previous route that completes after the current route",
+          "invocations": 1,
+          "location": null,
+          "numPassingAsserts": 3,
+          "retryReasons": [],
+          "startAt": 1791653702161,
+          "status": "passed",
+          "title": "[C3] ignores a previous route that completes after the current route"
+        },
+        {
+          "ancestorTitles": [
+            "VersionViewerPage review context (D2)"
+          ],
+          "duration": 291,
+          "failing": false,
+          "failureDetails": [],
+          "failureMessages": [],
+          "fullName": "VersionViewerPage review context (D2) [C3] retries the failed PDF without refetching its successful metadata",
+          "invocations": 1,
+          "location": null,
+          "numPassingAsserts": 6,
+          "retryReasons": [],
+          "startAt": 1791653702336,
+          "status": "passed",
+          "title": "[C3] retries the failed PDF without refetching its successful metadata"
+        },
+        {
+          "ancestorTitles": [
+            "VersionViewerPage review context (D2)"
+          ],
+          "duration": 95,
+          "failing": false,
+          "failureDetails": [],
+          "failureMessages": [],
+          "fullName": "VersionViewerPage review context (D2) [C3] keeps the metadata failure visible after the PDF arrives",
+          "invocations": 1,
+          "location": null,
+          "numPassingAsserts": 3,
+          "retryReasons": [],
+          "startAt": 1791653702627,
+          "status": "passed",
+          "title": "[C3] keeps the metadata failure visible after the PDF arrives"
+        }
+      ],
+      "endTime": 1791653702735,
+      "name": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/app/projects/[projectId]/documents/[docId]/versions/[versionId]/__tests__/page.test.tsx",
+      "startTime": 1791653698666,
+      "status": "passed",
+      "summary": ""
+    }
+  ],
+  "wasInterrupted": false
+}

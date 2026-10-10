@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="3.114" timestamp="2026-10-10T16:59:41.486939+00:00" hostname="workspace"><testcase classname="reviews.tests.test_review_request_edges" name="test_hidden_reviewer_returns_uniform_not_found[foreign]" time="1.427"><failure>Traceback omitted; original artifact hash is preserved in provenance.json.</failure></testcase></testsuite></testsuites>

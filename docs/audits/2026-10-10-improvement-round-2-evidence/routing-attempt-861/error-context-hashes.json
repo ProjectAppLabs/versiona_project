@@ -1,0 +1,22 @@
+[
+  {
+    "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/playwright/app-compare-e1-compare-ver-1056a-a-no-ofrece-pares-inválidos-Desktop-Chrome/error-context.md",
+    "source_sha256": "7bc737410bb0359bc12af8e1ed9b18c739ec5c9ac4b445805f64a29a3bc3de84",
+    "size": 13734
+  },
+  {
+    "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/playwright/app-compare-e1-compare-ver-68469-saltado-al-cambiar-el-ancho-Desktop-Chrome/error-context.md",
+    "source_sha256": "47d0b63d519615dd1ab2a13fa311a838593838c70dbe4a83d43660a4e3055c32",
+    "size": 12698
+  },
+  {
+    "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/playwright/app-compare-e1-compare-ver-7af26-n-la-tabla-de-verdad-exacta-Desktop-Chrome/error-context.md",
+    "source_sha256": "99934c6d936e6420d60cc81c42ead210bf84b34be68e75a407ba31424a578a24",
+    "size": 9431
+  },
+  {
+    "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/playwright/app-compare-e1-compare-ver-c23ed-saltado-al-cambiar-el-ancho-Desktop-Chrome/error-context.md",
+    "source_sha256": "c1b1fccc47418d59ab10e32ea38a89aabb7da37c2bb2e771e0320631dcc636ad",
+    "size": 12699
+  }
+]

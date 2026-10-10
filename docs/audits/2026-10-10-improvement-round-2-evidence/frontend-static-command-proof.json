@@ -1,0 +1,30 @@
+{
+  "commit": "86110774cf187f7c108131dc90eb1e41889143dc",
+  "rows": [
+    {
+      "label": "tsc",
+      "actual_argv": [
+        "npx",
+        "tsc",
+        "--noEmit"
+      ],
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend",
+      "started_at": "2026-10-10T17:40:37.111Z",
+      "finished_at": "2026-10-10T17:41:13.099Z",
+      "exit_code": 0
+    },
+    {
+      "label": "eslint",
+      "actual_argv": [
+        "npm",
+        "run",
+        "lint"
+      ],
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend",
+      "started_at": "2026-10-10T17:40:37.091Z",
+      "finished_at": "2026-10-10T17:41:36.648Z",
+      "exit_code": 0
+    }
+  ],
+  "eslint_warning_count_source": "verifier actual console result:16warnings0errors; warning counts are not present in the command recorder"
+}

@@ -1,0 +1,8 @@
+{
+  "exported_artifacts_verified": true,
+  "reason": "exact round, commit, passing test artifacts and live E2E where required are verified",
+  "qa_commit": "86110774cf187f7c108131dc90eb1e41889143dc",
+  "execution_count": 13,
+  "source_provenance_files": 63,
+  "scope": "Artifact validation of sanitized copies, not a live QA execution of the later documentation commit."
+}

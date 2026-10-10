@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="1.140" timestamp="2026-10-10T17:11:30.412819+00:00" hostname="workspace"><testcase classname="public_tools.tests.test_public_comparison_endpoints" name="test_post_happy_path_returns_done_result_in_eager_mode" time="0.760" /></testsuite></testsuites>

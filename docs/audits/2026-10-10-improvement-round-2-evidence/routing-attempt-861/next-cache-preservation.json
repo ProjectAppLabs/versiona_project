@@ -1,0 +1,39 @@
+{
+  "commit": "86110774cf187f7c108131dc90eb1e41889143dc",
+  "observed_at": "2026-10-10T17:44:20.810469+00:00",
+  "servers": [
+    {
+      "pid": 297128,
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend",
+      "action": "SIGTERM"
+    },
+    {
+      "pid": 297141,
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend",
+      "action": "SIGTERM"
+    }
+  ],
+  "preserved_path": "/tmp/versiona-improvement-10102026-ronda2/next-cache-failed-8611077",
+  "manifests": [
+    {
+      "path": "dev/server/app-paths-manifest.json",
+      "sha256": "0e4a66f786c463afc4aaf627569e2a95a13f0d8ca2acc7870ddf0750d4bf6d80",
+      "size": 240
+    },
+    {
+      "path": "dev/routes-manifest.json",
+      "sha256": "fbf9b46ffef8fbb97644c7426ea4176281f5c81801ced93496bd7d4a804b58eb",
+      "size": 475
+    },
+    {
+      "path": "dev/prerender-manifest.json",
+      "sha256": "7b238aac7d7ef8c28446cd29107033ac5413e404e1009f905bfb28154e4c20d7",
+      "size": 354
+    },
+    {
+      "path": "dev/package.json",
+      "sha256": "73513439b93b2391b8a67720b5e0959f46afc909c1f0fc7dd73b79c5ae36bda7",
+      "size": 24
+    }
+  ]
+}

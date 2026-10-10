@@ -1,0 +1,49 @@
+{
+  "captured_at": "2026-10-10T18:09:52.022912+00:00",
+  "rows": [
+    {
+      "pid": 319284,
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend",
+      "argv": [
+        "flock",
+        "-w",
+        "1800",
+        "/tmp/versiona-improvement-10102026-ronda2/e2e.lock",
+        "npx",
+        "playwright",
+        "test",
+        "e2e/app/documents/c3-version-history.spec.ts",
+        "e2e/app/compare/e1-compare-versions.spec.ts",
+        "--output=test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-warm-runtime/playwright",
+        "--forbid-only",
+        "--workers=1",
+        "--retries=0"
+      ],
+      "safe_environment": {
+        "CI": "",
+        "E2E_FRONTEND_PORT": "3121",
+        "E2E_BACKEND_PORT": "8121"
+      }
+    },
+    {
+      "pid": 319307,
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend",
+      "argv": [
+        "node",
+        "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/node_modules/.bin/playwright",
+        "test",
+        "e2e/app/documents/c3-version-history.spec.ts",
+        "e2e/app/compare/e1-compare-versions.spec.ts",
+        "--output=test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-warm-runtime/playwright",
+        "--forbid-only",
+        "--workers=1",
+        "--retries=0"
+      ],
+      "safe_environment": {
+        "CI": "",
+        "E2E_FRONTEND_PORT": "3121",
+        "E2E_BACKEND_PORT": "8121"
+      }
+    }
+  ]
+}

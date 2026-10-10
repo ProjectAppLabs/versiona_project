@@ -1,0 +1,52 @@
+{
+  "observed_at": "2026-10-10T17:43:48.709850+00:00",
+  "commit": "86110774cf187f7c108131dc90eb1e41889143dc",
+  "cache_manifest_before": {
+    "/_not-found/page": "app/_not-found/page.js",
+    "/page": "app/page.js",
+    "/projects/[projectId]/page": "app/projects/[projectId]/page.js",
+    "/projects/new/page": "app/projects/new/page.js",
+    "/projects/page": "app/projects/page.js"
+  },
+  "requests": [
+    {
+      "label": "frontend_document",
+      "status": 404,
+      "body_sha256": "db254f4ba4f693bff936ed0235a53d499b1d828abc84e51be62fb9c906470d04",
+      "next_default_404": true,
+      "document_url_sha256": "bf7fbf8899240bff01192de012183aa1d3192431812bc505c803695eecba7b18",
+      "body_length": 19409
+    },
+    {
+      "label": "backend_versions",
+      "status": 200,
+      "body_sha256": "7452224968f7cde81dfacf0dfe65c828fb63083a354827ff0e82d3ee93d4c024",
+      "next_default_404": false,
+      "document_url_sha256": "bf7fbf8899240bff01192de012183aa1d3192431812bc505c803695eecba7b18",
+      "body_length": 792
+    },
+    {
+      "label": "frontend_document",
+      "status": 404,
+      "body_sha256": "e5409ee9594ffc8f7b9bdf678508fcd9c94cb25db5100e0fd21ef72e0ed63395",
+      "next_default_404": true,
+      "document_url_sha256": "bf7fbf8899240bff01192de012183aa1d3192431812bc505c803695eecba7b18",
+      "body_length": 19409
+    },
+    {
+      "label": "backend_versions",
+      "status": 200,
+      "body_sha256": "aa6c0bde9944638ebb6db4c8fbcd26089c918011939c6a5ac197474aaa333b37",
+      "next_default_404": false,
+      "document_url_sha256": "bf7fbf8899240bff01192de012183aa1d3192431812bc505c803695eecba7b18",
+      "body_length": 793
+    }
+  ],
+  "cache_manifest_after": {
+    "/_not-found/page": "app/_not-found/page.js",
+    "/page": "app/page.js",
+    "/projects/[projectId]/page": "app/projects/[projectId]/page.js",
+    "/projects/new/page": "app/projects/new/page.js",
+    "/projects/page": "app/projects/page.js"
+  }
+}

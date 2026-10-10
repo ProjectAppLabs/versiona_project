@@ -1,0 +1,123 @@
+{
+  "summary": {
+    "total_files": 3,
+    "total_tests": 26,
+    "errors": 0,
+    "warnings": 0,
+    "info": 0,
+    "infra_errors": 0,
+    "unmatched_include_files": [],
+    "quality_score": 100,
+    "status": "passed",
+    "issues_by_category": {},
+    "semantic_rules": "strict",
+    "semantic_suppressed_by_mode": {
+      "backend": 0,
+      "frontend_unit": 0,
+      "frontend_e2e": 0
+    },
+    "active_exceptions": {
+      "total": 0,
+      "by_rule": {},
+      "by_file": {},
+      "details": [],
+      "invalid": {
+        "total": 0,
+        "details": []
+      }
+    },
+    "external_lint": {
+      "mode": "run",
+      "results": [
+        {
+          "source": "ruff",
+          "status": "ok",
+          "message": null,
+          "findings": 0
+        },
+        {
+          "source": "eslint",
+          "status": "ok",
+          "message": null,
+          "findings": 0
+        }
+      ]
+    },
+    "timings": {
+      "backend": 0.0,
+      "frontend_unit": 9.6388,
+      "frontend_e2e": 0.0,
+      "external_lint": 8.4867,
+      "total": 18.1266
+    }
+  },
+  "backend": {
+    "files": 0,
+    "tests": 0,
+    "errors": 0,
+    "warnings": 0,
+    "info": 0,
+    "issues": [],
+    "suite_findings": {
+      "semantic_issues_suppressed_by_mode": 0,
+      "active_exceptions_count": 0,
+      "error_count": 0,
+      "warning_count": 0
+    },
+    "file_details": []
+  },
+  "frontend": {
+    "unit": {
+      "files": 3,
+      "tests": 26,
+      "errors": 0,
+      "warnings": 0,
+      "info": 0,
+      "issues": [],
+      "suite_findings": {
+        "semantic_issues_suppressed_by_mode": 0,
+        "active_exceptions_count": 0,
+        "error_count": 0,
+        "warning_count": 0
+      },
+      "file_details": [
+        {
+          "file": "frontend/app/projects/[projectId]/documents/[docId]/versions/[versionId]/__tests__/page.test.tsx",
+          "area": "unit",
+          "location_ok": true,
+          "tests": 6,
+          "issues": 0
+        },
+        {
+          "file": "frontend/lib/stores/__tests__/versionStore.historyLock.test.ts",
+          "area": "unit",
+          "location_ok": true,
+          "tests": 7,
+          "issues": 0
+        },
+        {
+          "file": "frontend/lib/stores/__tests__/versionStore.test.ts",
+          "area": "unit",
+          "location_ok": true,
+          "tests": 13,
+          "issues": 0
+        }
+      ]
+    },
+    "e2e": {
+      "files": 0,
+      "tests": 0,
+      "errors": 0,
+      "warnings": 0,
+      "info": 0,
+      "issues": [],
+      "suite_findings": {
+        "semantic_issues_suppressed_by_mode": 0,
+        "active_exceptions_count": 0,
+        "error_count": 0,
+        "warning_count": 0
+      },
+      "file_details": []
+    }
+  }
+}
