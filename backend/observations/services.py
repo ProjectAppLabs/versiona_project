@@ -1,6 +1,7 @@
 """D3 observation services: threads, the I14 state machine and re-anchoring."""
 
 from django.db import transaction
+from django.db.models import Exists, Max, OuterRef, Subquery
 
 from audit import services as audit
 from documents.models import DocumentVersion, SectionVersion
@@ -16,6 +17,8 @@ VALID_TRANSITIONS = {
     ('answered', 'open'),
     ('resolved', 'open'),
 }
+
+REANCHOR_BATCH_SIZE = 100
 
 
 def _doc_link(document) -> str:
@@ -177,54 +180,65 @@ def reanchor_observations(version: DocumentVersion) -> dict:
     (previous quads carried); content changed ⇒ reanchored to the section's new
     bboxes; section retired ⇒ orphaned. Idempotent (unique constraint)."""
     counters = {'exact': 0, 'reanchored_section': 0, 'orphaned': 0}
-    observations = Observation.objects.filter(document=version.document).select_related(
-        'section'
-    )
-    if not observations.exists():
+    observations = Observation.objects.filter(document_id=version.document_id)
+    # Freeze the traversal ceiling; later threads belong to a subsequent pass.
+    upper_pk = observations.aggregate(upper_pk=Max('pk'))['upper_pk']
+    if upper_pk is None:
         return counters
-
-    current = {
-        snap.section_id: snap
-        for snap in SectionVersion.objects.filter(document_version=version)
-    }
-    previous_number = version.number - 1
-    previous_hashes = {
-        snap.section_id: snap.body_hash
-        for snap in SectionVersion.objects.filter(
-            document_version__document=version.document,
-            document_version__number=previous_number,
-        )
-    }
-
-    for observation in observations:
-        if ObservationAnchor.objects.filter(
-            observation=observation, document_version=version
-        ).exists():
-            continue  # idempotent re-run
-        previous_anchor = (
-            observation.anchors.filter(document_version__number__lt=version.number)
-            .order_by('-document_version__number')
-            .first()
-        )
-        snap = current.get(observation.section_id) if observation.section_id else None
-        if snap is None:
-            method = ObservationAnchor.Method.ORPHANED
-            page, quads = previous_anchor.page if previous_anchor else 1, []
-        elif previous_hashes.get(observation.section_id) == snap.body_hash:
-            method = ObservationAnchor.Method.EXACT
-            page = previous_anchor.page if previous_anchor else snap.page_start
-            quads = previous_anchor.quads if previous_anchor else snap.bboxes
-        else:
-            method = ObservationAnchor.Method.REANCHORED
-            page, quads = snap.page_start, snap.bboxes
-
-        ObservationAnchor.objects.create(
-            observation=observation,
-            document_version=version,
-            page=page,
-            quads=quads,
-            text_snippet=previous_anchor.text_snippet if previous_anchor else '',
-            method=method,
-        )
-        counters[method] += 1
+    destination_anchor = ObservationAnchor.objects.filter(
+        observation_id=OuterRef('pk'), document_version_id=version.pk,
+    )
+    # An anchor can skip versions: preserve the greatest prior version number,
+    # including historical versions now in trash, as the original lookup did.
+    prior_anchor = ObservationAnchor.objects.filter(
+        observation_id=OuterRef('pk'), document_version__number__lt=version.number,
+    ).order_by('-document_version__number')
+    pending = observations.filter(pk__lte=upper_pk).annotate(
+        has_destination_anchor=Exists(destination_anchor),
+        prior_anchor_id=Subquery(prior_anchor.values('pk')[:1]),
+    ).filter(has_destination_anchor=False)
+    last_pk = 0
+    while batch := list(pending.filter(pk__gt=last_pk).order_by('pk').values(
+        'pk', 'section_id', 'prior_anchor_id',
+    )[:REANCHOR_BATCH_SIZE]):
+        last_pk = batch[-1]['pk']
+        prior_ids = [row['prior_anchor_id'] for row in batch if row['prior_anchor_id']]
+        previous_anchors = {
+            row['pk']: row for row in ObservationAnchor.objects.filter(pk__in=prior_ids).values(
+                'pk', 'page', 'quads', 'text_snippet',
+            )
+        }
+        section_ids = {row['section_id'] for row in batch if row['section_id']}
+        current = {
+            row['section_id']: row for row in SectionVersion.objects.filter(
+                document_version_id=version.pk, section_id__in=section_ids,
+            ).values('section_id', 'body_hash', 'page_start', 'bboxes')
+        }
+        previous_hashes = dict(SectionVersion.objects.filter(
+            document_version__document_id=version.document_id,
+            document_version__number=version.number - 1,
+            section_id__in=section_ids,
+        ).values_list('section_id', 'body_hash'))
+        anchors = []
+        for observation in batch:
+            previous_anchor = previous_anchors.get(observation['prior_anchor_id'])
+            snap = current.get(observation['section_id'])
+            if snap is None:
+                method = ObservationAnchor.Method.ORPHANED
+                page, quads = previous_anchor['page'] if previous_anchor else 1, []
+            elif previous_hashes.get(observation['section_id']) == snap['body_hash']:
+                method = ObservationAnchor.Method.EXACT
+                page = previous_anchor['page'] if previous_anchor else snap['page_start']
+                quads = previous_anchor['quads'] if previous_anchor else snap['bboxes']
+            else:
+                method = ObservationAnchor.Method.REANCHORED
+                page, quads = snap['page_start'], snap['bboxes']
+            anchors.append(ObservationAnchor(
+                observation_id=observation['pk'], document_version_id=version.pk,
+                page=page, quads=quads,
+                text_snippet=previous_anchor['text_snippet'] if previous_anchor else '',
+                method=method,
+            ))
+            counters[method] += 1
+        ObservationAnchor.objects.bulk_create(anchors, batch_size=REANCHOR_BATCH_SIZE)
     return counters
