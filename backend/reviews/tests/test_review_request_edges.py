@@ -1,26 +1,34 @@
-"""D1 request endpoint edges + service validations over engine-independent
-fixtures (versions arrive analyzed from the shared context)."""
+"""D1 request endpoint edges and service validations.
+
+Engine-independent fixtures arrive analyzed from the shared context.
+"""
 
 from uuid import uuid4
 
 import pytest
+from audit.models import AuditEvent
 from django.urls import Resolver404, resolve
-
 from documents.models import DocumentVersion
 from documents.services.version_service import DomainError
+from notifications.models import Notification
+from orgs.models import OrganizationMembership
+from projects.models import ProjectMembership
 from projects.services import config_service
+
 from reviews.models import ReviewAssignment, ReviewRequest
 from reviews.services import review_service
 
 
 @pytest.fixture
 def ready_version(document_with_versions):
+    """Provide an analyzed version for review endpoint tests."""
     document, versions = document_with_versions(n_versions=1)
     return document, versions[0]
 
 
 @pytest.fixture
 def open_review(ready_version, versiona_context):
+    """Provide a pending review requested by the project's editor."""
     _, version = ready_version
     return review_service.create_review_request(
         version, versiona_context.users['editor'],
@@ -34,6 +42,7 @@ def open_review(ready_version, versiona_context):
 def test_reviews_list_returns_requests_with_assignments(
     client_as, ready_version, versiona_context, open_review
 ):
+    """Expose a version's review request with its selected assignment."""
     _, version = ready_version
 
     response = client_as('viewer').get(f'/api/versions/{version.public_id}/reviews/')
@@ -49,6 +58,7 @@ def test_reviews_list_returns_requests_with_assignments(
 def test_second_open_request_via_api_returns_conflict(
     client_as, ready_version, versiona_context, open_review
 ):
+    """Reject a second open request for a version through the endpoint."""
     _, version = ready_version
 
     response = client_as('editor').post(
@@ -64,6 +74,7 @@ def test_second_open_request_via_api_returns_conflict(
 @pytest.mark.django_db
 @pytest.mark.escenario('D1-A02')
 def test_requester_cancels_open_review_via_api(client_as, ready_version, open_review):
+    """Allow the requester to cancel an open review through the endpoint."""
     _, version = ready_version
 
     response = client_as('editor').post(
@@ -79,6 +90,7 @@ def test_requester_cancels_open_review_via_api(client_as, ready_version, open_re
 @pytest.mark.django_db
 @pytest.mark.escenario('D1-P04')
 def test_cancel_unknown_review_returns_404(client_as, ready_version):
+    """Hide a nonexistent review when cancellation is requested."""
     _, version = ready_version
 
     response = client_as('editor').post(
@@ -93,6 +105,7 @@ def test_cancel_unknown_review_returns_404(client_as, ready_version):
 def test_cancel_already_closed_review_returns_conflict(
     client_as, ready_version, versiona_context, open_review
 ):
+    """Reject cancellation of a review that is already closed."""
     _, version = ready_version
     review_service.cancel_review_request(open_review, versiona_context.users['editor'])
 
@@ -107,6 +120,7 @@ def test_cancel_already_closed_review_returns_conflict(
 @pytest.mark.django_db
 @pytest.mark.escenario('D2-L01')
 def test_review_context_endpoint_returns_empty_payload_without_seal(client_as, ready_version):
+    """Return empty review context when the reviewer has no previous seal."""
     _, version = ready_version
 
     response = client_as('reviewer').get(f'/api/versions/{version.public_id}/review_context/')
@@ -118,6 +132,7 @@ def test_review_context_endpoint_returns_empty_payload_without_seal(client_as, r
 @pytest.mark.django_db
 @pytest.mark.escenario('D1-E01')
 def test_review_request_requires_analyzed_version(ready_version, versiona_context):
+    """Reject review requests for a version whose analysis is still pending."""
     _, version = ready_version
     DocumentVersion.all_objects.filter(pk=version.pk).update(
         analysis_status=DocumentVersion.AnalysisStatus.PENDING
@@ -137,6 +152,7 @@ def test_review_request_requires_analyzed_version(ready_version, versiona_contex
 @pytest.mark.django_db
 @pytest.mark.escenario('D1-E01')
 def test_review_request_on_trashed_version_is_rejected(ready_version, versiona_context):
+    """Reject review requests for a version in the trash."""
     _, version = ready_version
     version.soft_delete(versiona_context.users['editor'])
 
@@ -153,6 +169,7 @@ def test_review_request_on_trashed_version_is_rejected(ready_version, versiona_c
 @pytest.mark.django_db
 @pytest.mark.escenario('D1-E01')
 def test_review_request_without_reviewers_is_rejected(ready_version, versiona_context):
+    """Require an explicit reviewer selection before creating a request."""
     _, version = ready_version
 
     with pytest.raises(DomainError) as excinfo:
@@ -165,6 +182,7 @@ def test_review_request_without_reviewers_is_rejected(ready_version, versiona_co
 @pytest.mark.django_db
 @pytest.mark.escenario('D1-E01')
 def test_review_request_with_unknown_reviewer_is_rejected(ready_version, versiona_context):
+    """Unknown reviewer IDs share the privacy rejection of inaccessible users."""
     _, version = ready_version
 
     with pytest.raises(DomainError) as excinfo:
@@ -172,13 +190,153 @@ def test_review_request_with_unknown_reviewer_is_rejected(ready_version, version
             version, versiona_context.users['editor'], [999999]
         )
 
-    assert excinfo.value.status_code == 400
-    assert str(excinfo.value) == 'Algún revisor no existe.'
+    assert excinfo.value.status_code == 404
+    assert str(excinfo.value) == 'Revisor no encontrado.'
+
+
+def review_selection_state(version):
+    """Capture persistent effects and the version preserved by a rejected selection."""
+    return {
+        'requests': ReviewRequest.objects.count(),
+        'assignments': ReviewAssignment.objects.count(),
+        'notifications': Notification.objects.count(),
+        'audit_events': AuditEvent.objects.count(),
+        'version': DocumentVersion.objects.values(
+            'message', 'sha256', 'analysis_status', 'config_version_id', 'is_approved',
+        ).get(pk=version.pk),
+    }
+
+
+@pytest.fixture(params=['foreign', 'without_project', 'inactive_org', 'unknown'])
+def hidden_reviewer_id(request, versiona_context, django_user_model):
+    """Supply IDs unavailable through the target project's effective access."""
+    if request.param == 'foreign':
+        return versiona_context.users['non_member'].pk
+    if request.param == 'without_project':
+        user = django_user_model.objects.create_user(
+            email='unassigned@versiona.test', password='secreta123',
+        )
+        OrganizationMembership.objects.create(
+            organization=versiona_context.org, user=user,
+            role=OrganizationMembership.Role.MEMBER,
+        )
+        return user.pk
+    if request.param == 'inactive_org':
+        user = versiona_context.users['reviewer']
+        OrganizationMembership.objects.filter(
+            organization=versiona_context.org, user=user,
+        ).update(is_active=False)
+        return user.pk
+    return 999999
+
+
+@pytest.mark.django_db
+def test_hidden_reviewer_returns_uniform_not_found(
+    client_as, ready_version, hidden_reviewer_id,
+):
+    """Unavailable reviewer IDs reveal no identity and leave persistent state intact."""
+    _, version = ready_version
+    before = review_selection_state(version)
+
+    response = client_as('editor').post(
+        f'/api/versions/{version.public_id}/reviews/',
+        {'reviewer_ids': [hidden_reviewer_id]}, format='json',
+    )
+
+    assert response.status_code == 404
+    assert response.data == {'error': 'Revisor no encontrado.'}
+    assert review_selection_state(version) == before
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(('visible_alias', 'hidden_first'), [
+    pytest.param('viewer', False, id='viewer-before-hidden'),
+    pytest.param('viewer', True, id='hidden-before-viewer'),
+    pytest.param('admin', False, id='self-before-hidden'),
+    pytest.param('admin', True, id='hidden-before-self'),
+])
+def test_hidden_reviewer_precedes_visible_selection_errors(
+    client_as, ready_version, versiona_context, visible_alias, hidden_first,
+):
+    """A mixed selection has one privacy response regardless of candidate order."""
+    _, version = ready_version
+    visible_id = versiona_context.users[visible_alias].pk
+    hidden_id = versiona_context.users['non_member'].pk
+    reviewer_ids = {False: [visible_id, hidden_id], True: [hidden_id, visible_id]}[hidden_first]
+    before = review_selection_state(version)
+
+    response = client_as('admin').post(
+        f'/api/versions/{version.public_id}/reviews/',
+        {'reviewer_ids': reviewer_ids}, format='json',
+    )
+
+    assert response.status_code == 404
+    assert response.data == {'error': 'Revisor no encontrado.'}
+    assert review_selection_state(version) == before
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(('visible_alias', 'expected_error'), [
+    pytest.param(
+        'viewer', 'viewer@versiona.test no puede revisar en este proyecto (rol: viewer).',
+        id='visible-viewer',
+    ),
+    pytest.param('admin', 'No puedes asignarte tu propia revisión.', id='visible-self'),
+])
+def test_visible_reviewer_keeps_selection_error(
+    client_as, ready_version, versiona_context, visible_alias, expected_error,
+):
+    """Visible candidates retain their actionable role or self-review rejection."""
+    _, version = ready_version
+    before = review_selection_state(version)
+
+    response = client_as('admin').post(
+        f'/api/versions/{version.public_id}/reviews/',
+        {'reviewer_ids': [versiona_context.users[visible_alias].pk]}, format='json',
+    )
+
+    assert response.status_code == 400
+    assert response.data == {'error': expected_error}
+    assert review_selection_state(version) == before
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('org_role', ['owner', 'admin'])
+def test_implicit_org_admin_can_receive_review_assignment(
+    client_as, ready_version, versiona_context, org_role,
+):
+    """Effective organization admins remain eligible without project membership."""
+    _, version = ready_version
+    reviewer = versiona_context.users['owner']
+    OrganizationMembership.objects.filter(
+        organization=versiona_context.org, user=reviewer,
+    ).update(role=org_role)
+    assert not ProjectMembership.objects.filter(
+        project=versiona_context.project, user=reviewer,
+    ).exists()
+
+    response = client_as('editor').post(
+        f'/api/versions/{version.public_id}/reviews/',
+        {'reviewer_ids': [reviewer.pk]}, format='json',
+    )
+
+    assert response.status_code == 201
+    review = ReviewRequest.objects.get(public_id=response.data['public_id'])
+    assert review.document_version_id == version.pk
+    assert review.requested_by_id == versiona_context.users['editor'].pk
+    assignment = review.assignments.get()
+    assert assignment.reviewer_id == reviewer.pk
+    assert assignment.status == ReviewAssignment.Status.PENDING
+    notification = Notification.objects.get(user=reviewer, event_key='review.requested')
+    assert notification.payload['review'] == str(review.public_id)
+    event = AuditEvent.objects.get(event_type='review.requested', object_id_ref=str(review.public_id))
+    assert event.payload['reviewers'] == [reviewer.email]
 
 
 @pytest.mark.django_db
 @pytest.mark.escenario('D1-A02')
 def test_non_requester_reviewer_cannot_cancel_review(versiona_context, open_review):
+    """Reject cancellation by a reviewer who did not open the request."""
     with pytest.raises(DomainError) as excinfo:
         review_service.cancel_review_request(open_review, versiona_context.users['reviewer'])
 
@@ -189,6 +347,7 @@ def test_non_requester_reviewer_cannot_cancel_review(versiona_context, open_revi
 @pytest.mark.django_db
 @pytest.mark.escenario('D1-A02')
 def test_admin_who_did_not_request_can_cancel_review(versiona_context, open_review):
+    """Allow a project admin to cancel another user's open review request."""
     review = review_service.cancel_review_request(open_review, versiona_context.users['admin'])
 
     assert review.status == ReviewRequest.Status.CANCELLED
@@ -214,8 +373,10 @@ def version_owned_by_sections(versiona_context, document_with_versions):
 def test_section_owners_do_not_make_reviewer_selection_optional(
     client_as, version_owned_by_sections
 ):
-    """Negative verification: auto-suggestion from section owners is absent —
-    the request still demands an explicit manual selection (DP-A7)."""
+    """Require explicit reviewer selection despite configured section owners.
+
+    Auto-suggestion is absent: DP-A7 requires manual reviewer selection.
+    """
     version = version_owned_by_sections
 
     response = client_as('editor').post(
@@ -231,8 +392,10 @@ def test_section_owners_do_not_make_reviewer_selection_optional(
 def test_section_owners_are_not_added_as_reviewers_on_their_own(
     client_as, versiona_context, version_owned_by_sections
 ):
-    """Negative verification: the admin owns 'confidencialidad' yet gets no
-    assignment because only the explicitly chosen reviewer is assigned."""
+    """Assign only the explicitly selected reviewer.
+
+    The admin owns 'confidencialidad' but was not selected for this request.
+    """
     version = version_owned_by_sections
 
     response = client_as('editor').post(
@@ -251,8 +414,10 @@ def test_section_owners_are_not_added_as_reviewers_on_their_own(
 def test_assignment_scope_ignores_the_sections_the_reviewer_owns(
     versiona_context, version_owned_by_sections
 ):
-    """Negative verification: no per-section scope is derived from ownership —
-    every assignment is created covering the whole document."""
+    """Keep assignment scope independent of section ownership.
+
+    A selected reviewer receives whole-document scope.
+    """
     review = review_service.create_review_request(
         version_owned_by_sections,
         versiona_context.users['editor'],
@@ -265,8 +430,10 @@ def test_assignment_scope_ignores_the_sections_the_reviewer_owns(
 @pytest.mark.django_db
 @pytest.mark.escenario('D2-P01')
 def test_review_progress_route_is_not_registered():
-    """Negative verification: `review_requests/{id}/progress/` (docs/audit/03 D2)
-    has no URL entry, so its permission matrix cannot exist yet."""
+    """Keep the unimplemented review progress route unregistered.
+
+    The route described in docs/audit/03 D2 has no URL entry.
+    """
     with pytest.raises(Resolver404):
         resolve(f'/api/review_requests/{uuid4()}/progress/')
 
@@ -274,8 +441,10 @@ def test_review_progress_route_is_not_registered():
 @pytest.mark.django_db
 @pytest.mark.escenario('D2-P01')
 def test_assigned_reviewer_hits_a_missing_progress_endpoint(client_as, open_review):
-    """Negative verification: even the assigned reviewer gets a router 404 —
-    the D2 progress surface is unimplemented, not merely restricted."""
+    """Return a router 404 for the unimplemented progress endpoint.
+
+    Assignment does not make the absent D2 progress surface available.
+    """
     assignment = ReviewAssignment.objects.get(review_request=open_review)
 
     response = client_as('reviewer').get(
@@ -286,7 +455,7 @@ def test_assigned_reviewer_hits_a_missing_progress_endpoint(client_as, open_revi
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize('actor, expected', [
+@pytest.mark.parametrize(('actor', 'expected'), [
     pytest.param('reviewer', 200, id='d2-p01-assigned-reviewer'),
     pytest.param('viewer', 200, id='d2-p02-unassigned-member'),
     pytest.param('anonymous', 401, id='d2-p03-anonymous'),
@@ -294,8 +463,10 @@ def test_assigned_reviewer_hits_a_missing_progress_endpoint(client_as, open_revi
 ])
 @pytest.mark.escenario('D2-P01')
 def test_review_context_permission_matrix(client_as, ready_version, open_review, actor, expected):
-    """The implemented D2 surface is `review_context/`, gated by project role
-    (viewer+), not by assignment: an unassigned member reads it too."""
+    """Enforce project access on the implemented review context endpoint.
+
+    Viewer membership suffices; an assignment is not required.
+    """
     _, version = ready_version
 
     response = client_as(actor).get(f'/api/versions/{version.public_id}/review_context/')
