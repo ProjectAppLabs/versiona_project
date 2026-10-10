@@ -1,0 +1,26 @@
+{
+  "time": "2026-10-10T17:47:50.828342+00:00",
+  "rows": [
+    {
+      "pid": 297087,
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend",
+      "signal": "SIGTERM"
+    },
+    {
+      "pid": 297076,
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend",
+      "signal": "SIGTERM"
+    },
+    {
+      "pid": 302010,
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend",
+      "signal": "SIGTERM"
+    },
+    {
+      "pid": 301991,
+      "cwd": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend",
+      "signal": "SIGTERM"
+    }
+  ],
+  "ports3121_8121_free": true
+}

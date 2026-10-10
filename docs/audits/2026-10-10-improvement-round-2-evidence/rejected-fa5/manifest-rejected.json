@@ -1,0 +1,185 @@
+{
+  "schema": 1,
+  "kind": "improvement-qa",
+  "round_id": "versiona-20261010-ronda2",
+  "codebase": "versiona_project",
+  "commit": "fa5a3f7a805022df46dafd5223bbb8a237b529f2",
+  "candidate_ids": [
+    "I-S-0c3b90d936f0",
+    "I-M-0c0b8831bfb6",
+    "I-O-42a58784c64c"
+  ],
+  "report": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/QA-REJECTED.md",
+  "executions": [
+    {
+      "command": "VERSIONA_QA_WORKTREE=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616 /tmp/versiona-improvement-10102026-ronda2/run-pytest.sh security reviews/tests/test_review_request_edges.py::test_reviews_list_returns_requests_with_assignments reviews/tests/test_review_request_edges.py::test_second_open_request_via_api_returns_conflict reviews/tests/test_review_request_edges.py::test_requester_cancels_open_review_via_api reviews/tests/test_review_request_edges.py::test_cancel_unknown_review_returns_404 reviews/tests/test_review_request_edges.py::test_cancel_already_closed_review_returns_conflict reviews/tests/test_review_request_edges.py::test_review_context_endpoint_returns_empty_payload_without_seal reviews/tests/test_review_request_edges.py::test_review_request_requires_analyzed_version reviews/tests/test_review_request_edges.py::test_review_request_on_trashed_version_is_rejected reviews/tests/test_review_request_edges.py::test_review_request_without_reviewers_is_rejected reviews/tests/test_review_request_edges.py::test_review_request_with_unknown_reviewer 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_returns_uniform_not_found[foreign]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_returns_uniform_not_found[without_project]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_returns_uniform_not_found[inactive_org]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_returns_uniform_not_found[unknown]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_precedes_visible_selection_errors[viewer-before-hidden]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_precedes_visible_selection_errors[hidden-before-viewer]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_precedes_visible_selection_errors[self-before-hidden]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_precedes_visible_selection_errors[hidden-before-self]' -v --junitxml=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/test-results/improvement/versiona-20261010-ronda2/security-edges-1.xml",
+      "exit_code": 0,
+      "executed": true,
+      "candidate_ids": [
+        "I-S-0c3b90d936f0"
+      ],
+      "layer": "backend",
+      "report": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/QA-REJECTED.md",
+      "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/security-edges-1.xml",
+      "format": "junit",
+      "live": false
+    },
+    {
+      "command": "VERSIONA_QA_WORKTREE=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616 /tmp/versiona-improvement-10102026-ronda2/run-pytest.sh security 'reviews/tests/test_review_request_edges.py::test_visible_reviewer_keeps_selection_error[visible-viewer]' 'reviews/tests/test_review_request_edges.py::test_visible_reviewer_keeps_selection_error[visible-self]' 'reviews/tests/test_review_request_edges.py::test_implicit_org_admin_can_receive_review_assignment[owner]' 'reviews/tests/test_review_request_edges.py::test_implicit_org_admin_can_receive_review_assignment[admin]' reviews/tests/test_review_request_edges.py::test_non_requester_reviewer_cannot_cancel_review reviews/tests/test_review_request_edges.py::test_admin_who_did_not_request_can_cancel_review reviews/tests/test_review_request_edges.py::test_section_owners_do_not_make_reviewer_selection_optional reviews/tests/test_review_request_edges.py::test_section_owners_are_not_added_as_reviewers_on_their_own reviews/tests/test_review_request_edges.py::test_assignment_scope_ignores_the_sections_the_reviewer_owns reviews/tests/test_review_request_edges.py::test_review_progress_route_is_not_registered reviews/tests/test_review_request_edges.py::test_assigned_reviewer_hits_a_missing_progress_endpoint 'reviews/tests/test_review_request_edges.py::test_review_context_permission_matrix[d2-p01-assigned-reviewer]' 'reviews/tests/test_review_request_edges.py::test_review_context_permission_matrix[d2-p02-unassigned-member]' 'reviews/tests/test_review_request_edges.py::test_review_context_permission_matrix[d2-p03-anonymous]' 'reviews/tests/test_review_request_edges.py::test_review_context_permission_matrix[d2-p04-non-member]' -v --junitxml=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/test-results/improvement/versiona-20261010-ronda2/security-edges-2.xml",
+      "exit_code": 0,
+      "executed": true,
+      "candidate_ids": [
+        "I-S-0c3b90d936f0"
+      ],
+      "layer": "backend",
+      "report": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/QA-REJECTED.md",
+      "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/security-edges-2.xml",
+      "format": "junit",
+      "live": false
+    },
+    {
+      "command": "VERSIONA_QA_WORKTREE=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616 /tmp/versiona-improvement-10102026-ronda2/run-pytest.sh security reviews/tests/test_review_requests.py::test_request_assigns_reviewers_and_notifies_them reviews/tests/test_review_requests.py::test_reviewer_selection_is_validated reviews/tests/test_review_requests.py::test_create_review_permission_matrix reviews/tests/test_review_requests.py::test_members_endpoint_feeds_the_reviewer_picker -v --junitxml=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/test-results/improvement/versiona-20261010-ronda2/security-regression.xml",
+      "exit_code": 0,
+      "executed": true,
+      "candidate_ids": [
+        "I-S-0c3b90d936f0"
+      ],
+      "layer": "backend",
+      "report": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/QA-REJECTED.md",
+      "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/security-regression.xml",
+      "format": "junit",
+      "live": false
+    },
+    {
+      "command": "VERSIONA_QA_WORKTREE=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616 /tmp/versiona-improvement-10102026-ronda2/run-pytest.sh observability public_tools/tests/test_public_processing_diagnostics.py -v --junitxml=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/test-results/improvement/versiona-20261010-ronda2/observability-diagnostics.xml",
+      "exit_code": 0,
+      "executed": true,
+      "candidate_ids": [
+        "I-O-42a58784c64c"
+      ],
+      "layer": "backend",
+      "report": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/QA-REJECTED.md",
+      "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/observability-diagnostics.xml",
+      "format": "junit",
+      "live": false
+    },
+    {
+      "command": "VERSIONA_QA_WORKTREE=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616 /tmp/versiona-improvement-10102026-ronda2/run-pytest.sh observability public_tools/tests/test_public_cleanup_failures.py public_tools/tests/test_public_comparison_service.py -v --junitxml=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/test-results/improvement/versiona-20261010-ronda2/observability-regressions.xml",
+      "exit_code": 0,
+      "executed": true,
+      "candidate_ids": [
+        "I-O-42a58784c64c"
+      ],
+      "layer": "backend",
+      "report": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/QA-REJECTED.md",
+      "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/observability-regressions.xml",
+      "format": "junit",
+      "live": false
+    },
+    {
+      "command": "VERSIONA_QA_WORKTREE=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616 /tmp/versiona-improvement-10102026-ronda2/run-pytest.sh observability public_tools/tests/test_public_comparison_endpoints.py::test_post_happy_path_returns_done_result_in_eager_mode -v --junitxml=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/test-results/improvement/versiona-20261010-ronda2/observability-endpoint.xml",
+      "exit_code": 0,
+      "executed": true,
+      "candidate_ids": [
+        "I-O-42a58784c64c"
+      ],
+      "layer": "backend",
+      "report": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/QA-REJECTED.md",
+      "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/observability-endpoint.xml",
+      "format": "junit",
+      "live": false
+    },
+    {
+      "command": "npm test -- lib/stores/__tests__/versionStore.test.ts --json --outputFile=test-results/improvement/versiona-20261010-ronda2/unit-versionStore.json",
+      "exit_code": 0,
+      "executed": true,
+      "candidate_ids": [
+        "I-M-0c0b8831bfb6"
+      ],
+      "layer": "frontend-unit",
+      "report": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/QA-REJECTED.md",
+      "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/unit-versionStore.xml",
+      "format": "junit",
+      "live": false
+    },
+    {
+      "command": "npm test -- lib/stores/__tests__/versionStore.historyLock.test.ts --json --outputFile=test-results/improvement/versiona-20261010-ronda2/unit-historyLock.json",
+      "exit_code": 0,
+      "executed": true,
+      "candidate_ids": [
+        "I-M-0c0b8831bfb6"
+      ],
+      "layer": "frontend-unit",
+      "report": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/QA-REJECTED.md",
+      "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/unit-historyLock.xml",
+      "format": "junit",
+      "live": false
+    },
+    {
+      "command": "npm test -- --runTestsByPath 'app/projects/[projectId]/documents/[docId]/versions/[versionId]/__tests__/page.test.tsx' --json --outputFile=test-results/improvement/versiona-20261010-ronda2/unit-version-page.json",
+      "exit_code": 0,
+      "executed": true,
+      "candidate_ids": [
+        "I-M-0c0b8831bfb6"
+      ],
+      "layer": "frontend-unit",
+      "report": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/QA-REJECTED.md",
+      "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/unit-version-page.xml",
+      "format": "junit",
+      "live": false
+    },
+    {
+      "command": "VERSIONA_QA_WORKTREE=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616 /tmp/versiona-improvement-10102026-ronda2/run-e2e.sh e2e/app/documents/c3-version-history.spec.ts e2e/app/compare/e1-compare-versions.spec.ts --output=test-results/improvement/versiona-20261010-ronda2/playwright",
+      "exit_code": 0,
+      "executed": true,
+      "candidate_ids": [
+        "I-M-0c0b8831bfb6"
+      ],
+      "layer": "e2e",
+      "report": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/QA-REJECTED.md",
+      "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/playwright-results.json",
+      "format": "playwright-json",
+      "live": true
+    },
+    {
+      "command": "PATH=/tmp/versiona-improvement-10102026/venv/bin:$PATH python3 scripts/test_quality_gate.py --repo-root . --suite backend --semantic-rules strict --junk-severity error --external-lint run --include-file backend/reviews/tests/test_review_request_edges.py --include-file backend/public_tools/tests/test_public_processing_diagnostics.py --report-path frontend/test-results/improvement/versiona-20261010-ronda2/quality-backend-canonical.json --no-color",
+      "exit_code": 1,
+      "executed": true,
+      "candidate_ids": [
+        "I-S-0c3b90d936f0",
+        "I-O-42a58784c64c"
+      ],
+      "layer": "gate",
+      "report": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/QA-REJECTED.md",
+      "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/quality-backend-canonical.json",
+      "format": "gate-json",
+      "live": false
+    },
+    {
+      "command": "PATH=/tmp/versiona-improvement-10102026/venv/bin:$PATH python3 scripts/test_quality_gate.py --repo-root . --suite frontend-unit --semantic-rules strict --junk-severity error --external-lint run --include-file frontend/lib/stores/__tests__/versionStore.test.ts --include-file frontend/lib/stores/__tests__/versionStore.historyLock.test.ts --include-file 'frontend/app/projects/[projectId]/documents/[docId]/versions/[versionId]/__tests__/page.test.tsx' --report-path frontend/test-results/improvement/versiona-20261010-ronda2/quality-unit-canonical.json --no-color",
+      "exit_code": 0,
+      "executed": true,
+      "candidate_ids": [
+        "I-M-0c0b8831bfb6"
+      ],
+      "layer": "gate",
+      "report": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/QA-REJECTED.md",
+      "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/quality-unit-canonical.json",
+      "format": "gate-json",
+      "live": false
+    },
+    {
+      "command": "PATH=/tmp/versiona-improvement-10102026/venv/bin:$PATH python3 scripts/test_quality_gate.py --repo-root . --suite frontend-e2e --semantic-rules strict --junk-severity error --external-lint run --include-file frontend/e2e/app/documents/c3-version-history.spec.ts --report-path frontend/test-results/improvement/versiona-20261010-ronda2/quality-e2e-canonical.json --no-color",
+      "exit_code": 0,
+      "executed": true,
+      "candidate_ids": [
+        "I-M-0c0b8831bfb6"
+      ],
+      "layer": "gate",
+      "report": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/QA-REJECTED.md",
+      "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/rejected-fa5/quality-e2e-canonical.json",
+      "format": "gate-json",
+      "live": false
+    }
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "summary": {
+    "total_files": 2,
+    "total_tests": 29,
+    "errors": 0,
+    "warnings": 1,
+    "info": 0,
+    "infra_errors": 0,
+    "unmatched_include_files": [],
+    "quality_score": 99,
+    "status": "passed",
+    "issues_by_category": {
+      "too_many_assertions": 1
+    },
+    "semantic_rules": "strict",
+    "semantic_suppressed_by_mode": {
+      "backend": 0,
+      "frontend_unit": 0,
+      "frontend_e2e": 0
+    },
+    "active_exceptions": {
+      "total": 0,
+      "by_rule": {},
+      "by_file": {},
+      "details": [],
+      "invalid": {
+        "total": 0,
+        "details": []
+      }
+    },
+    "external_lint": {
+      "mode": "run",
+      "results": [
+        {
+          "source": "ruff",
+          "status": "ok",
+          "message": null,
+          "findings": 0
+        },
+        {
+          "source": "eslint",
+          "status": "ok",
+          "message": null,
+          "findings": 0
+        }
+      ]
+    },
+    "timings": {
+      "backend": 0.3561,
+      "frontend_unit": 0.0,
+      "frontend_e2e": 0.0,
+      "external_lint": 0.3764,
+      "total": 0.7332
+    }
+  },
+  "backend": {
+    "files": 2,
+    "tests": 29,
+    "errors": 0,
+    "warnings": 1,
+    "info": 0,
+    "issues": [
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "Too many assertions (8 > 7)",
+        "severity": "warning",
+        "category": "too_many_assertions",
+        "line": 305,
+        "identifier": "test_implicit_org_admin_can_receive_review_assignment",
+        "suggestion": "Split into multiple focused tests.",
+        "rule_id": "too_many_assertions"
+      }
+    ],
+    "suite_findings": {
+      "semantic_issues_suppressed_by_mode": 0,
+      "active_exceptions_count": 0,
+      "error_count": 0,
+      "warning_count": 1
+    },
+    "file_details": [
+      {
+        "file": "backend/public_tools/tests/test_public_processing_diagnostics.py",
+        "area": "",
+        "location_ok": true,
+        "tests": 7,
+        "issues": 0
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "area": "",
+        "location_ok": true,
+        "tests": 22,
+        "issues": 1
+      }
+    ]
+  },
+  "frontend": {
+    "unit": {
+      "files": 0,
+      "tests": 0,
+      "errors": 0,
+      "warnings": 0,
+      "info": 0,
+      "issues": [],
+      "suite_findings": {
+        "semantic_issues_suppressed_by_mode": 0,
+        "active_exceptions_count": 0,
+        "error_count": 0,
+        "warning_count": 0
+      },
+      "file_details": []
+    },
+    "e2e": {
+      "files": 0,
+      "tests": 0,
+      "errors": 0,
+      "warnings": 0,
+      "info": 0,
+      "issues": [],
+      "suite_findings": {
+        "semantic_issues_suppressed_by_mode": 0,
+        "active_exceptions_count": 0,
+        "error_count": 0,
+        "warning_count": 0
+      },
+      "file_details": []
+    }
+  }
+}

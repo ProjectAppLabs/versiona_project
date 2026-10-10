@@ -1,0 +1,10 @@
+{
+  "blob": "dac8de2c8959c9b379186543b0f1d4d16a8f1c13",
+  "after_402": {
+    "detail": "v2",
+    "file": "fixture-v1.pdf"
+  },
+  "after_old_response": {
+    "file": "fixture-v1.pdf"
+  }
+}

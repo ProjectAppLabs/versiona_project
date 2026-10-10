@@ -1,0 +1,112 @@
+{
+  "source": "cmd fields are copied literally from the immutable functions.exec tool inputs. Exit codes and abbreviated output summaries are reported by the verifier from its actual tool returns; summaries are not complete raw stdout or tool chunk identifiers. JUnit/JSON and recorded spawned argv independently verify cases and results.",
+  "attempt_8611077": [
+    {
+      "label": "security-edges-1-invalid-selection",
+      "cmd": "VERSIONA_QA_WORKTREE=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616 /tmp/versiona-improvement-10102026-ronda2/run-pytest.sh security reviews/tests/test_review_request_edges.py::test_reviews_list_returns_requests_with_assignments reviews/tests/test_review_request_edges.py::test_second_open_request_via_api_returns_conflict reviews/tests/test_review_request_edges.py::test_requester_cancels_open_review_via_api reviews/tests/test_review_request_edges.py::test_cancel_unknown_review_returns_404 reviews/tests/test_review_request_edges.py::test_cancel_already_closed_review_returns_conflict reviews/tests/test_review_request_edges.py::test_review_context_endpoint_returns_empty_payload_without_seal reviews/tests/test_review_request_edges.py::test_review_request_requires_analyzed_version reviews/tests/test_review_request_edges.py::test_review_request_on_trashed_version_is_rejected reviews/tests/test_review_request_edges.py::test_review_request_without_reviewers_is_rejected reviews/tests/test_review_request_edges.py::test_review_request_with_unknown_reviewer 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_returns_uniform_not_found[foreign]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_returns_uniform_not_found[without_project]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_returns_uniform_not_found[inactive_org]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_returns_uniform_not_found[unknown]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_precedes_visible_selection_errors[viewer-before-hidden]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_precedes_visible_selection_errors[hidden-before-viewer]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_precedes_visible_selection_errors[self-before-hidden]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_precedes_visible_selection_errors[hidden-before-self]' -v --junitxml=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/security-edges-1.xml",
+      "exit_code": 4,
+      "executed_cases": 0,
+      "verifier_output_summary": "collected 17 items; no tests ran; ERROR: not found: ...::test_review_request_with_unknown_reviewer"
+    },
+    {
+      "label": "security-edges-1-retry",
+      "cmd": "VERSIONA_QA_WORKTREE=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616 /tmp/versiona-improvement-10102026-ronda2/run-pytest.sh security reviews/tests/test_review_request_edges.py::test_reviews_list_returns_requests_with_assignments reviews/tests/test_review_request_edges.py::test_second_open_request_via_api_returns_conflict reviews/tests/test_review_request_edges.py::test_requester_cancels_open_review_via_api reviews/tests/test_review_request_edges.py::test_cancel_unknown_review_returns_404 reviews/tests/test_review_request_edges.py::test_cancel_already_closed_review_returns_conflict reviews/tests/test_review_request_edges.py::test_review_context_endpoint_returns_empty_payload_without_seal reviews/tests/test_review_request_edges.py::test_review_request_requires_analyzed_version reviews/tests/test_review_request_edges.py::test_review_request_on_trashed_version_is_rejected reviews/tests/test_review_request_edges.py::test_review_request_without_reviewers_is_rejected reviews/tests/test_review_request_edges.py::test_review_request_with_unknown_reviewer_is_rejected 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_returns_uniform_not_found[foreign]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_returns_uniform_not_found[without_project]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_returns_uniform_not_found[inactive_org]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_returns_uniform_not_found[unknown]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_precedes_visible_selection_errors[viewer-before-hidden]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_precedes_visible_selection_errors[hidden-before-viewer]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_precedes_visible_selection_errors[self-before-hidden]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_precedes_visible_selection_errors[hidden-before-self]' -v --junitxml=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/security-edges-1-retry.xml",
+      "exit_code": 0,
+      "artifact": "security-edges-1-retry.xml",
+      "verifier_output_summary": "collected 18 items; 18 passed in 7.90s"
+    },
+    {
+      "label": "security-edges-2",
+      "cmd": "VERSIONA_QA_WORKTREE=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616 /tmp/versiona-improvement-10102026-ronda2/run-pytest.sh security 'reviews/tests/test_review_request_edges.py::test_visible_reviewer_keeps_selection_error[visible-viewer]' 'reviews/tests/test_review_request_edges.py::test_visible_reviewer_keeps_selection_error[visible-self]' 'reviews/tests/test_review_request_edges.py::test_implicit_org_admin_can_receive_review_assignment[owner]' 'reviews/tests/test_review_request_edges.py::test_implicit_org_admin_can_receive_review_assignment[admin]' reviews/tests/test_review_request_edges.py::test_non_requester_reviewer_cannot_cancel_review reviews/tests/test_review_request_edges.py::test_admin_who_did_not_request_can_cancel_review reviews/tests/test_review_request_edges.py::test_section_owners_do_not_make_reviewer_selection_optional reviews/tests/test_review_request_edges.py::test_section_owners_are_not_added_as_reviewers_on_their_own reviews/tests/test_review_request_edges.py::test_assignment_scope_ignores_the_sections_the_reviewer_owns reviews/tests/test_review_request_edges.py::test_review_progress_route_is_not_registered reviews/tests/test_review_request_edges.py::test_assigned_reviewer_hits_a_missing_progress_endpoint 'reviews/tests/test_review_request_edges.py::test_review_context_permission_matrix[d2-p01-assigned-reviewer]' 'reviews/tests/test_review_request_edges.py::test_review_context_permission_matrix[d2-p02-unassigned-member]' 'reviews/tests/test_review_request_edges.py::test_review_context_permission_matrix[d2-p03-anonymous]' 'reviews/tests/test_review_request_edges.py::test_review_context_permission_matrix[d2-p04-non-member]' -v --junitxml=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/security-edges-2.xml",
+      "exit_code": 0,
+      "artifact": "security-edges-2.xml",
+      "verifier_output_summary": "collected 15 items; 15 passed in 13.14s"
+    },
+    {
+      "label": "security-regression",
+      "cmd": "VERSIONA_QA_WORKTREE=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616 /tmp/versiona-improvement-10102026-ronda2/run-pytest.sh security reviews/tests/test_review_requests.py::test_request_assigns_reviewers_and_notifies_them reviews/tests/test_review_requests.py::test_reviewer_selection_is_validated reviews/tests/test_review_requests.py::test_create_review_permission_matrix reviews/tests/test_review_requests.py::test_members_endpoint_feeds_the_reviewer_picker -v --junitxml=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/security-regression.xml",
+      "exit_code": 0,
+      "artifact": "security-regression.xml",
+      "verifier_output_summary": "collected 9 items; 9 passed in 15.77s"
+    },
+    {
+      "label": "observability-diagnostics",
+      "cmd": "VERSIONA_QA_WORKTREE=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616 /tmp/versiona-improvement-10102026-ronda2/run-pytest.sh observability public_tools/tests/test_public_processing_diagnostics.py -v --junitxml=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/observability-diagnostics.xml",
+      "exit_code": 0,
+      "artifact": "observability-diagnostics.xml",
+      "verifier_output_summary": "collected 8 items; 8 passed in 8.96s"
+    },
+    {
+      "label": "observability-regressions",
+      "cmd": "VERSIONA_QA_WORKTREE=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616 /tmp/versiona-improvement-10102026-ronda2/run-pytest.sh observability public_tools/tests/test_public_cleanup_failures.py public_tools/tests/test_public_comparison_service.py -v --junitxml=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/observability-regressions.xml",
+      "exit_code": 0,
+      "artifact": "observability-regressions.xml",
+      "verifier_output_summary": "collected 17 items; 17 passed in 9.77s"
+    },
+    {
+      "label": "observability-endpoint",
+      "cmd": "VERSIONA_QA_WORKTREE=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616 /tmp/versiona-improvement-10102026-ronda2/run-pytest.sh observability public_tools/tests/test_public_comparison_endpoints.py::test_post_happy_path_returns_done_result_in_eager_mode -v --junitxml=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/observability-endpoint.xml",
+      "exit_code": 0,
+      "artifact": "observability-endpoint.xml",
+      "verifier_output_summary": "collected 1 item; 1 passed in 7.11s"
+    },
+    {
+      "label": "unit-versionStore",
+      "cmd": "npm test -- lib/stores/__tests__/versionStore.test.ts --json --outputFile=test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-versionStore.json",
+      "exit_code": 0,
+      "verifier_output_summary": "Tests: 13 passed, 13 total; Test results written to: test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-versionStore.json"
+    },
+    {
+      "label": "unit-historyLock",
+      "cmd": "npm test -- lib/stores/__tests__/versionStore.historyLock.test.ts --json --outputFile=test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-historyLock.json",
+      "exit_code": 0,
+      "verifier_output_summary": "Tests: 7 passed, 7 total; Test results written to: test-results/improvement/versiona-20261010-ronda2/attempt-8611077/unit-historyLock.json"
+    }
+  ],
+  "e2e_interruptions": [
+    {
+      "label": "attempt-8611077-original",
+      "tool_input_cmd": "VERSIONA_QA_WORKTREE=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616 PLAYWRIGHT_JSON_OUTPUT_FILE=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/playwright-results.json PLAYWRIGHT_HTML_OUTPUT_DIR=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/html node frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/run-recorded.cjs e2e-c3-e1 /home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616 -- /tmp/versiona-improvement-10102026-ronda2/run-e2e.sh e2e/app/documents/c3-version-history.spec.ts e2e/app/compare/e1-compare-versions.spec.ts --output=test-results/improvement/versiona-20261010-ronda2/attempt-8611077/playwright",
+      "command_record_start": "command-records.jsonl label e2e-c3-e1",
+      "interruption": {
+        "tool": "functions.exec → tools.write_stdin",
+        "session_id": 30976,
+        "chars": "Ctrl-C"
+      },
+      "tool_result": {
+        "exit_code": 130,
+        "output": ""
+      },
+      "note": "run-recorded has only a started record because Ctrl-C terminated the wrapper; no finished timestamp is asserted."
+    },
+    {
+      "label": "attempt-8611077-clean-cache",
+      "tool_input_cmd": "VERSIONA_QA_WORKTREE=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616 PLAYWRIGHT_JSON_OUTPUT_FILE=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-clean-cache-retry/playwright-results.json PLAYWRIGHT_HTML_OUTPUT_DIR=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-clean-cache-retry/html node frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/run-recorded.cjs e2e-c3-e1-clean-cache /home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616 -- /tmp/versiona-improvement-10102026-ronda2/run-e2e.sh e2e/app/documents/c3-version-history.spec.ts e2e/app/compare/e1-compare-versions.spec.ts --output=test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-clean-cache-retry/playwright",
+      "command_record_start": "command-records.jsonl label e2e-c3-e1-clean-cache",
+      "returned_chunk_before_interruption": "✘ 1 [Desktop Chrome] › e2e/app/compare/e1-compare-versions.spec.ts:13:7 › E1-F01/F02 — las tres vistas muestran la tabla de verdad exacta (1.2m)",
+      "interruption": {
+        "tool": "functions.exec → tools.write_stdin",
+        "session_id": 63342,
+        "chars": "Ctrl-C"
+      },
+      "tool_result": {
+        "exit_code": 130,
+        "output": ""
+      },
+      "note": "run-recorded has only a started record because Ctrl-C terminated the wrapper; no finished timestamp is asserted."
+    },
+    {
+      "label": "attempt-8611077-clean-cache-L01-context",
+      "context_artifact": "e2e-clean-cache-retry/playwright/app-compare-e1-compare-ver-1056a-a-no-ofrece-pares-inválidos-Desktop-Chrome/error-context.md",
+      "state": "interrupted/in-flight",
+      "note": "The context shows the Nuevo proyecto link state and the test's configured 60000ms slow timeout, but no runner result line exists for L01. It is not evidence of a completed timeout."
+    }
+  ],
+  "attempt_fa5a3f7": {
+    "label": "security-edges-1-original",
+    "cmd": "VERSIONA_QA_WORKTREE=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616 /tmp/versiona-improvement-10102026-ronda2/run-pytest.sh security reviews/tests/test_review_request_edges.py::test_reviews_list_returns_requests_with_assignments reviews/tests/test_review_request_edges.py::test_second_open_request_via_api_returns_conflict reviews/tests/test_review_request_edges.py::test_requester_cancels_open_review_via_api reviews/tests/test_review_request_edges.py::test_cancel_unknown_review_returns_404 reviews/tests/test_review_request_edges.py::test_cancel_already_closed_review_returns_conflict reviews/tests/test_review_request_edges.py::test_review_context_endpoint_returns_empty_payload_without_seal reviews/tests/test_review_request_edges.py::test_review_request_requires_analyzed_version reviews/tests/test_review_request_edges.py::test_review_request_on_trashed_version_is_rejected reviews/tests/test_review_request_edges.py::test_review_request_without_reviewers_is_rejected reviews/tests/test_review_request_edges.py::test_review_request_with_unknown_reviewer 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_returns_uniform_not_found[foreign]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_returns_uniform_not_found[without_project]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_returns_uniform_not_found[inactive_org]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_returns_uniform_not_found[unknown]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_precedes_visible_selection_errors[viewer-before-hidden]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_precedes_visible_selection_errors[hidden-before-viewer]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_precedes_visible_selection_errors[self-before-hidden]' 'reviews/tests/test_review_request_edges.py::test_hidden_reviewer_precedes_visible_selection_errors[hidden-before-self]' -v --junitxml=/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/test-results/improvement/versiona-20261010-ronda2/security-edges-1.xml",
+    "exit_code": 0,
+    "errata": "The direct tool input itself named test_review_request_with_unknown_reviewer; it is not the JUnit node ID. The execution did pass 18 cases, and the prior attempt is not modified.",
+    "verifier_output_summary": "collected 18 items; 18 passed in 4.49s"
+  }
+}

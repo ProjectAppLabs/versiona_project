@@ -1,0 +1,263 @@
+{
+  "numFailedTestSuites": 0,
+  "numFailedTests": 0,
+  "numPassedTestSuites": 1,
+  "numPassedTests": 13,
+  "numPendingTestSuites": 0,
+  "numPendingTests": 0,
+  "numRuntimeErrorTestSuites": 0,
+  "numTodoTests": 0,
+  "numTotalTestSuites": 1,
+  "numTotalTests": 13,
+  "snapshot": {
+    "added": 0,
+    "didUpdate": false,
+    "failure": false,
+    "filesAdded": 0,
+    "filesRemoved": 0,
+    "filesRemovedList": [],
+    "filesUnmatched": 0,
+    "filesUpdated": 0,
+    "matched": 0,
+    "total": 0,
+    "unchecked": 0,
+    "uncheckedKeysByFile": [],
+    "unmatched": 0,
+    "updated": 0
+  },
+  "startTime": 1791653650170,
+  "success": true,
+  "testResults": [
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "versionStore"
+          ],
+          "duration": 37,
+          "failing": false,
+          "failureDetails": [],
+          "failureMessages": [],
+          "fullName": "versionStore fetchDetail stores the version detail",
+          "invocations": 1,
+          "location": null,
+          "numPassingAsserts": 1,
+          "retryReasons": [],
+          "startAt": 1791653658531,
+          "status": "passed",
+          "title": "fetchDetail stores the version detail"
+        },
+        {
+          "ancestorTitles": [
+            "versionStore"
+          ],
+          "duration": 4,
+          "failing": false,
+          "failureDetails": [],
+          "failureMessages": [],
+          "fullName": "versionStore fetchDetail surfaces backend errors",
+          "invocations": 1,
+          "location": null,
+          "numPassingAsserts": 1,
+          "retryReasons": [],
+          "startAt": 1791653658569,
+          "status": "passed",
+          "title": "fetchDetail surfaces backend errors"
+        },
+        {
+          "ancestorTitles": [
+            "versionStore"
+          ],
+          "duration": 60,
+          "failing": false,
+          "failureDetails": [],
+          "failureMessages": [],
+          "fullName": "versionStore fetchFileUrl returns and stores the presigned url",
+          "invocations": 1,
+          "location": null,
+          "numPassingAsserts": 2,
+          "retryReasons": [],
+          "startAt": 1791653658573,
+          "status": "passed",
+          "title": "fetchFileUrl returns and stores the presigned url"
+        },
+        {
+          "ancestorTitles": [
+            "versionStore"
+          ],
+          "duration": 2,
+          "failing": false,
+          "failureDetails": [],
+          "failureMessages": [],
+          "fullName": "versionStore editMessage patches and updates the loaded detail",
+          "invocations": 1,
+          "location": null,
+          "numPassingAsserts": 2,
+          "retryReasons": [],
+          "startAt": 1791653658633,
+          "status": "passed",
+          "title": "editMessage patches and updates the loaded detail"
+        },
+        {
+          "ancestorTitles": [
+            "versionStore"
+          ],
+          "duration": 9,
+          "failing": false,
+          "failureDetails": [],
+          "failureMessages": [],
+          "fullName": "versionStore editMessage returns false with the frozen-message error (I2b)",
+          "invocations": 1,
+          "location": null,
+          "numPassingAsserts": 2,
+          "retryReasons": [],
+          "startAt": 1791653658636,
+          "status": "passed",
+          "title": "editMessage returns false with the frozen-message error (I2b)"
+        },
+        {
+          "ancestorTitles": [
+            "versionStore"
+          ],
+          "duration": 7,
+          "failing": false,
+          "failureDetails": [],
+          "failureMessages": [],
+          "fullName": "versionStore trashVersion and restoreVersion call their endpoints",
+          "invocations": 1,
+          "location": null,
+          "numPassingAsserts": 4,
+          "retryReasons": [],
+          "startAt": 1791653658646,
+          "status": "passed",
+          "title": "trashVersion and restoreVersion call their endpoints"
+        },
+        {
+          "ancestorTitles": [
+            "versionStore"
+          ],
+          "duration": 3,
+          "failing": false,
+          "failureDetails": [],
+          "failureMessages": [],
+          "fullName": "versionStore downloadUrl returns null and records the error on failure",
+          "invocations": 1,
+          "location": null,
+          "numPassingAsserts": 2,
+          "retryReasons": [],
+          "startAt": 1791653658653,
+          "status": "passed",
+          "title": "downloadUrl returns null and records the error on failure"
+        },
+        {
+          "ancestorTitles": [
+            "versionStore"
+          ],
+          "duration": 3,
+          "failing": false,
+          "failureDetails": [],
+          "failureMessages": [],
+          "fullName": "versionStore keeps the current metadata after an older version responds",
+          "invocations": 1,
+          "location": null,
+          "numPassingAsserts": 1,
+          "retryReasons": [],
+          "startAt": 1791653658662,
+          "status": "passed",
+          "title": "keeps the current metadata after an older version responds"
+        },
+        {
+          "ancestorTitles": [
+            "versionStore"
+          ],
+          "duration": 1,
+          "failing": false,
+          "failureDetails": [],
+          "failureMessages": [],
+          "fullName": "versionStore keeps the current metadata after an older request fails",
+          "invocations": 1,
+          "location": null,
+          "numPassingAsserts": 1,
+          "retryReasons": [],
+          "startAt": 1791653658665,
+          "status": "passed",
+          "title": "keeps the current metadata after an older request fails"
+        },
+        {
+          "ancestorTitles": [
+            "versionStore"
+          ],
+          "duration": 3,
+          "failing": false,
+          "failureDetails": [],
+          "failureMessages": [],
+          "fullName": "versionStore returns each concurrent comparison URL without replacing the latest PDF",
+          "invocations": 1,
+          "location": null,
+          "numPassingAsserts": 3,
+          "retryReasons": [],
+          "startAt": 1791653658666,
+          "status": "passed",
+          "title": "returns each concurrent comparison URL without replacing the latest PDF"
+        },
+        {
+          "ancestorTitles": [
+            "versionStore"
+          ],
+          "duration": 1,
+          "failing": false,
+          "failureDetails": [],
+          "failureMessages": [],
+          "fullName": "versionStore keeps the PDF error when its metadata completes later",
+          "invocations": 1,
+          "location": null,
+          "numPassingAsserts": 1,
+          "retryReasons": [],
+          "startAt": 1791653658670,
+          "status": "passed",
+          "title": "keeps the PDF error when its metadata completes later"
+        },
+        {
+          "ancestorTitles": [
+            "versionStore"
+          ],
+          "duration": 1,
+          "failing": false,
+          "failureDetails": [],
+          "failureMessages": [],
+          "fullName": "versionStore discards a pending PDF after its metadata fails",
+          "invocations": 1,
+          "location": null,
+          "numPassingAsserts": 2,
+          "retryReasons": [],
+          "startAt": 1791653658671,
+          "status": "passed",
+          "title": "discards a pending PDF after its metadata fails"
+        },
+        {
+          "ancestorTitles": [
+            "versionStore"
+          ],
+          "duration": 2,
+          "failing": false,
+          "failureDetails": [],
+          "failureMessages": [],
+          "fullName": "versionStore preserves the loaded PDF during a same-version metadata refresh",
+          "invocations": 1,
+          "location": null,
+          "numPassingAsserts": 2,
+          "retryReasons": [],
+          "startAt": 1791653658672,
+          "status": "passed",
+          "title": "preserves the loaded PDF during a same-version metadata refresh"
+        }
+      ],
+      "endTime": 1791653658680,
+      "name": "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/frontend/lib/stores/__tests__/versionStore.test.ts",
+      "startTime": 1791653656094,
+      "status": "passed",
+      "summary": ""
+    }
+  ],
+  "wasInterrupted": false
+}

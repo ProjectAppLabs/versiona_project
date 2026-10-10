@@ -1,0 +1,489 @@
+{
+  "summary": {
+    "total_files": 2,
+    "total_tests": 29,
+    "errors": 29,
+    "warnings": 1,
+    "info": 1,
+    "infra_errors": 0,
+    "unmatched_include_files": [],
+    "quality_score": 0,
+    "status": "failed",
+    "issues_by_category": {
+      "missing_docstring": 1,
+      "too_many_assertions": 1,
+      "external_lint": 29
+    },
+    "semantic_rules": "strict",
+    "semantic_suppressed_by_mode": {
+      "backend": 0,
+      "frontend_unit": 0,
+      "frontend_e2e": 0
+    },
+    "active_exceptions": {
+      "total": 0,
+      "by_rule": {},
+      "by_file": {},
+      "details": [],
+      "invalid": {
+        "total": 0,
+        "details": []
+      }
+    },
+    "external_lint": {
+      "mode": "run",
+      "results": [
+        {
+          "source": "ruff",
+          "status": "ok",
+          "message": null,
+          "findings": 29
+        },
+        {
+          "source": "eslint",
+          "status": "ok",
+          "message": null,
+          "findings": 0
+        }
+      ]
+    },
+    "timings": {
+      "backend": 0.217,
+      "frontend_unit": 0.0,
+      "frontend_e2e": 0.0,
+      "external_lint": 0.3166,
+      "total": 0.5337
+    }
+  },
+  "backend": {
+    "files": 2,
+    "tests": 29,
+    "errors": 29,
+    "warnings": 1,
+    "info": 1,
+    "issues": [
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "Complex test (15 lines) lacks docstring",
+        "severity": "info",
+        "category": "missing_docstring",
+        "line": 124,
+        "identifier": "test_review_request_requires_analyzed_version",
+        "suggestion": "Add docstring explaining what is being tested.",
+        "rule_id": "missing_docstring"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "Too many assertions (8 > 7)",
+        "severity": "warning",
+        "category": "too_many_assertions",
+        "line": 292,
+        "identifier": "test_implicit_org_admin_can_receive_review_assignment",
+        "suggestion": "Split into multiple focused tests.",
+        "rule_id": "too_many_assertions"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "1 blank line required between summary line and description",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 1,
+        "identifier": "D205",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d205",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d205:a385f389c3e15ca9"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "Multi-line docstring closing quotes should be on a separate line",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 1,
+        "identifier": "D209",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d209",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d209:a385f389c3e15ca9"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "Import block is un-sorted or un-formatted",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 4,
+        "identifier": "I001",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:i001",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:i001:19e10ae5fc04c51b"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "Missing docstring in public function",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 21,
+        "identifier": "D103",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d103",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d103:32f29fe00d13ece4"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "Missing docstring in public function",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 27,
+        "identifier": "D103",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d103",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d103:1c4ab6d7844b92ee"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "Missing docstring in public function",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 38,
+        "identifier": "D103",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d103",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d103:ebb5e118298692ea"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "Missing docstring in public function",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 53,
+        "identifier": "D103",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d103",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d103:95f0dcd598d47520"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "Missing docstring in public function",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 70,
+        "identifier": "D103",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d103",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d103:eef302f696e8709b"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "Missing docstring in public function",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 85,
+        "identifier": "D103",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d103",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d103:47bf8e3b5dc74597"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "Missing docstring in public function",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 97,
+        "identifier": "D103",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d103",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d103:f2f7e6f2cd258deb"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "Missing docstring in public function",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 113,
+        "identifier": "D103",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d103",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d103:56ffa8773edcce64"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "Missing docstring in public function",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 124,
+        "identifier": "D103",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d103",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d103:c47a9f9c265c914e"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "Missing docstring in public function",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 143,
+        "identifier": "D103",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d103",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d103:6b4b129299912b12"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "Missing docstring in public function",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 159,
+        "identifier": "D103",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d103",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d103:c640ca86a4a03564"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "Missing docstring in public function",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 325,
+        "identifier": "D103",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d103",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d103:f9138e682c40b70a"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "Missing docstring in public function",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 335,
+        "identifier": "D103",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d103",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d103:b00508815eac324a"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "1 blank line required between summary line and description",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 361,
+        "identifier": "D205",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d205",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d205:da70cd1360c7c1fb"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "Multi-line docstring closing quotes should be on a separate line",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 361,
+        "identifier": "D209",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d209",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d209:da70cd1360c7c1fb"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "1 blank line required between summary line and description",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 378,
+        "identifier": "D205",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d205",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d205:0cbf8f983051b2ab"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "Multi-line docstring closing quotes should be on a separate line",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 378,
+        "identifier": "D209",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d209",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d209:0cbf8f983051b2ab"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "1 blank line required between summary line and description",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 398,
+        "identifier": "D205",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d205",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d205:cf3292804b02d017"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "Multi-line docstring closing quotes should be on a separate line",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 398,
+        "identifier": "D209",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d209",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d209:cf3292804b02d017"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "1 blank line required between summary line and description",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 412,
+        "identifier": "D205",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d205",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d205:ae66e03dd1ede380"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "Multi-line docstring closing quotes should be on a separate line",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 412,
+        "identifier": "D209",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d209",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d209:ae66e03dd1ede380"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "1 blank line required between summary line and description",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 421,
+        "identifier": "D205",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d205",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d205:5c86443a21d3f7c5"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "Multi-line docstring closing quotes should be on a separate line",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 421,
+        "identifier": "D209",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d209",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d209:5c86443a21d3f7c5"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "Wrong type passed to first argument of `pytest.mark.parametrize`; expected `tuple`",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 433,
+        "identifier": "PT006",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:pt006",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:pt006:ca7b256016217fb8"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "1 blank line required between summary line and description",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 441,
+        "identifier": "D205",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d205",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d205:46bc6cb424a6892b"
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "message": "Multi-line docstring closing quotes should be on a separate line",
+        "severity": "error",
+        "category": "external_lint",
+        "line": 441,
+        "identifier": "D209",
+        "suggestion": "Fix or suppress in external linter config where justified",
+        "rule_id": "ruff:d209",
+        "source": "ruff",
+        "fingerprint": "backend/reviews/tests/test_review_request_edges.py:ruff:d209:46bc6cb424a6892b"
+      }
+    ],
+    "suite_findings": {
+      "semantic_issues_suppressed_by_mode": 0,
+      "active_exceptions_count": 0,
+      "error_count": 29,
+      "warning_count": 1
+    },
+    "file_details": [
+      {
+        "file": "backend/public_tools/tests/test_public_processing_diagnostics.py",
+        "area": "",
+        "location_ok": true,
+        "tests": 7,
+        "issues": 0
+      },
+      {
+        "file": "backend/reviews/tests/test_review_request_edges.py",
+        "area": "",
+        "location_ok": true,
+        "tests": 22,
+        "issues": 31
+      }
+    ]
+  },
+  "frontend": {
+    "unit": {
+      "files": 0,
+      "tests": 0,
+      "errors": 0,
+      "warnings": 0,
+      "info": 0,
+      "issues": [],
+      "suite_findings": {
+        "semantic_issues_suppressed_by_mode": 0,
+        "active_exceptions_count": 0,
+        "error_count": 0,
+        "warning_count": 0
+      },
+      "file_details": []
+    },
+    "e2e": {
+      "files": 0,
+      "tests": 0,
+      "errors": 0,
+      "warnings": 0,
+      "info": 0,
+      "issues": [],
+      "suite_findings": {
+        "semantic_issues_suppressed_by_mode": 0,
+        "active_exceptions_count": 0,
+        "error_count": 0,
+        "warning_count": 0
+      },
+      "file_details": []
+    }
+  }
+}

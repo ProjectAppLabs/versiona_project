@@ -240,10 +240,12 @@
         "viewer"
       ],
       "priority": "P2",
-      "description": "Timeline shows author/date/message per version, downloads via signed URL and jumps to comparison (docs/plan/01 C3). At 412x915 each version message wraps in full instead of being truncated, and the view/download/delete actions take their own row as 44 px touch targets; the 412 px timeline contract is exercised by the C2 spec (C2-R01, C2-R02).",
+      "description": "Timeline shows author/date/message per version, downloads via signed URL and jumps to comparison (docs/plan/01 C3). The document viewer only displays metadata and a PDF belonging to the requested version. A file-loading failure remains visible beside the valid version details; retrying loads that same version without showing a previous PDF. These failure and success outcomes require live evidence from the C3 spec. At 412x915 each version message wraps in full instead of being truncated, and the view/download/delete actions take their own row as 44 px touch targets; the 412 px timeline contract is exercised by the C2 spec (C2-R01, C2-R02).",
       "expectedSpecs": 1,
       "outcomes": [
-        "display"
+        "display",
+        "failure",
+        "success"
       ]
     },
     "d1-request-review": {

@@ -1,0 +1,47 @@
+{
+  "commit": "86110774cf187f7c108131dc90eb1e41889143dc",
+  "rows": [
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/security-edges-1-retry.xml",
+      "cases": 18,
+      "selected_targets": 18,
+      "all_targets_match_junit": true,
+      "all_junit_cases_selected": true
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/security-edges-2.xml",
+      "cases": 15,
+      "selected_targets": 15,
+      "all_targets_match_junit": true,
+      "all_junit_cases_selected": true
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/security-regression.xml",
+      "cases": 9,
+      "selected_targets": 4,
+      "all_targets_match_junit": true,
+      "all_junit_cases_selected": true
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/observability-diagnostics.xml",
+      "cases": 8,
+      "selected_targets": 1,
+      "all_targets_match_junit": true,
+      "all_junit_cases_selected": true
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/observability-regressions.xml",
+      "cases": 17,
+      "selected_targets": 2,
+      "all_targets_match_junit": true,
+      "all_junit_cases_selected": true
+    },
+    {
+      "artifact": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/observability-endpoint.xml",
+      "cases": 1,
+      "selected_targets": 1,
+      "all_targets_match_junit": true,
+      "all_junit_cases_selected": true
+    }
+  ]
+}

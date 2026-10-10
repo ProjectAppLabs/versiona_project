@@ -1,0 +1,49 @@
+{
+  "commit": "86110774cf187f7c108131dc90eb1e41889143dc",
+  "source_sha256": "2e4cceb4ed3dc5621cf107b7b5510bee9b22eb0557f564cea90115567f3efd9b",
+  "source_copy": "next-trace-private-original.jsonl",
+  "helper_upload_dropzone_timeout_seconds": 15,
+  "events": [
+    {
+      "name": "compile-path",
+      "route_template": "/projects",
+      "duration_microseconds": 14505512,
+      "duration_seconds": 14.505512,
+      "timestamp_monotonic": 31953612383,
+      "startTime": 1791654734676
+    },
+    {
+      "name": "compile-path",
+      "route_template": "/projects/new",
+      "duration_microseconds": 11883220,
+      "duration_seconds": 11.88322,
+      "timestamp_monotonic": 31991243230,
+      "startTime": 1791654772307
+    },
+    {
+      "name": "handle-request",
+      "route_template": "/projects/[projectId]?_rsc=redacted",
+      "duration_microseconds": 112677,
+      "duration_seconds": 0.112677,
+      "timestamp_monotonic": 32009634261,
+      "startTime": 1791654790698
+    },
+    {
+      "name": "compile-path",
+      "route_template": "/projects/[projectId]",
+      "duration_microseconds": 10826688,
+      "duration_seconds": 10.826688,
+      "timestamp_monotonic": 32009795208,
+      "startTime": 1791654790859
+    },
+    {
+      "name": "handle-request",
+      "route_template": "/projects/[projectId]?_rsc=redacted",
+      "duration_microseconds": 21511498,
+      "duration_seconds": 21.511498,
+      "timestamp_monotonic": 32009793148,
+      "startTime": 1791654790857
+    }
+  ],
+  "inference": "The new project navigation RSC request took21.511498s, longer than the helper15s window. Compile took10.826688s. Browser context shows saved toast on the old form; this supports cold dev route latency as the first timeout precondition failure. The second guest-header failure remains unclassified."
+}

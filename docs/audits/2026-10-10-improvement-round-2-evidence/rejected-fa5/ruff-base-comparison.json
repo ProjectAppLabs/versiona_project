@@ -1,0 +1,436 @@
+{
+  "base": "dac8de2c8959c9b379186543b0f1d4d16a8f1c13",
+  "commit": "fa5a3f7a805022df46dafd5223bbb8a237b529f2",
+  "file": "backend/reviews/tests/test_review_request_edges.py",
+  "command_argv": [
+    "/tmp/versiona-improvement-10102026/venv/bin/ruff",
+    "check",
+    "--no-cache",
+    "--stdin-filename",
+    "/home/dev_env/webapps/.wt/versiona_project/queue-10102026-170616/backend/reviews/tests/test_review_request_edges.py",
+    "--output-format",
+    "json",
+    "--select",
+    "PT001,PT002,PT003,PT006,PT007,PT011,PT012,PT013,PT014,PT015,PT016,PT018,PT019,PT020,PT023,PT025,PT026,PT027,PT028,PT029,PT031,F,I,UP,D",
+    "-"
+  ],
+  "base_findings": [
+    {
+      "rule": "D205",
+      "line": 1,
+      "anchor": "module_docstring",
+      "message": "1 blank line required between summary line and description"
+    },
+    {
+      "rule": "D209",
+      "line": 1,
+      "anchor": "module_docstring",
+      "message": "Multi-line docstring closing quotes should be on a separate line"
+    },
+    {
+      "rule": "I001",
+      "line": 4,
+      "anchor": "module_imports",
+      "message": "Import block is un-sorted or un-formatted"
+    },
+    {
+      "rule": "D103",
+      "line": 17,
+      "anchor": "ready_version",
+      "message": "Missing docstring in public function"
+    },
+    {
+      "rule": "D103",
+      "line": 23,
+      "anchor": "open_review",
+      "message": "Missing docstring in public function"
+    },
+    {
+      "rule": "D103",
+      "line": 34,
+      "anchor": "test_reviews_list_returns_requests_with_assignments",
+      "message": "Missing docstring in public function"
+    },
+    {
+      "rule": "D103",
+      "line": 49,
+      "anchor": "test_second_open_request_via_api_returns_conflict",
+      "message": "Missing docstring in public function"
+    },
+    {
+      "rule": "D103",
+      "line": 66,
+      "anchor": "test_requester_cancels_open_review_via_api",
+      "message": "Missing docstring in public function"
+    },
+    {
+      "rule": "D103",
+      "line": 81,
+      "anchor": "test_cancel_unknown_review_returns_404",
+      "message": "Missing docstring in public function"
+    },
+    {
+      "rule": "D103",
+      "line": 93,
+      "anchor": "test_cancel_already_closed_review_returns_conflict",
+      "message": "Missing docstring in public function"
+    },
+    {
+      "rule": "D103",
+      "line": 109,
+      "anchor": "test_review_context_endpoint_returns_empty_payload_without_seal",
+      "message": "Missing docstring in public function"
+    },
+    {
+      "rule": "D103",
+      "line": 120,
+      "anchor": "test_review_request_requires_analyzed_version",
+      "message": "Missing docstring in public function"
+    },
+    {
+      "rule": "D103",
+      "line": 139,
+      "anchor": "test_review_request_on_trashed_version_is_rejected",
+      "message": "Missing docstring in public function"
+    },
+    {
+      "rule": "D103",
+      "line": 155,
+      "anchor": "test_review_request_without_reviewers_is_rejected",
+      "message": "Missing docstring in public function"
+    },
+    {
+      "rule": "D103",
+      "line": 167,
+      "anchor": "test_review_request_with_unknown_reviewer_is_rejected",
+      "message": "Missing docstring in public function"
+    },
+    {
+      "rule": "D103",
+      "line": 181,
+      "anchor": "test_non_requester_reviewer_cannot_cancel_review",
+      "message": "Missing docstring in public function"
+    },
+    {
+      "rule": "D103",
+      "line": 191,
+      "anchor": "test_admin_who_did_not_request_can_cancel_review",
+      "message": "Missing docstring in public function"
+    },
+    {
+      "rule": "D205",
+      "line": 217,
+      "anchor": "test_section_owners_do_not_make_reviewer_selection_optional",
+      "message": "1 blank line required between summary line and description"
+    },
+    {
+      "rule": "D209",
+      "line": 217,
+      "anchor": "test_section_owners_do_not_make_reviewer_selection_optional",
+      "message": "Multi-line docstring closing quotes should be on a separate line"
+    },
+    {
+      "rule": "D205",
+      "line": 234,
+      "anchor": "test_section_owners_are_not_added_as_reviewers_on_their_own",
+      "message": "1 blank line required between summary line and description"
+    },
+    {
+      "rule": "D209",
+      "line": 234,
+      "anchor": "test_section_owners_are_not_added_as_reviewers_on_their_own",
+      "message": "Multi-line docstring closing quotes should be on a separate line"
+    },
+    {
+      "rule": "D205",
+      "line": 254,
+      "anchor": "test_assignment_scope_ignores_the_sections_the_reviewer_owns",
+      "message": "1 blank line required between summary line and description"
+    },
+    {
+      "rule": "D209",
+      "line": 254,
+      "anchor": "test_assignment_scope_ignores_the_sections_the_reviewer_owns",
+      "message": "Multi-line docstring closing quotes should be on a separate line"
+    },
+    {
+      "rule": "D205",
+      "line": 268,
+      "anchor": "test_review_progress_route_is_not_registered",
+      "message": "1 blank line required between summary line and description"
+    },
+    {
+      "rule": "D209",
+      "line": 268,
+      "anchor": "test_review_progress_route_is_not_registered",
+      "message": "Multi-line docstring closing quotes should be on a separate line"
+    },
+    {
+      "rule": "D205",
+      "line": 277,
+      "anchor": "test_assigned_reviewer_hits_a_missing_progress_endpoint",
+      "message": "1 blank line required between summary line and description"
+    },
+    {
+      "rule": "D209",
+      "line": 277,
+      "anchor": "test_assigned_reviewer_hits_a_missing_progress_endpoint",
+      "message": "Multi-line docstring closing quotes should be on a separate line"
+    },
+    {
+      "rule": "PT006",
+      "line": 289,
+      "anchor": "test_review_context_permission_matrix",
+      "message": "Wrong type passed to first argument of `pytest.mark.parametrize`; expected `tuple`"
+    },
+    {
+      "rule": "D205",
+      "line": 297,
+      "anchor": "test_review_context_permission_matrix",
+      "message": "1 blank line required between summary line and description"
+    },
+    {
+      "rule": "D209",
+      "line": 297,
+      "anchor": "test_review_context_permission_matrix",
+      "message": "Multi-line docstring closing quotes should be on a separate line"
+    }
+  ],
+  "current_findings": [
+    {
+      "rule": "D205",
+      "line": 1,
+      "anchor": "module_docstring",
+      "message": "1 blank line required between summary line and description",
+      "origin": "base",
+      "base_line": 1
+    },
+    {
+      "rule": "D209",
+      "line": 1,
+      "anchor": "module_docstring",
+      "message": "Multi-line docstring closing quotes should be on a separate line",
+      "origin": "base",
+      "base_line": 1
+    },
+    {
+      "rule": "I001",
+      "line": 4,
+      "anchor": "module_imports",
+      "message": "Import block is un-sorted or un-formatted",
+      "origin": "base",
+      "base_line": 4
+    },
+    {
+      "rule": "D103",
+      "line": 21,
+      "anchor": "ready_version",
+      "message": "Missing docstring in public function",
+      "origin": "base",
+      "base_line": 17
+    },
+    {
+      "rule": "D103",
+      "line": 27,
+      "anchor": "open_review",
+      "message": "Missing docstring in public function",
+      "origin": "base",
+      "base_line": 23
+    },
+    {
+      "rule": "D103",
+      "line": 38,
+      "anchor": "test_reviews_list_returns_requests_with_assignments",
+      "message": "Missing docstring in public function",
+      "origin": "base",
+      "base_line": 34
+    },
+    {
+      "rule": "D103",
+      "line": 53,
+      "anchor": "test_second_open_request_via_api_returns_conflict",
+      "message": "Missing docstring in public function",
+      "origin": "base",
+      "base_line": 49
+    },
+    {
+      "rule": "D103",
+      "line": 70,
+      "anchor": "test_requester_cancels_open_review_via_api",
+      "message": "Missing docstring in public function",
+      "origin": "base",
+      "base_line": 66
+    },
+    {
+      "rule": "D103",
+      "line": 85,
+      "anchor": "test_cancel_unknown_review_returns_404",
+      "message": "Missing docstring in public function",
+      "origin": "base",
+      "base_line": 81
+    },
+    {
+      "rule": "D103",
+      "line": 97,
+      "anchor": "test_cancel_already_closed_review_returns_conflict",
+      "message": "Missing docstring in public function",
+      "origin": "base",
+      "base_line": 93
+    },
+    {
+      "rule": "D103",
+      "line": 113,
+      "anchor": "test_review_context_endpoint_returns_empty_payload_without_seal",
+      "message": "Missing docstring in public function",
+      "origin": "base",
+      "base_line": 109
+    },
+    {
+      "rule": "D103",
+      "line": 124,
+      "anchor": "test_review_request_requires_analyzed_version",
+      "message": "Missing docstring in public function",
+      "origin": "base",
+      "base_line": 120
+    },
+    {
+      "rule": "D103",
+      "line": 143,
+      "anchor": "test_review_request_on_trashed_version_is_rejected",
+      "message": "Missing docstring in public function",
+      "origin": "base",
+      "base_line": 139
+    },
+    {
+      "rule": "D103",
+      "line": 159,
+      "anchor": "test_review_request_without_reviewers_is_rejected",
+      "message": "Missing docstring in public function",
+      "origin": "base",
+      "base_line": 155
+    },
+    {
+      "rule": "D103",
+      "line": 325,
+      "anchor": "test_non_requester_reviewer_cannot_cancel_review",
+      "message": "Missing docstring in public function",
+      "origin": "base",
+      "base_line": 181
+    },
+    {
+      "rule": "D103",
+      "line": 335,
+      "anchor": "test_admin_who_did_not_request_can_cancel_review",
+      "message": "Missing docstring in public function",
+      "origin": "base",
+      "base_line": 191
+    },
+    {
+      "rule": "D205",
+      "line": 361,
+      "anchor": "test_section_owners_do_not_make_reviewer_selection_optional",
+      "message": "1 blank line required between summary line and description",
+      "origin": "base",
+      "base_line": 217
+    },
+    {
+      "rule": "D209",
+      "line": 361,
+      "anchor": "test_section_owners_do_not_make_reviewer_selection_optional",
+      "message": "Multi-line docstring closing quotes should be on a separate line",
+      "origin": "base",
+      "base_line": 217
+    },
+    {
+      "rule": "D205",
+      "line": 378,
+      "anchor": "test_section_owners_are_not_added_as_reviewers_on_their_own",
+      "message": "1 blank line required between summary line and description",
+      "origin": "base",
+      "base_line": 234
+    },
+    {
+      "rule": "D209",
+      "line": 378,
+      "anchor": "test_section_owners_are_not_added_as_reviewers_on_their_own",
+      "message": "Multi-line docstring closing quotes should be on a separate line",
+      "origin": "base",
+      "base_line": 234
+    },
+    {
+      "rule": "D205",
+      "line": 398,
+      "anchor": "test_assignment_scope_ignores_the_sections_the_reviewer_owns",
+      "message": "1 blank line required between summary line and description",
+      "origin": "base",
+      "base_line": 254
+    },
+    {
+      "rule": "D209",
+      "line": 398,
+      "anchor": "test_assignment_scope_ignores_the_sections_the_reviewer_owns",
+      "message": "Multi-line docstring closing quotes should be on a separate line",
+      "origin": "base",
+      "base_line": 254
+    },
+    {
+      "rule": "D205",
+      "line": 412,
+      "anchor": "test_review_progress_route_is_not_registered",
+      "message": "1 blank line required between summary line and description",
+      "origin": "base",
+      "base_line": 268
+    },
+    {
+      "rule": "D209",
+      "line": 412,
+      "anchor": "test_review_progress_route_is_not_registered",
+      "message": "Multi-line docstring closing quotes should be on a separate line",
+      "origin": "base",
+      "base_line": 268
+    },
+    {
+      "rule": "D205",
+      "line": 421,
+      "anchor": "test_assigned_reviewer_hits_a_missing_progress_endpoint",
+      "message": "1 blank line required between summary line and description",
+      "origin": "base",
+      "base_line": 277
+    },
+    {
+      "rule": "D209",
+      "line": 421,
+      "anchor": "test_assigned_reviewer_hits_a_missing_progress_endpoint",
+      "message": "Multi-line docstring closing quotes should be on a separate line",
+      "origin": "base",
+      "base_line": 277
+    },
+    {
+      "rule": "PT006",
+      "line": 433,
+      "anchor": "test_review_context_permission_matrix",
+      "message": "Wrong type passed to first argument of `pytest.mark.parametrize`; expected `tuple`",
+      "origin": "base",
+      "base_line": 289
+    },
+    {
+      "rule": "D205",
+      "line": 441,
+      "anchor": "test_review_context_permission_matrix",
+      "message": "1 blank line required between summary line and description",
+      "origin": "base",
+      "base_line": 297
+    },
+    {
+      "rule": "D209",
+      "line": 441,
+      "anchor": "test_review_context_permission_matrix",
+      "message": "Multi-line docstring closing quotes should be on a separate line",
+      "origin": "base",
+      "base_line": 297
+    }
+  ],
+  "current_origin_counts": {
+    "base": 29
+  }
+}

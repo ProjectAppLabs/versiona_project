@@ -1,0 +1,12 @@
+[
+  {
+    "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-clean-cache-retry/playwright/app-compare-e1-compare-ver-1056a-a-no-ofrece-pares-inválidos-Desktop-Chrome/error-context.md",
+    "source_sha256": "374d13245dd8489461433495e91f513535355453fc9e3513f075d616fbc322d4",
+    "size": 6050
+  },
+  {
+    "source": "frontend/test-results/improvement/versiona-20261010-ronda2/attempt-8611077/e2e-clean-cache-retry/playwright/app-compare-e1-compare-ver-7af26-n-la-tabla-de-verdad-exacta-Desktop-Chrome/error-context.md",
+    "source_sha256": "accbc91ed559d4e7a23ec4541e43753b06250e14c07adb2da92f28f31f175efe",
+    "size": 6433
+  }
+]

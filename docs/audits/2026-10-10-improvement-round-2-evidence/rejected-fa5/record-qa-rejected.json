@@ -1,0 +1,257 @@
+{
+  "blocked": {},
+  "codebase": "versiona_project",
+  "deferred": [],
+  "fronts": [
+    {
+      "front": "security",
+      "module": null,
+      "reason": "eligible work or required QA remains; the top-three budget does not exhaust a front",
+      "report": null,
+      "state": "pending"
+    },
+    {
+      "front": "maintainability",
+      "module": null,
+      "reason": "eligible work or required QA remains; the top-three budget does not exhaust a front",
+      "report": null,
+      "state": "pending"
+    },
+    {
+      "front": "observability",
+      "module": null,
+      "reason": "eligible work or required QA remains; the top-three budget does not exhaust a front",
+      "report": null,
+      "state": "pending"
+    },
+    {
+      "front": "performance",
+      "module": null,
+      "reason": "a candidate or changed context still needs a value assessment",
+      "report": null,
+      "state": "needs-evidence"
+    },
+    {
+      "front": "responsive",
+      "module": null,
+      "reason": "a candidate or changed context still needs a value assessment",
+      "report": null,
+      "state": "needs-evidence"
+    }
+  ],
+  "needs_evidence": [
+    "P-backend-tasks-01",
+    "P-backend-tasks-03",
+    "P-backend-views-01",
+    "P-backend-queries-02",
+    "P-backend-queries-01",
+    "P-backend-tasks-02",
+    "responsive:auth",
+    "responsive:billing",
+    "responsive:compare",
+    "responsive:documents",
+    "responsive:home",
+    "responsive:master",
+    "responsive:onboarding",
+    "responsive:org",
+    "responsive:public",
+    "responsive:review"
+  ],
+  "pending": [
+    "P-backend-tasks-02",
+    "responsive:auth",
+    "responsive:billing",
+    "responsive:compare",
+    "responsive:documents",
+    "responsive:home",
+    "responsive:master",
+    "responsive:onboarding",
+    "responsive:org",
+    "responsive:public",
+    "responsive:review"
+  ],
+  "policy_version": "1.0.0",
+  "qa": {
+    "commit": "fa5a3f7a805022df46dafd5223bbb8a237b529f2",
+    "reason": "a required check did not execute or failed",
+    "round_id": "versiona-20261010-ronda2",
+    "verified": false
+  },
+  "read_only": false,
+  "selected": [
+    {
+      "action": "diagnose",
+      "category": "backend/tasks",
+      "confidence": "inferred",
+      "context": null,
+      "context_fingerprint": null,
+      "context_stale": false,
+      "effort": null,
+      "evidence": [
+        "backend/documents/services/trash_service.py:142",
+        "backend/versiona_project/tasks.py:204"
+      ],
+      "front": "performance",
+      "id": "P-backend-tasks-03",
+      "legacy_ref": {
+        "front": "performance",
+        "ledger": "/home/dev_env/webapps/vps-ops-toolkit/config/perf-ledger/versiona_project.yml"
+      },
+      "module": "documents",
+      "paths": [
+        "backend/documents/services/trash_service.py",
+        "backend/versiona_project/tasks.py"
+      ],
+      "problem": "La purga de papelera recorre documentos y sus hijos sin una estrategia de lotes explícita.",
+      "process": "purge_trashed daily",
+      "qa": {
+        "date": null,
+        "rejected_because": [],
+        "report": null,
+        "status": "pending",
+        "tests": {},
+        "verdict": null
+      },
+      "regression_pending": false,
+      "report": null,
+      "required_pending": true,
+      "root_cause": "performance:P-backend-tasks-03",
+      "severity": "bloqueante",
+      "status": "candidate",
+      "tests_declared": [],
+      "value_assessment": {
+        "benefit": "unknown",
+        "change_risk": "medium",
+        "effort": "M",
+        "evidence": [
+          "backend/documents/services/trash_service.py:142",
+          "backend/versiona_project/tasks.py:204"
+        ],
+        "mandatory": true,
+        "reason": "legacy candidate needs a value assessment"
+      },
+      "value_decision": {
+        "decision": "needs-evidence",
+        "policy_version": "1.0.0",
+        "reason": "benefit has not been demonstrated",
+        "required": true
+      },
+      "why_pending": null
+    },
+    {
+      "action": "diagnose",
+      "category": "backend/views",
+      "confidence": "inferred",
+      "context": null,
+      "context_fingerprint": null,
+      "context_stale": false,
+      "effort": null,
+      "evidence": [
+        "backend/projects/views.py:241"
+      ],
+      "front": "performance",
+      "id": "P-backend-views-01",
+      "legacy_ref": {
+        "front": "performance",
+        "ledger": "/home/dev_env/webapps/vps-ops-toolkit/config/perf-ledger/versiona_project.yml"
+      },
+      "module": "projects",
+      "paths": [
+        "backend/projects/views.py"
+      ],
+      "problem": "El reporte recorre documentos y consulta versiones, sellos, observaciones y checks dentro del recorrido.",
+      "process": "GET /api/projects/:projectId/report/",
+      "qa": {
+        "date": null,
+        "rejected_because": [],
+        "report": null,
+        "status": "pending",
+        "tests": {},
+        "verdict": null
+      },
+      "regression_pending": false,
+      "report": null,
+      "required_pending": true,
+      "root_cause": "performance:P-backend-views-01",
+      "severity": "bloqueante",
+      "status": "candidate",
+      "tests_declared": [],
+      "value_assessment": {
+        "benefit": "unknown",
+        "change_risk": "medium",
+        "effort": "M",
+        "evidence": [
+          "backend/projects/views.py:241"
+        ],
+        "mandatory": true,
+        "reason": "legacy candidate needs a value assessment"
+      },
+      "value_decision": {
+        "decision": "needs-evidence",
+        "policy_version": "1.0.0",
+        "reason": "benefit has not been demonstrated",
+        "required": true
+      },
+      "why_pending": null
+    },
+    {
+      "action": "diagnose",
+      "category": "backend/queries",
+      "confidence": "inferred",
+      "context": null,
+      "context_fingerprint": null,
+      "context_stale": false,
+      "effort": "M",
+      "evidence": [
+        "backend/documents/views.py:34",
+        "backend/documents/serializers.py:79"
+      ],
+      "front": "performance",
+      "id": "P-backend-queries-01",
+      "legacy_ref": {
+        "front": "performance",
+        "ledger": "/home/dev_env/webapps/vps-ops-toolkit/config/perf-ledger/versiona_project.yml"
+      },
+      "module": "documents",
+      "paths": [
+        "backend/documents/views.py",
+        "backend/documents/serializers.py"
+      ],
+      "problem": "La lista consulta metadatos por documento y la autorización compartida agrega lecturas fuera del alcance local.",
+      "process": "GET /api/projects/:projectId/documents/",
+      "qa": {
+        "date": null,
+        "rejected_because": [],
+        "report": null,
+        "status": "pending",
+        "tests": {},
+        "verdict": null
+      },
+      "regression_pending": false,
+      "report": "docs/audits/2026-09-30-versiona_project_staging-perf-round.md",
+      "required_pending": false,
+      "root_cause": "performance:P-backend-queries-01",
+      "severity": "mayor",
+      "status": "diagnosed",
+      "tests_declared": [],
+      "value_assessment": {
+        "benefit": "unknown",
+        "change_risk": "medium",
+        "effort": "M",
+        "evidence": [
+          "backend/documents/views.py:34",
+          "backend/documents/serializers.py:79"
+        ],
+        "mandatory": false,
+        "reason": "legacy candidate needs a value assessment"
+      },
+      "value_decision": {
+        "decision": "needs-evidence",
+        "policy_version": "1.0.0",
+        "reason": "benefit has not been demonstrated",
+        "required": false
+      },
+      "why_pending": "La propuesta local conserva más consultas de las permitidas; resolverlo exige cambiar autorización compartida fuera de los paths del candidato."
+    }
+  ]
+}

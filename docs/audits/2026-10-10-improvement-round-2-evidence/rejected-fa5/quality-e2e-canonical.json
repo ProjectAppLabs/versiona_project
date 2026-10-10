@@ -1,0 +1,122 @@
+{
+  "summary": {
+    "total_files": 1,
+    "total_tests": 4,
+    "errors": 0,
+    "warnings": 0,
+    "info": 1,
+    "infra_errors": 0,
+    "unmatched_include_files": [],
+    "quality_score": 98,
+    "status": "passed",
+    "issues_by_category": {
+      "fragile_test_data": 1
+    },
+    "semantic_rules": "strict",
+    "semantic_suppressed_by_mode": {
+      "backend": 0,
+      "frontend_unit": 0,
+      "frontend_e2e": 0
+    },
+    "active_exceptions": {
+      "total": 0,
+      "by_rule": {},
+      "by_file": {},
+      "details": [],
+      "invalid": {
+        "total": 0,
+        "details": []
+      }
+    },
+    "external_lint": {
+      "mode": "run",
+      "results": [
+        {
+          "source": "ruff",
+          "status": "ok",
+          "message": null,
+          "findings": 0
+        },
+        {
+          "source": "eslint",
+          "status": "ok",
+          "message": null,
+          "findings": 0
+        }
+      ]
+    },
+    "timings": {
+      "backend": 0.0,
+      "frontend_unit": 0.0,
+      "frontend_e2e": 0.6164,
+      "external_lint": 8.37,
+      "total": 8.9871
+    }
+  },
+  "backend": {
+    "files": 0,
+    "tests": 0,
+    "errors": 0,
+    "warnings": 0,
+    "info": 0,
+    "issues": [],
+    "suite_findings": {
+      "semantic_issues_suppressed_by_mode": 0,
+      "active_exceptions_count": 0,
+      "error_count": 0,
+      "warning_count": 0
+    },
+    "file_details": []
+  },
+  "frontend": {
+    "unit": {
+      "files": 0,
+      "tests": 0,
+      "errors": 0,
+      "warnings": 0,
+      "info": 0,
+      "issues": [],
+      "suite_findings": {
+        "semantic_issues_suppressed_by_mode": 0,
+        "active_exceptions_count": 0,
+        "error_count": 0,
+        "warning_count": 0
+      },
+      "file_details": []
+    },
+    "e2e": {
+      "files": 1,
+      "tests": 4,
+      "errors": 0,
+      "warnings": 0,
+      "info": 1,
+      "issues": [
+        {
+          "file": "frontend/e2e/app/documents/c3-version-history.spec.ts",
+          "message": "Potentially fragile hardcoded test data detected (editor@versiona.test)",
+          "severity": "info",
+          "category": "fragile_test_data",
+          "line": 9,
+          "identifier": "C3 — Navegar el historial > C3-F01/F02 — timeline con autor, mensaje y miniatura; descarga por URL firmada",
+          "suggestion": "Prefer generated fixtures or scenario builders for stable data",
+          "rule_id": "fragile_test_data"
+        }
+      ],
+      "suite_findings": {
+        "semantic_issues_suppressed_by_mode": 0,
+        "active_exceptions_count": 0,
+        "error_count": 0,
+        "warning_count": 0
+      },
+      "file_details": [
+        {
+          "file": "frontend/e2e/app/documents/c3-version-history.spec.ts",
+          "area": "e2e",
+          "location_ok": true,
+          "tests": 4,
+          "issues": 1
+        }
+      ]
+    }
+  }
+}

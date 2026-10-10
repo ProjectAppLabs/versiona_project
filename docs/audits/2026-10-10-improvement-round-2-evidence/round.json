@@ -1,0 +1,168 @@
+{
+  "candidates": [
+    "I-S-0c3b90d936f0",
+    "I-M-0c0b8831bfb6",
+    "I-O-42a58784c64c"
+  ],
+  "codebase": "versiona_project",
+  "commit": "86110774cf187f7c108131dc90eb1e41889143dc",
+  "created_at": "2026-10-10T17:10:57Z",
+  "e2e_required": true,
+  "fronts": [
+    "security",
+    "maintainability",
+    "observability"
+  ],
+  "id": "versiona-20261010-ronda2",
+  "module": "project",
+  "qa": {
+    "commit": "86110774cf187f7c108131dc90eb1e41889143dc",
+    "executions": [
+      {
+        "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/security-edges-1-retry.xml",
+        "candidate_ids": [
+          "I-S-0c3b90d936f0"
+        ],
+        "format": "junit",
+        "layer": "backend",
+        "live": false,
+        "report": "docs/audits/2026-10-10-improvement-round-2-evidence/QA.md"
+      },
+      {
+        "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/security-edges-2.xml",
+        "candidate_ids": [
+          "I-S-0c3b90d936f0"
+        ],
+        "format": "junit",
+        "layer": "backend",
+        "live": false,
+        "report": "docs/audits/2026-10-10-improvement-round-2-evidence/QA.md"
+      },
+      {
+        "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/security-regression.xml",
+        "candidate_ids": [
+          "I-S-0c3b90d936f0"
+        ],
+        "format": "junit",
+        "layer": "backend",
+        "live": false,
+        "report": "docs/audits/2026-10-10-improvement-round-2-evidence/QA.md"
+      },
+      {
+        "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/observability-diagnostics.xml",
+        "candidate_ids": [
+          "I-O-42a58784c64c"
+        ],
+        "format": "junit",
+        "layer": "backend",
+        "live": false,
+        "report": "docs/audits/2026-10-10-improvement-round-2-evidence/QA.md"
+      },
+      {
+        "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/observability-regressions.xml",
+        "candidate_ids": [
+          "I-O-42a58784c64c"
+        ],
+        "format": "junit",
+        "layer": "backend",
+        "live": false,
+        "report": "docs/audits/2026-10-10-improvement-round-2-evidence/QA.md"
+      },
+      {
+        "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/observability-endpoint.xml",
+        "candidate_ids": [
+          "I-O-42a58784c64c"
+        ],
+        "format": "junit",
+        "layer": "backend",
+        "live": false,
+        "report": "docs/audits/2026-10-10-improvement-round-2-evidence/QA.md"
+      },
+      {
+        "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/unit-versionStore.xml",
+        "candidate_ids": [
+          "I-M-0c0b8831bfb6"
+        ],
+        "format": "junit",
+        "layer": "frontend-unit",
+        "live": false,
+        "report": "docs/audits/2026-10-10-improvement-round-2-evidence/QA.md"
+      },
+      {
+        "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/unit-historyLock.xml",
+        "candidate_ids": [
+          "I-M-0c0b8831bfb6"
+        ],
+        "format": "junit",
+        "layer": "frontend-unit",
+        "live": false,
+        "report": "docs/audits/2026-10-10-improvement-round-2-evidence/QA.md"
+      },
+      {
+        "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/unit-version-page.xml",
+        "candidate_ids": [
+          "I-M-0c0b8831bfb6"
+        ],
+        "format": "junit",
+        "layer": "frontend-unit",
+        "live": false,
+        "report": "docs/audits/2026-10-10-improvement-round-2-evidence/QA.md"
+      },
+      {
+        "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/playwright-results.json",
+        "candidate_ids": [
+          "I-M-0c0b8831bfb6"
+        ],
+        "format": "playwright-json",
+        "layer": "e2e",
+        "live": true,
+        "report": "docs/audits/2026-10-10-improvement-round-2-evidence/QA.md"
+      },
+      {
+        "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/quality-backend.json",
+        "candidate_ids": [
+          "I-S-0c3b90d936f0",
+          "I-O-42a58784c64c"
+        ],
+        "format": "gate-json",
+        "layer": "gate",
+        "live": false,
+        "report": "docs/audits/2026-10-10-improvement-round-2-evidence/QA.md"
+      },
+      {
+        "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/quality-unit.json",
+        "candidate_ids": [
+          "I-M-0c0b8831bfb6"
+        ],
+        "format": "gate-json",
+        "layer": "gate",
+        "live": false,
+        "report": "docs/audits/2026-10-10-improvement-round-2-evidence/QA.md"
+      },
+      {
+        "artifact": "docs/audits/2026-10-10-improvement-round-2-evidence/quality-e2e.json",
+        "candidate_ids": [
+          "I-M-0c0b8831bfb6"
+        ],
+        "format": "gate-json",
+        "layer": "gate",
+        "live": false,
+        "report": "docs/audits/2026-10-10-improvement-round-2-evidence/QA.md"
+      }
+    ],
+    "reason": "exact round, commit, passing test artifacts and live E2E where required are verified",
+    "recorded_at": "2026-10-10T18:18:46Z",
+    "report": "docs/audits/2026-10-10-improvement-round-2-evidence/QA.md",
+    "round_id": "versiona-20261010-ronda2",
+    "status": "verified"
+  },
+  "report": "docs/audits/2026-10-10-versiona-improvement-round-2.md",
+  "required_layers": [
+    "backend",
+    "e2e",
+    "frontend-unit",
+    "gate"
+  ],
+  "status": "verified",
+  "updated_at": "2026-10-10T17:30:05Z"
+}
