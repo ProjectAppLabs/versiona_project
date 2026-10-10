@@ -18,9 +18,14 @@ async function search(query: string): Promise<MailpitMessage[]> {
   const response = await fetch(
     `${MAILPIT_API}/api/v1/search?query=${encodeURIComponent(query)}`
   );
-  if (!response.ok) return [];
+  if (!response.ok) {
+    throw new Error(`Mailpit search failed with HTTP ${response.status}`);
+  }
   const data = (await response.json()) as { messages?: MailpitMessage[] };
-  return data.messages ?? [];
+  if (!Array.isArray(data.messages)) {
+    throw new Error('Mailpit search returned an invalid messages payload');
+  }
+  return data.messages;
 }
 
 export async function waitForEmail(
@@ -49,5 +54,8 @@ export async function assertNoEmailFor(address: string): Promise<void> {
 }
 
 export async function purgeMailbox(): Promise<void> {
-  await fetch(`${MAILPIT_API}/api/v1/messages`, { method: 'DELETE' });
+  const response = await fetch(`${MAILPIT_API}/api/v1/messages`, { method: 'DELETE' });
+  if (!response.ok) {
+    throw new Error(`Mailpit purge failed with HTTP ${response.status}`);
+  }
 }
