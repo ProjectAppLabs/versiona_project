@@ -41,6 +41,7 @@ export interface VerifyResult {
 }
 
 interface SealState {
+  versionId: string | null;
   seals: SealSummary[];
   validityRecords: ValidityRecord[];
   pendingPlan: ValidityRecord[];
@@ -66,84 +67,127 @@ function messageOf(err: unknown): string {
   );
 }
 
-export const useSealStore = create<SealState>((set, get) => ({
-  seals: [],
-  validityRecords: [],
-  pendingPlan: [],
-  isLoading: false,
-  isSubmitting: false,
-  error: null,
+export const useSealStore = create<SealState>((set, get) => {
+  let navigationGeneration = 0;
+  let sealsGeneration = 0;
+  let planGeneration = 0;
+  let submissionGeneration = 0;
 
-  fetchSeals: async (versionId) => {
-    set({ isLoading: true, error: null });
-    try {
-      const { data } = await api.get(`versions/${versionId}/seals/`);
+  // A new visit owns all three datasets; per-resource generations also prevent
+  // an older refresh of the same UUID from replacing a newer response.
+  const enterVersion = (versionId: string) => {
+    if (get().versionId !== versionId) {
+      navigationGeneration += 1;
+      sealsGeneration += 1;
+      planGeneration += 1;
+      submissionGeneration += 1;
       set({
-        seals: data.seals,
-        validityRecords: data.validity_records,
-        isLoading: false,
+        versionId, seals: [], validityRecords: [], pendingPlan: [],
+        isLoading: false, isSubmitting: false, error: null,
       });
-    } catch (err) {
-      set({ isLoading: false, error: messageOf(err) });
     }
-  },
+    const generation = navigationGeneration;
+    return () => generation === navigationGeneration && get().versionId === versionId;
+  };
 
-  createSeal: async (versionId, { coversAll, sectionKeys = [] }) => {
-    set({ isSubmitting: true, error: null });
-    try {
-      await api.post(`versions/${versionId}/seals/`, {
-        covers_all: coversAll,
-        section_keys: sectionKeys,
-      });
-      set({ isSubmitting: false });
-      await get().fetchSeals(versionId);
-      return true;
-    } catch (err) {
-      set({ isSubmitting: false, error: messageOf(err) });
-      return false;
-    }
-  },
+  return {
+    versionId: null,
+    seals: [],
+    validityRecords: [],
+    pendingPlan: [],
+    isLoading: false,
+    isSubmitting: false,
+    error: null,
 
-  revokeSeal: async (versionId, sealId) => {
-    try {
-      await api.post(`versions/${versionId}/seals/${sealId}/revoke/`);
-      await get().fetchSeals(versionId);
-      return true;
-    } catch (err) {
-      set({ error: messageOf(err) });
-      return false;
-    }
-  },
+    fetchSeals: async (versionId) => {
+      const isCurrentVersion = enterVersion(versionId);
+      const generation = ++sealsGeneration;
+      const isCurrent = () => isCurrentVersion() && generation === sealsGeneration;
+      set({ isLoading: true, error: null });
+      try {
+        const { data } = await api.get(`versions/${versionId}/seals/`);
+        if (isCurrent()) {
+          set({ seals: data.seals, validityRecords: data.validity_records, isLoading: false });
+        }
+      } catch (err) {
+        if (isCurrent()) set({ isLoading: false, error: messageOf(err) });
+      }
+    },
 
-  verifySeal: async (versionId, sealId) => {
-    try {
-      const { data } = await api.get(`versions/${versionId}/seals/${sealId}/verify/`);
-      return data as VerifyResult;
-    } catch (err) {
-      set({ error: messageOf(err) });
-      return null;
-    }
-  },
+    createSeal: async (versionId, { coversAll, sectionKeys = [] }) => {
+      const isCurrentVersion = enterVersion(versionId);
+      const generation = ++submissionGeneration;
+      const isCurrent = () => isCurrentVersion() && generation === submissionGeneration;
+      set({ isSubmitting: true, error: null });
+      try {
+        await api.post(`versions/${versionId}/seals/`, {
+          covers_all: coversAll,
+          section_keys: sectionKeys,
+        });
+        if (isCurrent()) {
+          set({ isSubmitting: false });
+          await get().fetchSeals(versionId);
+        }
+        return true;
+      } catch (err) {
+        if (isCurrent()) set({ isSubmitting: false, error: messageOf(err) });
+        return false;
+      }
+    },
 
-  fetchPlan: async (versionId) => {
-    try {
-      const { data } = await api.get(`versions/${versionId}/seal_plan/`);
-      set({ pendingPlan: data.pending });
-    } catch (err) {
-      set({ error: messageOf(err) });
-    }
-  },
+    revokeSeal: async (versionId, sealId) => {
+      const isCurrent = enterVersion(versionId);
+      try {
+        await api.post(`versions/${versionId}/seals/${sealId}/revoke/`);
+        if (isCurrent()) await get().fetchSeals(versionId);
+        return true;
+      } catch (err) {
+        if (isCurrent()) set({ error: messageOf(err) });
+        return false;
+      }
+    },
 
-  confirmPlan: async (versionId, decisions) => {
-    set({ isSubmitting: true, error: null });
-    try {
-      await api.post(`versions/${versionId}/seal_plan/`, { decisions });
-      set({ isSubmitting: false, pendingPlan: [] });
-      await get().fetchSeals(versionId);
-      return true;
-    } catch (err) {
-      set({ isSubmitting: false, error: messageOf(err) });
-      return false;
-    }
-  },
-}));
+    verifySeal: async (versionId, sealId) => {
+      const isCurrent = enterVersion(versionId);
+      try {
+        const { data } = await api.get(`versions/${versionId}/seals/${sealId}/verify/`);
+        return data as VerifyResult;
+      } catch (err) {
+        if (isCurrent()) set({ error: messageOf(err) });
+        return null;
+      }
+    },
+
+    fetchPlan: async (versionId) => {
+      const isCurrentVersion = enterVersion(versionId);
+      const generation = ++planGeneration;
+      const isCurrent = () => isCurrentVersion() && generation === planGeneration;
+      try {
+        const { data } = await api.get(`versions/${versionId}/seal_plan/`);
+        if (isCurrent()) set({ pendingPlan: data.pending });
+      } catch (err) {
+        if (isCurrent()) set({ error: messageOf(err) });
+      }
+    },
+
+    confirmPlan: async (versionId, decisions) => {
+      const isCurrentVersion = enterVersion(versionId);
+      const generation = ++submissionGeneration;
+      const isCurrent = () => isCurrentVersion() && generation === submissionGeneration;
+      set({ isSubmitting: true, error: null });
+      try {
+        await api.post(`versions/${versionId}/seal_plan/`, { decisions });
+        if (isCurrent()) {
+          // An in-flight GET must not resurrect the plan just confirmed.
+          planGeneration += 1;
+          set({ isSubmitting: false, pendingPlan: [] });
+          await get().fetchSeals(versionId);
+        }
+        return true;
+      } catch (err) {
+        if (isCurrent()) set({ isSubmitting: false, error: messageOf(err) });
+        return false;
+      }
+    },
+  };
+});
