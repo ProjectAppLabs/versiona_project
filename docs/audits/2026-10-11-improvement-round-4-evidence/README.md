@@ -14,7 +14,7 @@ de su retiro y el archivo conserva su estructura y procedencia.
 
 | Candidato | Fuente implementada | Evidencia propia final |
 |---|---|---|
-| `I-O-a878b49c51b0` | `190868b3debb459a987e146db01959f344f8b5c3` | 34 casos Django/MySQL y gate estricto; cinco fallos conductuales antes del arreglo. |
+| `I-O-a878b49c51b0` | `0b53ace523c45c257372b911156f4c754128690e` | 34 casos Django/MySQL y gate estricto; cinco fallos conductuales antes del arreglo. |
 | `I-M-2426b181350e` | `6bd9cfd01d5dceb7d86091e5f3f01f72172d4b37` | 20 casos store, 14 panel, ESLint, TypeScript y gate; 15 fallos store y seis panel antes del arreglo. |
 | `I-M-3b071b0852e3` | `afd783f04a6adf4d3ef43643ea6a75d6d74c671f` | Gate/ESLint y TypeScript; demos de fallo del oráculo separadas del D5 real. |
 

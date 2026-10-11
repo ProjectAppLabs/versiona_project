@@ -25,7 +25,10 @@ permitiendo notificaciones legítimas de otros documentos.
 
 Pruebas propias finales: observabilidad 34/34 Django/MySQL y mantenibilidad
 20/20 store + 14/14 panel; gates y lint reales exit 0. Los intentos fallidos
-originales se conservan. El mapa D5 distingue navegación que desmonta el visor
+originales se conservan. La auditoría exigió reemplazar inyecciones ORM/modelo por fallos de cursor SQL;
+el dueño corrigió sólo dos tests y reprodujo cinco fallos sobre archive verificado
+antes de pasar 34/34 nuevamente. El intento combinado anterior queda separado.
+El mapa D5 distingue navegación que desmonta el visor
 y prueba React con instancia conservada. Una sola QA sobre el commit limpio
 de la unión y el tren CI determinan el cierre efectivo; los PR y el archivo
 privado de evidencia registran ese veredicto sin alterar el SHA probado.
