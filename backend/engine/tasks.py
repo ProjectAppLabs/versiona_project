@@ -18,10 +18,10 @@ from celery import shared_task
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
-from kombu.exceptions import OperationalError as BrokerOperationalError
-
 from documents.models import DocumentVersion
 from documents.services import storage_service
+from kombu.exceptions import OperationalError as BrokerOperationalError
+
 from engine.models import EngineJob
 from engine.services.analysis import EncryptedPdfError, InvalidPdfError, analyze_bytes
 from engine.services.persistence import persist_analysis
@@ -56,8 +56,8 @@ class _RecoveryBlocked(Exception):
     """Existing data has no checkpoint that can safely authorize a replay."""
 
 
-def enqueue_analysis(version: DocumentVersion) -> EngineJob:
-    """Create (or reuse) the analysis job for a version and dispatch it."""
+def ensure_analysis_job(version: DocumentVersion) -> EngineJob:
+    """Persist an analysis intention without publishing or executing it."""
     job, _created = EngineJob.objects.get_or_create(
         idempotency_key=f'analysis:v{version.pk}',
         defaults={
@@ -66,6 +66,12 @@ def enqueue_analysis(version: DocumentVersion) -> EngineJob:
             'payload': {'version_id': version.pk, 'file_key': version.file_key},
         },
     )
+    return job
+
+
+def enqueue_analysis(version: DocumentVersion) -> EngineJob:
+    """Create (or reuse) the analysis job for a version and dispatch it."""
+    job = ensure_analysis_job(version)
     if job.status != EngineJob.Status.PENDING or job.celery_task_id:
         return job
     if run_analysis.app.conf.task_always_eager:
