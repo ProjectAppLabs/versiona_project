@@ -1,12 +1,13 @@
 """A persisted upload remains recoverable when broker publication fails."""
 
+from contextlib import contextmanager
 from datetime import timedelta
 from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
 from django.db import OperationalError as DatabaseOperationalError
-from django.db import transaction
+from django.db import connection, transaction
 from django.utils import timezone
 from engine import tasks
 from engine.models import EngineJob
@@ -122,12 +123,27 @@ def _complete_then_rollback(document, intent, editor):
         raise ValueError('cancelled')
 
 
+@contextmanager
+def _analysis_intent_disconnect():
+    """Interrupt the SQL transport on the real ORM's analysis-job INSERT."""
+    failures = []
+    insert_prefix = f'INSERT INTO {connection.ops.quote_name(EngineJob._meta.db_table)} '
+
+    def unavailable_insert(execute, sql, params, many, context):
+        if sql.startswith(insert_prefix):
+            failures.append(sql)
+            raise DatabaseOperationalError(2006, 'simulated database disconnect')
+        return execute(sql, params, many, context)
+
+    with connection.execute_wrapper(unavailable_insert):
+        yield failures
+
+
 @pytest.fixture
-def unavailable_analysis_intent(monkeypatch):
-    """Fail at the database boundary that inserts the durable analysis intent."""
-    insert = MagicMock(side_effect=DatabaseOperationalError(2006, 'simulated database disconnect'))
-    monkeypatch.setattr(EngineJob.objects, 'get_or_create', insert)
-    return insert
+def unavailable_analysis_intent():
+    """Fail SQL insertion while preserving real ORM and transaction behavior."""
+    with _analysis_intent_disconnect() as failures:
+        yield failures
 
 
 @pytest.mark.django_db(transaction=True)
@@ -185,15 +201,13 @@ def test_analysis_intent_failure_preserves_existing_final_pdf(staged_upload, una
 
 @pytest.mark.django_db(transaction=True)
 @freeze_time('2026-10-11T12:00:00Z')
-def test_original_upload_retries_after_analysis_intent_failure(staged_upload, broker, monkeypatch):
+def test_original_upload_retries_after_analysis_intent_failure(staged_upload, broker):
     """Catches: an insertion failure permanently stranding the original upload."""
     document, intent, editor = staged_upload
-    insert = MagicMock(side_effect=DatabaseOperationalError(2006, 'simulated database disconnect'))
-    with monkeypatch.context() as failure:
-        failure.setattr(EngineJob.objects, 'get_or_create', insert)
+    with _analysis_intent_disconnect() as failures:
         with pytest.raises(DatabaseOperationalError, match='simulated database disconnect'):
             version_service.complete_upload(document, intent.upload_id, 'Entrega', editor)
-    insert.assert_called_once()
+    assert len(failures) == 1
 
     version, job = version_service.complete_upload(document, intent.upload_id, 'Entrega', editor)
     EngineJob.objects.filter(pk=job.pk).update(updated_at=timezone.now() - timedelta(seconds=61))
@@ -212,16 +226,23 @@ def test_original_upload_retries_after_analysis_intent_failure(staged_upload, br
 
 @pytest.mark.django_db(transaction=True)
 @freeze_time('2026-10-11T12:00:00Z')
-def test_dispatch_callback_failure_keeps_a_recoverable_upload(staged_upload, broker, monkeypatch):
+def test_dispatch_callback_failure_keeps_a_recoverable_upload(staged_upload, broker):
     """Catches: discarding the committed upload after publication setup fails."""
     document, intent, editor = staged_upload
     payload = storage_service.get_bytes(intent.key)
-    lock = MagicMock(side_effect=DatabaseOperationalError(2006, 'simulated dispatch disconnect'))
-    with monkeypatch.context() as failure:
-        failure.setattr(EngineJob.objects, 'select_for_update', lock)
+    failures = []
+    job_table = f'FROM {connection.ops.quote_name(EngineJob._meta.db_table)} '
+
+    def unavailable_dispatch(execute, sql, params, many, context):
+        if sql.startswith('SELECT ') and job_table in sql and sql.endswith('FOR UPDATE'):
+            failures.append(sql)
+            raise DatabaseOperationalError(2006, 'simulated dispatch disconnect')
+        return execute(sql, params, many, context)
+
+    with connection.execute_wrapper(unavailable_dispatch):
         with pytest.raises(DatabaseOperationalError, match='simulated dispatch disconnect'):
             version_service.complete_upload(document, intent.upload_id, 'Entrega', editor)
-    lock.assert_called_once()
+    assert len(failures) == 1
     version = DocumentVersion.objects.get(document=document)
     job = EngineJob.objects.get(document_version=version)
     assert storage_service.get_bytes(version.file_key) == payload

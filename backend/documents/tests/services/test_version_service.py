@@ -7,6 +7,8 @@ from pathlib import Path
 
 import pytest
 from audit.models import AuditEvent
+from django.db import OperationalError as DatabaseOperationalError
+from django.db import connection
 
 from documents.models import Document, DocumentVersion, SectionVersion
 from documents.services import storage_service, version_service
@@ -338,19 +340,23 @@ def test_promotion_write_failure_preserves_staging(
 
 
 @pytest.fixture
-def failed_counter_write(document, versiona_context, monkeypatch):
+def failed_counter_write(document, versiona_context):
     """Interrupt the database write after the final PDF has been promoted."""
     editor = versiona_context.users['editor']
     intent = version_service.create_upload_intent(document, editor)
     first = (TESTDATA / 'contrato_v1.pdf').read_bytes()
     storage_service.put_bytes(intent.key, first, 'application/pdf')
 
-    def unavailable_database(_document, **_kwargs):
-        raise RuntimeError('private database write failed')
+    update_prefix = f'UPDATE {connection.ops.quote_name(Document._meta.db_table)} '
+    counter_column = connection.ops.quote_name('latest_number')
 
-    with monkeypatch.context() as failure:
-        failure.setattr(Document, 'save', unavailable_database)
-        with pytest.raises(RuntimeError, match='database write failed'):
+    def unavailable_database(execute, sql, params, many, context):
+        if sql.startswith(update_prefix) and counter_column in sql:
+            raise DatabaseOperationalError(2006, 'private database write failed')
+        return execute(sql, params, many, context)
+
+    with connection.execute_wrapper(unavailable_database):
+        with pytest.raises(DatabaseOperationalError, match='database write failed'):
             version_service.complete_upload(document, intent.upload_id, 'fallida', editor)
     return document, intent, editor, first
 
