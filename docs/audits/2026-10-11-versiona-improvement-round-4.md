@@ -113,11 +113,25 @@ manage.py migrate. Ruff, ESLint, TypeScript y gate estricto se ejecutan con
 herramientas reales. Los artefactos requeridos serán tipados y verificables;
 sin app ejecutada el estado sigue qa-pending.
 
+La auditoría rechazó las primeras inyecciones de fallo que sustituían consultas
+ORM y métodos de modelos. El dueño reescribió sólo sus dos archivos de tests:
+el error se inyecta ahora en el cursor SQL con execute_wrapper, delegando el
+resto a MySQL real. Auditor KEEP; sin excepciones nuevas. La repetición causal
+sobre git archive exacto de la base, sin .git prestado, volvió a producir cinco
+fallos, cero errores y cero skips. Hashes de archive, blobs de app y dos overlays
+de tests identifican la fuente; el HEAD del dueño no se confunde con el código
+anterior servido. El verde final mantiene los 34 casos y las mismas garantías.
+
+La unión previa b36868d pasó 68 casos pero fue rechazada por calidad antes de
+iniciar E2E. Se conserva íntegra como intento previo; sus resultados no se
+reasignan al commit nuevo. La QA definitiva vuelve a ejecutar sobre su propia
+fuente limpia y conserva un directorio de artefactos nuevo.
+
 Resultados propios comprobados sobre cada commit limpio:
 
 | Dueño | Commit fuente | Resultado original final |
 |---|---|---|
-| Observabilidad | `190868b3debb459a987e146db01959f344f8b5c3` | 34/34 Django/MySQL, sin errores ni skips; Ruff y gate estricto con lint externo exit 0. |
+| Observabilidad | `0b53ace523c45c257372b911156f4c754128690e` | 34/34 Django/MySQL, sin errores ni skips; Ruff y gate estricto con lint externo exit 0. |
 | Mantenibilidad | `6bd9cfd01d5dceb7d86091e5f3f01f72172d4b37` | 20/20 store y 14/14 panel; ESLint, TypeScript y gate estricto exit 0. |
 | QA | `afd783f04a6adf4d3ef43643ea6a75d6d74c671f` | TypeScript y gate estricto con ESLint real exit 0; auditoría estática KEEP. El recorrido real se ejecuta en la unión. |
 
