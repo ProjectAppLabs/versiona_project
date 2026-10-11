@@ -11,16 +11,16 @@ analysis job.
 import logging
 from dataclasses import dataclass
 
+from audit import services as audit
 from django.conf import settings
 from django.db import OperationalError, transaction
 from django.utils.text import slugify
+from engine.services.analysis import EncryptedPdfError, InvalidPdfError, open_pdf
+from engine.tasks import enqueue_analysis, ensure_analysis_job
+from projects.models import Project, ProjectConfigVersion
 
-from audit import services as audit
 from documents.models import Document, DocumentVersion
 from documents.services import storage_service
-from engine.services.analysis import EncryptedPdfError, InvalidPdfError, open_pdf
-from engine.tasks import enqueue_analysis
-from projects.models import Project, ProjectConfigVersion
 
 logger = logging.getLogger(__name__)
 
@@ -174,9 +174,6 @@ def _create_locked_version(document, data, sha256, size, message, user, request)
             )
         number = locked.latest_number + 1
         final_key = storage_service.version_key(locked, number)
-        # Promote precisely the bytes validated above, even if the signed PUT
-        # token replaces the staging object before this row lock is acquired.
-        storage_service.put_bytes(final_key, data, 'application/pdf')
         version = DocumentVersion.objects.create(
             document=locked,
             number=number,
@@ -187,6 +184,14 @@ def _create_locked_version(document, data, sha256, size, message, user, request)
             author=user,
             config_version=ProjectConfigVersion.current_for(locked.project),
         )
+        # Version and intention commit together. A failed insertion must not
+        # consume staging or overwrite a preexisting uncommitted promotion.
+        # Dispatch still belongs to complete_upload, preserving eager execution
+        # and asynchronous on_commit publication.
+        ensure_analysis_job(version)
+        # Promote precisely the bytes validated above, even if the signed PUT
+        # token replaces the staging object before this row lock is acquired.
+        storage_service.put_bytes(final_key, data, 'application/pdf')
         locked.latest_number = number
         locked.save(update_fields=['latest_number', 'updated_at'])
         # D1: reviewing an outdated version is pointless — supersede open

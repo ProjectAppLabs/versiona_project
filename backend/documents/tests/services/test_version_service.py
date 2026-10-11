@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 from audit.models import AuditEvent
 
-from documents.models import DocumentVersion, SectionVersion
+from documents.models import Document, DocumentVersion, SectionVersion
 from documents.services import storage_service, version_service
 from documents.services.storage import filesystem
 
@@ -134,8 +134,11 @@ def test_identical_binary_is_rejected(document, versiona_context):
 def test_binary_of_the_current_version_is_rejected_after_trashing_a_newer_draft(
     document, versiona_context,
 ):
-    """Catches: F6 comparing against the trashed draft's number instead of the
-    document's current version."""
+    """Reject the current binary after a newer draft is trashed.
+
+    Catches: F6 comparing against the trashed draft's number instead of the
+    document's current version.
+    """
     from documents.services import trash_service
 
     editor = versiona_context.users['editor']
@@ -334,30 +337,45 @@ def test_promotion_write_failure_preserves_staging(
     assert list(filesystem.resolve_path(final_key).parent.glob('.tmp-*')) == []
 
 
-@pytest.mark.django_db
-def test_retry_replaces_uncommitted_promotion_after_database_failure(
-    document, versiona_context, monkeypatch,
-):
-    """A failed DB write cannot make the next version reuse a stale binary."""
+@pytest.fixture
+def failed_counter_write(document, versiona_context, monkeypatch):
+    """Interrupt the database write after the final PDF has been promoted."""
     editor = versiona_context.users['editor']
     intent = version_service.create_upload_intent(document, editor)
     first = (TESTDATA / 'contrato_v1.pdf').read_bytes()
-    retry = (TESTDATA / 'contrato_v2.pdf').read_bytes()
     storage_service.put_bytes(intent.key, first, 'application/pdf')
-    create_version = DocumentVersion.objects.create
 
-    def unavailable_database(**_kwargs):
+    def unavailable_database(_document, **_kwargs):
         raise RuntimeError('private database write failed')
 
-    monkeypatch.setattr(DocumentVersion.objects, 'create', unavailable_database)
-    with pytest.raises(RuntimeError, match='database write failed'):
-        version_service.complete_upload(document, intent.upload_id, 'fallida', editor)
-    monkeypatch.setattr(DocumentVersion.objects, 'create', create_version)
+    with monkeypatch.context() as failure:
+        failure.setattr(Document, 'save', unavailable_database)
+        with pytest.raises(RuntimeError, match='database write failed'):
+            version_service.complete_upload(document, intent.upload_id, 'fallida', editor)
+    return document, intent, editor, first
+
+
+@pytest.mark.django_db
+def test_failed_counter_write_keeps_retryable_promotion(failed_counter_write):
+    """A database rollback leaves the captured bytes available for replacement."""
+    from engine.models import EngineJob
+
+    document, intent, _editor, first = failed_counter_write
+
     document.refresh_from_db()
+
     assert document.latest_number == 0
     assert not DocumentVersion.objects.filter(document=document).exists()
+    assert not EngineJob.objects.exists()
     assert storage_service.get_bytes(intent.key) == first
     assert storage_service.get_bytes(storage_service.version_key(document, 1)) == first
+
+
+@pytest.mark.django_db
+def test_retry_replaces_uncommitted_promotion_after_database_failure(failed_counter_write):
+    """A failed DB write cannot make the next version reuse a stale binary."""
+    document, intent, editor, _first = failed_counter_write
+    retry = (TESTDATA / 'contrato_v2.pdf').read_bytes()
     storage_service.put_bytes(intent.key, retry, 'application/pdf')
 
     version, job = version_service.complete_upload(document, intent.upload_id, 'reintento', editor)
