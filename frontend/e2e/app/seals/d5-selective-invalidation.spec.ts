@@ -1,13 +1,79 @@
+import type { Page } from '@playwright/test';
+
 import { expect, test } from '../../test-with-coverage';
 import { D5_SELECTIVE_INVALIDATION } from '../../helpers/flow-tags';
 import { assertNoEmailFor, purgeMailbox, waitForEmail } from '../../helpers/mailpit';
 import { openSeededProject, uniqueName, uploadPdf } from '../../helpers/versiona';
+import type { NotificationItem } from '../../../lib/stores/notificationStore';
+
+async function readInbox(page: Page): Promise<NotificationItem[]> {
+  // Absence is meaningful only after a successful read has rendered. A loading
+  // skeleton or an HTTP error also hides inbox-list, so neither proves silence.
+  const read = page.waitForResponse((response) =>
+    response.request().method() === 'GET'
+      && new URL(response.url()).pathname === '/api/me/notifications/'
+  );
+  await page.goto('/inbox');
+  const response = await read;
+  expect(response.status(), 'el inbox debe responder correctamente').toBe(200);
+  expect(await response.finished(), 'la lectura del inbox debe terminar').toBeNull();
+  const data = await response.json() as { results: NotificationItem[] };
+  expect(data.results, 'el inbox debe devolver una lista de avisos').toEqual(expect.any(Array));
+
+  const main = page.getByRole('main');
+  const finalState = data.results.length > 0
+    ? main.getByTestId('inbox-list')
+    : main.getByTestId('empty-state').filter({ hasText: 'No tienes notificaciones' });
+  await expect(finalState).toBeVisible();
+  await expect(main.getByTestId('async-loading')).toHaveCount(0);
+  await expect(main.getByTestId('async-error')).toHaveCount(0);
+  return data.results;
+}
+
+interface InvalidationTarget {
+  seal: string;
+  title: string;
+  link: string;
+}
+
+async function expectInvalidationNotice(
+  page: Page, items: NotificationItem[], target: InvalidationTarget
+): Promise<void> {
+  const matches = items.filter((item) => item.event_key === 'seal.invalidated'
+    && item.payload.seal === target.seal && item.payload.to_version === 2);
+  expect(matches, 'debe llegar el aviso de este sello y esta entrega').toHaveLength(1);
+  expect(matches[0]).toMatchObject({
+    title: target.title,
+    link: target.link,
+    payload: { sections: ['obligaciones-del-contratista'] },
+  });
+  const notice = page.getByRole('main').getByTestId('inbox-item-seal.invalidated')
+    .filter({ hasText: target.title });
+  await expect(notice).toHaveCount(1);
+  await expect(notice).toHaveAttribute('href', target.link);
+  await expect(notice).toContainText('obligaciones-del-contratista');
+}
+
+async function expectNoInvalidationNotice(
+  page: Page, items: NotificationItem[], target: InvalidationTarget
+): Promise<void> {
+  // Other documents may have legitimate notifications. None may identify this
+  // preserved seal's delivery through its payload, title or destination.
+  expect(items.filter((item) => item.event_key === 'seal.invalidated'
+    && (item.link === target.link || item.title === target.title
+      || (item.payload.seal === target.seal && item.payload.to_version === 2))
+  ), 'el sello conservado no debe recibir este aviso').toHaveLength(0);
+  await expect(page.getByRole('main').getByTestId('inbox-item-seal.invalidated')
+    .filter({ hasText: target.title })).toHaveCount(0);
+}
 
 /**
  * LA PRUEBA REINA (docs/plan/06 §5.2 — el diferencial del producto):
  * revisor A sella §1–2 · revisor B sella §3 · el editor sube v2 que cambia §3
  * (y otras, pero NO las de A) ⇒ el sello de A se CONSERVA con constancia, el
  * de B se INVALIDA, y SOLO B recibe el correo (S6). Multi-contexto real.
+ * Atrapa: aceptar carga/error como ausencia, o un aviso de otro documento como
+ * prueba de que la invalidación de esta entrega llegó al revisor correcto.
  */
 
 test.describe('D5 — Invalidación selectiva 💎', () => {
@@ -44,7 +110,14 @@ test.describe('D5 — Invalidación selectiva 💎', () => {
       await pageA.getByTestId('seal-sections-open').click();
       await pageA.getByTestId('pick-objeto-del-contrato').check();
       await pageA.getByTestId('pick-definiciones').check();
+      const placedA = pageA.waitForResponse((response) =>
+        response.request().method() === 'POST'
+          && new URL(response.url()).pathname.endsWith('/seals/')
+      );
       await pageA.getByTestId('seal-picked').click();
+      const sealAResponse = await placedA;
+      expect(sealAResponse.status()).toBe(201);
+      const sealA = (await sealAResponse.json()).public_id as string;
       await expect(pageA.getByTestId('seal-reviewer@versiona.test')).toBeVisible({
         timeout: 20_000,
       });
@@ -56,7 +129,14 @@ test.describe('D5 — Invalidación selectiva 💎', () => {
       await expect(pageB.getByTestId('seal-action-bar')).toBeVisible({ timeout: 20_000 });
       await pageB.getByTestId('seal-sections-open').click();
       await pageB.getByTestId('pick-obligaciones-del-contratista').check();
+      const placedB = pageB.waitForResponse((response) =>
+        response.request().method() === 'POST'
+          && new URL(response.url()).pathname.endsWith('/seals/')
+      );
       await pageB.getByTestId('seal-picked').click();
+      const sealBResponse = await placedB;
+      expect(sealBResponse.status()).toBe(201);
+      const sealB = (await sealBResponse.json()).public_id as string;
       await expect(pageB.getByTestId('seal-admin@versiona.test')).toBeVisible({
         timeout: 20_000,
       });
@@ -73,6 +153,11 @@ test.describe('D5 — Invalidación selectiva 💎', () => {
         .click();
       await editorPage.waitForURL(/versions\//);
 
+      const v1Id = new URL(v1Url).pathname.split('/versions/')[1];
+      const v2Id = new URL(editorPage.url()).pathname.split('/versions/')[1];
+      const invalidationLink = `${new URL(timelineUrl).pathname}/compare/${v1Id}/${v2Id}`;
+      const invalidationTitle = `Tu sello en "${title}" requiere re-revisión (v2)`;
+
       const preservedCard = editorPage.getByTestId('validity-reviewer@versiona.test');
       await expect(preservedCard).toBeVisible({ timeout: 30_000 });
       await expect(preservedCard).toHaveAttribute('data-decision', 'preserved');
@@ -85,19 +170,20 @@ test.describe('D5 — Invalidación selectiva 💎', () => {
       await expect(invalidatedCard).toContainText('obligaciones-del-contratista');
 
       // ── B tiene la re-revisión en su campanita e inbox ────────────────
-      await pageB.goto('/inbox');
-      await expect(
-        pageB.getByTestId('inbox-item-seal.invalidated').first()
-      ).toBeVisible({ timeout: 20_000 });
-      await expect(pageB.getByText(/re-revisión/).first()).toBeVisible();
+      const inboxB = await readInbox(pageB);
+      await expectInvalidationNotice(pageB, inboxB, {
+        seal: sealB, title: invalidationTitle, link: invalidationLink,
+      });
 
       // ── S6 por correo: B recibió email; A NO recibió nada ─────────────
       await waitForEmail({ to: 'admin@versiona.test', subjectContains: 're-revisión' });
       await assertNoEmailFor('reviewer@versiona.test');
 
       // ── A no tiene notificación de invalidación (su sello vive) ───────
-      await pageA.goto('/inbox');
-      await expect(pageA.getByTestId('inbox-list')).toHaveCount(0, { timeout: 15_000 });
+      const inboxA = await readInbox(pageA);
+      await expectNoInvalidationNotice(pageA, inboxA, {
+        seal: sealA, title: invalidationTitle, link: invalidationLink,
+      });
 
       // ── v3 conserva el MISMO sello de v1 sin volver a sellar v2 ───────
       await editorPage.goto(timelineUrl);
