@@ -1,6 +1,6 @@
 {
-  "version": "2.4.2",
-  "lastUpdated": "2026-10-10",
+  "version": "2.4.3",
+  "lastUpdated": "2026-10-11",
   "flows": {
     "home-loads": {
       "name": "Landing page loads",
@@ -318,7 +318,7 @@
         "admin"
       ],
       "priority": "P1",
-      "description": "Re-delivery preserves inherited seals across three versions, invalidates changed coverage, and requires coordinator confirmation for verified degraded analysis; reviewers are notified only after final invalidation. At 835x1194 the coordinator switches each pending seal between the 44 px 'Conservar' and 'Invalidar' options and confirms through a 44 px 'Confirmar plan'; choosing 'Invalidar' persists the 'invalidated' decision.",
+      "description": "Re-delivery preserves inherited seals across three versions only when every covered section has exact normalized body-hash equality, invalidates changed coverage, and requires coordinator confirmation for verified degraded analysis. The browser D5 journey holds the seals and plan responses for document A, navigates through Panel to document B, and confirms B's pending plan after A resolves without A's plan, seal, or initial radio choice replacing B; this navigation unmounts the viewer, while the retained-instance case belongs to the React SealsPanel regression. An invalidation notice is accepted only after a successful rendered inbox read and when its exact invalidated seal, target version, title, link, and changed sections identify this delivery; the preserved reviewer has no matching notice or email. At 835x1194 the coordinator switches each pending seal between the 44 px 'Conservar' and 'Invalidar' options and confirms through a 44 px 'Confirmar plan'; choosing 'Invalidar' persists the 'invalidated' decision.",
       "expectedSpecs": 2,
       "outcomes": [
         "success",

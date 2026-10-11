@@ -4,11 +4,11 @@
 
 Use this document to understand each flow's steps, branching conditions, role restrictions,
 and API contracts before writing or reviewing E2E tests. Flow ids map 1:1 to
-`frontend/e2e/flow-definitions.json` (v2.4.2) and to the founding-artifact flow ids
+`frontend/e2e/flow-definitions.json` (v2.4.3) and to the founding-artifact flow ids
 (A1…F1) planned in `docs/plan/01-alcance-mvp.md`.
 
-**Version:** 2.4.2
-**Last Updated:** 2026-10-09
+**Version:** 2.4.3
+**Last Updated:** 2026-10-11
 
 > Maintenance rule (docs/plan/09 DoD #4): each vertical iteration rewrites the sheets of the
 > flows it ships and flips them from *Planned* to *Implemented*. Acceptance criteria live in
@@ -34,7 +34,7 @@ and API contracts before writing or reviewing E2E tests. Flow ids map 1:1 to
 ## Module Index
 
 > **Status governance (updated 2026-10-08)**: the authoritative registry is
-> `frontend/e2e/flow-definitions.json` (v2.4.2, 40 flows). Implementation, authored
+> `frontend/e2e/flow-definitions.json` (v2.4.3, 40 flows). Implementation, authored
 > specs and executed coverage are separate: qualifying tests and their live/CI
 > artifacts determine coverage. A row in this map never grants it by itself.
 
@@ -456,3 +456,27 @@ Las pruebas nuevas no se ejecutaron en vivo durante la autoría (no había app n
 navegador); su validación es la del CI del PR. Las acciones de D1 (solicitud de
 revisión) y E4 (constancias) y los componentes compartidos (Modal, avisos,
 confirmación por texto) quedan fuera de esta ronda.
+
+
+## R4 — datos vigentes y oráculo D5 (2026-10-11)
+
+| Vista | Interacción | Clase | Evidencia escrita para la unión |
+|---|---|---|---|
+| Visor y sellos | Nueva entrega conserva hasta v3 el sello de A sólo ante igualdad exacta del hash normalizado de cada sección cubierta; invalida el sello B que cubre una sección cambiada. | success | D5-F01/F02/F05/F06 comprueba la cadena real y sus veredictos. |
+| Visor y plan D5 | Con las respuestas de sellos y plan de A retenidas, el administrador navega por Panel → proyecto → documento B, deja terminar A y confirma exclusivamente el plan pendiente de B. | success | D5-A04-current-version en `d5-coordinator-confirmation.spec.ts` comprueba sello, plan, elección inicial y decisión persistida de B; A sigue pendiente. |
+| Plan D5 | Administrador lee propuesta y evidencia, elige Conservar o Invalidar y confirma. | display | Observado dentro de los recorridos de éxito; no concede crédito cualificado a display. |
+| Bandeja y notificación D5 | B lee su aviso después de un GET 200 y render final; evento, sello, v2, título, enlace y secciones identifican exactamente la entrega. A no tiene ese aviso ni correo; puede tener otros avisos legítimos. | success | D5-F01/F02/F05/F06 en `d5-selective-invalidation.spec.ts`. Carga, error o invalidación ajena no sustituyen el resultado. |
+| Plan D5 | Si falla la confirmación, el plan permanece visible y se muestra el error. | failure | Brecha E2E heredada: no hay escenario Playwright cualificado `@outcome:failure`. Los regresores unitarios verifican respuestas antiguas y errores sin adjudicarse ese crédito. |
+| Plan D5 | Validación de elecciones del formulario. | error | n/a: cada fila pendiente tiene una elección válida preseleccionada. Los 400 del contrato se prueban en backend. |
+
+La navegación de D5-A04 cambia de ruta y desmonta el visor; el singleton store
+sigue vivo. La instancia React conservada se verifica por separado mediante
+rerender de A a B en `SealsPanel.test.tsx`. No se atribuye ese montaje al E2E.
+Ambos specs D5 llevan `@outcome:success`; las brechas display/failure siguen
+visibles. No se añade un flujo ni se cambian prioridades, outcomes o exenciones.
+
+Referencias de la unión: `sealStore.ts:67-189`, `SealsPanel.tsx:43-95`,
+`InvalidationReviewCard.tsx:23-95`, `d5-coordinator-confirmation.spec.ts:55-158`,
+`d5-selective-invalidation.spec.ts:12-67`, `SealsPanel.test.tsx:207-251`.
+Tags, autoría y esta tabla no acreditan ejecución. La QA final identifica el
+commit limpio servido y conserva los resultados originales fuera del mapa.
