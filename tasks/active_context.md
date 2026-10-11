@@ -3,7 +3,43 @@
 > Memory Bank core file: current focus, recent changes, next steps. Updated every session
 > that changes project state.
 
-**Last updated**: 2026-10-10
+**Last updated**: 2026-10-11
+
+## Cuarta ronda coordinada (2026-10-11) — alcance implementado
+
+Base remota congelada `master@36e7cafd534b24be82be0581b52d1de8e5d7bcf5`.
+Los seis diagnósticos se redujeron a tres causas con retorno demostrado:
+estado de sellos/plan D5 de otra versión, versión sin intención durable de
+análisis y falso positivo del inbox en el E2E D5. Mantenibilidad,
+observabilidad y QA tienen diez archivos exclusivos y commits separados.
+El orquestador sólo mantiene documentación, mapa, ledger local e integración.
+No se edita ni pushea el toolkit y no se toca el checkout de deploy.
+
+La creación de versión e intención comparte el atomic/lock existente antes de
+promover bytes; el dispatch exterior conserva eager y publicación tras commit.
+Un fallo al registrar el job conserva staging y bytes finales preexistentes.
+Las respuestas y refrescos de sellos/plan quedan asociados al UUID vigente,
+incluido el primer render del panel. D5, permisos y payloads no cambian.
+El E2E exige una lectura final válida del inbox y la identidad exacta del aviso,
+permitiendo notificaciones legítimas de otros documentos.
+
+Pruebas propias finales: observabilidad 34/34 Django/MySQL y mantenibilidad
+20/20 store + 14/14 panel; gates y lint reales exit 0. Los intentos fallidos
+originales se conservan. La auditoría exigió reemplazar inyecciones ORM/modelo por fallos de cursor SQL;
+el dueño corrigió sólo dos tests y reprodujo cinco fallos sobre archive verificado
+antes de pasar 34/34 nuevamente. El intento combinado anterior queda separado.
+El mapa D5 distingue navegación que desmonta el visor
+y prueba React con instancia conservada. Una sola QA sobre el commit limpio
+de la unión y el tren CI determinan el cierre efectivo; los PR y el archivo
+privado de evidencia registran ese veredicto sin alterar el SHA probado.
+Reporte: `docs/audits/2026-10-11-versiona-improvement-round-4.md`.
+
+Mailpit M1 queda pendiente por el cupo global, aunque supera el umbral. Timing
+E2E público, CSV Bearer, nombres largos, snapshots/historia/PDF y el callback
+de sellado requieren evidencia antes de intervenir. El rollback exterior tras
+promoción puede dejar objetos heredados; no se promete atomicidad DB/FS.
+Seguridad es madura sólo en las rutas revisadas; rendimiento y responsividad
+no justificaron cambios con la evidencia disponible.
 
 ## Ronda coordinada (2026-10-10) — QA aprobada
 
