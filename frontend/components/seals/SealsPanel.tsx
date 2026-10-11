@@ -6,7 +6,7 @@
  * coordinator's pending plan when the project runs in that mode.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { InvalidationReviewCard } from '@/components/seals/InvalidationReviewCard';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -40,24 +40,33 @@ interface SealsPanelProps {
 export function SealsPanel({ versionId, canConfirmPlan, currentUserEmail, onWithdraw }: SealsPanelProps) {
   const t = useDict('seals');
   const { toast } = useToast();
-  const seals = useSealStore((s) => s.seals);
-  const validityRecords = useSealStore((s) => s.validityRecords);
-  const pendingPlan = useSealStore((s) => s.pendingPlan);
+  const storedVersionId = useSealStore((s) => s.versionId);
+  const storedSeals = useSealStore((s) => s.seals);
+  const storedValidityRecords = useSealStore((s) => s.validityRecords);
+  const storedPendingPlan = useSealStore((s) => s.pendingPlan);
+  const ownsVersion = storedVersionId === versionId;
+  const seals = ownsVersion ? storedSeals : [];
+  const validityRecords = ownsVersion ? storedValidityRecords : [];
+  const pendingPlan = ownsVersion ? storedPendingPlan : [];
   const isLoading = useSealStore((s) => s.isLoading);
   const fetchSeals = useSealStore((s) => s.fetchSeals);
   const fetchPlan = useSealStore((s) => s.fetchPlan);
   const verifySeal = useSealStore((s) => s.verifySeal);
   const [verified, setVerified] = useState<Record<string, boolean>>({});
+  const verificationGeneration = useRef(0);
 
   useEffect(() => {
+    verificationGeneration.current += 1;
     void fetchSeals(versionId);
     void fetchPlan(versionId);
+    return () => { verificationGeneration.current += 1; };
   }, [versionId, fetchSeals, fetchPlan]);
 
   const verify = async (seal: SealSummary) => {
+    const generation = verificationGeneration.current;
     const result = await verifySeal(versionId, seal.public_id);
-    if (result) {
-      setVerified((current) => ({ ...current, [seal.public_id]: result.signature_valid }));
+    if (result && generation === verificationGeneration.current && useSealStore.getState().versionId === versionId) {
+      setVerified((current) => ({ ...current, [`${versionId}:${seal.public_id}`]: result.signature_valid }));
       toast(result.signature_valid ? t.signatureValid : t.signatureInvalid,
         result.signature_valid ? 'success' : 'error');
     }
@@ -69,8 +78,12 @@ export function SealsPanel({ versionId, canConfirmPlan, currentUserEmail, onWith
     return { variant, reason };
   };
 
-  if (isLoading && seals.length === 0) {
-    return <Skeleton className="h-40 w-full" data-testid="seals-loading" />;
+  if (!ownsVersion || (isLoading && seals.length === 0)) {
+    return (
+      <div data-testid="seals-loading">
+        <Skeleton className="h-40 w-full" />
+      </div>
+    );
   }
 
   return (
@@ -78,7 +91,7 @@ export function SealsPanel({ versionId, canConfirmPlan, currentUserEmail, onWith
       <h2 className="text-sm font-semibold text-muted-foreground">{t.title}</h2>
 
       {canConfirmPlan && pendingPlan.length > 0 ? (
-        <InvalidationReviewCard versionId={versionId} pending={pendingPlan} />
+        <InvalidationReviewCard key={versionId} versionId={versionId} pending={pendingPlan} />
       ) : null}
 
       {seals.length === 0 && validityRecords.length === 0 ? (
@@ -97,9 +110,9 @@ export function SealsPanel({ versionId, canConfirmPlan, currentUserEmail, onWith
             <StatusBadge variant={seal.is_active ? 'approved' : 'neutral'}>
               {seal.is_active ? t.validity.valid : t.validity.revoked}
             </StatusBadge>
-            {verified[seal.public_id] !== undefined ? (
-              <StatusBadge variant={verified[seal.public_id] ? 'approved' : 'failed'}>
-                Ed25519 {verified[seal.public_id] ? '✓' : '✗'}
+            {verified[`${versionId}:${seal.public_id}`] !== undefined ? (
+              <StatusBadge variant={verified[`${versionId}:${seal.public_id}`] ? 'approved' : 'failed'}>
+                Ed25519 {verified[`${versionId}:${seal.public_id}`] ? '✓' : '✗'}
               </StatusBadge>
             ) : null}
           </div>
