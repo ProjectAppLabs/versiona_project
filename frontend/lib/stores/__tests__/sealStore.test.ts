@@ -106,11 +106,11 @@ describe('sealStore', () => {
     mockPost.mockResolvedValueOnce({ data: { resolved: [] } });
     mockGet.mockResolvedValueOnce({ data: { seals: [], validity_records: [] } });
 
-    const ok = await useSealStore.getState().confirmPlan('v2', { s1: 'invalidated' });
+    const ok = await useSealStore.getState().confirmPlan('v2', { s2: 'invalidated' });
 
     expect(ok).toBe(true);
     expect(mockPost).toHaveBeenCalledWith('versions/v2/seal_plan/', {
-      decisions: { s1: 'invalidated' },
+      decisions: { s2: 'invalidated' },
     });
     expect(useSealStore.getState().pendingPlan).toEqual([]);
   });
