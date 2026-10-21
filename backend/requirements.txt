@@ -12,7 +12,7 @@
 # Seal signing (Ed25519)
 # Security pins (transitive deps con CVEs en versiones previas)
 # Task queue (Celery — broker and result backend on Redis)
-Django==6.0.5
+Django==6.0.8
 Faker==40.18.0
 PyMuPDF>=1.24,<2
 asgiref==3.11.1
@@ -24,7 +24,7 @@ django-cors-headers==4.9.0
 django-dbbackup>=4.0.0
 django-silk>=5.0.0
 djangorestframework-simplejwt==5.5.1
-djangorestframework==3.17.1
+djangorestframework==3.17.2
 factory-boy==3.3.3
 freezegun==1.5.5
 gunicorn>=23.0,<24.0
@@ -33,7 +33,7 @@ mysqlclient>=2.2.1,<3
 ocrmypdf==17.8.0
 pillow==13.0.0
 pygments>=2.20.0
-pyjwt>=2.12.1
+pyjwt>=2.15.0
 pyotp==2.10.0
 pytest-cov==7.1.0
 pytest-django==4.12.0
@@ -45,9 +45,10 @@ qrcode==8.2
 redis>=4.0.0
 reportlab>=4.2,<5
 requests==2.34.2
+certifi>=2026.10.19  # GHSA-6q48-6c7w-9gw2: drop the compromised emSign roots
 ruff==0.15.13
 six==1.17.0
 snowballstemmer>=2.2,<4
 sqlparse==0.5.5
 typing_extensions==4.15.0
-urllib3>=2.7.0
+urllib3>=2.8.0
