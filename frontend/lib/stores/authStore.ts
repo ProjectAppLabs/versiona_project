@@ -35,6 +35,12 @@ type AuthState = {
   resetPassword: (args: { email: string; code: string; new_password: string }) => Promise<void>;
 };
 
+// Bumped on every sign-out. restoreUser drops a validate_token answer that
+// lands after one: applied late, it would flip isAuthenticated back to true and
+// re-persist user_data for a user who already signed out, so the authenticated
+// header came back on /sign-in with no session cookie behind it.
+let sessionGeneration = 0;
+
 export const useAuthStore = create<AuthState>((set, get) => ({
   accessToken: getAccessToken(),
   refreshToken: getRefreshToken(),
@@ -136,6 +142,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   signOut: () => {
+    sessionGeneration += 1;
     clearGoogleLinkTicket();
     clearTokens();
     localStorage.removeItem('user_data');
@@ -145,9 +152,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   restoreUser: async () => {
     const token = getAccessToken();
     if (!token) return;
+    const generation = sessionGeneration;
 
     try {
       const response = await api.get('validate_token/');
+      if (generation !== sessionGeneration) return;
       const user = response.data?.user;
 
       if (user) {
@@ -155,6 +164,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         set({ user, isAuthenticated: true });
       }
     } catch {
+      if (generation !== sessionGeneration) return;
       clearTokens();
       localStorage.removeItem('user_data');
       set({ accessToken: null, refreshToken: null, user: null, isAuthenticated: false });
