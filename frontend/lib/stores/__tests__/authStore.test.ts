@@ -36,6 +36,26 @@ const resetAuthState = () => {
   });
 };
 
+// A request the test settles by hand, to order a response after a sign-out.
+const deferred = <T>() => {
+  let resolve!: (value: T) => void;
+  let reject!: (reason: unknown) => void;
+  const promise = new Promise<T>((onResolve, onReject) => {
+    resolve = onResolve;
+    reject = onReject;
+  });
+  return { promise, resolve, reject };
+};
+
+const RESTORED_USER = {
+  id: 7,
+  email: 'restore@example.com',
+  first_name: 'Restore',
+  last_name: 'User',
+  role: 'customer',
+  is_staff: false,
+};
+
 describe('authStore', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -327,6 +347,66 @@ describe('authStore', () => {
     expect(mockClearTokens).toHaveBeenCalledTimes(1);
     expect(useAuthStore.getState().user).toBeNull();
     expect(useAuthStore.getState().isAuthenticated).toBe(false);
+  });
+
+  it('stays signed out when validate_token answers after sign out', async () => {
+    mockGetAccessToken.mockReturnValue('access');
+    const validation = deferred<{ data: { user: typeof RESTORED_USER } }>();
+    mockApi.get.mockReturnValueOnce(validation.promise);
+    const restoring = useAuthStore.getState().restoreUser();
+    act(() => {
+      useAuthStore.getState().signOut();
+    });
+
+    validation.resolve({ data: { user: RESTORED_USER } });
+    await act(async () => {
+      await restoring;
+    });
+
+    expect(useAuthStore.getState().isAuthenticated).toBe(false);
+  });
+
+  it('keeps the signed-out user out of localStorage when validate_token answers after sign out', async () => {
+    mockGetAccessToken.mockReturnValue('access');
+    const validation = deferred<{ data: { user: typeof RESTORED_USER } }>();
+    mockApi.get.mockReturnValueOnce(validation.promise);
+    const restoring = useAuthStore.getState().restoreUser();
+    act(() => {
+      useAuthStore.getState().signOut();
+    });
+
+    validation.resolve({ data: { user: RESTORED_USER } });
+    await act(async () => {
+      await restoring;
+    });
+
+    expect(localStorage.getItem('user_data')).toBeNull();
+  });
+
+  it('keeps the next session when a stale validate_token fails after sign out', async () => {
+    mockGetAccessToken.mockReturnValue('stale-access');
+    const validation = deferred<never>();
+    mockApi.get.mockReturnValueOnce(validation.promise);
+    const restoring = useAuthStore.getState().restoreUser();
+    act(() => {
+      useAuthStore.getState().signOut();
+    });
+    mockGetAccessToken.mockReturnValue('next-access');
+    mockGetRefreshToken.mockReturnValue('next-refresh');
+    mockApi.post.mockResolvedValueOnce({
+      status: 200,
+      data: { access: 'next-access', refresh: 'next-refresh', user: RESTORED_USER },
+    });
+    await act(async () => {
+      await useAuthStore.getState().signIn({ email: 'restore@example.com', password: 'secret' });
+    });
+
+    validation.reject(new Error('stale session'));
+    await act(async () => {
+      await restoring;
+    });
+
+    expect(useAuthStore.getState().isAuthenticated).toBe(true);
   });
 
   it('keeps authentication unchanged when Google requires explicit linking', async () => {
