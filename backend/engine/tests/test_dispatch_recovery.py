@@ -58,6 +58,7 @@ def analysis_job_factory(versiona_context):
 def broker(monkeypatch, settings):
     """Simulate the broker publication boundary without network access."""
     settings.CELERY_TASK_ALWAYS_EAGER = False
+    tasks.run_analysis.app.conf.task_always_eager = False
     connection = MagicMock()
     connection.__enter__.return_value = connection
     producer = connection.Producer.return_value

@@ -24,6 +24,7 @@ TESTDATA = Path(__file__).resolve().parents[4] / 'testdata' / 'pdfs'
 def staged_upload(versiona_context, settings):
     """Store a deterministic PDF for an asynchronous upload."""
     settings.CELERY_TASK_ALWAYS_EAGER = False
+    tasks.run_analysis.app.conf.task_always_eager = False
     editor = versiona_context.users['editor']
     document = version_service.create_document(versiona_context.project, 'Contrato', editor)
     intent = version_service.create_upload_intent(document, editor)
