@@ -91,7 +91,7 @@ hay flag que los saltee:
    **terminá** sin tocar nada. El nombre del VPS correcto (`vps_work=`) sale de un
    comando simple más, con el `project` del registro:
    `bash ~/webapps/vps-ops-toolkit/scripts/maintenance/resolve-work-coordinate.sh --check <project literal>`
-   → reportá `tailscale ssh ryzepeck@<vps_work>`.
+   → reportá `bash ~/webapps/vps-ops-toolkit/scripts/vpn/cli.sh ssh ryzepeck@<vps_work>`.
 2. **Rama BASE** — `branch` igual a `default_branch`, `resolved_branch`,
    `registered_branch`, `deploy_branch` o `base`. Son ramas compartidas, jamás de una
    sesión: ❌ acá no se commitea, no se pushea y no se entrega nada. Cortá tu rama

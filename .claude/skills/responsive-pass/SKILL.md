@@ -473,7 +473,7 @@ en el ledger se hace después desde DEV. Lo mismo vale para `--record-qa`. Quié
 la sesión que condujo la pasada deja en su reporte final la ruta y el sha del reporte del host.
 Si hay un orquestador, éste le encarga el `--record` (y el `--record-qa`) a una sesión de DEV
 por su propio canal, nunca a través del operador; si no lo hay, el operador abre una sesión
-de DEV y lo corre ahí. La sesión de DEV lee el reporte del host por `tailscale ssh`, en sólo
+de DEV y lo corre ahí. La sesión de DEV lee el reporte del host por `bash ~/webapps/vps-ops-toolkit/scripts/vpn/cli.sh ssh`, en sólo
 lectura, verifica el sha antes de registrar y lo registra con su fragmento.
 
 1. **Reporte de la corrida** (Write, toolkit):

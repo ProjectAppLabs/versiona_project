@@ -88,7 +88,7 @@ La detección usa `resolve_server_alias` + `is_dev_machine` de `scripts/lib/boot
   ambos hosts y `vps-project-migration-data` en target
 - Cuenta OS locked `vps-integrity-dbtest` instalada para que un dump no pueda
   convertir un meta-comando MySQL `\!` en ejecución root
-- SSH alias funcional desde el host de invocación (Tailscale o `~/.ssh/config`)
+- SSH alias funcional desde el host de invocación (VPN o `~/.ssh/config`)
 
 **Pre-requisitos del diseño suspendido en projects.yml:**
 - El proyecto existe en `projects.yml` con `server: <origin>` correcto
@@ -190,7 +190,7 @@ Estos pasos son inventario de cierre. `migrate-project.sh` no entra hoy en ellos
 desde `--apply` ni `--cutover`; el guard termina antes de sourcear librerías o
 producir cualquiera de sus efectos.
 
-### Paso 1 — Preflight SSH/Tailscale + repo version check + integridad del origen
+### Paso 1 — Preflight SSH/VPN + repo version check + integridad del origen
 
 Verifica conectividad SSH a origin y target. Después chequea que ambos
 hosts tengan la versión del repo con `FORCE_SINGLE_PROJECT` implementado
@@ -245,7 +245,7 @@ Inmediatamente después fija el HEAD completo. Si el target está
 el comando exacto, password-bound y nunca `sudo -n`:
 
 ```bash
-tailscale ssh ryzepeck@<target>
+bash scripts/vpn/cli.sh ssh ryzepeck@<target>
 sudo /usr/local/sbin/vps-integrity initial-authorize <proyecto> \
   --type migrate --target-commit <FULL_SHA> --ttl 15m
 ```

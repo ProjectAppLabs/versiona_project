@@ -18,7 +18,7 @@ description: "Herramienta del OPERADOR (manual-only desde 2026-08-22): las sesio
 > - **`vps-ops-toolkit`** (commit directo a `master`, sin PR — ver "Git en este
 >   repo" en su CLAUDE.md) → **Path B (trunk flow)**: valida el verde localmente con
 >   los mismos checks del CI (`scripts/ci/*` + `bash -n` + shellcheck si está), y si
->   pasan hace commit + push a `master`, propaga al fleet vía Tailscale, y confirma
+>   pasan hace commit + push a `master`, propaga al fleet vía la VPN, y confirma
 >   el run de `validation-coverage` en master. `gh` es **opcional** acá.
 >
 > **Defaults de proyecto (Path A; override con flags):**
@@ -33,7 +33,7 @@ description: "Herramienta del OPERADOR (manual-only desde 2026-08-22): las sesio
 > **Defaults del toolkit (Path B; override con flags):**
 > - Green gate local ON: si un validador que corre da error, **frena** sin pushear.
 >   (`--no-verify` para saltarlo.)
-> - Propaga el commit al fleet vía Tailscale. (`--no-propagate` para no propagar.)
+> - Propaga el commit al fleet vía la VPN. (`--no-propagate` para no propagar.)
 > - Confirma el run de CI en master post-push si hay `gh`. (`--no-ci-watch` lo salta.)
 > - Los flags de proyecto (`--merge-method`, `--no-create-pr`, `--autonomous`,
 >   `--fix-nontest`, `--max-iterations`) son **no-ops** en el toolkit.
@@ -210,7 +210,7 @@ MERGE_ALLOWED=1
 # server: empiezan a saltarlo, y el commit aterriza en la rama equivocada).
 if [ "$HOST_ST" = "wrong-host" ]; then
     echo "⏭️  $REPO_NAME trabaja en $VPS_WORK, no en este host — abortando sin tocar nada."
-    echo "    Continuá allá:  tailscale ssh ryzepeck@$VPS_WORK"
+    echo "    Continuá allá:  bash ~/webapps/vps-ops-toolkit/scripts/vpn/cli.sh ssh ryzepeck@$VPS_WORK"
     exit 0
 fi
 
@@ -722,7 +722,7 @@ Capturá el SHA pusheado: `git rev-parse HEAD`.
 Con `PROPAGATE=1` (default) y sólo si T2 hizo un commit real **y** el push tuvo
 éxito: sincronizá la copia del toolkit en los otros hosts del fleet (otros VPS + dev
 si está prendida) con el commit recién pusheado, corriendo el core de `git-sync` en
-cada host remoto vía Tailscale.
+cada host remoto vía la VPN.
 
 ```bash
 if [ "$(basename "$(git rev-parse --show-toplevel)")" != "vps-ops-toolkit" ]; then
@@ -732,13 +732,14 @@ else
 fi
 ```
 
-- **Exit code `75`** (Tailscale pide autorización interactiva): el script imprimió un
-  link `https://login.tailscale.com/...`. **Mostrale el link tal cual al operador**,
-  pedile que lo abra y autorice con la cuenta del fleet, esperá su confirmación, y
+- **Exit code `75`** (la VPN pide autorización interactiva): seguí $vpn-connect.
+  El operador corre el comando del runbook de canales (el README junto a `config/*/expected-nodes.yml`)
+  en su propia terminal y abre el enlace en su navegador, sin pegarlo en ningún
+  lado. Esperá su confirmación y
   **re-ejecutá el mismo comando** (idempotente). Repetí hasta que el exit deje de ser
   `75`. Una autorización habilita TODOS los VPS de la ventana de re-auth. NO caigas a
-  `ssh` directo, NO abortes, NO asumas que un VPS está caído (ver CLAUDE.md "Flujo de
-  auth de Tailscale SSH").
+  `ssh` directo, NO abortes, NO asumas que un VPS está caído (ver el runbook de canales, §Flujo de
+  auth).
 - Reportá por host: `SYNCED <sha>` (actualizado) / `CONFLICT_NEEDS_MANUAL_SYNC`
   (divergencia real; quedó con el working tree intacto → requiere `git-sync` manual;
   no bloquea el commit ya hecho) / `UNREACHABLE` (dev apagada / VPS caído; warning,
@@ -953,7 +954,7 @@ sólo por el que notificó y dejá los demás listados como "en vuelo".
   está `completed`/mergeado (confirmalo con UN `gh run view <id> --json status`
   ANTES de matar) o duplica un watcher del mismo objeto. Matar con `TaskStop`.
 - **Intocable:** cualquier shell sin el prefijo o fuera del ledger de la sesión —
-  dev servers de `dev-up`, `tailscale up`, tasks del operador, otras sesiones.
+  dev servers de `dev-up`, `bash ~/webapps/vps-ops-toolkit/scripts/vpn/cli.sh up`, tasks del operador, otras sesiones.
   Fuente: tu propio contexto/ledger, **jamás `ps`**. En duda: reportar, no matar.
 - **Orden fijo — sweep ANTES de mount:** el watcher nuevo aún no existe
   (imposible matarlo por error) y el trabajo recién hecho es lo que invalidó los
@@ -1043,7 +1044,7 @@ Reemplazá ✅ por ⚠️/❌/⏸️ según corresponda y agregá `## Next steps
 - **`release_merge` stale** (nombra una rama sin PR abierto) → next step con la
   limpieza del campo (el `awk` de Phase 5) o su corrección en projects.yml.
 - **Host equivocado** (`host_status=wrong-host`) → `⏭️ merge-when-green — N/A`,
-  fila `Coordenada` en ⏭️ y next step `tailscale ssh ryzepeck@<vps_work>`.
+  fila `Coordenada` en ⏭️ y next step `bash ~/webapps/vps-ops-toolkit/scripts/vpn/cli.sh ssh ryzepeck@<vps_work>`.
 - **Coordenada no resoluble** → fila `Coordenada` en ℹ️ diciendo que el guard de
   release no pudo evaluarse; nunca omitir la fila.
 - Fix loop que pausó por código de prod → ⏸️ + el cambio a aprobar.
@@ -1098,6 +1099,6 @@ mergeados: N · release-hold: N · ya en base: N · sin cambios: N · wrong-host
 ```
 
 `## Next steps` sólo con lo accionable: los `failed:*`, los `release-hold` que ya
-estén listos para lanzar, y los `wrong-host` con el `tailscale ssh` de destino. Los
+estén listos para lanzar, y los `wrong-host` con el `bash ~/webapps/vps-ops-toolkit/scripts/vpn/cli.sh ssh` de destino. Los
 `skipped:ya-en-base` **no** van a Next steps: la fila ya nombra la rama obsoleta y
 borrarla es decisión del operador, repo por repo.
