@@ -593,7 +593,7 @@ Report:
 local(es) quedaron sincronizados (Phases 1-7): así el fleet se alinea contra un
 local ya sano.
 
-Delega en el orquestador multi-host, que conecta por Tailscale y corre el core
+Delega en el orquestador multi-host, que conecta por la VPN y corre el core
 no-interactivo en cada VPS remoto (+ la dev si está online):
 
 El flag de repos es literal: `--repos=toolkit` sin `--all-repos`, `--repos=all` con
@@ -606,10 +606,11 @@ bash ~/webapps/vps-ops-toolkit/scripts/maintenance/propagate-toolkit-commit.sh -
 bash ~/webapps/vps-ops-toolkit/scripts/maintenance/propagate-toolkit-commit.sh --apply --repos=toolkit
 ```
 
-**Sentinel `exit 75` = pausa de auth de Tailscale**, NO es un fallo: el script
-imprime el link de login. Mostráselo al operador tal cual, esperá a que autorice
-(una sola autorización habilita todos los VPS) y **re-corré el mismo comando** —
-es idempotente.
+**Sentinel `exit 75` = pausa de auth de la VPN**, NO es un fallo: seguí
+[[vpn-connect]]. El operador corre el comando del runbook de canales (el README junto a `config/*/expected-nodes.yml`)
+en su propia terminal y abre el enlace en su navegador, sin pegarlo. Esperá su
+confirmación (una autorización habilita todos los VPS) y **re-corré el mismo
+comando** — es idempotente.
 
 **Precondición**: para que el fleet reciba tus commits, el local debe estar
 **pusheado**. Si `git status -sb` muestra `ahead`, avisá: los hosts remotos se
@@ -645,7 +646,7 @@ Tras el reporte, si la sesión es interactiva y NO hubo flags explícitos
 | Opción (label) | description (costo/efecto) | preview (comando exacto) |
 |---|---|---|
 | --all-repos (este host) | rebasa LOCAL_PROJECTS + toolkit de ESTE host | `/git-sync --all-repos` |
-| --all-vps (toolkit en el fleet) | core no-interactivo en cada VPS vía Tailscale; conflicto ⇒ abort + reporte | `/git-sync --all-vps` |
+| --all-vps (toolkit en el fleet) | core no-interactivo en cada VPS vía la VPN; conflicto ⇒ abort + reporte | `/git-sync --all-vps` |
 | Ambos ejes | toolkit + LOCAL_PROJECTS de cada host del fleet | `/git-sync --all-repos --all-vps` |
 | Drop de stash OBSOLETO/VIEJO | SÓLO los que ESTE run clasificó así, uno por uno y con su evidencia | `git stash drop stash@{N}` |
 

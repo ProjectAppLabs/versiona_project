@@ -302,7 +302,7 @@ git worktree list --porcelain | sed -n 's/^worktree //p'
 | `rama-actual-sucia` | `CURRENT` con tree sucio | advisory "posible sesión activa" — excluida de auto-ejecución, jamás se ofrece |
 
 `host_status=wrong-host` ⇒ el **repo entero** se salta (⏭️ con el
-`tailscale ssh ryzepeck@<vps_work>` de destino), igual que merge-when-green.
+`bash ~/webapps/vps-ops-toolkit/scripts/vpn/cli.sh ssh ryzepeck@<vps_work>` de destino), igual que merge-when-green.
 
 ## Phase 2 — Estrategia + tabla del plan + LA única pregunta
 
@@ -675,8 +675,9 @@ frenan un merge ni degradan una fila ya mergeada.
 if [ -f "$HOME/webapps/vps-ops-toolkit/scripts/integrity/fleet-integrity-status.sh" ]; then bash "$HOME/webapps/vps-ops-toolkit/scripts/integrity/fleet-integrity-status.sh"; elif [ -x /usr/local/sbin/vps-integrity ]; then sudo -n /usr/local/sbin/vps-integrity status --line; else echo "ℹ️ vps-integrity no instalado — sin eco de integridad"; fi
 ```
 
-La vista de fleet resuelve sola local vs `tailscale ssh`; su **exit 75** es la
-pausa de auth de Tailscale, no un error: mostrale el link al operador y seguí.
+La vista de fleet resuelve sola local vs `bash ~/webapps/vps-ops-toolkit/scripts/vpn/cli.sh ssh`; su **exit 75** es la
+pausa de auth de la VPN, no un error: seguí $vpn-connect para que el operador
+la complete en su propia terminal y abra el enlace en su navegador, sin pegarlo.
 Va como UNA línea bajo el tablero (`Integridad: drift=<n> · críticos=<n> · <VPS>`
 o `Integridad: ⏭️ motor no instalado`), nunca como columna ni como veredicto.
 

@@ -305,8 +305,7 @@ Run `basename "$(git rev-parse --show-toplevel)"`:
 4. **Land on the resolved coordinate.** `resolved_branch` from the preflight is
    the BASE; the commit lands on a `qa/<fecha>-<slug>` session branch whose PR
    targets it (Phase 7). `host_status=wrong-host` blocks **authoring/landing** — STOP before
-   writing anything; the work lives in another VPS clone (use its `tailscale
-   ssh`). The dry-run analysis (Phases 0–2) MAY proceed on the wrong host,
+   writing anything; the work lives in another VPS clone (use its `bash ~/webapps/vps-ops-toolkit/scripts/vpn/cli.sh ssh`). The dry-run analysis (Phases 0–2) MAY proceed on the wrong host,
    flagged ⚠️ and declared in the verdict.
 5. **Never merge.** Stop at "committed on the work branch". Merging is
    `$merge-queue` (operator); `$merge-when-green` is operator-only. A release
@@ -662,11 +661,12 @@ Hard guardrails (all always ON):
 
 ## Fleet mode (analysis-only)
 
-`$qa --all-repos` (this host) or `$qa --all-vps` (fleet via tailscale) call
+`$qa --all-repos` (this host) or `$qa --all-vps` (fleet por la VPN) call
 `qa-agent.sh` in fleet mode: gate + flow-audit + per-project verdict + per-host
 report. **No authoring** — subagents run where Claude runs, and there is no Claude
-on a VPS. Authoring is always local + single-project. On a tailscale auth pause
-(exit 75) show the login link and re-run.
+on a VPS. Authoring is always local + single-project. Ante una pausa de auth de la VPN
+(exit 75), seguí $vpn-connect: el operador autoriza en su terminal y abre el enlace
+en su navegador, sin pegarlo; después re-corré.
 
 **Pilot clones (authoring a repo whose work clone lives on another VPS):** clone
 into a NON-COLLIDING path (`<name>_pilot`, never the fleet dir name — the fleet
@@ -681,7 +681,7 @@ the session branch inside it is fine; the rule "never checkout a fleet main
 clone" stays intact.
 
 **Remote-verify (running the touched tests on the VPS work clone via
-`tailscale ssh`):** the substrate lives there (venv, DB, node_modules, browsers).
+`bash ~/webapps/vps-ops-toolkit/scripts/vpn/cli.sh ssh`):** the substrate lives there (venv, DB, node_modules, browsers).
 Node is under nvm with an interactive-only guard — non-interactive SSH (even
 `bash -lc`) cannot see `npx`; prefix the absolute path:
 `export PATH="$HOME/.nvm/versions/node/v22.22.2/bin:$PATH"`. This is the CI
@@ -739,7 +739,7 @@ Casos de veredicto:
 - 🔴 errores de CONTENIDO del gate, o un test (nuevo o existente) falla.
 - 🚫 REFUSED — intento de commit en `wrong-host`. Nombrar el VPS correcto.
 - ⏭️ abstención (sin infra de tests / nada que QA-ear).
-- ⏸️ release-hold, auth-pendiente de tailscale, o app no corriendo que requiere al
+- ⏸️ release-hold, auth-pendiente de la VPN, o app no corriendo que requiere al
   operador.
 
 En modo fleet, anteponer una columna `Host`/`Proyecto` y, si hay >15 filas, un

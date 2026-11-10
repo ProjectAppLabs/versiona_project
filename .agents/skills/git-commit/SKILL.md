@@ -1,6 +1,6 @@
 ---
 name: "git-commit"
-description: "Inspect git changes, generate a professional commit message with FEAT/FIX/DOCS prefix, and execute git add + commit + push. Defaults to the current repo (cwd). Cuando el repo del cwd es vps-ops-toolkit, tras un push exitoso propaga el commit al resto del fleet (otros VPS + dev si está prendida) vía Tailscale (ON por defecto, --no-propagate para saltar); un repo de proyecto nunca se propaga. Pass --all-repos to iterate over LOCAL_PROJECTS + toolkit on this host. git-commit NO tiene modo fleet: --all-vps y --all son error (no se commitea a ciegas en clones de otros VPS); para el eje fleet usar $git-sync --all-vps."
+description: "Inspect git changes, generate a professional commit message with FEAT/FIX/DOCS prefix, and execute git add + commit + push. Defaults to the current repo (cwd). Cuando el repo del cwd es vps-ops-toolkit, tras un push exitoso propaga el commit al resto del fleet (otros VPS + dev si está prendida) vía la VPN (ON por defecto, --no-propagate para saltar); un repo de proyecto nunca se propaga. Pass --all-repos to iterate over LOCAL_PROJECTS + toolkit on this host. git-commit NO tiene modo fleet: --all-vps y --all son error (no se commitea a ciegas en clones de otros VPS); para el eje fleet usar $git-sync --all-vps."
 ---
 
 > **⚠️ How to invoke**:
@@ -21,7 +21,7 @@ description: "Inspect git changes, generate a professional commit message with F
 >   el multi-repo-local es `--all-repos`. `--all` sigue funcionando como **alias
 >   deprecado** de `--all-repos` (con warning).
 > - Con `--no-propagate`: salta la propagación del toolkit al fleet (útil
->   offline / sin Tailscale). Combinable con `--all-repos`.
+>   offline / sin VPN). Combinable con `--all-repos`.
 > - **Mientras rija la metodología de Integrity** (CLAUDE.md, «Integridad del
 >   fleet»): siempre `--no-propagate`. La propagación sale de DEV y sólo como
 >   parte del setup de esa misma generación en cada host (R26, L051). Desde T+2,
@@ -42,7 +42,7 @@ description: "Inspect git changes, generate a professional commit message with F
 > **Propagación al fleet (ON por defecto, sólo cuando el repo es
 > `vps-ops-toolkit`):** tras commit+push exitoso del toolkit, este skill corre
 > la **Phase 2** que sincroniza la copia del repo en los otros entornos (otros
-> VPS del fleet + dev machine si está prendida) vía Tailscale SSH. Si el repo
+> VPS del fleet + dev machine si está prendida) vía la SSH por la VPN. Si el repo
 > del cwd es un proyecto (no el toolkit), o los repos de proyecto del modo
 > `--all`, **NO se propagan** (viven en un solo VPS cada uno).
 
@@ -60,7 +60,7 @@ nunca en fleet/headless/cron.
 |---|---|---|
 | Repo actual (Recommended) | commit + push del repo del cwd; si es el toolkit, propaga al fleet al final | `$git-commit` |
 | Todos los repos de este host | un commit por repo dirty (LOCAL_PROJECTS + toolkit), mensaje propio por repo | `$git-commit --all-repos` |
-| Repo actual sin propagar | commit + push sin sincronizar el toolkit al fleet (offline / sin Tailscale) | `$git-commit --no-propagate` |
+| Repo actual sin propagar | commit + push sin sincronizar el toolkit al fleet (offline / sin VPN) | `$git-commit --no-propagate` |
 
 **Qué NO se pregunta:** `--all-vps` y `--all` (error-by-design: no se commitea
 a ciegas en clones de otros VPS — el eje fleet es `$git-sync --all-vps`).
@@ -82,7 +82,7 @@ a ciegas en clones de otros VPS — el eje fleet es `$git-sync --all-vps`).
 |---|---|
 | (ninguno) | el repo del cwd; propagación al fleet ON si es `vps-ops-toolkit` |
 | `--all-repos` | itera `LOCAL_PROJECTS` + toolkit de ESTE host (sólo desde el toolkit) |
-| `--no-propagate` | no sincroniza el toolkit al fleet (offline / sin Tailscale). Combinable |
+| `--no-propagate` | no sincroniza el toolkit al fleet (offline / sin VPN). Combinable |
 | `--all-vps` | **ERROR**: git-commit NO tiene modo fleet — no se commitea a ciegas en clones de otros VPS (pueden estar dirty o en una release, y el mensaje se redactaría sobre diffs que nunca viste). ¿Los repos de ESTE host? → `--all-repos` · ¿Sincronizar el toolkit en el fleet? → ya ocurre solo tras el push (o `$git-sync --all-vps`) · ¿Rebasar todo el fleet? → `$git-sync --all-repos --all-vps` |
 | `--all` | **ERROR**: ambiguo y retirado. ¿Todos los repos de ESTE host? → `--all-repos` |
 | cualquier otro | **ERROR**: argumento desconocido |
@@ -250,7 +250,7 @@ Output rules:
 
 Esta fase sincroniza la copia de **`vps-ops-toolkit`** en los otros entornos del
 fleet (los otros VPS + la dev machine **si está prendida**) con el SHA exacto
-que acabás de pushear, vía Tailscale SSH. Un host sólo avanza si está en
+que acabás de pushear, vía la SSH por la VPN. Un host sólo avanza si está en
 `master`, limpio y su HEAD es ancestro del target; el cambio es `--ff-only`,
 sin `checkout`, `rebase`, `autostash` ni hooks Git. El resultado `SYNCED` se
 publica únicamente después de reconciliar además el user-level completo
@@ -295,16 +295,16 @@ se revierte por una falla de propagación.
    ```
    Si el toplevel es otro repo: `⏭️ Repo no-toolkit (<repo>) — sin propagación al
    fleet.` y **no corras** los comandos de SHA/propagación.
-2. **Si el exit code es `75`** (Tailscale pide autorización interactiva): el
-   script ya imprimió un link `https://login.tailscale.com/...`. **Mostrale el
-   link tal cual al operador**, pedile que lo abra y autorice con la cuenta del
-   fleet, y **esperá su confirmación**. Luego **re-ejecutá el mismo comando**
+2. **Si el exit code es `75`** (la VPN pide autorización interactiva): seguí
+   $vpn-connect. El operador corre el comando del runbook de canales (el README junto a `config/*/expected-nodes.yml`)
+   en su propia terminal y abre el enlace en su navegador, sin pegarlo en ningún
+   lado. **Esperá su confirmación**. Luego **re-ejecutá el mismo comando**
    (es idempotente; los hosts ya sincronizados reportan al instante). Repetí
    hasta que el exit code deje de ser `75`. Una sola autorización habilita TODOS
    los VPS de la ventana de re-auth.
    - **NO** caigas a `ssh` directo, **NO** abortes, **NO** asumas que un VPS
-     está caído. Es el flujo normal de auth de Tailscale (ver CLAUDE.md
-     "Flujo de auth de Tailscale SSH").
+     está caído. Es el flujo normal de auth de la VPN (ver el runbook de
+     canales, §Flujo de auth).
 3. Reportá el resumen por host del script:
    - `SYNCED <sha-completo>` + `TOOLKIT_EXECSET_STRICT_CURRENT` → **generación
      integral y exec-set estricto**: Git exacto, user-level y Codex/MCP listos.
@@ -349,7 +349,7 @@ Tras el reporte, si la sesión es interactiva y NO hubo flags explícitos
 | Opción (label) | description (costo/efecto) | preview (comando exacto) |
 |---|---|---|
 | --all-repos | un commit por cada repo dirty de ESTE host (mensaje propio por repo) | `$git-commit --all-repos` |
-| Re-run sin propagar | commit+push sin sincronizar el toolkit al fleet (offline / sin Tailscale) | `$git-commit --no-propagate` |
+| Re-run sin propagar | commit+push sin sincronizar el toolkit al fleet (offline / sin VPN) | `$git-commit --no-propagate` |
 | Dejar el PR en verde (sin merge) | *repo de proyecto*: espera el CI del PR de TU rama y corre el fix loop; no mergea | `$pr-green` |
 | Green gate + propagación | *toolkit*: Path B (green gate local + push a master + fleet) — **operador** | `$merge-when-green` |
 
@@ -360,7 +360,7 @@ commitea a ciegas en clones de otros VPS) — el eje fleet es `$git-sync --all-v
 
 Reportar siguiendo $output-protocol. Plantilla específica de esta skill:
 
-🟢 git-commit OK   (🟡 si el push quedó pendiente o un host requiere sync manual; ⏸️ si Tailscale pide auth (exit 75); ⏭️ si no había cambios)
+🟢 git-commit OK   (🟡 si el push quedó pendiente o un host requiere sync manual; ⏸️ si la VPN pide auth (exit 75); ⏭️ si no había cambios)
 
 | Dimensión | Estado | Detalle |
 |---|---|---|

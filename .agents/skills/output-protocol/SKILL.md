@@ -209,18 +209,18 @@ de drift.
 | Dimensión | Estado | Detalle |
 |---|---|---|
 | setup-dev-machine | ✅ | git alias, prompt, statusline OK |
-| tailscale install/enable | ✅ | tailscaled enabled, versión 1.78.1 |
-| tailscale auth | ⏸️ | requiere `sudo tailscale up --ssh` (browser OAuth) |
+| Cliente y demonio de la VPN | ✅ | `bash scripts/vpn/bootstrap-fleet.sh --check`: habilitado, versión 1.78.1 |
+| Auth de la VPN | ⏸️ | operador: up del runbook de canales en su terminal y OAuth en su navegador, sin pegar el enlace |
 | add-self registry | ⏭️ | depende de auth previa |
 | ssh-fleet backup | ⏭️ | flag --include-ssh no pasado |
-| ssh-fleet-check | ⚠️ | 1 VPS no responde Tailscale (vps-gym) |
+| ssh-fleet-check | ⚠️ | 1 VPS no responde por la VPN (vps-gym) |
 
 ## Next steps
-- `sudo tailscale up --ssh` — completar OAuth en browser de la dev
+- El operador corre el `up` del runbook de canales (el README junto a `config/*/expected-nodes.yml`) en su propia terminal y abre el enlace en su navegador, sin pegarlo.
 - `bash scripts/bootstrap/init-fleet.sh --apply` — re-correr tras auth
-- (admin console) Disable key expiry para esta dev en https://login.tailscale.com/admin/machines
+- (admin console) Disable key expiry para esta dev en la consola de administración de la VPN (su URL está en el runbook de canales)
 
-📊 Avance ▰▰▰▰▰▰▰▱▱▱ 70 % — falta: OAuth de Tailscale y re-correr init-fleet
+📊 Avance ▰▰▰▰▰▰▰▱▱▱ 70 % — falta: OAuth de la VPN y re-correr init-fleet
 ```
 
 ## Cómo referenciar este protocolo desde una skill
